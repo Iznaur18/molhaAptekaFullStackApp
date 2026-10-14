@@ -17,6 +17,7 @@ import {
   LazyPartnerProgramPage,
   LazyAdvertisingPage,
   LazyOneCIntegrationPage,
+  LazyDealRequestsPage,
   LazyDeliveryPaymentPage,
   LazySafeDealPage,
   LazySafeDealModerationPage,
@@ -149,6 +150,8 @@ export function renderProfileTabPanel(mainView, props) {
       );
     case "delivery-payment":
       return <LazyDeliveryPaymentPage />;
+    case "deal-requests":
+      return <LazyDealRequestsPage />;
     case "safe-deal":
       return <LazySafeDealPage />;
     case "edit-profile":

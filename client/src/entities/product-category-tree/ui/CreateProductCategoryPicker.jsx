@@ -19,6 +19,7 @@ import "./CreateProductCategoryPicker.css";
  * @property {string} categoryBreadcrumbRu
  * @property {import('../../product/model/types.js').ProductCategory} productCategory
  * @property {string[]} [defaultCharacteristicKeys]
+ * @property {"goods" | "viewing" | "service"} [dealType]
  */
 
 /**
@@ -123,6 +124,7 @@ function ProductCategoryTreePicker({ value, onChange, disabled = false }) {
         defaultCharacteristicKeys: Array.isArray(node.defaultCharacteristicKeys)
           ? node.defaultCharacteristicKeys.map(String)
           : [],
+        dealType: node.dealType,
       });
       setPickerOpen(false);
       setTrail([]);

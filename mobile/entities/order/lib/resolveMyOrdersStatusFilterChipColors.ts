@@ -1,4 +1,3 @@
-import type { OrderStatus } from "@/entities/order/model/constants";
 import { semanticColors } from "@/shared/theme/semanticColors";
 
 /** Паритет с web `MyOrdersPage.css` status chip active colors. */
@@ -21,7 +20,8 @@ export const resolveMyOrdersStatusFilterChipActiveColors = (
     };
   }
 
-  const key = status as OrderStatus;
+  // Свой цвет на сайте есть только у пяти исходных статусов, остальные — общий.
+  const key = status as keyof typeof MY_ORDERS_STATUS_FILTER_CHIP_COLORS;
   const color =
     MY_ORDERS_STATUS_FILTER_CHIP_COLORS[key] ??
     MY_ORDERS_STATUS_FILTER_CHIP_COLORS.defaultActive;

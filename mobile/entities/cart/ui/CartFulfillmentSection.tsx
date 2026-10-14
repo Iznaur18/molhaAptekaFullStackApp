@@ -23,6 +23,10 @@ type CartCheckoutSummary = {
 
 type CartFulfillmentSectionProps = {
   title: string;
+  /** Предупреждение над товарами: например, их везут разные службы. */
+  note?: string | null;
+  /** Что известно о цене доставки до оформления; пусто — строки нет. */
+  deliveryHint?: string;
   lines: CartLine[];
   selectedCount: number;
   areAllSelected: boolean;
@@ -38,6 +42,8 @@ type CartFulfillmentSectionProps = {
 
 export const CartFulfillmentSection = ({
   title,
+  note = null,
+  deliveryHint = "",
   lines,
   selectedCount,
   areAllSelected,
@@ -67,6 +73,7 @@ export const CartFulfillmentSection = ({
       <View style={styles.header}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.hint}>{CART_PAGE_UI.SECTION_FULFILLMENT_HINT}</Text>
+        {note ? <Text style={styles.note}>{note}</Text> : null}
       </View>
 
       <CartSelectAllRow
@@ -134,6 +141,14 @@ export const CartFulfillmentSection = ({
                     formatPriceRub(summary.selectedWholesaleDiscount),
                   )}
                 </Text>
+              </View>
+            ) : null}
+            {deliveryHint ? (
+              <View style={styles.totalRow}>
+                <Text style={styles.discountLabel}>
+                  {CART_PAGE_UI.DELIVERY_FEE_LABEL}
+                </Text>
+                <Text style={styles.deliveryFeeValue}>{deliveryHint}</Text>
               </View>
             ) : null}
             {showDeliveryFeeNote ? (

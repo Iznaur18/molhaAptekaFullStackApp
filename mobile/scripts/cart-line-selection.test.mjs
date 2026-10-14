@@ -80,7 +80,7 @@ test("cart totals follow the selection", () => {
 
   assert.match(
     cartScreen,
-    /canCheckoutActive = activeSummary\.selectedLines\.length > 0/,
+    /canCheckoutActive =\s+activeSummary\.selectedLines\.length > 0/,
   );
   assert.match(fulfillment, /formatPriceRub\(summary\.selectedTotal\)/);
   assert.doesNotMatch(cartScreen, /displayTotal/);

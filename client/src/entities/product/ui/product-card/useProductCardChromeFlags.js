@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { SHOW_ADD_TO_CART_ON_CATALOG_CARD } from "../../lib/catalogCardPurchasePolicy.js";
 import { resolveProductPurchaseButtonState } from "../../lib/resolveProductPurchaseButtonState.js";
 import { isProductOutOfStock } from "../../lib/isProductOutOfStock.js";
-import { isProductSellerClosedNow } from "@molha/api-contract";
+import { isCartDealType, isProductSellerClosedNow } from "@molha/api-contract";
 import { isProductRaffleParticipant } from "../../../raffle/lib/isProductRaffleParticipant.js";
 import { resolveAuctionUiState } from "../../lib/resolveAuctionUiState.js";
 import { shouldShowPremiumProductCardChrome } from "../../lib/isPremiumSellerProduct.js";
@@ -104,14 +104,20 @@ export function useProductCardChromeFlags(props, currentUserId) {
         })
       : null;
   const showAddToCartButton = purchaseButtonState?.hasPurchaseButton === true;
+  // Авто, недвижимость, услуги: на месте «В корзину» — кнопка заявки, иначе
+  // карточка внизу пустая и ниже соседних товаров.
+  const showDealButton =
+    purchaseButtonState != null &&
+    !purchaseButtonState.showOwnProductPurchaseButton &&
+    !isCartDealType(product.productDealType);
+  const showPurchaseSlot = showAddToCartButton || showDealButton;
 
   const hasSellerToolbar = onDeleteProduct != null;
   const showFooterActions =
     (isModerationQueue && props.moderationActions != null) ||
     (!showBannerLayout && hasSellerToolbar) ||
-    (showAddToCartButton && !showBannerLayout);
-  const showBannerActions =
-    showBannerLayout && (showAddToCartButton || hasSellerToolbar);
+    (showPurchaseSlot && !showBannerLayout);
+  const showBannerActions = showBannerLayout && (showPurchaseSlot || hasSellerToolbar);
 
   const cardClassName = useMemo(
     () =>
@@ -177,6 +183,7 @@ export function useProductCardChromeFlags(props, currentUserId) {
     showImageOverlayBadges,
     showWishlistToggle,
     showAddToCartButton,
+    showDealButton,
     purchaseButtonState,
     showFooterActions,
     showBannerActions,

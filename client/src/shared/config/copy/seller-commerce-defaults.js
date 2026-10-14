@@ -57,6 +57,10 @@ export const SELLER_COMMERCE_DEFAULTS_UI = {
 /** Переключатель «как в профиле / свои настройки» в форме товара. */
 export const PRODUCT_FULFILLMENT_SOURCE_UI = {
   LEGEND: "Адрес и доставка",
+  // Объявление без корзины берёт из профиля только адрес — про доставку молчим.
+  LEGEND_ADDRESS_ONLY: "Адрес",
+  PROFILE_HINT_ADDRESS_ONLY:
+    "Адрес берётся из профиля. Поменяете там — изменится и здесь.",
   OPTION_PROFILE: "Как в профиле",
   OPTION_CUSTOM: "Задать для этого товара",
   PROFILE_HINT:

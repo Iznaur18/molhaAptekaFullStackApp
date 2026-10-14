@@ -735,6 +735,35 @@ export const useCheckoutPaymentMethodPickerStyles = createThemedStyles((theme) =
   cardLabelSelected: {
     color: theme.colors.text,
   },
+  // Web: `.checkout-payment-method-picker__card--locked` — пунктир без заливки.
+  cardLocked: {
+    backgroundColor: "transparent",
+    borderColor: theme.colors.border,
+    borderStyle: "dashed",
+    opacity: 0.7,
+  },
+  cardLockReason: {
+    marginTop: 2,
+    fontSize: 11,
+    lineHeight: 13,
+    fontWeight: "500",
+    textAlign: "center",
+    color: theme.colors.textMuted,
+  },
+  // Web: `.checkout-payment-method-picker__single` — один способ строкой.
+  single: {
+    alignSelf: "flex-start",
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderWidth: 1.5,
+    borderColor: theme.colors.action,
+    borderRadius: 12,
+    backgroundColor: theme.colors.actionSoft,
+    color: theme.colors.text,
+    fontSize: 14,
+    fontWeight: "600",
+    overflow: "hidden",
+  },
 }));
 
 export const useAddressSuggestStyles = createThemedStyles((theme) => ({
@@ -964,5 +993,174 @@ export const useAuthGateStyles = createThemedStyles((theme) => ({
     color: theme.colors.textMuted,
     textAlign: "center",
     marginBottom: theme.spacing[4],
+  },
+}));
+
+/** Паритет с web `CheckoutSellerDeliveryCost.css`: цена доставки по тарифу продавца. */
+export const useCheckoutSellerDeliveryCostStyles = createThemedStyles((theme) => ({
+  root: {
+    gap: 6,
+    marginTop: theme.spacing[2],
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 12,
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  legend: {
+    flexShrink: 1,
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.colors.textSecondary,
+  },
+  value: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: theme.colors.text,
+    fontVariant: ["tabular-nums"],
+  },
+  hint: {
+    fontSize: 12.5,
+    lineHeight: 17,
+    color: theme.colors.textMuted,
+  },
+  hintError: {
+    color: theme.colors.danger,
+  },
+  totals: {
+    gap: 4,
+    marginTop: 4,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+  },
+  totalRow: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  totalRowSum: {
+    marginTop: 4,
+  },
+  totalLabel: {
+    fontSize: 13.5,
+    color: theme.colors.textSecondary,
+  },
+  totalValue: {
+    fontSize: 13.5,
+    color: theme.colors.text,
+    fontVariant: ["tabular-nums"],
+  },
+  totalSumLabel: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: theme.colors.text,
+  },
+  totalSumValue: {
+    fontSize: 16,
+    fontWeight: "800",
+    color: theme.colors.text,
+    fontVariant: ["tabular-nums"],
+  },
+  attribution: {
+    fontSize: 11,
+    lineHeight: 14,
+    color: theme.colors.textMuted,
+  },
+}));
+
+/** Паритет с web `CdekPickupPointPicker.css`: город, тариф, пункт, получатель. */
+export const useCdekPickupPointPickerStyles = createThemedStyles((theme) => ({
+  root: {
+    gap: 12,
+    marginTop: theme.spacing[2],
+  },
+  field: {
+    gap: 6,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.colors.textSecondary,
+  },
+  input: {
+    minHeight: 46,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 12,
+    backgroundColor: theme.colors.surface,
+    color: theme.colors.text,
+    fontSize: 16,
+  },
+  findButton: {
+    minHeight: 46,
+    paddingHorizontal: 16,
+    paddingVertical: 11,
+    borderRadius: 12,
+    backgroundColor: theme.colors.action,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  findButtonText: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: theme.colors.onContrast,
+  },
+  disabled: {
+    opacity: 0.55,
+  },
+  options: {
+    gap: 8,
+  },
+  option: {
+    gap: 2,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 12,
+    backgroundColor: theme.colors.surface,
+  },
+  optionActive: {
+    borderWidth: 2,
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.actionSoft,
+  },
+  optionTitle: {
+    fontSize: 14,
+    lineHeight: 19,
+    fontWeight: "600",
+    color: theme.colors.text,
+  },
+  optionMeta: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: theme.colors.textSecondary,
+  },
+  price: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: theme.colors.text,
+    fontVariant: ["tabular-nums"],
+  },
+  hint: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: theme.colors.textMuted,
+  },
+  error: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: theme.colors.danger,
   },
 }));

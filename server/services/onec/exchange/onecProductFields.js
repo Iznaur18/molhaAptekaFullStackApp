@@ -76,6 +76,7 @@ export function buildOneCProductCommonFields({
     product1cGroupId: item.groupIds?.[0] ?? null,
     productCategory: categoryWrite.productCategory,
     productCategoryId: categoryWrite.productCategoryId,
+    productDealType: categoryWrite.productDealType,
     categoryPathIds: categoryWrite.categoryPathIds,
     categoryBreadcrumbRu: categoryWrite.categoryBreadcrumbRu,
     productSearchBlob: searchBlob,

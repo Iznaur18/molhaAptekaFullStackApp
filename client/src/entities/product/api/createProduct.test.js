@@ -127,4 +127,43 @@ describe("createProduct: тело запроса", () => {
     expect(payload.productDeliveryEnabled).toBe(false);
     expect(payload.productCourierDeliveryEnabled).toBe(false);
   });
+  it("условия сделки доезжают до сервера, а у обычного товара их нет", async () => {
+    await createProduct({
+      ...PICKUP_BODY,
+      productFulfillmentSource: "profile",
+      productServicePriceMode: "from",
+      productServicePriceUnit: "hour",
+      productServiceLocations: ["at_client", "online"],
+    });
+
+    const payload = sentPayload();
+    // Белый список уже однажды терял выбор перевозчика — и эти поля терял тоже.
+    expect(payload.productServicePriceMode).toBe("from");
+    expect(payload.productServicePriceUnit).toBe("hour");
+    expect(payload.productServiceLocations).toEqual(["at_client", "online"]);
+    expect(payload).not.toHaveProperty("productViewingSchedule");
+
+    postMock.mockClear();
+    await createProduct({ ...PICKUP_BODY, productFulfillmentSource: "profile" });
+    expect(sentPayload()).not.toHaveProperty("productServicePriceMode");
+  });
+
+  it("вес и габариты доезжают до сервера, «не знаю» — как null", async () => {
+    await createProduct({
+      ...PICKUP_BODY,
+      productFulfillmentSource: "profile",
+      productWeightG: 1200,
+      productLengthCm: 30,
+      productWidthCm: null,
+      productHeightCm: null,
+    });
+
+    const payload = sentPayload();
+    // Раньше белый список их выкидывал, и доставка считала товар средней
+    // коробкой, хотя продавец указал вес и размеры.
+    expect(payload.productWeightG).toBe(1200);
+    expect(payload.productLengthCm).toBe(30);
+    expect(payload.productWidthCm).toBeNull();
+    expect(payload.productHeightCm).toBeNull();
+  });
 });

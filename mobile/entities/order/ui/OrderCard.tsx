@@ -37,6 +37,7 @@ import {
   resolveSellerOrderCollapsedPreview,
 } from "@/entities/order/lib/orderNeedsSellerAttention";
 import { resolveOrderLineItemName } from "@/entities/order/lib/resolveOrderLineItemName";
+import { resolveOrderShipmentActions } from "@/entities/order/lib/resolveOrderShipmentActions";
 import { resolveOrderStatusBadgeStyle } from "@/entities/order/lib/resolveOrderStatusBadgeStyle";
 import { resolveOrderStatusLabelRu } from "@/entities/order/lib/resolveOrderStatusLabelRu";
 import {
@@ -50,7 +51,6 @@ import {
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_DELIVERED,
   ORDER_STATUS_PENDING,
-  ORDER_STATUS_SHIPPED,
   type OrderPaymentMethod,
 } from "@/entities/order/model/constants";
 import {
@@ -84,6 +84,11 @@ type OrderCardOrder = {
   totalAmount?: number;
   deliveryAddress?: string;
   paymentMethod?: string;
+  /** Когда прошла предоплата по СБП; пусто — заказ ещё ждёт денег. */
+  prepaidPaidAt?: unknown;
+  /** Срок оплаты: ставит сервер, когда продавец подтвердил заказ. */
+  prepaymentDueAt?: unknown;
+  fulfillmentMethod?: string;
   createdAt?: string;
   shippingProvider?: string | null;
   shippingTrackingNumber?: string | null;
@@ -150,6 +155,13 @@ type OrderCardProps = {
   onCancelItem?: (ctx: OrderItemActionContext) => void | Promise<void>;
   onMarkShipped?: (ctx: OrderItemActionContext) => void | Promise<void>;
   onMarkDelivered?: (ctx: OrderItemActionContext) => void | Promise<void>;
+  /** Продавец двигает отправление на следующую ступень сборки. */
+  onAdvanceShipment?: (ctx: {
+    orderId: string;
+    nextStatus: string;
+  }) => void | Promise<void>;
+  /** Покупатель оплачивает заказ с предоплатой по СБП. */
+  onPayOrder?: (ctx: { orderId: string }) => void | Promise<void>;
   pendingActionKey?: string | null;
   itemActionErrors?: Record<string, string>;
   collapsible?: boolean;
@@ -161,6 +173,25 @@ type OrderCardProps = {
 
 const formatPayment = (method?: string) =>
   ORDER_PAYMENT_METHOD_LABEL_RU[method as OrderPaymentMethod] ?? method ?? "—";
+
+/** «4 октября, 15:30» — срок оплаты по СБП во времени устройства покупателя. */
+const formatPrepaymentDue = (value: string | null): string => {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return new Intl.DateTimeFormat("ru-RU", {
+    day: "numeric",
+    month: "long",
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+    .format(date)
+    .replace(" в ", ", ");
+};
+
+/** Ключ действия над отправлением целиком — рядом с ключами позиций. */
+export const orderShipmentActionKey = (orderId: string, action: "advance" | "pay") =>
+  `${orderId}:${action}`;
 
 const formatLoyaltyPoints = (value: unknown) => Math.floor(Number(value) || 0);
 
@@ -330,6 +361,8 @@ export const OrderCard = ({
   onCancelItem,
   onMarkShipped,
   onMarkDelivered,
+  onAdvanceShipment,
+  onPayOrder,
   pendingActionKey = null,
   itemActionErrors = {},
   collapsible = false,
@@ -358,6 +391,47 @@ export const OrderCard = ({
   const toggleExpanded = () => {
     onExpandedChange?.(!expanded);
   };
+
+  // Кнопки отправления целиком — не у каждой позиции: продавец собирает
+  // свой кусок заказа, а не строку за строкой.
+  const shipment = resolveOrderShipmentActions(order, attentionRole);
+  const advanceKey = orderShipmentActionKey(order._id, "advance");
+  const payKey = orderShipmentActionKey(order._id, "pay");
+  const isItemPending = (itemIndex: number) =>
+    pendingActionKey === `${order._id}:${itemIndex}`;
+  const shipmentAdvance = onAdvanceShipment ? shipment.advance : null;
+  const shipItemIndexes = onMarkShipped ? shipment.shipItemIndexes : [];
+  const deliverItemIndexes = onMarkDelivered ? shipment.deliverItemIndexes : [];
+  const handOverItemIndexes = onMarkDelivered ? shipment.handOverItemIndexes : [];
+  const isAdvancePending = pendingActionKey === advanceKey;
+  const isShipPending = shipItemIndexes.some(isItemPending);
+  const isDeliverPending = deliverItemIndexes.some(isItemPending);
+  const isHandOverPending = handOverItemIndexes.some(isItemPending);
+  const isShipmentBusy =
+    isAdvancePending || isShipPending || isDeliverPending || isHandOverPending;
+  // Ошибка отгрузки или выдачи привязана к позиции и показывается у неё.
+  const shipmentActionError = itemActionErrors[advanceKey] ?? "";
+  const hasShipmentActions =
+    Boolean(shipmentAdvance) ||
+    shipItemIndexes.length > 0 ||
+    deliverItemIndexes.length > 0 ||
+    handOverItemIndexes.length > 0;
+  const runForItems = async (
+    itemIndexes: number[],
+    action?: (ctx: OrderItemActionContext) => void | Promise<void>,
+  ) => {
+    for (const itemIndex of itemIndexes) {
+      await action?.({ orderId: order._id, itemIndex });
+    }
+  };
+
+  const isPayPending = pendingActionKey === payKey;
+  const payError = itemActionErrors[payKey] ?? "";
+  const prepaymentDueText = formatPrepaymentDue(shipment.prepaymentDueAt);
+  const canPayNow =
+    shipment.awaitingPaymentAfterAccept &&
+    attentionRole === "buyer" &&
+    Boolean(onPayOrder);
 
   const renderLineItemSecondary = (
     item: unknown,
@@ -450,10 +524,6 @@ export const OrderCard = ({
     const canCancel = source.status === ORDER_STATUS_PENDING && Boolean(onCancelItem);
     const canConfirm =
       source.status === ORDER_STATUS_DELIVERED && Boolean(onConfirmDelivered);
-    const canMarkShipped =
-      source.status === ORDER_STATUS_PENDING && Boolean(onMarkShipped);
-    const canMarkDelivered =
-      source.status === ORDER_STATUS_SHIPPED && Boolean(onMarkDelivered);
     const key = source._id ?? `item-${index}`;
     const productName = resolveOrderLineItemName(item);
     const isProductClickable =
@@ -474,11 +544,9 @@ export const OrderCard = ({
     // В компактной карточке статус строки не печатается, поэтому отменённую
     // позицию видно только по метке.
     const isCancelled = source.status === ORDER_STATUS_CANCELLED;
-    const hasItemActions =
-      (canMarkShipped && (onMarkShipped || onCancelItem)) ||
-      (canMarkDelivered && onMarkDelivered) ||
-      canConfirm ||
-      (canCancel && !onMarkShipped);
+    // «Отгрузить», «Доставлен» и ступени сборки — в строке отправления ниже:
+    // у позиции остаются только отмена и подтверждение получения.
+    const hasItemActions = canConfirm || canCancel;
 
     return (
       <View
@@ -585,59 +653,7 @@ export const OrderCard = ({
 
         {hasItemActions || actionError ? (
           <View style={styles.itemActionsRow}>
-            {canMarkShipped && (onMarkShipped || onCancelItem) ? (
-              <>
-                {onCancelItem ? (
-                  <Pressable
-                    style={[
-                      styles.actionButton,
-                      styles.actionButtonCancel,
-                      isActionPending && styles.actionDisabled,
-                    ]}
-                    onPress={() => onCancelItem({ orderId: order._id, itemIndex })}
-                    disabled={isActionPending}
-                  >
-                    <Text
-                      style={[styles.actionButtonText, styles.actionButtonTextCancel]}
-                    >
-                      {isActionPending
-                        ? ORDER_CARD_UI.ACTION_PENDING
-                        : ORDER_CARD_UI.ACTION_CANCEL}
-                    </Text>
-                  </Pressable>
-                ) : null}
-                {onMarkShipped ? (
-                  <Pressable
-                    style={[
-                      styles.actionButton,
-                      isActionPending && styles.actionDisabled,
-                    ]}
-                    onPress={() => onMarkShipped({ orderId: order._id, itemIndex })}
-                    disabled={isActionPending}
-                  >
-                    <Text style={styles.actionButtonText}>
-                      {isActionPending
-                        ? ORDER_CARD_UI.ACTION_PENDING
-                        : ORDER_CARD_UI.ACTION_SHIPPED}
-                    </Text>
-                  </Pressable>
-                ) : null}
-              </>
-            ) : null}
-            {canMarkDelivered && onMarkDelivered ? (
-              <Pressable
-                style={[styles.actionButton, isActionPending && styles.actionDisabled]}
-                onPress={() => onMarkDelivered({ orderId: order._id, itemIndex })}
-                disabled={isActionPending}
-              >
-                <Text style={styles.actionButtonText}>
-                  {isActionPending
-                    ? ORDER_CARD_UI.ACTION_PENDING
-                    : ORDER_CARD_UI.ACTION_DELIVERED}
-                </Text>
-              </Pressable>
-            ) : null}
-            {canConfirm || (canCancel && !onMarkShipped) ? (
+            {canConfirm || canCancel ? (
               <>
                 {canCancel ? (
                   <Pressable
@@ -746,6 +762,116 @@ export const OrderCard = ({
           <View style={styles.itemsList}>
             {items.map((item, index) => renderLineItem(item, index))}
           </View>
+
+          {hasShipmentActions || shipmentActionError ? (
+            <View style={styles.itemActionsRow}>
+              {shipmentAdvance ? (
+                <Pressable
+                  style={[styles.actionButton, isShipmentBusy && styles.actionDisabled]}
+                  onPress={() =>
+                    onAdvanceShipment?.({
+                      orderId: order._id,
+                      nextStatus: shipmentAdvance.nextStatus,
+                    })
+                  }
+                  disabled={isShipmentBusy}
+                >
+                  <Text style={styles.actionButtonText}>
+                    {isAdvancePending
+                      ? ORDER_CARD_UI.ACTION_PENDING
+                      : shipmentAdvance.label}
+                  </Text>
+                </Pressable>
+              ) : null}
+              {shipItemIndexes.length > 0 ? (
+                <Pressable
+                  style={[styles.actionButton, isShipmentBusy && styles.actionDisabled]}
+                  onPress={() => void runForItems(shipItemIndexes, onMarkShipped)}
+                  disabled={isShipmentBusy}
+                >
+                  <Text style={styles.actionButtonText}>
+                    {isShipPending
+                      ? ORDER_CARD_UI.ACTION_PENDING
+                      : ORDER_CARD_UI.ACTION_SHIPPED}
+                  </Text>
+                </Pressable>
+              ) : null}
+              {deliverItemIndexes.length > 0 ? (
+                <Pressable
+                  style={[styles.actionButton, isShipmentBusy && styles.actionDisabled]}
+                  onPress={() => void runForItems(deliverItemIndexes, onMarkDelivered)}
+                  disabled={isShipmentBusy}
+                >
+                  <Text style={styles.actionButtonText}>
+                    {isDeliverPending
+                      ? ORDER_CARD_UI.ACTION_PENDING
+                      : ORDER_CARD_UI.ACTION_DELIVERED}
+                  </Text>
+                </Pressable>
+              ) : null}
+              {handOverItemIndexes.length > 0 ? (
+                <Pressable
+                  style={[styles.actionButton, isShipmentBusy && styles.actionDisabled]}
+                  onPress={() => void runForItems(handOverItemIndexes, onMarkDelivered)}
+                  disabled={isShipmentBusy}
+                >
+                  <Text style={styles.actionButtonText}>
+                    {isHandOverPending
+                      ? ORDER_CARD_UI.ACTION_PENDING
+                      : ORDER_CARD_UI.ACTION_HANDED_TO_BUYER}
+                  </Text>
+                </Pressable>
+              ) : null}
+              {shipmentActionError ? (
+                <Text style={styles.itemError}>{shipmentActionError}</Text>
+              ) : null}
+            </View>
+          ) : null}
+
+          {shipment.awaitingPrepayment ? (
+            <View style={styles.awaitingPrepayment}>
+              <Text style={styles.awaitingPrepaymentTitle}>
+                {shipment.awaitingSellerAccept
+                  ? ORDER_CARD_UI.AWAITING_ACCEPT
+                  : ORDER_CARD_UI.AWAITING_PREPAYMENT}
+              </Text>
+              <Text style={styles.awaitingPrepaymentHint}>
+                {shipment.awaitingSellerAccept
+                  ? attentionRole === "seller"
+                    ? ORDER_CARD_UI.AWAITING_ACCEPT_SELLER_HINT
+                    : ORDER_CARD_UI.AWAITING_ACCEPT_BUYER_HINT
+                  : attentionRole === "seller"
+                    ? ORDER_CARD_UI.AWAITING_PREPAYMENT_SELLER_HINT
+                    : ORDER_CARD_UI.AWAITING_PREPAYMENT_BUYER_HINT}
+              </Text>
+              {shipment.awaitingPaymentAfterAccept &&
+              attentionRole === "buyer" &&
+              prepaymentDueText ? (
+                <Text style={styles.prepaymentDue}>
+                  {ORDER_CARD_UI.PREPAYMENT_DUE(prepaymentDueText)}
+                </Text>
+              ) : null}
+              {canPayNow ? (
+                <Pressable
+                  style={[styles.payNowButton, isPayPending && styles.actionDisabled]}
+                  onPress={() => onPayOrder?.({ orderId: order._id })}
+                  disabled={isPayPending}
+                  accessibilityRole="button"
+                >
+                  <Text style={styles.payNowButtonText}>
+                    {isPayPending
+                      ? ORDER_CARD_UI.PAY_NOW_PENDING
+                      : shipment.prepaymentAmountRub > 0
+                        ? ORDER_CARD_UI.PAY_NOW_AMOUNT(
+                            formatPriceRub(shipment.prepaymentAmountRub),
+                          )
+                        : ORDER_CARD_UI.PAY_NOW}
+                  </Text>
+                </Pressable>
+              ) : null}
+              {payError ? <Text style={styles.itemError}>{payError}</Text> : null}
+            </View>
+          ) : null}
 
           {compact ? (
             <View style={styles.detailsFold}>

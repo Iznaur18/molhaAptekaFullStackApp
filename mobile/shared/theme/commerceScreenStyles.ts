@@ -252,6 +252,54 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     fontSize: 12,
     color: theme.colors.danger,
   },
+  // Web: `.order-card__awaiting-prepayment`.
+  awaitingPrepayment: {
+    marginTop: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.warning,
+    borderRadius: 12,
+    backgroundColor: theme.colors.warningSurface,
+    gap: 6,
+  },
+  awaitingPrepaymentTitle: {
+    fontSize: 13.6,
+    lineHeight: 20,
+    fontWeight: "700",
+    color: theme.colors.warningText,
+  },
+  awaitingPrepaymentHint: {
+    fontSize: 13.6,
+    lineHeight: 20,
+    color: theme.colors.warningText,
+  },
+  // Web: `.order-card__prepayment-due`.
+  prepaymentDue: {
+    fontSize: 13.6,
+    lineHeight: 20,
+    fontWeight: "700",
+    color: theme.colors.warningText,
+  },
+  // Web: `.order-card__pay-now`.
+  payNowButton: {
+    alignSelf: "stretch",
+    minHeight: 46,
+    marginTop: 6,
+    paddingVertical: 11,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    backgroundColor: theme.colors.action,
+    alignItems: "center",
+    justifyContent: "center",
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+  },
+  payNowButtonText: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: theme.colors.onContrast,
+    textAlign: "center",
+  },
   metaRow: {
     flexDirection: "row",
     flexWrap: "wrap",

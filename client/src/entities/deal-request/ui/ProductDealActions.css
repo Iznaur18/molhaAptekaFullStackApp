@@ -1,0 +1,144 @@
+.product-deal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+/* Нижняя панель на телефоне: кнопки той же высоты, что «В корзину». */
+.product-deal-actions_dock {
+  gap: 0.35rem;
+}
+
+.product-deal-actions_dock .product-deal-actions__row {
+  flex-wrap: nowrap;
+}
+
+.product-deal-actions_dock .product-deal-actions__button {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 3rem;
+  padding: 0.75rem 0.6rem;
+  border-radius: 1.25rem;
+  corner-shape: squircle;
+  font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Телефон: иконка трубки, рядом текст — только под ценой на компьютере. */
+.product-deal-actions__phone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+/* Нижняя панель: квадратная кнопка с одной иконкой. */
+.product-deal-actions_dock .product-deal-actions__phone_icon-only {
+  flex: 0 0 3rem;
+  width: 3rem;
+  padding: 0;
+}
+
+/* Карточка в ленте: та же геометрия, что у «В корзину» (.add-to-cart). */
+.product-deal-actions_card {
+  gap: 0.3rem;
+}
+
+.product-deal-actions_card .product-deal-actions__button {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  padding: 0.45rem 1rem;
+  border-radius: 1rem;
+  corner-shape: squircle;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.product-deal-actions__terms {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0;
+}
+
+.product-deal-actions__terms dt {
+  font-size: 0.8125rem;
+  color: var(--iz-color-text-muted);
+}
+
+.product-deal-actions__terms dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.product-deal-actions__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.product-deal-actions__button {
+  flex: 1 1 11rem;
+  justify-content: center;
+  text-align: center;
+  text-decoration: none;
+}
+
+.product-deal-actions__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.9rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 1rem;
+  background: var(--iz-color-surface);
+}
+
+.product-deal-actions__form-title,
+.product-deal-actions__sent-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--iz-color-text);
+}
+
+.product-deal-actions__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.875rem;
+  color: var(--iz-color-text-secondary);
+}
+
+.product-deal-actions__field input,
+.product-deal-actions__field textarea {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.75rem;
+  background: var(--iz-color-bg);
+  color: var(--iz-color-text);
+  /* 16px: меньше — iOS приближает страницу при фокусе. */
+  font: inherit;
+  font-size: 1rem;
+}
+
+.product-deal-actions__field textarea {
+  resize: vertical;
+}
+
+.product-deal-actions__hint {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--iz-color-text-muted);
+}
+
+.product-deal-actions__error {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--iz-color-danger-text);
+}

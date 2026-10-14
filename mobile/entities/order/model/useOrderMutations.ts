@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import {
+  advanceShipmentStatus,
   confirmOrderItem,
   markOrderItemCancelled,
   markOrderItemDelivered,
@@ -47,6 +48,12 @@ export const useOrderMutations = () => {
     onSuccess: invalidateSales,
   });
 
+  const advanceShipmentMutation = useMutation({
+    mutationFn: ({ orderId, nextStatus }: { orderId: string; nextStatus: string }) =>
+      advanceShipmentStatus(orderId, nextStatus),
+    onSuccess: invalidateSales,
+  });
+
   const updateStatusMutation = useMutation({
     mutationFn: ({ orderId, status }: { orderId: string; status: string }) =>
       updateOrderStatus(orderId, status),
@@ -57,6 +64,7 @@ export const useOrderMutations = () => {
     cancelItemMutation,
     shipItemMutation,
     deliverItemMutation,
+    advanceShipmentMutation,
     updateStatusMutation,
   };
 };

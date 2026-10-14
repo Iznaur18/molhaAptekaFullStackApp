@@ -1,0 +1,171 @@
+/**
+ * Лист снизу — анимация как у окна полок (AssignProductToSellerShelfModal).
+ */
+.deal-request-sheet__backdrop {
+  --deal-sheet-enter-ms: 280ms;
+  --deal-sheet-exit-ms: 220ms;
+  --deal-sheet-enter-ease: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --deal-sheet-exit-ease: cubic-bezier(0.55, 0.055, 0.675, 1);
+  --deal-sheet-radius: 2rem;
+
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overscroll-behavior: none;
+}
+
+.deal-request-sheet__scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--iz-color-ink) 55%, transparent);
+  opacity: 0;
+  transition: opacity var(--deal-sheet-exit-ms) var(--deal-sheet-exit-ease);
+}
+
+.deal-request-sheet__backdrop--open .deal-request-sheet__scrim {
+  opacity: 1;
+  transition: opacity var(--deal-sheet-enter-ms) var(--deal-sheet-enter-ease);
+}
+
+.deal-request-sheet__dismiss {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.deal-request-sheet__panel {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 32rem;
+  max-height: min(88dvh, 100%);
+  border-radius: var(--deal-sheet-radius) var(--deal-sheet-radius) 0 0;
+  corner-shape: squircle;
+  background: var(--iz-color-surface);
+  box-shadow: 0 -12px 40px color-mix(in srgb, var(--iz-color-ink) 18%, transparent);
+  overflow: hidden;
+  transform: translate3d(0, 100%, 0);
+  transition: transform var(--deal-sheet-exit-ms) var(--deal-sheet-exit-ease);
+  will-change: transform;
+}
+
+.deal-request-sheet__backdrop--open .deal-request-sheet__panel {
+  transform: translate3d(0, 0, 0);
+  transition: transform var(--deal-sheet-enter-ms) var(--deal-sheet-enter-ease);
+}
+
+.deal-request-sheet__grabber {
+  align-self: center;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 0.3rem;
+  margin-top: 0.6rem;
+  border-radius: 999px;
+  background: var(--iz-color-border-strong);
+}
+
+.deal-request-sheet__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  min-height: 0;
+  overflow: auto;
+  padding: 0.75rem 1.1rem calc(1.1rem + env(safe-area-inset-bottom, 0px));
+  color: var(--iz-color-text);
+}
+
+.deal-request-sheet__title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.deal-request-sheet__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.875rem;
+  color: var(--iz-color-text-secondary);
+}
+
+.deal-request-sheet__field input,
+.deal-request-sheet__field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.85rem;
+  background: var(--iz-color-bg);
+  color: var(--iz-color-text);
+  /* 16px: меньше — iOS приближает страницу при фокусе. */
+  font: inherit;
+  font-size: 1rem;
+}
+
+.deal-request-sheet__field textarea {
+  resize: vertical;
+}
+
+/* Дата и время рядом, поровну. */
+.deal-request-sheet__when {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 0.6rem;
+}
+
+.deal-request-sheet__field input[type="date"],
+.deal-request-sheet__field input[type="time"] {
+  min-height: 3rem;
+  appearance: none;
+  -webkit-appearance: none;
+  /* iOS центрирует текст даты и игнорирует ширину без этого. */
+  display: flex;
+  align-items: center;
+  text-align: left;
+}
+
+.deal-request-sheet__field input::-webkit-date-and-time-value {
+  text-align: left;
+}
+
+.deal-request-sheet__title:focus {
+  outline: none;
+}
+
+.deal-request-sheet__hint {
+  margin: 0;
+  color: var(--iz-color-text-muted);
+}
+
+.deal-request-sheet__error {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--iz-color-danger-text);
+}
+
+.deal-request-sheet__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.deal-request-sheet__button {
+  flex: 1 1 0;
+  min-height: 3rem;
+  justify-content: center;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 1.25rem;
+  corner-shape: squircle;
+}

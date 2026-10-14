@@ -1,3 +1,4 @@
+import { isCartDealType } from "@molha/api-contract";
 import { useState } from "react";
 
 import { PRODUCT_DETAILS_PAGE_SPLIT_MIN_PX } from "../lib/productDetailsPageLayoutConstants.js";
@@ -5,6 +6,7 @@ import { useAppShellCompactLayout } from "../../../shared/lib/useAppShellCompact
 import { useMaxWidthMediaQuery } from "../../../shared/lib/useMaxWidthMediaQuery.js";
 import { useSwipeRightToDismiss } from "../../../shared/lib/useSwipeRightToDismiss.js";
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
+import { ProductDealActions } from "../../deal-request/ui/ProductDealActions.jsx";
 import { ProductDetailsModalDetailsTab } from "./product-details-modal/ProductDetailsModalDetailsTab.jsx";
 import { ProductDetailsModalPinnedGallery } from "./product-details-modal/ProductDetailsModalPinnedGallery.jsx";
 import { ProductDetailsModalPurchaseActions } from "./product-details-modal/ProductDetailsModalPurchaseActions.jsx";
@@ -125,8 +127,37 @@ export function ProductDetailsModal({
     ctrl.detailsTab === "auction" &&
     !ctrl.isSellerView &&
     ctrl.auctionUi.auctionActive;
+  // Авто, недвижимость, услуги: в панели вместо «В корзину» — заявка и телефон.
+  const showMobileDealDock =
+    isMobileNav &&
+    !showMobilePurchaseDock &&
+    ctrl.detailsTab === "details" &&
+    ctrl.showPriceBlock &&
+    !ctrl.showOwnProductPurchaseButton &&
+    !isCartDealType(product.productDealType);
   const showMobileDock =
-    showMobilePurchaseDock || showMobileInstallmentDock || showMobileAuctionDock;
+    showMobilePurchaseDock ||
+    showMobileDealDock ||
+    showMobileInstallmentDock ||
+    showMobileAuctionDock;
+  const mobileDealDock = showMobileDealDock ? (
+    <ProductDetailsModalPurchaseActions
+      productId={String(product._id)}
+      isAuthorized={isAuthorized}
+      onRequestLogin={onRequestLogin}
+      canShowAddToCart={false}
+      onBack={onClose}
+      className="product-details-modal__price-actions--mobile-dock"
+    >
+      <ProductDealActions
+        product={product}
+        isAuthorized={isAuthorized}
+        isOwnProduct={false}
+        onRequestLogin={onRequestLogin}
+        variant="dock"
+      />
+    </ProductDetailsModalPurchaseActions>
+  ) : null;
   const mobilePurchaseDock = showMobilePurchaseDock ? (
     <ProductDetailsModalPurchaseActions
       productId={String(product._id)}
@@ -145,7 +176,9 @@ export function ProductDetailsModal({
       onBack={onClose}
       className="product-details-modal__price-actions--mobile-dock"
     />
-  ) : null;
+  ) : (
+    mobileDealDock
+  );
   const hasDesktopFooter = !isMobileNav && (secondaryFooter || adminFooter);
   const modalFooter = hasDesktopFooter ? (
     <div className="product-details-modal__footer-actions">

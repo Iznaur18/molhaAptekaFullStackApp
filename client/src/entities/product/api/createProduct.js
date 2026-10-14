@@ -5,7 +5,15 @@ import { formatApiErrorMessage } from "@izibuy/shared-lib";
 import {
   PRODUCT_FULFILLMENT_SOURCE_CUSTOM,
   PRODUCT_FULFILLMENT_SOURCE_PROFILE,
+  productDealTermsFieldsShape,
+  productShippingFieldsShape,
 } from "@molha/api-contract";
+
+/** Списки берутся из контракта: новое поле в этих группах попадёт сюда само. */
+const PASSTHROUGH_FIELDS = [
+  ...Object.keys(productDealTermsFieldsShape),
+  ...Object.keys(productShippingFieldsShape),
+];
 
 /** @typedef {import('@molha/api-contract/types').CreateProductBodyContract} CreateProductBody */
 
@@ -117,6 +125,15 @@ export async function createProduct(body) {
         payload.productReturnEnabled && Array.isArray(body.productReturnTerms)
           ? body.productReturnTerms
           : [];
+    }
+    // Условия сделки и вес с габаритами. Тело собирается по белому списку, и
+    // без этих строк выбор продавца молча терялся: объявление создавалось с
+    // ценой «точная», без мест оказания и без веса — доставка считала его
+    // средней коробкой, хотя продавец всё заполнил.
+    for (const field of PASSTHROUGH_FIELDS) {
+      if (body[field] !== undefined) {
+        payload[field] = body[field];
+      }
     }
     const legacy = body.productImageUrl?.trim();
     if (legacy && urls.length === 0) {

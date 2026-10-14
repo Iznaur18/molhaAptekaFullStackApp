@@ -1,3 +1,8 @@
+import {
+  CATEGORY_DEAL_TYPE_DEFAULT,
+  normalizeCategoryDealType,
+} from "@molha/api-contract";
+
 import ProductCategoryModel from "../../models/ProductCategoryModel.js";
 import { PRODUCT_CATEGORY_VALUES } from "../../constants/productConstants.js";
 import { UNCATEGORIZED_PRODUCT_CATEGORY_SLUG } from "../../constants/productCategoryTreeConstants.js";
@@ -12,6 +17,7 @@ const uncategorizedProductCategoryWrite = () => ({
   categoryPathIds: [],
   categoryBreadcrumbRu: "",
   productCategory: UNCATEGORIZED_PRODUCT_CATEGORY_SLUG,
+  productDealType: CATEGORY_DEAL_TYPE_DEFAULT,
   categorySearchKeywords: [],
   categoryPathLabelRu: [],
 });
@@ -111,6 +117,7 @@ export const resolveProductCategoryWriteFromId = async (categoryId) => {
     categoryPathIds: pathIds,
     categoryBreadcrumbRu,
     productCategory,
+    productDealType: normalizeCategoryDealType(leaf.effectiveDealType),
     categorySearchKeywords: Array.isArray(leaf.searchKeywords)
       ? leaf.searchKeywords
       : [],
@@ -186,6 +193,7 @@ export const resolveProductCategoryWriteFromLegacySlugOnly = async (legacySlug) 
     categoryPathIds: [],
     categoryBreadcrumbRu: "",
     productCategory,
+    productDealType: CATEGORY_DEAL_TYPE_DEFAULT,
     categorySearchKeywords: [],
     categoryPathLabelRu: [],
   };

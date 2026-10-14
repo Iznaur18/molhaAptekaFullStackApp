@@ -44,6 +44,7 @@ export const MY_PROFILE_PAGE_UI = {
   TAB_MY_PRODUCTS: "Мои товары",
   TAB_MY_SALES: "Мои продажи",
   TAB_MY_ORDERS: "Мои покупки",
+  TAB_DEAL_REQUESTS: "Заявки",
   TAB_AUCTION: "Аукцион",
   /** @param {number} count */
   TAB_BADGE: (count) => (count > 99 ? "99+" : String(count)),

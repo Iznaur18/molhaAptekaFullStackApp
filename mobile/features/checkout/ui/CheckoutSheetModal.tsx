@@ -10,11 +10,20 @@ import {
   View,
 } from "react-native";
 import Animated from "react-native-reanimated";
+import type {
+  CartSellerDelivery,
+  CdekOrderSelection,
+  YandexDeliveryOrderSelection,
+} from "@izibuy/shared-lib";
 
 import type { OrderFulfillmentMethod } from "@/entities/order/api/createOrder";
 import type { OrderPaymentMethod } from "@/entities/order/model/constants";
 import type { CheckoutProductPickupGroup } from "@/entities/cart/lib/buildCheckoutPickupLocations";
-import { CheckoutForm } from "@/features/checkout/ui/CheckoutForm";
+import {
+  CheckoutForm,
+  type CheckoutCdekConfig,
+  type CheckoutYandexConfig,
+} from "@/features/checkout/ui/CheckoutForm";
 import { useCheckoutSheetModalAnimation } from "@/features/checkout/model/useCheckoutSheetModalAnimation";
 import { CHECKOUT_FORM_UI, CART_PAGE_UI } from "@/shared/config";
 import { resolveAppShellMaxWidthStyle } from "@/shared/lib/appShellLayout";
@@ -27,6 +36,15 @@ type CheckoutSheetModalProps = {
   pickupGroups?: CheckoutProductPickupGroup[];
   deliveryAvailable?: boolean;
   pickupAvailable?: boolean;
+  allowedPaymentMethods?: readonly string[] | null;
+  cardPrepaidAvailable?: boolean;
+  sellerDeliveryAvailable?: boolean;
+  cdek?: CheckoutCdekConfig | null;
+  yandex?: CheckoutYandexConfig | null;
+  sellerDelivery?: CartSellerDelivery | null;
+  deliveryProductIds?: readonly string[];
+  initialFulfillmentMethod?: OrderFulfillmentMethod | null;
+  onFulfillmentMethodChange?: (method: OrderFulfillmentMethod) => void;
   isSubmitting: boolean;
   submitError: string;
   submitSuccess: string;
@@ -38,6 +56,8 @@ type CheckoutSheetModalProps = {
     deliveryAddressFlat: string;
     paymentMethod: OrderPaymentMethod;
     pickupSelections?: Array<{ productId: string; pickupLocationId: string }>;
+    cdekShipment?: CdekOrderSelection;
+    yandexDeliveryShipment?: YandexDeliveryOrderSelection;
   }) => void | Promise<void>;
 };
 
@@ -47,6 +67,15 @@ export const CheckoutSheetModal = ({
   pickupGroups = [],
   deliveryAvailable = false,
   pickupAvailable = true,
+  allowedPaymentMethods = null,
+  cardPrepaidAvailable = false,
+  sellerDeliveryAvailable,
+  cdek = null,
+  yandex = null,
+  sellerDelivery = null,
+  deliveryProductIds,
+  initialFulfillmentMethod = null,
+  onFulfillmentMethodChange,
   isSubmitting,
   submitError,
   submitSuccess,
@@ -116,6 +145,15 @@ export const CheckoutSheetModal = ({
               pickupGroups={pickupGroups}
               deliveryAvailable={deliveryAvailable}
               pickupAvailable={pickupAvailable}
+              allowedPaymentMethods={allowedPaymentMethods}
+              cardPrepaidAvailable={cardPrepaidAvailable}
+              sellerDeliveryAvailable={sellerDeliveryAvailable}
+              cdek={cdek}
+              yandex={yandex}
+              sellerDelivery={sellerDelivery}
+              deliveryProductIds={deliveryProductIds}
+              initialFulfillmentMethod={initialFulfillmentMethod}
+              onFulfillmentMethodChange={onFulfillmentMethodChange}
               isSubmitting={isSubmitting}
               submitError={submitError}
               submitSuccess={submitSuccess}

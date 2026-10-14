@@ -10,6 +10,10 @@ import { DEFAULT_USER_AVATAR_URL } from "@/entities/user/model/constants";
 import { normalizeUploadUrlForStorage } from "@/shared/lib";
 
 import { buildUserBusinessHoursPatchBody } from "@/entities/user/lib/userBusinessHoursForm";
+import {
+  birthDateIsoDateToApiValue,
+  parseBirthDateInputToIsoDate,
+} from "./birthDateInputMask";
 import { getUserBackgroundFocus } from "./profileImageFocus";
 import type { EditProfileFormState } from "./mapUserToEditProfileForm";
 import { serializeUserBackground } from "./userBackgroundValue";

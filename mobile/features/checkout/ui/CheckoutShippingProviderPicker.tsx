@@ -1,34 +1,86 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import {
-  CHECKOUT_SHIPPING_PROVIDER_SELLER,
-  hasCheckoutLiveCarrierProviders,
-  listCheckoutShippingProviderOptions,
-  listCheckoutShippingServiceOptions,
-  resolveCheckoutShippingProviderLabel,
-  SHIPPING_SERVICE_COURIER,
-  SHIPPING_SERVICE_PICKUP_POINT,
-} from "@/features/checkout/lib/checkoutShippingProviderOptions";
 import { CHECKOUT_FORM_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 
-const SERVICE_LABEL: Record<string, string> = {
-  [SHIPPING_SERVICE_COURIER]: CHECKOUT_FORM_UI.SHIPPING_SERVICE_COURIER,
-  [SHIPPING_SERVICE_PICKUP_POINT]: CHECKOUT_FORM_UI.SHIPPING_SERVICE_PICKUP_POINT,
+/** Карточка «своей доставки» продавца: службы у неё нет. */
+const SELLER_CARD_ID = "seller";
+
+export type CheckoutCarrierOption = {
+  /** Id службы из контракта (`SHIPPING_PROVIDER_*`). */
+  id: string;
+  label: string;
 };
 
 type CheckoutShippingProviderPickerProps = {
   disabled?: boolean;
+  /** Продавец везёт сам. */
+  sellerDeliveryAvailable?: boolean;
+  /** Службы, по которым продавец подключил договор и включил доставку. */
+  carriers?: readonly CheckoutCarrierOption[];
+  /** Выбранная служба; `null` — своя доставка продавца. */
+  selectedCarrier?: string | null;
+  onSelectCarrier?: (carrier: string | null) => void;
 };
 
+/**
+ * Службы доставки в оформлении.
+ *
+ * Внутри «Доставки» покупатель выбирает службу из тех, что разрешил продавец:
+ * его собственную доставку или службу, по которой у продавца договор. Если
+ * вариант один, выбирать нечего — показываем строкой «Доставку выполняет …»,
+ * а не списком из одной карточки.
+ */
 export const CheckoutShippingProviderPicker = ({
   disabled = false,
+  sellerDeliveryAvailable = true,
+  carriers = [],
+  selectedCarrier = null,
+  onSelectCarrier,
 }: CheckoutShippingProviderPickerProps) => {
   const theme = useAppTheme();
-  const providerOptions = listCheckoutShippingProviderOptions();
-  const serviceOptions = listCheckoutShippingServiceOptions();
-  const showCarrierServices =
-    hasCheckoutLiveCarrierProviders() && serviceOptions.length > 0;
+  const cards = [
+    ...(sellerDeliveryAvailable
+      ? [{ id: SELLER_CARD_ID, label: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SELLER }]
+      : []),
+    ...carriers,
+  ];
+  const selectedId = selectedCarrier ?? SELLER_CARD_ID;
+
+  if (cards.length === 0) {
+    return null;
+  }
+
+  if (cards.length === 1) {
+    // В плашке — именительный падеж: «Доставку выполняет продавец», а не
+    // подпись карточки «Продавцом».
+    const singleName =
+      cards[0].id === SELLER_CARD_ID
+        ? CHECKOUT_FORM_UI.SHIPPING_PROVIDER_BADGE_SELLER
+        : cards[0].label;
+    return (
+      <View style={styles.root}>
+        <View
+          style={[
+            styles.single,
+            {
+              borderColor: theme.colors.action,
+              backgroundColor: theme.colors.actionSoft,
+            },
+          ]}
+          accessibilityRole="text"
+          accessibilityLabel={`${CHECKOUT_FORM_UI.SHIPPING_PROVIDER_BADGE_CAPTION} ${singleName}`}
+        >
+          <Text style={[styles.singleCaption, { color: theme.colors.textSecondary }]}>
+            {CHECKOUT_FORM_UI.SHIPPING_PROVIDER_BADGE_CAPTION}
+          </Text>
+          <Text style={[styles.singleName, { color: theme.colors.text }]}>
+            {singleName}
+          </Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.root}>
@@ -41,22 +93,19 @@ export const CheckoutShippingProviderPicker = ({
         contentContainerStyle={styles.wrap}
         accessibilityRole="radiogroup"
       >
-        {providerOptions.map((option) => {
-          const isSelected = option.id === CHECKOUT_SHIPPING_PROVIDER_SELLER;
-          const label = resolveCheckoutShippingProviderLabel(option.id, {
-            sellerLabel: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SELLER,
-          });
+        {cards.map((card) => {
+          const isSelected = card.id === selectedId;
 
           return (
             <Pressable
-              key={option.id}
+              key={card.id}
               disabled={disabled}
+              onPress={() =>
+                onSelectCarrier?.(card.id === SELLER_CARD_ID ? null : card.id)
+              }
               accessibilityRole="radio"
-              accessibilityState={{
-                checked: isSelected,
-                disabled,
-              }}
-              accessibilityLabel={label}
+              accessibilityState={{ checked: isSelected, disabled }}
+              accessibilityLabel={card.label}
               style={[
                 styles.card,
                 {
@@ -72,64 +121,15 @@ export const CheckoutShippingProviderPicker = ({
               <Text
                 style={[
                   styles.cardLabel,
-                  {
-                    color: isSelected ? theme.colors.text : theme.colors.action,
-                  },
+                  { color: isSelected ? theme.colors.text : theme.colors.action },
                 ]}
               >
-                {label}
+                {card.label}
               </Text>
             </Pressable>
           );
         })}
       </ScrollView>
-
-      {showCarrierServices ? (
-        <>
-          <Text
-            style={[
-              styles.legend,
-              styles.legendSub,
-              { color: theme.colors.textSecondary },
-            ]}
-          >
-            {CHECKOUT_FORM_UI.LABEL_SHIPPING_SERVICE}
-          </Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.row}
-            accessibilityRole="radiogroup"
-          >
-            {serviceOptions.map((option) => {
-              const label = SERVICE_LABEL[option.id] ?? option.id;
-              return (
-                <Pressable
-                  key={option.id}
-                  disabled={disabled}
-                  accessibilityRole="radio"
-                  accessibilityState={{ checked: false, disabled }}
-                  style={[
-                    styles.chip,
-                    {
-                      borderColor: theme.colors.border,
-                      backgroundColor: theme.colors.surface,
-                    },
-                  ]}
-                >
-                  <Text style={[styles.chipLabel, { color: theme.colors.text }]}>
-                    {label}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </ScrollView>
-        </>
-      ) : null}
-
-      <Text style={[styles.hint, { color: theme.colors.textMuted }]}>
-        {CHECKOUT_FORM_UI.SHIPPING_PROVIDER_HINT}
-      </Text>
     </View>
   );
 };
@@ -143,17 +143,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
   },
-  legendSub: {
-    marginTop: 4,
-  },
   wrap: {
     flexDirection: "row",
     gap: 12,
-    paddingRight: 4,
-  },
-  row: {
-    flexDirection: "row",
-    gap: 10,
     paddingRight: 4,
   },
   card: {
@@ -172,23 +164,22 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     textAlign: "center",
   },
-  chip: {
-    minWidth: 120,
-    minHeight: 44,
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 10,
-    alignItems: "center",
-    justifyContent: "center",
+  single: {
+    alignSelf: "flex-start",
+    gap: 2,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderWidth: 1.5,
+    borderRadius: 12,
   },
-  chipLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-    textAlign: "center",
+  singleCaption: {
+    fontSize: 12,
+    lineHeight: 15,
+    fontWeight: "500",
   },
-  hint: {
-    fontSize: 13,
-    lineHeight: 18,
+  singleName: {
+    fontSize: 15,
+    lineHeight: 19,
+    fontWeight: "700",
   },
 });

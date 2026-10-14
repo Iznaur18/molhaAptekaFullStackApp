@@ -24,6 +24,7 @@ import { ProductPurchaseCartButton } from "../ProductPurchaseCartButton.jsx";
  *   unitPriceSnapshot?: number;
  *   onBack?: () => void;
  *   className?: string;
+ *   children?: import("react").ReactNode;
  * }} props
  */
 export function ProductDetailsModalPurchaseActions({
@@ -43,8 +44,10 @@ export function ProductDetailsModalPurchaseActions({
   unitPriceSnapshot,
   onBack,
   className = "",
+  children = null,
 }) {
   if (
+    !children &&
     !canShowAddToCart &&
     !showOutOfStockPurchaseButton &&
     !showBlockedPurchaseButton &&
@@ -79,22 +82,25 @@ export function ProductDetailsModalPurchaseActions({
         </button>
       ) : null}
       <div className="product-details-modal__price-actions-cart">
-        <ProductPurchaseCartButton
-          productId={productId}
-          isAuthorized={isAuthorized}
-          onRequestLogin={onRequestLogin}
-          purchaseLimit={purchaseLimit}
-          canShowAddToCart={canShowAddToCart}
-          showOutOfStockPurchaseButton={showOutOfStockPurchaseButton}
-          showBlockedPurchaseButton={showBlockedPurchaseButton}
-          showSellerClosedPurchaseButton={showSellerClosedPurchaseButton}
-          showOwnProductPurchaseButton={showOwnProductPurchaseButton}
-          outOfStockPurchaseLabel={outOfStockPurchaseLabel}
-          blockedPurchaseLabel={blockedPurchaseLabel}
-          sellerClosedPurchaseLabel={sellerClosedPurchaseLabel}
-          ownProductPurchaseLabel={ownProductPurchaseLabel}
-          unitPriceSnapshot={unitPriceSnapshot}
-        />
+        {/* Объявление без корзины кладёт сюда свои кнопки: заявку и телефон. */}
+        {children ?? (
+          <ProductPurchaseCartButton
+            productId={productId}
+            isAuthorized={isAuthorized}
+            onRequestLogin={onRequestLogin}
+            purchaseLimit={purchaseLimit}
+            canShowAddToCart={canShowAddToCart}
+            showOutOfStockPurchaseButton={showOutOfStockPurchaseButton}
+            showBlockedPurchaseButton={showBlockedPurchaseButton}
+            showSellerClosedPurchaseButton={showSellerClosedPurchaseButton}
+            showOwnProductPurchaseButton={showOwnProductPurchaseButton}
+            outOfStockPurchaseLabel={outOfStockPurchaseLabel}
+            blockedPurchaseLabel={blockedPurchaseLabel}
+            sellerClosedPurchaseLabel={sellerClosedPurchaseLabel}
+            ownProductPurchaseLabel={ownProductPurchaseLabel}
+            unitPriceSnapshot={unitPriceSnapshot}
+          />
+        )}
       </div>
     </div>
   );

@@ -5,13 +5,24 @@ import {
   ORDER_FULFILLMENT_DELIVERY,
   ORDER_FULFILLMENT_PICKUP,
   PRODUCT_DELIVERY_FULFILLMENT_ENABLED,
+  SHIPPING_PROVIDER_CDEK,
+  SHIPPING_PROVIDER_YANDEX_DELIVERY,
   SHIPPING_PROVIDERS_CHECKOUT_SOON_HINT,
 } from "@molha/api-contract";
+import {
+  resolveCheckoutChosenCarrier,
+  resolveCheckoutPaymentMethodOptions,
+  resolveCardOnlyAllowedPaymentMethods,
+  type CartSellerDelivery,
+  type CdekOrderSelection,
+  type YandexDeliveryOrderSelection,
+} from "@izibuy/shared-lib";
 
 import { addressValueFromUser } from "@/entities/address/lib/addressValueFromUser";
 import { validateRuDeliveryAddressForm } from "@/entities/address/lib/validateRuDeliveryAddressForm";
 import type { OrderFulfillmentMethod } from "@/entities/order/api/createOrder";
 import {
+  ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY,
   ORDER_PAYMENT_METHOD_DEFAULT,
   type OrderPaymentMethod,
 } from "@/entities/order/model/constants";
@@ -26,7 +37,15 @@ import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useCheckoutFormStyles } from "@/shared/theme/formChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
 import { CheckoutPaymentMethodPicker } from "@/features/checkout/ui/CheckoutPaymentMethodPicker";
-import { CheckoutShippingProviderPicker } from "@/features/checkout/ui/CheckoutShippingProviderPicker";
+import { CdekPickupPointPicker } from "@/features/checkout/ui/CdekPickupPointPicker";
+import {
+  YandexPickupPointPicker,
+  type YandexCheckoutItem,
+} from "@/features/checkout/ui/YandexPickupPointPicker";
+import {
+  CheckoutShippingProviderPicker,
+  type CheckoutCarrierOption,
+} from "@/features/checkout/ui/CheckoutShippingProviderPicker";
 import {
   CHECKOUT_SAVED_ADDRESS_CUSTOM_ID,
   deliveryAddressFromSaved,
@@ -36,12 +55,48 @@ import {
 import { userSavedAddressesFromUser } from "@/entities/address/lib/userSavedAddressesFromUser";
 import { AddressSuggestInput } from "@/entities/address/ui/AddressSuggestInput";
 import { CheckoutSavedAddressPicker } from "@/features/checkout/ui/CheckoutSavedAddressPicker";
+import { CheckoutSellerDeliveryCost } from "@/features/checkout/ui/CheckoutSellerDeliveryCost";
+
+const EMPTY_PRODUCT_IDS: readonly string[] = [];
+
+/** Что нужно пикеру СДЭК: чей договор, какие товары и кто получатель. */
+export type CheckoutCdekConfig = {
+  sellerId: string;
+  productIds: readonly string[];
+  recipientName?: string;
+  recipientPhone?: string;
+};
+
+/** Что нужно пикеру Яндекса: чей договор, какие товары и кто получатель. */
+export type CheckoutYandexConfig = {
+  sellerId: string;
+  items: readonly YandexCheckoutItem[];
+  recipientName?: string;
+  recipientPhone?: string;
+};
 
 type CheckoutFormProps = {
   defaultUser?: Record<string, unknown> | null;
   pickupGroups?: CheckoutProductPickupGroup[];
   deliveryAvailable?: boolean;
   pickupAvailable?: boolean;
+  /** Что принимают продавцы оформляемых товаров; `null` — ограничений нет. */
+  allowedPaymentMethods?: readonly string[] | null;
+  /** Продавцы входят в список предоплаты площадки — доступна СБП. */
+  cardPrepaidAvailable?: boolean;
+  /** Везёт ли продавец сам; по умолчанию — как `deliveryAvailable`. */
+  sellerDeliveryAvailable?: boolean;
+  /** СДЭК у этого продавца подключён; `null` — службы нет. */
+  cdek?: CheckoutCdekConfig | null;
+  /** Яндекс Доставка у этого продавца подключена; null — службы нет. */
+  yandex?: CheckoutYandexConfig | null;
+  /** Тариф собственной доставки продавца; `null` — считать нечего. */
+  sellerDelivery?: CartSellerDelivery | null;
+  /** Товары, которые везут: по ним считается расстояние. */
+  deliveryProductIds?: readonly string[];
+  /** Способ, выбранный покупателем у этого продавца раньше. */
+  initialFulfillmentMethod?: OrderFulfillmentMethod | null;
+  onFulfillmentMethodChange?: (method: OrderFulfillmentMethod) => void;
   isSubmitting: boolean;
   submitError: string;
   submitSuccess: string;
@@ -54,6 +109,10 @@ type CheckoutFormProps = {
     deliveryAddressFlat: string;
     paymentMethod: OrderPaymentMethod;
     pickupSelections?: Array<{ productId: string; pickupLocationId: string }>;
+    /** Выбор СДЭК: тариф, пункт, город и получатель. Цену считает сервер. */
+    cdekShipment?: CdekOrderSelection;
+    /** Выбор Яндекса: пункт и получатель. Цену считает сервер. */
+    yandexDeliveryShipment?: YandexDeliveryOrderSelection;
   }) => void | Promise<void>;
 };
 
@@ -62,6 +121,15 @@ export const CheckoutForm = ({
   pickupGroups = [],
   deliveryAvailable = false,
   pickupAvailable = true,
+  allowedPaymentMethods = null,
+  cardPrepaidAvailable = false,
+  sellerDeliveryAvailable,
+  cdek = null,
+  yandex = null,
+  sellerDelivery = null,
+  deliveryProductIds = EMPTY_PRODUCT_IDS,
+  initialFulfillmentMethod = null,
+  onFulfillmentMethodChange,
   isSubmitting,
   submitError,
   submitSuccess,
@@ -74,8 +142,12 @@ export const CheckoutForm = ({
   const insets = useSafeAreaInsets();
   const checkoutStyles = useCheckoutFormStyles();
   const [fulfillmentMethod, setFulfillmentMethod] = useState<OrderFulfillmentMethod>(
-    ORDER_FULFILLMENT_PICKUP,
+    initialFulfillmentMethod ?? ORDER_FULFILLMENT_PICKUP,
   );
+  // Корзина помнит способ по продавцам: по нему считается доставка в итоге.
+  useEffect(() => {
+    onFulfillmentMethodChange?.(fulfillmentMethod);
+  }, [fulfillmentMethod, onFulfillmentMethodChange]);
   /** Книга адресов профиля — источник для выбора без повторного ввода. */
   const savedAddresses = useMemo(
     () => (defaultUser != null ? userSavedAddressesFromUser(defaultUser) : []),
@@ -97,6 +169,11 @@ export const CheckoutForm = ({
   const [paymentMethod, setPaymentMethod] = useState<OrderPaymentMethod>(
     ORDER_PAYMENT_METHOD_DEFAULT,
   );
+  /** Служба внутри «Доставки»: null — своя доставка продавца. */
+  const [carrierChoice, setCarrierChoice] = useState<string | null>(null);
+  const [cdekSelection, setCdekSelection] = useState<CdekOrderSelection | null>(null);
+  const [yandexSelection, setYandexSelection] =
+    useState<YandexDeliveryOrderSelection | null>(null);
   const [localError, setLocalError] = useState("");
   const [selectedPickupByProductId, setSelectedPickupByProductId] = useState<
     Record<string, string>
@@ -148,6 +225,69 @@ export const CheckoutForm = ({
 
   const deliverySelectable = PRODUCT_DELIVERY_FULFILLMENT_ENABLED && deliveryAvailable;
   const pickupSelectable = pickupAvailable;
+  // «Доставка» доступна и тогда, когда у продавца есть только СДЭК: своя
+  // доставка продавца — отдельный вопрос.
+  const sellerDeliverySelectable =
+    deliverySelectable && (sellerDeliveryAvailable ?? deliveryAvailable);
+
+  // СДЭК — служба внутри доставки: вместо адреса покупателя нужен пункт
+  // выдачи. Какая служба выбрана, решает общее правило из shared-lib.
+  const carrierCards = useMemo<CheckoutCarrierOption[]>(
+    () => [
+      ...(cdek
+        ? [
+            {
+              id: SHIPPING_PROVIDER_CDEK,
+              label: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_CDEK,
+            },
+          ]
+        : []),
+      ...(yandex
+        ? [
+            {
+              id: SHIPPING_PROVIDER_YANDEX_DELIVERY,
+              label: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_YANDEX,
+            },
+          ]
+        : []),
+    ],
+    [cdek, yandex],
+  );
+  const chosenCarrier = resolveCheckoutChosenCarrier({
+    needsDelivery: fulfillmentMethod === ORDER_FULFILLMENT_DELIVERY,
+    carrierOptions: carrierCards.map((card) => card.id),
+    carrierChoice,
+    sellerDeliveryAvailable: sellerDeliverySelectable,
+  });
+  const cdekChosen = chosenCarrier === SHIPPING_PROVIDER_CDEK;
+  // Яндекс берёт в пункте только карту — и за товар, и за доставку.
+  const yandexChosen = chosenCarrier === SHIPPING_PROVIDER_YANDEX_DELIVERY;
+  // Продавец сужает способы оплаты, служба «только карта» — ещё раз.
+  const effectiveAllowedPaymentMethods = useMemo(
+    () =>
+      yandexChosen
+        ? resolveCardOnlyAllowedPaymentMethods(allowedPaymentMethods)
+        : allowedPaymentMethods,
+    [yandexChosen, allowedPaymentMethods],
+  );
+  const availablePaymentMethods = useMemo(
+    () =>
+      resolveCheckoutPaymentMethodOptions({
+        cardPrepaidAvailable,
+        allowedMethods: effectiveAllowedPaymentMethods,
+      }).availableMethods,
+    [effectiveAllowedPaymentMethods, cardPrepaidAvailable],
+  );
+  // Выбранный способ продавец или служба могли не принимать (или он
+  // единственный и показан строкой) — форма сама встаёт на первый доступный.
+  useEffect(() => {
+    if (
+      availablePaymentMethods.length > 0 &&
+      !availablePaymentMethods.includes(paymentMethod)
+    ) {
+      setPaymentMethod(availablePaymentMethods[0]);
+    }
+  }, [availablePaymentMethods, paymentMethod]);
 
   useEffect(() => {
     if (!deliverySelectable && fulfillmentMethod === ORDER_FULFILLMENT_DELIVERY) {
@@ -171,11 +311,27 @@ export const CheckoutForm = ({
     if (isPickup) {
       return pickupSelectable && pickupReady;
     }
+    if (cdekChosen) {
+      return deliverySelectable && cdekSelection != null;
+    }
+    if (yandexChosen) {
+      return deliverySelectable && yandexSelection != null;
+    }
     return (
       deliverySelectable &&
       validateRuDeliveryAddressForm(deliveryAddress, { required: true }) === null
     );
-  }, [deliveryAddress, deliverySelectable, isPickup, pickupReady, pickupSelectable]);
+  }, [
+    cdekChosen,
+    cdekSelection,
+    yandexChosen,
+    yandexSelection,
+    deliveryAddress,
+    deliverySelectable,
+    isPickup,
+    pickupReady,
+    pickupSelectable,
+  ]);
 
   const deliveryOptionHint = !PRODUCT_DELIVERY_FULFILLMENT_ENABLED
     ? SHIPPING_PROVIDERS_CHECKOUT_SOON_HINT
@@ -211,6 +367,44 @@ export const CheckoutForm = ({
       return;
     }
 
+    if (yandexChosen) {
+      if (!yandexSelection) {
+        setLocalError(CHECKOUT_FORM_UI.YANDEX_POINT_REQUIRED);
+        return;
+      }
+      if (paymentMethod !== ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY) {
+        setLocalError(CHECKOUT_FORM_UI.YANDEX_CARD_ONLY);
+        return;
+      }
+      setLocalError("");
+      // Адрес заказа сервер возьмёт из пункта выдачи, цену пересчитает сам.
+      void onSubmit({
+        fulfillmentMethod: ORDER_FULFILLMENT_DELIVERY,
+        deliveryAddress: "",
+        deliveryAddressFlat: "",
+        paymentMethod,
+        yandexDeliveryShipment: yandexSelection,
+      });
+      return;
+    }
+
+    if (cdekChosen) {
+      if (!cdekSelection) {
+        setLocalError(CHECKOUT_FORM_UI.CDEK_POINT_REQUIRED);
+        return;
+      }
+      setLocalError("");
+      // Адрес заказа сервер возьмёт из пункта выдачи, цену пересчитает сам.
+      void onSubmit({
+        fulfillmentMethod: ORDER_FULFILLMENT_DELIVERY,
+        deliveryAddress: "",
+        deliveryAddressFlat: "",
+        paymentMethod,
+        cdekShipment: cdekSelection,
+      });
+      return;
+    }
+
     const validationError = validateRuDeliveryAddressForm(deliveryAddress, {
       required: true,
     });
@@ -227,7 +421,10 @@ export const CheckoutForm = ({
     });
   };
 
-  const isFormDisabled = isDisabled || isSubmitting || !isAddressValid;
+  // Ни одного общего способа у продавцов — заказ сервер всё равно отклонит.
+  const hasPaymentMethod = availablePaymentMethods.includes(paymentMethod);
+  const isFormDisabled =
+    isDisabled || isSubmitting || !isAddressValid || !hasPaymentMethod;
   const displayError = localError || submitError;
 
   return (
@@ -431,41 +628,86 @@ export const CheckoutForm = ({
               </Text>
             </View>
             <View style={checkoutStyles.fulfillmentSectionBody}>
-              <CheckoutSavedAddressPicker
-                addresses={savedAddresses}
-                selectedId={selectedSavedAddressId}
-                onSelect={handleSavedAddressSelect}
+              <CheckoutShippingProviderPicker
                 disabled={isDisabled || isSubmitting}
+                sellerDeliveryAvailable={sellerDeliverySelectable}
+                carriers={carrierCards}
+                selectedCarrier={chosenCarrier}
+                onSelectCarrier={(carrier) => {
+                  setLocalError("");
+                  setCarrierChoice(carrier);
+                }}
               />
 
-              <AddressSuggestInput
-                value={deliveryAddress}
-                onChange={handleDeliveryAddressChange}
-                disabled={isDisabled || isSubmitting}
-                displayOnly
-                placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_DELIVERY_ADDRESS}
-                label={CHECKOUT_FORM_UI.LABEL_DELIVERY_ADDRESS}
-                containerStyle={checkoutStyles.fieldGroup}
-                labelStyle={checkoutStyles.fieldLabel}
-                inputStyle={checkoutStyles.fieldInput}
-              />
+              {yandexChosen && yandex ? (
+                <>
+                  <Text style={checkoutStyles.pickupHint}>
+                    {CHECKOUT_FORM_UI.YANDEX_CARD_ONLY_HINT}
+                  </Text>
+                  <YandexPickupPointPicker
+                    sellerId={yandex.sellerId}
+                    items={yandex.items}
+                    initialRecipientName={yandex.recipientName}
+                    initialRecipientPhone={yandex.recipientPhone}
+                    disabled={isDisabled || isSubmitting}
+                    onChange={setYandexSelection}
+                  />
+                </>
+              ) : cdekChosen && cdek ? (
+                <CdekPickupPointPicker
+                  sellerId={cdek.sellerId}
+                  productIds={cdek.productIds}
+                  initialRecipientName={cdek.recipientName}
+                  initialRecipientPhone={cdek.recipientPhone}
+                  disabled={isDisabled || isSubmitting}
+                  onChange={setCdekSelection}
+                />
+              ) : (
+                <>
+                  <CheckoutSavedAddressPicker
+                    addresses={savedAddresses}
+                    selectedId={selectedSavedAddressId}
+                    onSelect={handleSavedAddressSelect}
+                    disabled={isDisabled || isSubmitting}
+                  />
 
-              <Text style={checkoutStyles.fieldLabel}>
-                {CHECKOUT_FORM_UI.LABEL_FLAT}
-              </Text>
-              <TextInput
-                style={checkoutStyles.fieldInput}
-                value={deliveryAddress.flat}
-                onChangeText={(flat) =>
-                  setDeliveryAddress((prev) => ({ ...prev, flat }))
-                }
-                placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_FLAT}
-                placeholderTextColor={theme.colors.textMuted}
-                editable={!isDisabled && !isSubmitting}
-                keyboardType="default"
-              />
+                  <AddressSuggestInput
+                    value={deliveryAddress}
+                    onChange={handleDeliveryAddressChange}
+                    disabled={isDisabled || isSubmitting}
+                    displayOnly
+                    placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_DELIVERY_ADDRESS}
+                    label={CHECKOUT_FORM_UI.LABEL_DELIVERY_ADDRESS}
+                    containerStyle={checkoutStyles.fieldGroup}
+                    labelStyle={checkoutStyles.fieldLabel}
+                    inputStyle={checkoutStyles.fieldInput}
+                  />
 
-              <CheckoutShippingProviderPicker disabled={isDisabled || isSubmitting} />
+                  <Text style={checkoutStyles.fieldLabel}>
+                    {CHECKOUT_FORM_UI.LABEL_FLAT}
+                  </Text>
+                  <TextInput
+                    style={checkoutStyles.fieldInput}
+                    value={deliveryAddress.flat}
+                    onChangeText={(flat) =>
+                      setDeliveryAddress((prev) => ({ ...prev, flat }))
+                    }
+                    placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_FLAT}
+                    placeholderTextColor={theme.colors.textMuted}
+                    editable={!isDisabled && !isSubmitting}
+                    keyboardType="default"
+                  />
+
+                  {sellerDelivery ? (
+                    <CheckoutSellerDeliveryCost
+                      sellerDelivery={sellerDelivery}
+                      productIds={deliveryProductIds}
+                      address={deliveryAddress}
+                      isAddressValid={isAddressValid}
+                    />
+                  ) : null}
+                </>
+              )}
             </View>
           </View>
         )}
@@ -474,6 +716,8 @@ export const CheckoutForm = ({
           value={paymentMethod}
           onChange={setPaymentMethod}
           disabled={isDisabled || isSubmitting}
+          cardPrepaidAvailable={cardPrepaidAvailable}
+          allowedMethods={effectiveAllowedPaymentMethods}
         />
 
         {displayError ? (

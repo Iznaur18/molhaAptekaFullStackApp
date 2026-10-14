@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { buildCdekOrderSelection } from "@izibuy/shared-lib";
 
 import {
   fetchCdekDeliveryPoints,
@@ -101,17 +102,15 @@ export function CdekPickupPointPicker({
   }, [productKey, sellerId]);
 
   useEffect(() => {
-    const name = recipientName.trim();
-    const phone = recipientPhone.trim();
+    // Когда выбор полон, решает shared-lib — одинаково для сайта и приложения.
     onChange(
-      pointCode && tariffCode && cityCode && name.length >= 2 && phone.length >= 10
-        ? {
-            tariffCode,
-            pickupPointCode: pointCode,
-            toCityCode: cityCode,
-            recipient: { name, phone },
-          }
-        : null,
+      buildCdekOrderSelection({
+        pointCode,
+        tariffCode,
+        cityCode,
+        recipientName,
+        recipientPhone,
+      }),
     );
   }, [pointCode, tariffCode, cityCode, recipientName, recipientPhone, onChange]);
 

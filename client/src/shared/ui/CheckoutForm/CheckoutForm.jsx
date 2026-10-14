@@ -10,6 +10,10 @@ import {
   SHIPPING_PROVIDER_YANDEX_EXPRESS,
   SHIPPING_PROVIDERS_CHECKOUT_SOON_HINT,
 } from "@molha/api-contract";
+import {
+  resolveCardOnlyAllowedPaymentMethods,
+  resolveCheckoutChosenCarrier,
+} from "@izibuy/shared-lib";
 
 import { AddressDeliveryFields } from "../../../entities/address/ui/AddressDeliveryFields.jsx";
 import { CheckoutSavedAddressPicker } from "../../../features/checkout/ui/CheckoutSavedAddressPicker.jsx";
@@ -276,14 +280,14 @@ export function CheckoutForm({
     yandexAvailable ? SHIPPING_PROVIDER_YANDEX_DELIVERY : null,
     expressAvailable ? SHIPPING_PROVIDER_YANDEX_EXPRESS : null,
   ].filter(Boolean);
-  const chosenCarrier =
-    !needsDelivery || needsPickup || carrierOptions.length === 0
-      ? null
-      : carrierOptions.includes(carrierChoice)
-        ? carrierChoice
-        : !sellerDeliveryAvailable
-          ? carrierOptions[0]
-          : null;
+  // Правило одно для сайта и приложения — в shared-lib.
+  const chosenCarrier = resolveCheckoutChosenCarrier({
+    needsDelivery,
+    needsPickup,
+    carrierOptions,
+    carrierChoice,
+    sellerDeliveryAvailable,
+  });
   const cdekChosen = chosenCarrier === SHIPPING_PROVIDER_CDEK;
   // Яндекс берёт в пункте только карту — и за товар, и за доставку.
   const yandexChosen = chosenCarrier === SHIPPING_PROVIDER_YANDEX_DELIVERY;
@@ -303,10 +307,8 @@ export function CheckoutForm({
   const mixedCarriersBlocked = needsDelivery && !chosenCarrier && mixedDeliveryCarriers;
   const effectiveAllowedPaymentMethods = useMemo(() => {
     if (cardOnlyCarrier) {
-      const base = Array.isArray(allowedPaymentMethods)
-        ? allowedPaymentMethods
-        : [ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY];
-      return base.filter((method) => method === ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY);
+      // Правило одно для сайта и приложения — в shared-lib.
+      return resolveCardOnlyAllowedPaymentMethods(allowedPaymentMethods);
     }
     if (gitorgCourierDelivery) {
       const base = Array.isArray(allowedPaymentMethods)

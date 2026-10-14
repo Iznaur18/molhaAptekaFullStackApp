@@ -51,6 +51,43 @@ describe("catalogCardPurchasePolicy", () => {
     expect(result.current.purchaseButtonState?.canShowAddToCart).toBe(false);
   });
 
+  it("у осмотра и услуги на месте «В корзину» — кнопка заявки", () => {
+    for (const productDealType of ["viewing", "service"]) {
+      const { result } = renderHook(() =>
+        useProductCardChromeFlags(
+          { product: { ...product, productDealType }, showAddToCart: true },
+          "buyer-1",
+        ),
+      );
+
+      expect(result.current.showAddToCartButton).toBe(false);
+      expect(result.current.showDealButton).toBe(true);
+      expect(result.current.showFooterActions).toBe(true);
+    }
+  });
+
+  it("кнопки заявки нет у обычного товара, у своего объявления и вне главной", () => {
+    const own = renderHook(() =>
+      useProductCardChromeFlags(
+        { product: { ...product, productDealType: "service" }, showAddToCart: true },
+        "seller-1",
+      ),
+    );
+    const goods = renderHook(() =>
+      useProductCardChromeFlags({ product, showAddToCart: true }, "buyer-1"),
+    );
+    const elsewhere = renderHook(() =>
+      useProductCardChromeFlags(
+        { product: { ...product, productDealType: "service" } },
+        "buyer-1",
+      ),
+    );
+
+    expect(own.result.current.showDealButton).toBe(false);
+    expect(goods.result.current.showDealButton).toBe(false);
+    expect(elsewhere.result.current.showDealButton).toBe(false);
+  });
+
   it("shows «out of stock» state for a product without stock", () => {
     const { result } = renderHook(() =>
       useProductCardChromeFlags(

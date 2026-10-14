@@ -53,6 +53,7 @@ export function buildProfileNavGroups({
   canUseAdvertising,
   canUseOneCIntegration,
   canUseDeliveryPayment,
+  canUseDealRequests,
   canUseSafeDeal,
   canUseSafeDealModeration,
   canUseEditProfile,
@@ -106,6 +107,7 @@ export function buildProfileNavGroups({
   onAdvertisingClick,
   onOneCIntegrationClick,
   onDeliveryPaymentClick,
+  onDealRequestsClick,
   onSafeDealClick,
   onSafeDealModerationClick,
   onEditProfileClick,
@@ -165,6 +167,12 @@ export function buildProfileNavGroups({
             badgeCount: pendingMyOrdersActionCount,
             disabled: !canUseMyOrders,
             onClick: () => selectTab("my-orders", onMyOrdersClick),
+          },
+          {
+            tab: "deal-requests",
+            label: MY_PROFILE_PAGE_UI.TAB_DEAL_REQUESTS,
+            disabled: !canUseDealRequests,
+            onClick: () => selectTab("deal-requests", onDealRequestsClick),
           },
           ...(canUseAuction
             ? [

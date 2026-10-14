@@ -31,6 +31,7 @@ export const DEV_API_PROXY_PREFIXES = [
   "/intro-ad",
   "/seller-personal-category",
   "/seller-shelf",
+  "/deal-requests",
   "/seller",
   "/audit",
   "/analytics",

@@ -1,3 +1,4 @@
+import { DEAL_REQUEST_STATUS_COMPLETED } from "@molha/api-contract";
 import mongoose from "mongoose";
 
 import { ORDER_STATUS_CONFIRMED } from "../../constants/orderConstants.js";
@@ -11,6 +12,7 @@ import {
   PRODUCT_REVIEW_TEXT_MAX_LENGTH,
 } from "../../constants/productReviewConstants.js";
 import {
+  DealRequestModel,
   OrderModel,
   ProductModel,
   ProductReviewModel,
@@ -62,8 +64,19 @@ export const userHasConfirmedProductPurchase = async (buyerUserId, productId) =>
   })
     .select("_id")
     .lean();
+  if (order != null) {
+    return true;
+  }
 
-  return order != null;
+  // Осмотр и услуга заказом не оформляются: их «покупка» — заявка, которую
+  // закрыли как состоявшуюся. Без неё отзыв мог бы оставить любой, кто просто
+  // записался и не пришёл.
+  const completedDeal = await DealRequestModel.exists({
+    buyerId: buyerOid,
+    productId: productOid,
+    status: DEAL_REQUEST_STATUS_COMPLETED,
+  });
+  return completedDeal != null;
 };
 
 /**

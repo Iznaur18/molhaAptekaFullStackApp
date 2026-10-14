@@ -58,6 +58,7 @@ import {
   resolveProductPickupEnabledForWrite,
 } from "./productPickup.js";
 import { resolveProductPickupWriteFields } from "./productPickupLocations.js";
+import { resolveProductDealTermsWrite } from "./productDealTermsFields.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 import { assertSellerManualProductCreateAllowed } from "../onec/assertSellerManualProductCreateAllowed.js";
 import { isSellerStorePaused } from "../seller/sellerStorePause.js";
@@ -362,6 +363,8 @@ export async function postProduct({
     productDeliveryCarrier,
     productCategory: categoryWrite.productCategory,
     productCategoryId: categoryWrite.productCategoryId,
+    productDealType: categoryWrite.productDealType,
+    ...resolveProductDealTermsWrite(body),
     categoryPathIds: categoryWrite.categoryPathIds,
     categoryBreadcrumbRu: categoryWrite.categoryBreadcrumbRu,
     sellerPersonalCategoryId,

@@ -1,3 +1,5 @@
+import { formatProductDealPrice } from "@molha/api-contract";
+
 import { PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import { getProductFieldLabel } from "../lib/productFieldRegistry.js";
@@ -41,7 +43,11 @@ export function ProductPriceDisplay({
 }) {
   const discountPercent = resolveProductDiscountPercent(product);
   const hasDiscount = hasProductCatalogDiscount(product);
-  const currentPriceText = formatPriceRub(Math.floor(Number(product.productPrice)));
+  // У услуги цена бывает «от 1 500 ₽ / час» или «Договорная».
+  const currentPriceText = formatProductDealPrice(
+    product,
+    formatPriceRub(Math.floor(Number(product.productPrice))),
+  );
   const oldPriceText = formatPriceRub(Math.floor(Number(product.productOldPrice)));
 
   const ariaLabel = hasDiscount
