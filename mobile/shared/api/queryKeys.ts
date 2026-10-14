@@ -6,6 +6,8 @@ export const catalogQueryKeys = {
   all: ["catalog"] as const,
   list: (params: Record<string, unknown>) =>
     [...catalogQueryKeys.all, "list", params] as const,
+  facets: (params: Record<string, unknown>) =>
+    [...catalogQueryKeys.all, "facets", params] as const,
   product: (productId: string) =>
     [...catalogQueryKeys.all, "product", productId] as const,
 };

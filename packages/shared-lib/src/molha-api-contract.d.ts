@@ -1,4 +1,8 @@
 declare module "@molha/api-contract" {
+  export const PRODUCT_CATALOG_DELIVERY_FILTER_VALUES: readonly string[];
+  export const PRODUCT_CATALOG_RATING_MIN_VALUES: readonly number[];
+  export const PRODUCT_PRICE_RUB_MAX: number;
+
   export const PRODUCT_BADGE_EXPLAIN_KEY_VALUES: readonly string[];
   export const PRODUCT_BADGE_EXPLAIN_DESCRIPTION_MAX_LENGTH: number;
   export const PRODUCT_WHOLESALE_MIN_QTY_MIN: number;

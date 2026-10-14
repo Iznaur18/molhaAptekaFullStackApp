@@ -29,10 +29,9 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import type {
-  CatalogListFilters,
-  CatalogSort,
-} from "@/entities/product/model/catalogListFilters";
+import { isCatalogFiltersDraftEmpty } from "@izibuy/shared-lib";
+
+import type { CatalogListFilters } from "@/entities/product/model/catalogListFilters";
 import { buildCatalogListScopeKey } from "@/entities/product/lib/shouldRetainCatalogListPlaceholderData";
 import { useCatalogProductsInfiniteQuery } from "@/entities/product/model/useCatalogProductsInfiniteQuery";
 import { useViewerRegion } from "@/entities/region/model/ViewerRegionProvider";
@@ -68,8 +67,12 @@ import { invalidateHomeFeedQueries } from "@/features/home-feed/model/invalidate
 import { useHomeFeedContentReady } from "@/features/home-feed/model/useHomeFeedContentReady";
 import {
   EMPTY_HOME_CATALOG_FEED_FILTERS,
+  hasHomeCatalogFeedExtraFilters,
+  homeCatalogFeedFiltersToDraft,
+  pickHomeCatalogFeedFilters,
   type HomeCatalogFeedFiltersState,
 } from "@/features/home-feed/model/homeCatalogFeedFilters";
+import { HomeCatalogFiltersSheet } from "@/features/home-feed/ui/HomeCatalogFiltersSheet";
 import { HomeCatalogEmbeddedSearchRow } from "@/features/home-feed/ui/HomeCatalogEmbeddedSearchRow";
 import { HomeFeedListHeader } from "@/features/home-feed/ui/HomeFeedListHeader";
 import { HomeCatalogFeedSheetCap } from "@/features/home-feed/ui/HomeCatalogFeedSheetCap";
@@ -157,6 +160,7 @@ export default function CatalogScreen() {
   const [selectedSellerPersonalCategoryId, setSelectedSellerPersonalCategoryId] =
     useState<string | null>(null);
   const [feedFilters, setFeedFilters] = useState<FeedFiltersState>(EMPTY_FEED_FILTERS);
+  const [isFiltersSheetOpen, setIsFiltersSheetOpen] = useState(false);
   const { viewerRegionCode } = useViewerRegion();
   // Пересечение типов: рантайм-реф Reanimated отдаёт внутренний FlatList
   // (нужен useScrollToTop), а проп ref анимированного списка требует
@@ -203,20 +207,8 @@ export default function CatalogScreen() {
       setSelectedRootSlug(pending.productCategory ?? null);
       setSelectedSubcategoryId(pending.categoryId ?? null);
       setSelectedSellerPersonalCategoryId(pending.sellerPersonalCategoryId ?? null);
-      setFeedFilters({
-        sort: pending.sort,
-        followingOnly: pending.followingOnly === true,
-        auctionOnly: pending.auctionOnly === true,
-        installmentOnly: pending.installmentOnly === true,
-        saleOnly: pending.saleOnly === true,
-        rentalOnly: pending.rentalOnly === true,
-        affiliateOnly: pending.affiliateOnly === true,
-        wholesaleOnly: pending.wholesaleOnly === true,
-        buyNFreeOnly: pending.buyNFreeOnly === true,
-        originalOnly: pending.originalOnly === true,
-        flashSaleOnly: pending.flashSaleOnly === true,
-        near: pending.near === true,
-      });
+      // Плитка каталога задаёт фильтры целиком — то же состояние, что меняет окно.
+      setFeedFilters(pickHomeCatalogFeedFilters(pending));
     }, []),
   );
 
@@ -228,18 +220,7 @@ export default function CatalogScreen() {
         selectedRootSlug && !selectedSubcategoryId ? selectedRootSlug : undefined,
       categoryId: selectedSubcategoryId ?? undefined,
       sellerPersonalCategoryId: selectedSellerPersonalCategoryId ?? undefined,
-      sort: feedFilters.sort as CatalogSort | undefined,
-      followingOnly: feedFilters.followingOnly || undefined,
-      auctionOnly: feedFilters.auctionOnly || undefined,
-      installmentOnly: feedFilters.installmentOnly || undefined,
-      saleOnly: feedFilters.saleOnly || undefined,
-      rentalOnly: feedFilters.rentalOnly || undefined,
-      affiliateOnly: feedFilters.affiliateOnly || undefined,
-      wholesaleOnly: feedFilters.wholesaleOnly || undefined,
-      buyNFreeOnly: feedFilters.buyNFreeOnly || undefined,
-      originalOnly: feedFilters.originalOnly || undefined,
-      flashSaleOnly: feedFilters.flashSaleOnly || undefined,
-      near: feedFilters.near || undefined,
+      ...feedFilters,
       regionCode: viewerRegionCode || undefined,
     }),
     [
@@ -282,6 +263,7 @@ export default function CatalogScreen() {
         originalOnly: feedFilters.originalOnly === true,
         flashSaleOnly: feedFilters.flashSaleOnly === true,
         near: feedFilters.near === true,
+        hasExtraFilters: hasHomeCatalogFeedExtraFilters(feedFilters),
       }),
     [
       submittedSearch,
@@ -543,13 +525,36 @@ export default function CatalogScreen() {
     }
   };
 
-  const searchRow = (
-    <HomeCatalogSearchRow
-      value={searchInput}
-      onChange={handleSearchInputChange}
-      onSubmit={handleSearchSubmit}
-      embeddedInForegroundSheet={showHomeFeed}
+  const openFiltersSheet = useCallback(() => setIsFiltersSheetOpen(true), []);
+  const closeFiltersSheet = useCallback(() => setIsFiltersSheetOpen(false), []);
+  const filtersActive = useMemo(
+    () => !isCatalogFiltersDraftEmpty(homeCatalogFeedFiltersToDraft(feedFilters)),
+    [feedFilters],
+  );
+
+  const filtersSheet = (
+    <HomeCatalogFiltersSheet
+      open={isFiltersSheetOpen}
+      appliedFilters={feedFilters}
+      catalogFilters={catalogFilters}
+      onClose={closeFiltersSheet}
+      onApply={setFeedFilters}
     />
+  );
+
+  const searchRow = (
+    <>
+      <HomeCatalogSearchRow
+        value={searchInput}
+        onChange={handleSearchInputChange}
+        onSubmit={handleSearchSubmit}
+        filtersOpen={isFiltersSheetOpen}
+        filtersActive={filtersActive}
+        onOpenFilters={openFiltersSheet}
+        embeddedInForegroundSheet={showHomeFeed}
+      />
+      {filtersSheet}
+    </>
   );
 
   const listHeader = (
@@ -832,7 +837,11 @@ export default function CatalogScreen() {
             value={searchInput}
             onChange={handleSearchInputChange}
             onSubmit={handleSearchSubmit}
+            filtersOpen={isFiltersSheetOpen}
+            filtersActive={filtersActive}
+            onOpenFilters={openFiltersSheet}
           >
+            {filtersSheet}
             {renderHomeFeedScene(
               <GestureDetector gesture={introTransition.panGesture}>
                 <View style={styles.homeFeedStage}>
