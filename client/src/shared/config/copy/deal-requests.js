@@ -40,15 +40,12 @@ export const PRODUCT_DEAL_ACTIONS_UI = {
 
 /** Условия сделки: поля в форме объявления и строки в самом объявлении. */
 export const PRODUCT_DEAL_TERMS_UI = {
-  SECTION_TITLE: { viewing: "Осмотр", service: "Условия услуги" },
+  SECTION_TITLE: { service: "Условия услуги" },
   PRICE_MODE_LABEL: "Как показать цену",
   PRICE_UNIT_LABEL: "За что цена",
   PRICE_NEGOTIABLE_HINT:
     "Покупатель увидит «Договорная». Число из поля цены никому не показывается — итог вы назовёте, принимая заявку.",
   LOCATIONS_LABEL: "Где оказываете услугу",
-  SCHEDULE_LABEL: "Когда можно посмотреть",
-  SCHEDULE_PLACEHOLDER: "Например: будни после 18:00, выходные весь день",
-  VIEW_SCHEDULE: "Когда можно посмотреть",
 };
 
 /** Страница «Заявки» в профиле. */

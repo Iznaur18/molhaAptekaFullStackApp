@@ -43,7 +43,6 @@ export const CREATE_PRODUCT_INITIAL_FORM = {
   productServicePriceMode: "",
   productServicePriceUnit: "",
   productServiceLocations: [],
-  productViewingSchedule: "",
   productCharacteristicsSellerTouched: false,
   productCharacteristicsAutoAppliedForCategoryId: null,
   productRegionCode: "",
@@ -122,7 +121,6 @@ export function createProductFormStateFromProduct(product) {
     productServiceLocations: Array.isArray(product.productServiceLocations)
       ? product.productServiceLocations
       : [],
-    productViewingSchedule: String(product.productViewingSchedule ?? ""),
     productCharacteristicsSellerTouched: true,
     productCharacteristicsAutoAppliedForCategoryId: null,
     productRegionCode: product.productRegionCode?.trim() || "RU-MOW",

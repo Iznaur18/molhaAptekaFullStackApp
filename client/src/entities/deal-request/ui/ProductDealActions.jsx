@@ -2,15 +2,11 @@ import {
   isCartDealType,
   isSellerPhoneOpenBeforeRequest,
   normalizeCategoryDealType,
-  resolveProductViewingSchedule,
 } from "@molha/api-contract";
 import { Phone } from "lucide-react";
 import { useCallback, useState } from "react";
 
-import {
-  PRODUCT_DEAL_ACTIONS_UI,
-  PRODUCT_DEAL_TERMS_UI,
-} from "../../../shared/config/appUiCopy.js";
+import { PRODUCT_DEAL_ACTIONS_UI } from "../../../shared/config/appUiCopy.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 import { fetchDealRequestSellerPhone } from "../api/dealRequestApi.js";
 import { DealRequestSheet } from "./DealRequestSheet.jsx";
@@ -26,7 +22,6 @@ import "./ProductDealActions.css";
  *     _id: unknown;
  *     productDealType?: unknown;
  *     productServiceLocations?: unknown;
- *     productViewingSchedule?: unknown;
  *   };
  *   isAuthorized: boolean;
  *   isOwnProduct: boolean;
@@ -66,8 +61,6 @@ export function ProductDealActions({
   const isCard = variant === "card";
   const isCompact = isDock || isCard;
   const showButtons = variant !== "details";
-  const showTerms = !isCompact;
-  const viewingSchedule = resolveProductViewingSchedule(product);
   // В карточке ленты телефона нет: места хватает на одну кнопку.
   const canShowPhone = !isCard && isSellerPhoneOpenBeforeRequest(dealType);
   const phoneButtonClassName = [
@@ -121,18 +114,6 @@ export function ProductDealActions({
         .filter(Boolean)
         .join(" ")}
     >
-      {/* Где оказывается услуга — во вкладке «Адрес», здесь только время осмотра. */}
-      {showTerms && viewingSchedule ? (
-        <dl className="product-deal-actions__terms">
-          {viewingSchedule ? (
-            <div>
-              <dt>{PRODUCT_DEAL_TERMS_UI.VIEW_SCHEDULE}</dt>
-              <dd>{viewingSchedule}</dd>
-            </div>
-          ) : null}
-        </dl>
-      ) : null}
-
       {showButtons ? (
         <div className="product-deal-actions__row">
           <button

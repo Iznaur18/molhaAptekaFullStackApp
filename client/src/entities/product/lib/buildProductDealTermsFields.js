@@ -1,6 +1,5 @@
 import {
   CATEGORY_DEAL_TYPE_SERVICE,
-  CATEGORY_DEAL_TYPE_VIEWING,
   normalizeCategoryDealType,
   normalizeProductServiceLocations,
   normalizeProductServicePriceMode,
@@ -34,9 +33,6 @@ export function buildProductDealTermsFields(form) {
     };
   }
 
-  if (dealType === CATEGORY_DEAL_TYPE_VIEWING) {
-    return { productViewingSchedule: String(form.productViewingSchedule ?? "").trim() };
-  }
-
+  // У осмотра своих условий нет: время договариваются в заявке.
   return {};
 }

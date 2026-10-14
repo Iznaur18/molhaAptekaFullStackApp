@@ -76,7 +76,6 @@ export function CreateProductCommerceSection({
           form={form}
           setForm={setForm}
           disabled={isSubmitting}
-          part="price"
         />
       ) : null}
       {showCatalogAvailabilityToggle ? (

@@ -6,8 +6,6 @@ import {
   normalizeCategoryDealType,
 } from "@molha/api-contract";
 
-import { PRODUCT_PICKUP_UI } from "../../../../shared/config/appUiCopy.js";
-
 import { userSavedAddressesFromUser } from "../../../address/lib/userSavedAddressesFromUser.js";
 import { useAuthSession } from "../../../user/model/useAuthSession.js";
 import { useMySellerCommerceDefaultsQuery } from "../../../seller-commerce-defaults/model/sellerCommerceDefaultsQueries.js";
@@ -17,7 +15,6 @@ import {
   useMyCdekConnectionQuery,
   useToggleCdekConnectionMutation,
 } from "../../../cdek/model/cdekConnectionQueries.js";
-import { CreateProductDealTermsFields } from "./CreateProductDealTermsFields.jsx";
 import { ProductFulfillmentSourceSwitch } from "./ProductFulfillmentSourceSwitch.jsx";
 
 import "./CreateProductSections.css";
@@ -67,23 +64,6 @@ export function CreateProductPickupSection({ form, setForm, isSubmitting }) {
 
   return (
     <div className="create-product-section">
-      {addressOnly ? (
-        <p className="create-product-section__lead" role="note">
-          {PRODUCT_PICKUP_UI.DEAL_FORM_NOTICE[dealType]}
-        </p>
-      ) : null}
-      {/* Когда можно посмотреть — над адресом: это про встречу. Цена услуги
-          живёт на шаге «Цена». */}
-      {addressOnly ? (
-        <CreateProductDealTermsFields
-          dealType={dealType}
-          form={form}
-          setForm={setForm}
-          disabled={isSubmitting}
-          part="meeting"
-        />
-      ) : null}
-
       {/* Адрес из профиля годится и для встречи: заставлять продавца заново
           ставить точку на карте ради осмотра незачем. */}
       <ProductFulfillmentSourceSwitch
