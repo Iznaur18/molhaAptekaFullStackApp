@@ -27,6 +27,7 @@ import "./CreateProductDealTermsFields.css";
  *   form: Record<string, unknown>;
  *   setForm: (updater: (prev: Record<string, unknown>) => Record<string, unknown>) => void;
  *   disabled?: boolean;
+ *   part: "price" | "meeting"; на шаге «Цена» — цена услуги, у адреса — время осмотра
  * }} props
  */
 export function CreateProductDealTermsFields({
@@ -34,13 +35,23 @@ export function CreateProductDealTermsFields({
   form,
   setForm,
   disabled = false,
+  part,
 }) {
   /** @param {Record<string, unknown>} patch */
   const patchForm = (patch) => setForm((prev) => ({ ...prev, ...patch }));
 
   if (dealType === CATEGORY_DEAL_TYPE_VIEWING) {
+    if (part !== "meeting") {
+      return null;
+    }
     return (
-      <div className="create-product-deal-terms">
+      <section
+        className="create-product-deal-terms"
+        aria-label={PRODUCT_DEAL_TERMS_UI.SECTION_TITLE[dealType]}
+      >
+        <p className="create-product-deal-terms__title">
+          {PRODUCT_DEAL_TERMS_UI.SECTION_TITLE[dealType]}
+        </p>
         <label className="create-product-deal-terms__field">
           <span>{PRODUCT_DEAL_TERMS_UI.SCHEDULE_LABEL}</span>
           <input
@@ -54,11 +65,11 @@ export function CreateProductDealTermsFields({
             }
           />
         </label>
-      </div>
+      </section>
     );
   }
 
-  if (dealType !== CATEGORY_DEAL_TYPE_SERVICE) {
+  if (dealType !== CATEGORY_DEAL_TYPE_SERVICE || part !== "price") {
     return null;
   }
 
@@ -75,7 +86,13 @@ export function CreateProductDealTermsFields({
   };
 
   return (
-    <div className="create-product-deal-terms">
+    <section
+      className="create-product-deal-terms"
+      aria-label={PRODUCT_DEAL_TERMS_UI.SECTION_TITLE[dealType]}
+    >
+      <p className="create-product-deal-terms__title">
+        {PRODUCT_DEAL_TERMS_UI.SECTION_TITLE[dealType]}
+      </p>
       <label className="create-product-deal-terms__field">
         <span>{PRODUCT_DEAL_TERMS_UI.PRICE_MODE_LABEL}</span>
         <select
@@ -128,6 +145,6 @@ export function CreateProductDealTermsFields({
           </label>
         ))}
       </fieldset>
-    </div>
+    </section>
   );
 }

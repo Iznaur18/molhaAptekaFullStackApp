@@ -3,10 +3,14 @@ import { PRODUCT_STOCK_QUANTITY_MAX } from "../../model/productStockConstants.js
 import { CREATE_PRODUCT_MODAL_UI } from "../../../../shared/config/appUiCopy.js";
 import { getProductFieldEditLabel } from "../../lib/productFieldRegistry.js";
 import { FormFieldLabel } from "../../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
+import { normalizeCategoryDealType } from "@molha/api-contract";
+
+import { CreateProductDealTermsFields } from "./CreateProductDealTermsFields.jsx";
 
 /**
  * @param {{
  *   form: Record<string, unknown>;
+ *   setForm?: (updater: (prev: Record<string, unknown>) => Record<string, unknown>) => void;
  *   isSubmitting: boolean;
  *   handleChange: import('react').ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
  *   handleAvailableChange: import('react').ChangeEventHandler<HTMLInputElement>;
@@ -18,6 +22,7 @@ import { FormFieldLabel } from "../../../../shared/ui/FormFieldLabel/FormFieldLa
  */
 export function CreateProductCommerceSection({
   form,
+  setForm,
   isSubmitting,
   handleChange,
   handleAvailableChange,
@@ -63,6 +68,16 @@ export function CreateProductCommerceSection({
         <p className="create-product-section__discount-preview">
           {CREATE_PRODUCT_MODAL_UI.LABEL_DISCOUNT_PREVIEW}: −{discountPreviewPercent}%
         </p>
+      ) : null}
+      {/* Услуга: как показать цену, за что она и где оказывается. */}
+      {setForm ? (
+        <CreateProductDealTermsFields
+          dealType={normalizeCategoryDealType(form.categoryDealType)}
+          form={form}
+          setForm={setForm}
+          disabled={isSubmitting}
+          part="price"
+        />
       ) : null}
       {showCatalogAvailabilityToggle ? (
         <label className="create-product-section__check">

@@ -1,9 +1,12 @@
-import { MapPin, Truck } from "lucide-react";
+import { Building2, Car, MapPin, MonitorSmartphone, Truck } from "lucide-react";
 import {
   PRODUCT_DELIVERY_CARRIER_GITORG,
   PRODUCT_DELIVERY_CARRIER_LABEL_RU,
   PRODUCT_DELIVERY_CARRIER_LOBO,
+  CATEGORY_DEAL_TYPE_SERVICE,
+  PRODUCT_SERVICE_LOCATION_LABELS_RU,
   isCartDealType,
+  normalizeProductServiceLocations,
   normalizeCategoryDealType,
   productPickupLocationsFromProduct,
   productShipsToBuyer,
@@ -13,6 +16,13 @@ import {
 import { PRODUCT_PICKUP_UI } from "../../../../shared/config/appUiCopy.js";
 import { openYandexMapsRoute } from "../../../../shared/lib/openYandexMaps.js";
 import { AppIcon } from "../../../../shared/ui/icon/index.js";
+
+/** Иконка к каждому месту оказания услуги. */
+const SERVICE_LOCATION_ICONS = {
+  at_client: Car,
+  at_provider: Building2,
+  online: MonitorSmartphone,
+};
 
 /**
  * @param {{
@@ -32,20 +42,43 @@ export function ProductPickupDetailsPanel({ product }) {
     : PRODUCT_PICKUP_UI.DEAL_DETAILS_TITLE[dealType];
   const noAddressLabel = isCartDeal
     ? PRODUCT_PICKUP_UI.DETAILS_NO_ADDRESS
-    : `${PRODUCT_PICKUP_UI.DEAL_DETAILS_NO_ADDRESS[dealType]}. ${PRODUCT_PICKUP_UI.DEAL_DETAILS_HINT}`;
+    : PRODUCT_PICKUP_UI.DEAL_DETAILS_NO_ADDRESS[dealType];
   const carrier = resolveProductDeliveryCarrier(product);
   const locations = productPickupLocationsFromProduct(product);
+  // Услуга: где её оказывают — рядом с адресом, это про то же «куда идти».
+  const serviceLocations =
+    dealType === CATEGORY_DEAL_TYPE_SERVICE
+      ? normalizeProductServiceLocations(product.productServiceLocations)
+      : [];
+  // Каждое место — своя строка со своей иконкой, как строка адреса над ними.
+  const serviceLocationsRow = serviceLocations.map((value) => (
+    <div key={value} className="product-pickup-details-panel__method">
+      <span className="product-pickup-details-panel__icon" aria-hidden>
+        <AppIcon icon={SERVICE_LOCATION_ICONS[value]} size="lg" strokeWidth={2.25} />
+      </span>
+      <span className="product-pickup-details-panel__text">
+        <span className="product-pickup-details-panel__title">
+          {PRODUCT_SERVICE_LOCATION_LABELS_RU[value]}
+        </span>
+        <span className="product-pickup-details-panel__subtitle product-pickup-details-panel__subtitle--muted">
+          {PRODUCT_PICKUP_UI.DEAL_SERVICE_LOCATION_HINTS[value]}
+        </span>
+      </span>
+    </div>
+  ));
+  const noAddress = (
+    <>
+      <p className="product-details-content-switcher__description">{noAddressLabel}</p>
+      {serviceLocationsRow}
+    </>
+  );
 
   if (!pickupOn && !deliveryOn) {
-    return (
-      <p className="product-details-content-switcher__description">{noAddressLabel}</p>
-    );
+    return noAddress;
   }
 
   if (pickupOn && locations.length === 0 && !deliveryOn) {
-    return (
-      <p className="product-details-content-switcher__description">{noAddressLabel}</p>
-    );
+    return noAddress;
   }
 
   return (
@@ -117,11 +150,7 @@ export function ProductPickupDetailsPanel({ product }) {
           </span>
         </div>
       ) : null}
-      {isCartDeal ? null : (
-        <p className="product-details-content-switcher__description">
-          {PRODUCT_PICKUP_UI.DEAL_DETAILS_HINT}
-        </p>
-      )}
+      {serviceLocationsRow}
     </div>
   );
 }

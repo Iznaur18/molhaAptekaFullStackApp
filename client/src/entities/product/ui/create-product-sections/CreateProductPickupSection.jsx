@@ -72,6 +72,18 @@ export function CreateProductPickupSection({ form, setForm, isSubmitting }) {
           {PRODUCT_PICKUP_UI.DEAL_FORM_NOTICE[dealType]}
         </p>
       ) : null}
+      {/* Когда можно посмотреть — над адресом: это про встречу. Цена услуги
+          живёт на шаге «Цена». */}
+      {addressOnly ? (
+        <CreateProductDealTermsFields
+          dealType={dealType}
+          form={form}
+          setForm={setForm}
+          disabled={isSubmitting}
+          part="meeting"
+        />
+      ) : null}
+
       {/* Адрес из профиля годится и для встречи: заставлять продавца заново
           ставить точку на карте ради осмотра незачем. */}
       <ProductFulfillmentSourceSwitch
@@ -83,15 +95,6 @@ export function CreateProductPickupSection({ form, setForm, isSubmitting }) {
           setForm((prev) => ({ ...prev, productFulfillmentSource: next }))
         }
       />
-
-      {addressOnly ? (
-        <CreateProductDealTermsFields
-          dealType={dealType}
-          form={form}
-          setForm={setForm}
-          disabled={isSubmitting}
-        />
-      ) : null}
 
       {followsProfile ? null : (
         <ProductPickupLocationFields

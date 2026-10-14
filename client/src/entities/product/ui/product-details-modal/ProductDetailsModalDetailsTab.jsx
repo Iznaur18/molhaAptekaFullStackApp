@@ -240,6 +240,8 @@ export function ProductDetailsModalDetailsTab({
         isAuthorized={isAuthorized}
         isOwnProduct={isOwnProduct}
         onRequestLogin={onRequestLogin}
+        // На телефоне кнопки — в нижней панели, как «В корзину»; здесь форма.
+        variant={showInlinePurchaseActions ? "full" : "details"}
       />
       <ProductDetailsWholesaleOffer
         product={product}

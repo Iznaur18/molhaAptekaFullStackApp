@@ -5,6 +5,44 @@
   width: 100%;
 }
 
+/* Нижняя панель на телефоне: кнопки той же высоты, что «В корзину». */
+.product-deal-actions_dock {
+  gap: 0.35rem;
+}
+
+.product-deal-actions_dock .product-deal-actions__row {
+  flex-wrap: nowrap;
+}
+
+.product-deal-actions_dock .product-deal-actions__button {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 3rem;
+  padding: 0.75rem 0.6rem;
+  border-radius: 1.25rem;
+  corner-shape: squircle;
+  font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Карточка в ленте: та же геометрия, что у «В корзину» (.add-to-cart). */
+.product-deal-actions_card {
+  gap: 0.3rem;
+}
+
+.product-deal-actions_card .product-deal-actions__button {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  padding: 0.45rem 1rem;
+  border-radius: 1rem;
+  corner-shape: squircle;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
 .product-deal-actions__terms {
   display: flex;
   flex-direction: column;

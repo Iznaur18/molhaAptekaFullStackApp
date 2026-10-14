@@ -1,28 +1,17 @@
 import {
-  CATEGORY_DEAL_TYPE_SERVICE,
-  DEAL_REQUEST_COMMENT_MAX_LENGTH,
-  ADDRESS_LINE_MAX_LENGTH,
   isCartDealType,
-  PRODUCT_SERVICE_LOCATION_LABELS_RU,
   isSellerPhoneOpenBeforeRequest,
   normalizeCategoryDealType,
-  normalizeProductServiceLocations,
   resolveProductViewingSchedule,
 } from "@molha/api-contract";
-import { useId, useState } from "react";
+import { useCallback, useState } from "react";
 
 import {
   PRODUCT_DEAL_ACTIONS_UI,
   PRODUCT_DEAL_TERMS_UI,
 } from "../../../shared/config/appUiCopy.js";
-import { HOME_MAIN_VIEW_PATH } from "../../../shared/lib/homeMainViewPaths.js";
 import { fetchDealRequestSellerPhone } from "../api/dealRequestApi.js";
-import {
-  defaultDealRequestTime,
-  fromDateTimeLocalValue,
-  toDateTimeLocalValue,
-} from "../lib/dealRequestTime.js";
-import { useCreateDealRequestMutation } from "../model/useDealRequestMutations.js";
+import { DealRequestSheet } from "./DealRequestSheet.jsx";
 
 import "./ProductDealActions.css";
 
@@ -40,43 +29,45 @@ import "./ProductDealActions.css";
  *   isAuthorized: boolean;
  *   isOwnProduct: boolean;
  *   onRequestLogin: () => void;
+ *   variant?: "full" | "dock" | "details" | "card";
  * }} props
+ *
+ * `variant` — где стоит блок. Кнопки живут там же, где у товара «В корзину»:
+ * на компьютере под ценой (`full`), на телефоне в нижней панели (`dock`). Под
+ * ценой на телефоне остаются только условия (`details`). Форма заявки — в
+ * окне, которое выезжает снизу.
  */
 export function ProductDealActions({
   product,
   isAuthorized,
   isOwnProduct,
   onRequestLogin,
+  variant = "full",
 }) {
-  const formId = useId();
   const dealType = normalizeCategoryDealType(product?.productDealType);
   const productId = String(product?._id ?? "");
-  const createMutation = useCreateDealRequestMutation();
 
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [isSent, setIsSent] = useState(false);
-  const [timeValue, setTimeValue] = useState(() =>
-    toDateTimeLocalValue(defaultDealRequestTime()),
-  );
-  const [address, setAddress] = useState("");
-  const [comment, setComment] = useState("");
-  const [formError, setFormError] = useState("");
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [phoneState, setPhoneState] = useState(
     /** @type {{ status: "idle" | "loading" | "ready" | "error"; phone?: string | null; message?: string }} */ ({
       status: "idle",
     }),
   );
+  const closeSheet = useCallback(() => setIsSheetOpen(false), []);
 
   if (isCartDealType(dealType) || isOwnProduct || !productId) {
     return null;
   }
 
-  const isService = dealType === CATEGORY_DEAL_TYPE_SERVICE;
-  const serviceLocations = isService
-    ? normalizeProductServiceLocations(product.productServiceLocations)
-    : [];
+  const isDock = variant === "dock";
+  // Карточка в ленте: одна кнопка на месте «В корзину».
+  const isCard = variant === "card";
+  const isCompact = isDock || isCard;
+  const showButtons = variant !== "details";
+  const showTerms = !isCompact;
   const viewingSchedule = resolveProductViewingSchedule(product);
-  const canShowPhone = isSellerPhoneOpenBeforeRequest(dealType);
+  // В карточке ленты телефона нет: места хватает на одну кнопку.
+  const canShowPhone = !isCard && isSellerPhoneOpenBeforeRequest(dealType);
 
   const requireLogin = () => {
     if (isAuthorized) {
@@ -105,73 +96,26 @@ export function ProductDealActions({
     }
   };
 
-  const handleOpenForm = () => {
+  const handleOpenSheet = () => {
     if (requireLogin()) {
       return;
     }
-    setFormError("");
-    setIsFormOpen(true);
+    setIsSheetOpen(true);
   };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const preferredAt = fromDateTimeLocalValue(timeValue);
-    if (!preferredAt) {
-      setFormError(PRODUCT_DEAL_ACTIONS_UI.TIME_REQUIRED);
-      return;
-    }
-    setFormError("");
-    try {
-      await createMutation.mutateAsync({
-        productId,
-        preferredAt,
-        comment: comment.trim(),
-        ...(isService ? { address: address.trim() } : {}),
-      });
-      setIsFormOpen(false);
-      setIsSent(true);
-    } catch (error) {
-      setFormError(
-        error instanceof Error
-          ? error.message
-          : PRODUCT_DEAL_ACTIONS_UI.SUBMIT_FALLBACK_ERROR,
-      );
-    }
-  };
-
-  if (isSent) {
-    return (
-      <div className="product-deal-actions" role="status">
-        <p className="product-deal-actions__sent-title">
-          {PRODUCT_DEAL_ACTIONS_UI.SENT_TITLE}
-        </p>
-        <p className="product-deal-actions__hint">
-          {PRODUCT_DEAL_ACTIONS_UI.SENT_HINT}
-        </p>
-        <a
-          className="app-btn app-btn--secondary product-deal-actions__button"
-          href={HOME_MAIN_VIEW_PATH["deal-requests"]}
-        >
-          {PRODUCT_DEAL_ACTIONS_UI.OPEN_REQUESTS}
-        </a>
-      </div>
-    );
-  }
 
   return (
-    <div className="product-deal-actions">
-      {serviceLocations.length > 0 || viewingSchedule ? (
+    <div
+      className={[
+        "product-deal-actions",
+        isDock ? "product-deal-actions_dock" : "",
+        isCard ? "product-deal-actions_card" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      {/* Где оказывается услуга — во вкладке «Адрес», здесь только время осмотра. */}
+      {showTerms && viewingSchedule ? (
         <dl className="product-deal-actions__terms">
-          {serviceLocations.length > 0 ? (
-            <div>
-              <dt>{PRODUCT_DEAL_TERMS_UI.VIEW_LOCATIONS}</dt>
-              <dd>
-                {serviceLocations
-                  .map((value) => PRODUCT_SERVICE_LOCATION_LABELS_RU[value])
-                  .join(", ")}
-              </dd>
-            </div>
-          ) : null}
           {viewingSchedule ? (
             <div>
               <dt>{PRODUCT_DEAL_TERMS_UI.VIEW_SCHEDULE}</dt>
@@ -180,80 +124,18 @@ export function ProductDealActions({
           ) : null}
         </dl>
       ) : null}
-      {isFormOpen ? (
-        <form
-          className="product-deal-actions__form"
-          onSubmit={handleSubmit}
-          aria-labelledby={`${formId}-title`}
-        >
-          <p className="product-deal-actions__form-title" id={`${formId}-title`}>
-            {PRODUCT_DEAL_ACTIONS_UI.FORM_TITLE[dealType]}
-          </p>
-          <label className="product-deal-actions__field">
-            <span>{PRODUCT_DEAL_ACTIONS_UI.FIELD_TIME}</span>
-            <input
-              type="datetime-local"
-              value={timeValue}
-              min={toDateTimeLocalValue(new Date())}
-              required
-              onChange={(event) => setTimeValue(event.target.value)}
-            />
-          </label>
-          {isService ? (
-            <label className="product-deal-actions__field">
-              <span>{PRODUCT_DEAL_ACTIONS_UI.FIELD_ADDRESS}</span>
-              <input
-                type="text"
-                value={address}
-                maxLength={ADDRESS_LINE_MAX_LENGTH}
-                placeholder={PRODUCT_DEAL_ACTIONS_UI.FIELD_ADDRESS_PLACEHOLDER}
-                onChange={(event) => setAddress(event.target.value)}
-              />
-            </label>
-          ) : null}
-          <label className="product-deal-actions__field">
-            <span>{PRODUCT_DEAL_ACTIONS_UI.FIELD_COMMENT}</span>
-            <textarea
-              value={comment}
-              rows={3}
-              maxLength={DEAL_REQUEST_COMMENT_MAX_LENGTH}
-              placeholder={PRODUCT_DEAL_ACTIONS_UI.FIELD_COMMENT_PLACEHOLDER[dealType]}
-              onChange={(event) => setComment(event.target.value)}
-            />
-          </label>
-          {formError ? (
-            <p className="product-deal-actions__error" role="alert">
-              {formError}
-            </p>
-          ) : null}
-          <div className="product-deal-actions__row">
-            <button
-              type="submit"
-              className="app-btn app-btn--primary product-deal-actions__button"
-              disabled={createMutation.isPending}
-            >
-              {createMutation.isPending
-                ? PRODUCT_DEAL_ACTIONS_UI.SUBMITTING
-                : PRODUCT_DEAL_ACTIONS_UI.SUBMIT}
-            </button>
-            <button
-              type="button"
-              className="app-btn app-btn--cancel"
-              disabled={createMutation.isPending}
-              onClick={() => setIsFormOpen(false)}
-            >
-              {PRODUCT_DEAL_ACTIONS_UI.CANCEL}
-            </button>
-          </div>
-        </form>
-      ) : (
+
+      {showButtons ? (
         <div className="product-deal-actions__row">
           <button
             type="button"
             className="app-btn app-btn--primary product-deal-actions__button"
-            onClick={handleOpenForm}
+            onClick={handleOpenSheet}
+            aria-label={PRODUCT_DEAL_ACTIONS_UI.REQUEST_BUTTON[dealType]}
           >
-            {PRODUCT_DEAL_ACTIONS_UI.REQUEST_BUTTON[dealType]}
+            {isCompact
+              ? PRODUCT_DEAL_ACTIONS_UI.REQUEST_BUTTON_SHORT[dealType]
+              : PRODUCT_DEAL_ACTIONS_UI.REQUEST_BUTTON[dealType]}
           </button>
           {canShowPhone && phoneState.status !== "ready" ? (
             <button
@@ -261,10 +143,13 @@ export function ProductDealActions({
               className="app-btn app-btn--secondary product-deal-actions__button"
               disabled={phoneState.status === "loading"}
               onClick={() => void handleShowPhone()}
+              aria-label={PRODUCT_DEAL_ACTIONS_UI.SHOW_PHONE}
             >
               {phoneState.status === "loading"
                 ? PRODUCT_DEAL_ACTIONS_UI.PHONE_LOADING
-                : PRODUCT_DEAL_ACTIONS_UI.SHOW_PHONE}
+                : isCompact
+                  ? PRODUCT_DEAL_ACTIONS_UI.SHOW_PHONE_SHORT
+                  : PRODUCT_DEAL_ACTIONS_UI.SHOW_PHONE}
             </button>
           ) : null}
           {phoneState.status === "ready" && phoneState.phone ? (
@@ -277,21 +162,31 @@ export function ProductDealActions({
             </a>
           ) : null}
         </div>
-      )}
-      {phoneState.status === "ready" && !phoneState.phone ? (
+      ) : null}
+
+      {showButtons && phoneState.status === "ready" && !phoneState.phone ? (
         <p className="product-deal-actions__hint">
           {PRODUCT_DEAL_ACTIONS_UI.PHONE_MISSING}
         </p>
       ) : null}
-      {phoneState.status === "error" ? (
+      {showButtons && phoneState.status === "error" ? (
         <p className="product-deal-actions__error" role="alert">
           {phoneState.message}
         </p>
       ) : null}
-      {!canShowPhone && !isFormOpen ? (
+      {showTerms && !canShowPhone ? (
         <p className="product-deal-actions__hint">
           {PRODUCT_DEAL_ACTIONS_UI.SERVICE_PHONE_HINT}
         </p>
+      ) : null}
+
+      {showButtons ? (
+        <DealRequestSheet
+          isOpen={isSheetOpen}
+          onClose={closeSheet}
+          productId={productId}
+          dealType={/** @type {"viewing" | "service"} */ (dealType)}
+        />
       ) : null}
     </div>
   );

@@ -5,6 +5,9 @@
 export const PRODUCT_DEAL_ACTIONS_UI = {
   REQUEST_BUTTON: { viewing: "Записаться на осмотр", service: "Оставить заявку" },
   SHOW_PHONE: "Показать телефон",
+  // Нижняя панель на телефоне: рядом с «Назад» длинные подписи не помещаются.
+  REQUEST_BUTTON_SHORT: { viewing: "Записаться", service: "Оставить заявку" },
+  SHOW_PHONE_SHORT: "Телефон",
   PHONE_LOADING: "Загружаем…",
   PHONE_MISSING: "Продавец не указал телефон — оставьте заявку",
   /** @param {string} phone */
@@ -26,6 +29,10 @@ export const PRODUCT_DEAL_ACTIONS_UI = {
   SUBMIT: "Отправить заявку",
   SUBMITTING: "Отправляем…",
   CANCEL: "Отмена",
+  CLOSE: "Закрыть",
+  FIELD_DATE: "Дата",
+  FIELD_CLOCK: "Время",
+  SUBMIT_BY_KIND: { viewing: "Записаться", service: "Отправить заявку" },
   TIME_REQUIRED: "Укажите дату и время",
   SUBMIT_FALLBACK_ERROR: "Не удалось отправить заявку",
   SENT_TITLE: "Заявка отправлена",
@@ -35,6 +42,7 @@ export const PRODUCT_DEAL_ACTIONS_UI = {
 
 /** Условия сделки: поля в форме объявления и строки в самом объявлении. */
 export const PRODUCT_DEAL_TERMS_UI = {
+  SECTION_TITLE: { viewing: "Осмотр", service: "Условия услуги" },
   PRICE_MODE_LABEL: "Как показать цену",
   PRICE_UNIT_LABEL: "За что цена",
   PRICE_NEGOTIABLE_HINT:
@@ -42,7 +50,6 @@ export const PRODUCT_DEAL_TERMS_UI = {
   LOCATIONS_LABEL: "Где оказываете услугу",
   SCHEDULE_LABEL: "Когда можно посмотреть",
   SCHEDULE_PLACEHOLDER: "Например: будни после 18:00, выходные весь день",
-  VIEW_LOCATIONS: "Где",
   VIEW_SCHEDULE: "Когда можно посмотреть",
 };
 
