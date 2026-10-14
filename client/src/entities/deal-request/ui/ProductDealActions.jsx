@@ -4,12 +4,14 @@ import {
   normalizeCategoryDealType,
   resolveProductViewingSchedule,
 } from "@molha/api-contract";
+import { Phone } from "lucide-react";
 import { useCallback, useState } from "react";
 
 import {
   PRODUCT_DEAL_ACTIONS_UI,
   PRODUCT_DEAL_TERMS_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { AppIcon } from "../../../shared/ui/icon/index.js";
 import { fetchDealRequestSellerPhone } from "../api/dealRequestApi.js";
 import { DealRequestSheet } from "./DealRequestSheet.jsx";
 
@@ -68,6 +70,12 @@ export function ProductDealActions({
   const viewingSchedule = resolveProductViewingSchedule(product);
   // В карточке ленты телефона нет: места хватает на одну кнопку.
   const canShowPhone = !isCard && isSellerPhoneOpenBeforeRequest(dealType);
+  const phoneButtonClassName = [
+    "app-btn app-btn--secondary product-deal-actions__button product-deal-actions__phone",
+    isCompact ? "product-deal-actions__phone_icon-only" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   const requireLogin = () => {
     if (isAuthorized) {
@@ -137,28 +145,36 @@ export function ProductDealActions({
               ? PRODUCT_DEAL_ACTIONS_UI.REQUEST_BUTTON_SHORT[dealType]
               : PRODUCT_DEAL_ACTIONS_UI.REQUEST_BUTTON[dealType]}
           </button>
+          {/* Телефон — иконкой трубки. В нижней панели только иконка: места
+              мало, а трубку узнают без подписи. */}
           {canShowPhone && phoneState.status !== "ready" ? (
             <button
               type="button"
-              className="app-btn app-btn--secondary product-deal-actions__button"
+              className={phoneButtonClassName}
               disabled={phoneState.status === "loading"}
               onClick={() => void handleShowPhone()}
               aria-label={PRODUCT_DEAL_ACTIONS_UI.SHOW_PHONE}
+              title={PRODUCT_DEAL_ACTIONS_UI.SHOW_PHONE}
             >
-              {phoneState.status === "loading"
-                ? PRODUCT_DEAL_ACTIONS_UI.PHONE_LOADING
-                : isCompact
-                  ? PRODUCT_DEAL_ACTIONS_UI.SHOW_PHONE_SHORT
-                  : PRODUCT_DEAL_ACTIONS_UI.SHOW_PHONE}
+              <AppIcon icon={Phone} size="md" strokeWidth={2.25} />
+              {isCompact ? null : (
+                <span>
+                  {phoneState.status === "loading"
+                    ? PRODUCT_DEAL_ACTIONS_UI.PHONE_LOADING
+                    : PRODUCT_DEAL_ACTIONS_UI.SHOW_PHONE}
+                </span>
+              )}
             </button>
           ) : null}
           {phoneState.status === "ready" && phoneState.phone ? (
             <a
-              className="app-btn app-btn--secondary product-deal-actions__button"
+              className={phoneButtonClassName}
               href={`tel:${phoneState.phone}`}
               aria-label={PRODUCT_DEAL_ACTIONS_UI.PHONE_CALL_ARIA(phoneState.phone)}
+              title={phoneState.phone}
             >
-              {phoneState.phone}
+              <AppIcon icon={Phone} size="md" strokeWidth={2.25} />
+              {isCompact ? null : <span>{phoneState.phone}</span>}
             </a>
           ) : null}
         </div>
@@ -172,11 +188,6 @@ export function ProductDealActions({
       {showButtons && phoneState.status === "error" ? (
         <p className="product-deal-actions__error" role="alert">
           {phoneState.message}
-        </p>
-      ) : null}
-      {showTerms && !canShowPhone ? (
-        <p className="product-deal-actions__hint">
-          {PRODUCT_DEAL_ACTIONS_UI.SERVICE_PHONE_HINT}
         </p>
       ) : null}
 

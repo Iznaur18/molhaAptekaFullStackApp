@@ -6,10 +6,14 @@ import {
   PRODUCT_FULFILLMENT_SOURCE_CUSTOM,
   PRODUCT_FULFILLMENT_SOURCE_PROFILE,
   productDealTermsFieldsShape,
+  productShippingFieldsShape,
 } from "@molha/api-contract";
 
-/** Список берётся из контракта: новое поле условий сделки попадёт сюда само. */
-const PRODUCT_DEAL_TERMS_FIELDS = Object.keys(productDealTermsFieldsShape);
+/** Списки берутся из контракта: новое поле в этих группах попадёт сюда само. */
+const PASSTHROUGH_FIELDS = [
+  ...Object.keys(productDealTermsFieldsShape),
+  ...Object.keys(productShippingFieldsShape),
+];
 
 /** @typedef {import('@molha/api-contract/types').CreateProductBodyContract} CreateProductBody */
 
@@ -122,10 +126,11 @@ export async function createProduct(body) {
           ? body.productReturnTerms
           : [];
     }
-    // Условия сделки (вид цены услуги, место, время осмотра). Тело собирается
-    // по белому списку, и без этих строк выбор продавца молча терялся:
-    // объявление создавалось с ценой «точная» и без мест оказания.
-    for (const field of PRODUCT_DEAL_TERMS_FIELDS) {
+    // Условия сделки и вес с габаритами. Тело собирается по белому списку, и
+    // без этих строк выбор продавца молча терялся: объявление создавалось с
+    // ценой «точная», без мест оказания и без веса — доставка считала его
+    // средней коробкой, хотя продавец всё заполнил.
+    for (const field of PASSTHROUGH_FIELDS) {
       if (body[field] !== undefined) {
         payload[field] = body[field];
       }

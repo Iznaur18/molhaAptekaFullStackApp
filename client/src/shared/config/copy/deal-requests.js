@@ -7,13 +7,11 @@ export const PRODUCT_DEAL_ACTIONS_UI = {
   SHOW_PHONE: "Показать телефон",
   // Нижняя панель на телефоне: рядом с «Назад» длинные подписи не помещаются.
   REQUEST_BUTTON_SHORT: { viewing: "Записаться", service: "Оставить заявку" },
-  SHOW_PHONE_SHORT: "Телефон",
   PHONE_LOADING: "Загружаем…",
   PHONE_MISSING: "Продавец не указал телефон — оставьте заявку",
   /** @param {string} phone */
   PHONE_CALL_ARIA: (phone) => `Позвонить продавцу: ${phone}`,
   PHONE_FALLBACK_ERROR: "Не удалось показать телефон",
-  SERVICE_PHONE_HINT: "Телефон исполнителя откроется, когда он примет заявку.",
   FORM_TITLE: {
     viewing: "Когда вам удобно посмотреть?",
     service: "Когда нужна услуга?",

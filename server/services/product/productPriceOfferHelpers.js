@@ -176,7 +176,7 @@ export const assertBuyerCanSubmitPriceOffer = async (buyerUserId, productId) => 
 
   const product = await ProductModel.findById(productId)
     .select(
-      "productSeller productModerationStatus productIsAvailable productAuctionEnabled",
+      "productSeller productModerationStatus productIsAvailable productAuctionEnabled productDealType",
     )
     .lean();
 
@@ -213,7 +213,7 @@ export const normalizeOfferPrice = (raw) => {
 export const loadProductForAuctionGate = async (productId) => {
   const product = await ProductModel.findById(productId)
     .select(
-      "productSeller productModerationStatus productIsAvailable productAuctionEnabled productAuctionCompletedOnce",
+      "productSeller productModerationStatus productIsAvailable productAuctionEnabled productAuctionCompletedOnce productDealType",
     )
     .lean();
 
@@ -388,7 +388,7 @@ export const resolveAcceptedOfferForOrder = async (
 export const assertSellerOwnsProduct = async (productId, sellerUserId) => {
   const product = await ProductModel.findById(productId)
     .select(
-      "productSeller productAuctionEnabled productModerationStatus productIsAvailable",
+      "productSeller productAuctionEnabled productModerationStatus productIsAvailable productDealType",
     )
     .lean();
 
@@ -403,7 +403,7 @@ export const assertSellerOwnsProduct = async (productId, sellerUserId) => {
 };
 
 const DASHBOARD_PRODUCT_SELECT =
-  "productName productImageUrls productImageUrl productSeller productAuctionEnabled productModerationStatus productIsAvailable";
+  "productName productImageUrls productImageUrl productSeller productAuctionEnabled productModerationStatus productIsAvailable productDealType";
 
 /**
  * @param {Record<string, unknown> | null | undefined} product

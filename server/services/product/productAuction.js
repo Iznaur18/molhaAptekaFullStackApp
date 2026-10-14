@@ -1,4 +1,9 @@
+import { isCartDealType } from "@molha/api-contract";
+
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
+
+export const AUCTION_DEAL_TYPE_FORBIDDEN_MESSAGE =
+  "Для этого объявления торг недоступен — договоритесь о цене в заявке";
 import {
   IN_APP_NOTIFICATION_KIND_AUCTION_TOGGLED_BY_ADMIN,
   IN_APP_NOTIFICATION_MESSAGE_AUCTION_DISABLED_BY_ADMIN,
@@ -12,6 +17,9 @@ import { rejectAllPendingOffersForProduct } from "./productPriceOfferHelpers.js"
  * @param {Record<string, unknown>} product
  */
 export const computeAuctionActive = (product) =>
+  // Принятая ставка оформляется заказом, а у авто, недвижимости и услуг заказа
+  // нет — без этой строки покупатель выигрывал торг и упирался в отказ.
+  isCartDealType(product.productDealType) &&
   product.productAuctionEnabled === true &&
   product.productModerationStatus === PRODUCT_MODERATION_APPROVED &&
   product.productIsAvailable !== false;
@@ -38,6 +46,9 @@ export const enrichProductWithAuctionFields = (product) => {
  * @param {Record<string, unknown>} product
  */
 export const assertAuctionAcceptsBids = (product) => {
+  if (!isCartDealType(product.productDealType)) {
+    throw new Error(AUCTION_DEAL_TYPE_FORBIDDEN_MESSAGE);
+  }
   if (product.productAuctionEnabled !== true) {
     throw new Error("Аукцион на этом товаре не проводится");
   }

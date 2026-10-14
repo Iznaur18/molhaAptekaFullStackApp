@@ -24,11 +24,12 @@ export const createDealRequestController = async (req, res) => {
 
 /** `GET /deal-requests/me?role=buyer|seller` */
 export const listMyDealRequestsController = async (req, res) => {
+  const query = req.validatedQuery ?? req.query;
   const data = await listMyDealRequests({
     userId: String(req.userId),
-    role: req.query.role,
-    page: req.query.page,
-    limit: req.query.limit,
+    role: query.role,
+    page: query.page,
+    limit: query.limit,
   });
   return successRes(res, data);
 };

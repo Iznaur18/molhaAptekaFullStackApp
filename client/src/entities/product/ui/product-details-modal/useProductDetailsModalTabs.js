@@ -53,9 +53,7 @@ export function useProductDetailsModalTabs({
   const showCompareTab = product?._id != null;
   const showAuctionTab =
     product?._id != null &&
-    (isSellerView
-      ? auctionUi.showSellerAuctionTab
-      : product.productAuctionEnabled === true);
+    (isSellerView ? auctionUi.showSellerAuctionTab : auctionUi.enabled);
   const showInstallmentTab =
     product?._id != null &&
     (isSellerView
@@ -120,9 +118,7 @@ export function useProductDetailsModalTabs({
     const showCompare = product._id != null;
     const showAuction =
       product._id != null &&
-      (isSellerView
-        ? auctionUi.showSellerAuctionTab
-        : product.productAuctionEnabled === true);
+      (isSellerView ? auctionUi.showSellerAuctionTab : auctionUi.enabled);
     const showInstallment =
       product._id != null &&
       (isSellerView
@@ -137,6 +133,7 @@ export function useProductDetailsModalTabs({
     if (detailsTab === "auction" && !showAuction) setDetailsTab("details");
     if (detailsTab === "installment" && !showInstallment) setDetailsTab("details");
   }, [
+    auctionUi.enabled,
     auctionUi.showSellerAuctionTab,
     detailsTab,
     installmentUi.installmentActive,

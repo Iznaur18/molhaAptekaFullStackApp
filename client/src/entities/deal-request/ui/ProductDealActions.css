@@ -27,6 +27,21 @@
   text-overflow: ellipsis;
 }
 
+/* Телефон: иконка трубки, рядом текст — только под ценой на компьютере. */
+.product-deal-actions__phone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+/* Нижняя панель: квадратная кнопка с одной иконкой. */
+.product-deal-actions_dock .product-deal-actions__phone_icon-only {
+  flex: 0 0 3rem;
+  width: 3rem;
+  padding: 0;
+}
+
 /* Карточка в ленте: та же геометрия, что у «В корзину» (.add-to-cart). */
 .product-deal-actions_card {
   gap: 0.3rem;

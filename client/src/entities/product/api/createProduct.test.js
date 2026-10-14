@@ -147,4 +147,23 @@ describe("createProduct: тело запроса", () => {
     await createProduct({ ...PICKUP_BODY, productFulfillmentSource: "profile" });
     expect(sentPayload()).not.toHaveProperty("productServicePriceMode");
   });
+
+  it("вес и габариты доезжают до сервера, «не знаю» — как null", async () => {
+    await createProduct({
+      ...PICKUP_BODY,
+      productFulfillmentSource: "profile",
+      productWeightG: 1200,
+      productLengthCm: 30,
+      productWidthCm: null,
+      productHeightCm: null,
+    });
+
+    const payload = sentPayload();
+    // Раньше белый список их выкидывал, и доставка считала товар средней
+    // коробкой, хотя продавец указал вес и размеры.
+    expect(payload.productWeightG).toBe(1200);
+    expect(payload.productLengthCm).toBe(30);
+    expect(payload.productWidthCm).toBeNull();
+    expect(payload.productHeightCm).toBeNull();
+  });
 });
