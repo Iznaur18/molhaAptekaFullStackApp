@@ -46,6 +46,21 @@ export const markOrderItemShipped = async (orderId: string, itemIndex: number) =
   }
 };
 
+/**
+ * `PATCH /order/:orderId/shipment/status` — продавец двигает своё отправление
+ * на ступень целиком: «Принят» → «На сборке» → «Готов».
+ */
+export const advanceShipmentStatus = async (orderId: string, nextStatus: string) => {
+  try {
+    const { data } = await apiClient.patch(`/order/${orderId}/shipment/status`, {
+      nextStatus,
+    });
+    return parseUpdateOrderItemData(data);
+  } catch (error) {
+    throw new Error(formatApiErrorMessage(error, FALLBACK));
+  }
+};
+
 export const markOrderItemDelivered = async (orderId: string, itemIndex: number) => {
   try {
     const { data } = await apiClient.patch(

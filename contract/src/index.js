@@ -689,7 +689,10 @@ export {
   sellerDeliveryDistanceKm,
   normalizeGeoCoord,
 } from "./sellerDeliveryTariff.js";
-export { sellerDeliveryQuoteBodySchema } from "./order.js";
+export {
+  sellerDeliveryQuoteBodySchema,
+  sellerDeliveryQuoteDataSchema,
+} from "./order.js";
 export {
   PLATFORM_COMMISSION_PERCENT_DEFAULT,
   PLATFORM_COMMISSION_PERCENT_MAX,
@@ -798,6 +801,9 @@ export {
   cdekDeliveryPointsQuerySchema,
   cdekTariffOptionSchema,
   cdekDeliveryPointSchema,
+  cdekAvailabilityDataSchema,
+  cdekDeliveryPointsDataSchema,
+  cdekQuoteDataSchema,
 } from "./cdek.js";
 export {
   CDEK_STAGE_CREATED,
@@ -844,6 +850,10 @@ export {
   yandexDeliveryDropoffBodySchema,
   yandexDeliveryQuoteBodySchema,
   yandexDeliveryOrderSelectionSchema,
+  yandexDeliveryAvailabilityDataSchema,
+  yandexDeliveryPointSchema,
+  yandexDeliveryPointsDataSchema,
+  yandexDeliveryQuoteDataSchema,
   YANDEX_DELIVERY_CARD_ONLY_MESSAGE,
   YANDEX_DELIVERY_POINT_GONE_MESSAGE,
   YANDEX_DELIVERY_NO_DROPOFF_MESSAGE,
@@ -997,6 +1007,8 @@ export {
   PLATFORM_SERVICE_KINDS,
   platformServicePaymentParamsSchema,
   platformServicePaymentBodySchema,
+  paymentConfigDataSchema,
+  createdPaymentDataSchema,
 } from "./payments.js";
 export {
   PROMO_RETURN_STREAK_TIME_ZONE,

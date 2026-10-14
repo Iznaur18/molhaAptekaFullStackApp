@@ -3,6 +3,11 @@ import {
   ORDER_FULFILLMENT_PICKUP,
 } from "@molha/api-contract";
 
+import type {
+  CdekOrderSelection,
+  YandexDeliveryOrderSelection,
+} from "@izibuy/shared-lib";
+
 import { apiClient, parseCreateOrderData } from "@/shared/api";
 import { API_CLIENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
@@ -16,12 +21,21 @@ export type OrderFulfillmentMethod =
 export type CreateOrderPayload = {
   items: { productId: string; quantity: number }[];
   fulfillmentMethod?: OrderFulfillmentMethod;
+  /** Способ получения на продавца: заказ распадается на отправления. */
+  fulfillmentBySellerId?: Record<string, OrderFulfillmentMethod>;
   deliveryAddress: string;
   deliveryAddressFlat?: string;
   paymentMethod: OrderPaymentMethod;
   priceOfferId?: string;
   affiliateCode?: string;
   pickupSelections?: Array<{ productId: string; pickupLocationId: string }>;
+  /**
+   * Доставка СДЭК до пункта выдачи. Клиент шлёт только выбор: цену сервер
+   * пересчитывает сам, адрес заказа берёт из пункта.
+   */
+  cdekShipment?: CdekOrderSelection;
+  /** Яндекс Доставка до пункта выдачи — так же, как СДЭК: только выбор. */
+  yandexDeliveryShipment?: YandexDeliveryOrderSelection;
   idempotencyKey: string;
 };
 

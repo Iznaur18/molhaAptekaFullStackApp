@@ -1,4 +1,5 @@
 import { useEffect, useId, useState } from "react";
+import { buildYandexDeliveryOrderSelection } from "@izibuy/shared-lib";
 
 import {
   fetchYandexDeliveryPoints,
@@ -111,12 +112,14 @@ export function YandexPickupPointPicker({
   }, [pointId, itemsKey]);
 
   useEffect(() => {
-    const name = recipientName.trim();
-    const phone = recipientPhone.trim();
+    // Когда выбор полон, решает shared-lib — одинаково для сайта и приложения.
     onChange(
-      pointId && quote?.available && name.length >= 2 && phone.length >= 10
-        ? { pickupPointId: pointId, recipient: { name, phone } }
-        : null,
+      buildYandexDeliveryOrderSelection({
+        pointId,
+        quoteAvailable: quote?.available === true,
+        recipientName,
+        recipientPhone,
+      }),
     );
   }, [pointId, quote, recipientName, recipientPhone, onChange]);
 

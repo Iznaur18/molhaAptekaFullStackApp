@@ -361,6 +361,19 @@ export const CART_PAGE_UI = {
   SECTION_PICKUP: "Самовывоз",
   SECTION_DELIVERY: "Доставка",
   SECTION_FULFILLMENT_HINT: "Оформляется отдельным заказом",
+  SECTION_SELLER_FALLBACK: "Продавец",
+  /** Товары одного продавца везут разные службы — одним заказом с доставкой нельзя. */
+  MIXED_CARRIERS_NOTE: "Товары едут разными службами — оформите по отдельности",
+  /** Цена доставки в строке продавца — ещё до оформления. */
+  DELIVERY_HINT_FREE: "Доставка бесплатно",
+  DELIVERY_HINT_FROM: (formatted: string) => `Доставка от ${formatted}`,
+  DELIVERY_HINT_BY_TARIFF: "Доставка по тарифу продавца",
+  /** То же в строке итога, где подпись «Доставка» уже стоит слева. */
+  DELIVERY_VALUE_FREE: "Бесплатно",
+  DELIVERY_VALUE_FROM: (formatted: string) => `от ${formatted}`,
+  DELIVERY_VALUE_BY_TARIFF: "По тарифу продавца",
+  SELLER_ROW_OPEN: "Перейти",
+  BACK_TO_SELLERS: "К продавцам",
   STOCK_REMAINING: (left: number) => `Осталось ${left} шт`,
   STOCK_QUANTITY_LIMITED: "Количество ограничено",
   CHECKOUT_OPEN: "Оформить заказ",
@@ -1184,6 +1197,58 @@ export const INSTALLMENT_UI = {
 
 export const CHECKOUT_FORM_UI = {
   HEADING: "Оформление заказа",
+  SHIPPING_PROVIDER_CDEK: "СДЭК",
+  SHIPPING_PROVIDER_YANDEX: "Яндекс Доставка",
+  YANDEX_UNAVAILABLE: "Яндекс Доставка сейчас не отвечает",
+  YANDEX_POINT_REQUIRED:
+    "Выберите пункт выдачи Яндекса и укажите получателя с телефоном",
+  YANDEX_CARD_ONLY: "С Яндекс Доставкой оплата только картой в пункте выдачи",
+  YANDEX_POINT_LABEL: "Пункт выдачи Яндекса",
+  YANDEX_RECIPIENT_PHONE: "Телефон получателя — на него Яндекс пришлёт код получения",
+  YANDEX_NO_POINTS:
+    "В этом городе нет пунктов Яндекса с оплатой картой — выберите другую службу",
+  YANDEX_PRICE: (formatted: string, days: number | null) =>
+    days ? `${formatted} · ${days} дн.` : formatted,
+  YANDEX_PRICING: "Считаем доставку…",
+  YANDEX_CARD_ONLY_HINT:
+    "Товар и доставку вы оплатите картой в пункте выдачи Яндекса, когда заберёте заказ",
+  SHIPPING_PROVIDER_BADGE_CAPTION: "Доставку выполняет",
+  SHIPPING_PROVIDER_BADGE_SELLER: "Продавец",
+  CDEK_UNAVAILABLE: "СДЭК сейчас не отвечает",
+  CDEK_POINT_REQUIRED: "Выберите пункт выдачи СДЭК и укажите получателя с телефоном",
+  CDEK_CITY_LABEL: "Город получения",
+  CDEK_CITY_PLACEHOLDER: "Например, Москва",
+  CDEK_FIND_POINTS: "Найти пункты",
+  CDEK_LOADING: "Ищем пункты выдачи…",
+  CDEK_NO_POINTS: "В этом городе пунктов СДЭК не нашлось — проверьте название",
+  CDEK_POINT_LABEL: "Пункт выдачи",
+  CDEK_POINT_PLACEHOLDER: "Выберите пункт",
+  CDEK_POINT_SEARCH_PLACEHOLDER: "Улица или номер дома",
+  CDEK_POINTS_MORE: (shown: number, total: number) =>
+    `Показаны ${shown} из ${total} — уточните адрес в поиске`,
+  CDEK_POINTS_NOT_MATCHED: "По такому адресу пунктов нет — измените запрос",
+  CDEK_TARIFF_LABEL: "Тариф",
+  CDEK_RECIPIENT_NAME: "Получатель (ФИО)",
+  CDEK_RECIPIENT_PHONE: "Телефон получателя — СДЭК позвонит, когда посылка придёт",
+  CDEK_RECIPIENT_PHONE_PLACEHOLDER: "+7 9XX XXX-XX-XX",
+  CDEK_PAY_ON_PICKUP:
+    "Доставку оплачиваете СДЭК при получении в пункте. В сумму заказа она не входит.",
+  CDEK_APPROXIMATE: "Цена примерная: у части товаров не указаны вес и габариты.",
+  SELLER_DELIVERY_LEGEND: "Доставка продавцом",
+  SELLER_DELIVERY_FREE: "Бесплатно",
+  SELLER_DELIVERY_FROM: (price: string) => `от ${price}`,
+  SELLER_DELIVERY_NEED_ADDRESS:
+    "Точная сумма появится, когда выберете адрес: она зависит от расстояния по дорогам",
+  SELLER_DELIVERY_CALCULATING: "Считаем расстояние по дорогам…",
+  SELLER_DELIVERY_FREE_FROM: (price: string) => `Бесплатно от ${price}`,
+  SELLER_DELIVERY_DISTANCE: (km: number) => `${km} км по дорогам`,
+  SELLER_DELIVERY_DISTANCE_ESTIMATE: (km: number) =>
+    `≈ ${km} км по дорогам — маршрут сейчас не построился, расстояние оценено по карте`,
+  SELLER_DELIVERY_MAP_ATTRIBUTION: "Маршрут по данным © участники OpenStreetMap",
+  SELLER_DELIVERY_QUOTE_FALLBACK: "Не удалось посчитать доставку",
+  TOTAL_GOODS: "Товары",
+  TOTAL_DELIVERY: "Доставка",
+  TOTAL_TO_PAY: "Итого",
   LABEL_FULFILLMENT: "Способ получения",
   LABEL_SAVED_ADDRESSES: "Сохранённые адреса",
   SAVED_ADDRESS_OTHER: "Указать другой на карте",
@@ -1201,6 +1266,7 @@ export const CHECKOUT_FORM_UI = {
   PLACEHOLDER_FLAT: "подъезд, этаж, кв",
   LABEL_PAYMENT_METHOD: "Способ оплаты",
   PAYMENT_METHOD_CARD_SOON: "Скоро",
+  PAYMENT_METHOD_NOT_ACCEPTED: "Продавец не принимает",
   LABEL_SHIPPING_PROVIDER: "Служба доставки",
   SHIPPING_PROVIDER_SELLER: "Продавцом",
   SHIPPING_PROVIDER_SOON: "Скоро",
@@ -1323,6 +1389,12 @@ export const COMMERCE_CARD_UI = {
   EXPAND_TOGGLE_ARIA: (expanded: boolean) => (expanded ? "Свернуть" : "Раскрыть"),
 } as const;
 
+export const PAYMENT_UI = {
+  CONFIG_FALLBACK: "Не удалось узнать доступные способы оплаты",
+  CREATE_FALLBACK: "Не удалось открыть оплату",
+  OPEN_URL_ERROR: "Не удалось открыть страницу оплаты. Попробуйте ещё раз.",
+} as const;
+
 export const ORDER_CARD_UI = {
   ITEMS_HEADING: "Позиции",
   ADDRESS_LABEL: "Адрес доставки",
@@ -1339,8 +1411,23 @@ export const ORDER_CARD_UI = {
   DETAILS_FOLD_SUMMARY: "Подробности заказа",
   ACTION_CONFIRM: "Подтвердить получение",
   ACTION_CANCEL: "Отменить",
-  ACTION_SHIPPED: "Принять",
+  ACTION_SHIPPED: "Отгрузить",
   ACTION_DELIVERED: "Доставлен",
+  ACTION_HANDED_TO_BUYER: "Выдал покупателю",
+  AWAITING_ACCEPT: "Ждём подтверждения продавца",
+  AWAITING_ACCEPT_BUYER_HINT:
+    "Продавец проверяет, что товар есть. Оплата откроется после подтверждения.",
+  AWAITING_ACCEPT_SELLER_HINT:
+    "Подтвердите заказ, если товар есть — покупатель сможет оплатить. Если товара нет, отмените заказ: деньги ещё не списаны.",
+  AWAITING_PREPAYMENT: "Ожидает оплаты",
+  AWAITING_PREPAYMENT_BUYER_HINT:
+    "Продавец подтвердил заказ. Оплатите — и он начнёт собирать.",
+  AWAITING_PREPAYMENT_SELLER_HINT:
+    "Заказ подтверждён, ждём оплату от покупателя. Собирать и отгружать его пока рано.",
+  PREPAYMENT_DUE: (until: string) => `Оплатите до ${until} — иначе заказ отменится`,
+  PAY_NOW: "Оплатить",
+  PAY_NOW_AMOUNT: (formatted: string) => `Оплатить ${formatted} по СБП`,
+  PAY_NOW_PENDING: "Открываем оплату…",
   ACTION_PENDING: "Сохраняем…",
   CANCEL_CONFIRM: "Отменить заказ покупателя?",
   BUYER_CANCEL_CONFIRM: "Отменить заказ?",

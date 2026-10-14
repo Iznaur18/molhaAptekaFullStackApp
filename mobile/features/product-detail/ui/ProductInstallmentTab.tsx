@@ -5,8 +5,10 @@ import {
   doProductsSupportPickup,
   doProductsSupportSellerDelivery,
 } from "@molha/api-contract";
+import { resolveCartAllowedPaymentMethods } from "@izibuy/shared-lib";
 
 import { buildCheckoutPickupGroups } from "@/entities/cart/lib/buildCheckoutPickupLocations";
+import { resolveCheckoutSellers } from "@/entities/cart/lib/resolveCheckoutSellers";
 import type { InstallmentPlan } from "@/entities/installment/api/installmentApi";
 import { resolveInstallmentPlanPriceSummary } from "@/entities/installment/lib/resolveInstallmentPlanPriceSummary";
 import { useInstallmentMutations } from "@/entities/installment/model/useInstallmentMutations";
@@ -123,6 +125,12 @@ export const ProductInstallmentTab = ({
 
   const pickupGroups = useMemo(
     () => buildCheckoutPickupGroups([{ product: productForCheckout }]),
+    [productForCheckout],
+  );
+  // Тот же фильтр, что в корзине: только способы, которые принимает продавец.
+  const allowedPaymentMethods = useMemo(
+    () =>
+      resolveCartAllowedPaymentMethods(resolveCheckoutSellers([productForCheckout])),
     [productForCheckout],
   );
   const pickupAvailable = useMemo(
@@ -421,6 +429,7 @@ export const ProductInstallmentTab = ({
         pickupGroups={pickupGroups}
         deliveryAvailable={deliveryAvailable}
         pickupAvailable={pickupAvailable}
+        allowedPaymentMethods={allowedPaymentMethods}
         isSubmitting={false}
         submitError={sheetSubmitError}
         submitSuccess=""

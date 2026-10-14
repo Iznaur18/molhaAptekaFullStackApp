@@ -1,14 +1,9 @@
-import {
-  ORDER_PAYMENT_METHOD_CARD_PREPAID,
-  ORDER_PAYMENT_METHOD_LABEL_RU,
-  ORDER_PAYMENT_METHODS,
-  ORDER_PAYMENT_METHODS_SELECTABLE,
-} from "../lib/checkoutPaymentMethodCardTheme.js";
+import { resolveCheckoutPaymentMethodOptions } from "@izibuy/shared-lib";
+
+import { ORDER_PAYMENT_METHOD_LABEL_RU } from "../lib/checkoutPaymentMethodCardTheme.js";
 import { CHECKOUT_FORM_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./CheckoutPaymentMethodPicker.css";
-
-const SELECTABLE_SET = new Set(ORDER_PAYMENT_METHODS_SELECTABLE);
 
 /**
  * @param {{
@@ -30,29 +25,18 @@ export function CheckoutPaymentMethodPicker({
   allowedMethods = null,
   hiddenMethods = [],
 }) {
-  const platformSelectable = cardPrepaidAvailable
-    ? new Set([...SELECTABLE_SET, ORDER_PAYMENT_METHOD_CARD_PREPAID])
-    : SELECTABLE_SET;
-  // Продавец сужает то, что вообще умеет площадка, но не расширяет:
-  // «картой заранее» без эквайринга не заработает от его галочки.
-  const selectableSet = Array.isArray(allowedMethods)
-    ? new Set(
-        [...platformSelectable].filter((method) => allowedMethods.includes(method)),
-      )
-    : platformSelectable;
-
-  // Порядок постоянный: сначала доступные, потом недоступные, внутри — как
-  // в списке способов. Выбранный способ в начало не прыгает: ряд не
-  // перестраивается под пальцем при каждом нажатии. Скрытые (при курьере
-  // площадки — наличные) не показываем вовсе: «продавец не принимает» про
-  // них было бы неправдой.
-  const orderedMethods = ORDER_PAYMENT_METHODS.filter(
-    (method) => !hiddenMethods.includes(method),
-  ).sort((a, b) => Number(selectableSet.has(b)) - Number(selectableSet.has(a)));
+  // Что доступно, в каком порядке и почему недоступно — считает shared-lib,
+  // одинаково для сайта и приложения. Выбранный способ в начало не прыгает:
+  // ряд не перестраивается под пальцем при каждом нажатии.
+  const { orderedMethods, availableMethods, notAcceptedBySeller } =
+    resolveCheckoutPaymentMethodOptions({
+      cardPrepaidAvailable,
+      allowedMethods,
+      hiddenMethods,
+    });
 
   // Выбирать не из чего — одна строка вместо ряда, где половина карточек
   // бледные «не принимает». Сам способ форма выставляет сама.
-  const availableMethods = orderedMethods.filter((method) => selectableSet.has(method));
   if (availableMethods.length === 1) {
     return (
       <div className="checkout-payment-method-picker">
@@ -73,16 +57,15 @@ export function CheckoutPaymentMethodPicker({
         aria-label={legend}
       >
         {orderedMethods.map((method) => {
-          const isSelectable = selectableSet.has(method);
+          const isSelectable = availableMethods.includes(method);
           const isSelected = value === method;
           const isLocked = !isSelectable;
           // «Скоро» и «продавец не принимает» — разные вещи. Показывать
           // первое вместо второго значит обещать покупателю, что способ
           // вот-вот появится, хотя у этого продавца он не появится никогда.
-          const lockReason =
-            isLocked && platformSelectable.has(method)
-              ? CHECKOUT_FORM_UI.PAYMENT_METHOD_NOT_ACCEPTED
-              : CHECKOUT_FORM_UI.PAYMENT_METHOD_CARD_SOON;
+          const lockReason = notAcceptedBySeller.includes(method)
+            ? CHECKOUT_FORM_UI.PAYMENT_METHOD_NOT_ACCEPTED
+            : CHECKOUT_FORM_UI.PAYMENT_METHOD_CARD_SOON;
           const cardClassName = [
             "checkout-payment-method-picker__card",
             `checkout-payment-method-picker__card--${method}`,
