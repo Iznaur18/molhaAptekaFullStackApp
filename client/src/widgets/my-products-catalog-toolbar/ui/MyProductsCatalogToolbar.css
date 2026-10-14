@@ -69,7 +69,7 @@
 .my-products-catalog-toolbar__chip_active:hover {
   border-color: var(--iz-color-action);
   background: var(--iz-color-action);
-  color: var(--iz-color-on-action, #fff);
+  color: var(--iz-color-on-contrast);
 }
 
 .my-products-catalog-toolbar__chip:focus-visible,

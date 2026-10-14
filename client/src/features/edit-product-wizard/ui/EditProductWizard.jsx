@@ -99,7 +99,9 @@ export function EditProductWizard({
   };
 
   const stepCopy = resolveEditProductWizardStepCopy(wizard.stepId);
+  // У категории заголовок не нужен: шаг и так подписан в прогрессе сверху.
   const showStepHeadline = ![
+    "category",
     "basic",
     "originality",
     "pickup",
@@ -206,6 +208,7 @@ export function EditProductWizard({
             <CreateProductReviewSection
               form={form}
               discountPreviewPercent={discountPreviewPercent}
+              stepIds={wizard.stepIds}
               onEditStep={wizard.goToStep}
             />
           ) : null}

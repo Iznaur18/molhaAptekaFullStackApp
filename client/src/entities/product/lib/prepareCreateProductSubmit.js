@@ -9,6 +9,8 @@ import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import {
   PRODUCT_FULFILLMENT_SOURCE_CUSTOM,
   PRODUCT_FULFILLMENT_SOURCE_PROFILE,
+  PRODUCT_LISTING_ORIGIN_OWN,
+  isCartDealType,
   isRuRegionCode,
   resolveProductDeliveryCarrier,
 } from "@molha/api-contract";
@@ -90,7 +92,14 @@ export function prepareCreateProductSubmit({
     return { ok: false, message: nameError };
   }
 
-  if (!isProductListingOrigin(form.productListingOrigin)) {
+  // У осмотра и услуги шага «Статус товара» нет: сервер поле требует, поэтому
+  // подставляем «Продаю своё», а уже выбранное раньше значение не трогаем.
+  const isCartDeal = isCartDealType(form.categoryDealType);
+  const productListingOrigin =
+    !isCartDeal && !isProductListingOrigin(form.productListingOrigin)
+      ? PRODUCT_LISTING_ORIGIN_OWN
+      : form.productListingOrigin;
+  if (!isProductListingOrigin(productListingOrigin)) {
     return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_LISTING_ORIGIN };
   }
 
@@ -259,7 +268,7 @@ export function prepareCreateProductSubmit({
   if (isEdit) {
     const patchBody = {
       productName: String(form.productName).trim(),
-      productListingOrigin: form.productListingOrigin,
+      productListingOrigin,
       productDescription: String(form.productDescription).trim(),
       productImageUrls: urls,
       productPreviewVideoUrl: previewVideoUrl,
@@ -292,7 +301,10 @@ export function prepareCreateProductSubmit({
   const productShippingFields = Object.fromEntries(
     ["productWeightG", "productLengthCm", "productWidthCm", "productHeightCm"].map(
       (key) => {
-        const parsed = Math.floor(Number(String(form[key] ?? "").trim()));
+        // Осмотр и услугу не отправляют посылкой — поля у них скрыты.
+        const parsed = isCartDeal
+          ? Math.floor(Number(String(form[key] ?? "").trim()))
+          : NaN;
         return [key, Number.isFinite(parsed) && parsed > 0 ? parsed : null];
       },
     ),
@@ -302,7 +314,7 @@ export function prepareCreateProductSubmit({
     ok: true,
     createBody: {
       productName: form.productName,
-      productListingOrigin: form.productListingOrigin,
+      productListingOrigin,
       productIsOriginal: false,
       productDescription: form.productDescription,
       productImageUrls: urls,

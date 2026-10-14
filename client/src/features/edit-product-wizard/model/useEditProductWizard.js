@@ -1,10 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import {
-  EDIT_PRODUCT_WIZARD_STEP_COUNT,
-  EDIT_PRODUCT_WIZARD_STEP_IDS,
-  resolveEditProductWizardStepId,
-} from "../lib/editProductWizardSteps.js";
+import { resolveProductWizardStepIds } from "../../create-product-wizard/lib/createProductWizardSteps.js";
 import { validateEditProductWizardStep } from "../lib/validateEditProductWizardStep.js";
 
 /**
@@ -17,8 +13,9 @@ export function useEditProductWizard({ isOpen, form }) {
   const [stepIndex, setStepIndex] = useState(0);
   const [stepError, setStepError] = useState("");
 
-  const stepIds = EDIT_PRODUCT_WIZARD_STEP_IDS;
-  const stepId = resolveEditProductWizardStepId(stepIndex);
+  const stepIds = resolveProductWizardStepIds(form.categoryDealType);
+  const stepCount = stepIds.length;
+  const stepId = stepIds[stepIndex] ?? stepIds[0];
 
   useEffect(() => {
     if (!isOpen) {
@@ -38,23 +35,24 @@ export function useEditProductWizard({ isOpen, form }) {
       return false;
     }
 
-    setStepIndex((current) =>
-      Math.min(current + 1, EDIT_PRODUCT_WIZARD_STEP_COUNT - 1),
-    );
+    setStepIndex((current) => Math.min(current + 1, stepCount - 1));
     setStepError("");
     return true;
-  }, [validateCurrentStep]);
+  }, [validateCurrentStep, stepCount]);
 
   const goBack = useCallback(() => {
     setStepIndex((current) => Math.max(current - 1, 0));
     setStepError("");
   }, []);
 
-  const goToStep = useCallback((index) => {
-    const safeIndex = Math.max(0, Math.min(index, EDIT_PRODUCT_WIZARD_STEP_COUNT - 1));
-    setStepIndex(safeIndex);
-    setStepError("");
-  }, []);
+  const goToStep = useCallback(
+    (index) => {
+      const safeIndex = Math.max(0, Math.min(index, stepCount - 1));
+      setStepIndex(safeIndex);
+      setStepError("");
+    },
+    [stepCount],
+  );
 
   return {
     stepId,
@@ -66,6 +64,6 @@ export function useEditProductWizard({ isOpen, form }) {
     goToStep,
     validateCurrentStep,
     isFirstStep: stepIndex === 0,
-    isLastStep: stepIndex === EDIT_PRODUCT_WIZARD_STEP_COUNT - 1,
+    isLastStep: stepIndex === stepCount - 1,
   };
 }

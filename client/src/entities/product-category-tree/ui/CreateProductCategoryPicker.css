@@ -70,16 +70,25 @@
   cursor: not-allowed;
 }
 
+/* Отдельная кнопка, а не ссылка: в тексте её не замечали. */
 .create-product-category-picker__mode-link {
   align-self: flex-start;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--iz-color-link, var(--iz-color-action));
-  font-size: var(--iz-font-sm, 0.875rem);
+  min-height: 2.75rem;
+  margin: 0.25rem 0 0;
+  padding: 0.6rem 1.1rem;
+  border: 1px solid var(--iz-color-action);
+  border-radius: 0.85rem;
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-action);
+  font: inherit;
+  font-size: var(--iz-font-md, 1rem);
   font-weight: var(--iz-weight-semibold, 600);
   cursor: pointer;
+}
+
+.create-product-category-picker__mode-link:hover:not(:disabled) {
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
 }
 
 .create-product-category-picker__mode-link:disabled {

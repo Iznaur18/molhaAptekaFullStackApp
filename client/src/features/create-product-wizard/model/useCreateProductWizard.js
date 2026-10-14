@@ -1,10 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import {
-  CREATE_PRODUCT_WIZARD_STEP_COUNT,
-  CREATE_PRODUCT_WIZARD_STEP_IDS,
-  resolveCreateProductWizardStepId,
-} from "../lib/createProductWizardSteps.js";
+import { resolveProductWizardStepIds } from "../lib/createProductWizardSteps.js";
 import { readCreateProductFormDraft } from "../../../entities/product/lib/createProductFormDraftStorage.js";
 import { validateCreateProductWizardStep } from "../lib/validateCreateProductWizardStep.js";
 
@@ -19,7 +15,9 @@ export function useCreateProductWizard({ isOpen, form, draftEnabled = false }) {
   const [stepIndex, setStepIndex] = useState(0);
   const [stepError, setStepError] = useState("");
 
-  const stepId = resolveCreateProductWizardStepId(stepIndex);
+  const stepIds = resolveProductWizardStepIds(form.categoryDealType);
+  const stepCount = stepIds.length;
+  const stepId = stepIds[stepIndex] ?? stepIds[0];
 
   useEffect(() => {
     if (!isOpen) {
@@ -29,10 +27,11 @@ export function useCreateProductWizard({ isOpen, form, draftEnabled = false }) {
     }
     // Возобновляем создание с того шага, на котором продавец прервался.
     const draft = draftEnabled ? readCreateProductFormDraft() : null;
+    const draftStepCount = draft
+      ? resolveProductWizardStepIds(draft.form?.categoryDealType).length
+      : 0;
     setStepIndex(
-      draft
-        ? Math.max(0, Math.min(draft.stepIndex, CREATE_PRODUCT_WIZARD_STEP_COUNT - 1))
-        : 0,
+      draft ? Math.max(0, Math.min(draft.stepIndex, draftStepCount - 1)) : 0,
     );
     setStepError("");
   }, [isOpen, draftEnabled]);
@@ -48,32 +47,30 @@ export function useCreateProductWizard({ isOpen, form, draftEnabled = false }) {
       return false;
     }
 
-    setStepIndex((current) =>
-      Math.min(current + 1, CREATE_PRODUCT_WIZARD_STEP_COUNT - 1),
-    );
+    setStepIndex((current) => Math.min(current + 1, stepCount - 1));
     setStepError("");
     return true;
-  }, [validateCurrentStep]);
+  }, [validateCurrentStep, stepCount]);
 
   const goBack = useCallback(() => {
     setStepIndex((current) => Math.max(current - 1, 0));
     setStepError("");
   }, []);
 
-  const goToStep = useCallback((index) => {
-    const safeIndex = Math.max(
-      0,
-      Math.min(index, CREATE_PRODUCT_WIZARD_STEP_COUNT - 1),
-    );
-    setStepIndex(safeIndex);
-    setStepError("");
-  }, []);
+  const goToStep = useCallback(
+    (index) => {
+      const safeIndex = Math.max(0, Math.min(index, stepCount - 1));
+      setStepIndex(safeIndex);
+      setStepError("");
+    },
+    [stepCount],
+  );
 
   return {
     stepId,
     stepIndex,
-    stepCount: CREATE_PRODUCT_WIZARD_STEP_COUNT,
-    stepIds: CREATE_PRODUCT_WIZARD_STEP_IDS,
+    stepCount,
+    stepIds,
     stepError,
     setStepError,
     goNext,
@@ -81,6 +78,6 @@ export function useCreateProductWizard({ isOpen, form, draftEnabled = false }) {
     goToStep,
     validateCurrentStep,
     isFirstStep: stepIndex === 0,
-    isLastStep: stepIndex === CREATE_PRODUCT_WIZARD_STEP_COUNT - 1,
+    isLastStep: stepIndex === stepCount - 1,
   };
 }

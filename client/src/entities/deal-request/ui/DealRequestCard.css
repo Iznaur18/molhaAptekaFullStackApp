@@ -135,6 +135,8 @@
 
 .deal-request-card__field input {
   width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   padding: 0.6rem 0.75rem;
   border: 1px solid var(--iz-color-border);
   border-radius: 0.75rem;
@@ -143,4 +145,19 @@
   /* 16px: меньше — iOS приближает страницу при фокусе. */
   font: inherit;
   font-size: 1rem;
+}
+
+/* iOS даёт полю даты свою минимальную ширину и центрирует текст — поле
+   вылезало за карточку. */
+.deal-request-card__field input[type="datetime-local"] {
+  min-height: 2.75rem;
+  appearance: none;
+  -webkit-appearance: none;
+  display: flex;
+  align-items: center;
+  text-align: left;
+}
+
+.deal-request-card__field input::-webkit-date-and-time-value {
+  text-align: left;
 }
