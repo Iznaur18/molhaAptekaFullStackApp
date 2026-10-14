@@ -35,13 +35,12 @@ describe("buildProductDealTermsFields", () => {
     });
   });
 
-  it("осмотр: только расписание, без пробелов по краям", () => {
+  it("осмотр: своих полей нет", () => {
     expect(
       buildProductDealTermsFields({
         categoryDealType: "viewing",
-        productViewingSchedule: "  будни после 18:00 ",
         productServicePriceMode: "from",
       }),
-    ).toEqual({ productViewingSchedule: "будни после 18:00" });
+    ).toEqual({});
   });
 });

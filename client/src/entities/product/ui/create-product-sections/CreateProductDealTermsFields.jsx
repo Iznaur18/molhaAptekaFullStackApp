@@ -1,6 +1,5 @@
 import {
   CATEGORY_DEAL_TYPE_SERVICE,
-  CATEGORY_DEAL_TYPE_VIEWING,
   PRODUCT_SERVICE_LOCATION_LABELS_RU,
   PRODUCT_SERVICE_LOCATIONS,
   PRODUCT_SERVICE_PRICE_MODE_LABELS_RU,
@@ -8,7 +7,6 @@ import {
   PRODUCT_SERVICE_PRICE_MODES,
   PRODUCT_SERVICE_PRICE_UNIT_LABELS_RU,
   PRODUCT_SERVICE_PRICE_UNITS,
-  PRODUCT_VIEWING_SCHEDULE_MAX_LENGTH,
   normalizeProductServiceLocations,
   normalizeProductServicePriceMode,
   normalizeProductServicePriceUnit,
@@ -19,15 +17,13 @@ import { PRODUCT_DEAL_TERMS_UI } from "../../../../shared/config/appUiCopy.js";
 import "./CreateProductDealTermsFields.css";
 
 /**
- * Условия сделки в объявлении без корзины: у услуги — вид цены и место, у
- * осмотра — когда можно приехать.
+ * Условия услуги на шаге «Цена»: вид цены и место. У осмотра условий нет.
  *
  * @param {{
  *   dealType: "goods" | "viewing" | "service";
  *   form: Record<string, unknown>;
  *   setForm: (updater: (prev: Record<string, unknown>) => Record<string, unknown>) => void;
  *   disabled?: boolean;
- *   part: "price" | "meeting"; на шаге «Цена» — цена услуги, у адреса — время осмотра
  * }} props
  */
 export function CreateProductDealTermsFields({
@@ -35,41 +31,11 @@ export function CreateProductDealTermsFields({
   form,
   setForm,
   disabled = false,
-  part,
 }) {
   /** @param {Record<string, unknown>} patch */
   const patchForm = (patch) => setForm((prev) => ({ ...prev, ...patch }));
 
-  if (dealType === CATEGORY_DEAL_TYPE_VIEWING) {
-    if (part !== "meeting") {
-      return null;
-    }
-    return (
-      <section
-        className="create-product-deal-terms"
-        aria-label={PRODUCT_DEAL_TERMS_UI.SECTION_TITLE[dealType]}
-      >
-        <p className="create-product-deal-terms__title">
-          {PRODUCT_DEAL_TERMS_UI.SECTION_TITLE[dealType]}
-        </p>
-        <label className="create-product-deal-terms__field">
-          <span>{PRODUCT_DEAL_TERMS_UI.SCHEDULE_LABEL}</span>
-          <input
-            type="text"
-            value={String(form.productViewingSchedule ?? "")}
-            maxLength={PRODUCT_VIEWING_SCHEDULE_MAX_LENGTH}
-            placeholder={PRODUCT_DEAL_TERMS_UI.SCHEDULE_PLACEHOLDER}
-            disabled={disabled}
-            onChange={(event) =>
-              patchForm({ productViewingSchedule: event.target.value })
-            }
-          />
-        </label>
-      </section>
-    );
-  }
-
-  if (dealType !== CATEGORY_DEAL_TYPE_SERVICE || part !== "price") {
+  if (dealType !== CATEGORY_DEAL_TYPE_SERVICE) {
     return null;
   }
 
