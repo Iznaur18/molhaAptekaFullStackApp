@@ -12,6 +12,7 @@ import {
 } from "../../services/user/userProfileVisibility.js";
 import { attachUserListCommerceStats } from "../../services/user/attachUserListCommerceStats.js";
 import { attachUserListDonationTotals } from "../../services/user/attachUserListDonationTotals.js";
+import { attachUserListReferralCounts } from "../../services/user/attachUserListReferralCounts.js";
 import { attachFollowersCountToUsers } from "../../services/user/userFollowHelpers.js";
 
 const USER_SEARCH_FIELDS = ["userName"];
@@ -152,7 +153,8 @@ export const userSearchController = async (req, res) => {
   const usersSanitized = sanitizeUsersSearchList(usersRaw, { viewer });
   const usersWithCommerce = await attachUserListCommerceStats(usersSanitized);
   const usersWithFollowers = await attachFollowersCountToUsers(usersWithCommerce);
-  const users = await attachUserListDonationTotals(usersWithFollowers);
+  const usersWithDonations = await attachUserListDonationTotals(usersWithFollowers);
+  const users = await attachUserListReferralCounts(usersWithDonations);
 
   return successRes(res, { users, total, page, limit });
 };

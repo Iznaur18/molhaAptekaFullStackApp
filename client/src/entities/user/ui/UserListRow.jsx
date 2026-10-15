@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import { formatLoyaltyPointsCount } from "@izibuy/shared-lib";
 
+import { formatSearchRowRatingCompact } from "../lib/formatSearchRowRating.js";
+import { formatSearchRowTotalSalesCount } from "../lib/formatSearchRowTotalSalesCount.js";
 import { pickUserProfilePhotoUrl } from "../lib/pickUserProfilePhotoUrl.js";
 import {
   formatProfileImageObjectPosition,
@@ -31,11 +33,54 @@ export function UserListRow({ user, onRowClick }) {
   );
   const showEmail = email.length > 0 && email !== userName;
   const isUserDataConfirmed = user.isUserDataConfirmed === true;
-  const donationsText = useMemo(() => {
-    const n = Number(user.totalDonatedRub);
-    const safe = Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
-    return `${formatLoyaltyPointsCount(safe)} ₽`;
-  }, [user.totalDonatedRub]);
+  const metrics = useMemo(() => {
+    /** @param {unknown} raw */
+    const count = (raw) => {
+      const n = Number(raw);
+      return Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
+    };
+    return [
+      {
+        key: "sales",
+        label: USER_LIST_ROW_UI.TOTAL_SALES_COUNT_LABEL,
+        value: formatSearchRowTotalSalesCount(user.totalSalesCount),
+      },
+      {
+        key: "rating",
+        label: USER_LIST_ROW_UI.RATING_SCORE_LABEL,
+        value: formatSearchRowRatingCompact(user.userRatingByVotes),
+        title: USER_LIST_ROW_UI.RATING_TITLE,
+      },
+      {
+        key: "followers",
+        label: USER_LIST_ROW_UI.FOLLOWERS_LABEL,
+        value: formatLoyaltyPointsCount(count(user.followersCount)),
+      },
+      {
+        key: "loyalty",
+        label: USER_LIST_ROW_UI.LOYALTY_POINTS_LABEL,
+        value: formatLoyaltyPointsCount(count(user.userLoyaltyPoints)),
+      },
+      {
+        key: "referrals",
+        label: USER_LIST_ROW_UI.REFERRALS_LABEL,
+        value: formatLoyaltyPointsCount(count(user.referredUsersCount)),
+        title: USER_LIST_ROW_UI.REFERRALS_TITLE,
+      },
+      {
+        key: "donations",
+        label: USER_LIST_ROW_UI.DONATIONS_LABEL,
+        value: `${formatLoyaltyPointsCount(count(user.totalDonatedRub))} ₽`,
+      },
+    ];
+  }, [
+    user.totalSalesCount,
+    user.userRatingByVotes,
+    user.followersCount,
+    user.userLoyaltyPoints,
+    user.referredUsersCount,
+    user.totalDonatedRub,
+  ]);
   const metaBadges = useMemo(() => {
     if (!user.isBlockedUser) {
       return [];
@@ -81,17 +126,17 @@ export function UserListRow({ user, onRowClick }) {
         </span>
       ) : null}
       <span className="user-list-row__metrics">
-        <span
-          className="user-list-row__metric user-list-row__metric_donations"
-          aria-label={`${USER_LIST_ROW_UI.DONATIONS_LABEL} ${donationsText}`}
-        >
-          <span className="user-list-row__metric-label">
-            {USER_LIST_ROW_UI.DONATIONS_LABEL}
+        {metrics.map((metric) => (
+          <span
+            key={metric.key}
+            className={`user-list-row__metric user-list-row__metric_${metric.key}`}
+            title={metric.title}
+            aria-label={`${metric.label} ${metric.value}`}
+          >
+            <span className="user-list-row__metric-label">{metric.label}</span>
+            <span className="user-list-row__metric-value">{metric.value}</span>
           </span>
-          <span className="user-list-row__metric-value user-list-row__metric-value_amount">
-            {donationsText}
-          </span>
-        </span>
+        ))}
       </span>
     </button>
   );
