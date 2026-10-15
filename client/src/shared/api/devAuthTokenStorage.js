@@ -1,3 +1,4 @@
+import { reportClientIssue } from "../lib/reportClientIssue.js";
 const DEV_ACCESS_TOKEN_KEY = "dev_access_token";
 const DEV_REFRESH_TOKEN_KEY = "dev_refresh_token";
 
@@ -14,8 +15,9 @@ export const saveDevAuthTokens = (accessToken, refreshToken) => {
   try {
     sessionStorage.setItem(DEV_ACCESS_TOKEN_KEY, accessToken);
     sessionStorage.setItem(DEV_REFRESH_TOKEN_KEY, refreshToken);
-  } catch {
+  } catch (error) {
     // sessionStorage недоступен
+    reportClientIssue("devAuthTokenStorage#1", error);
   }
 };
 
@@ -47,8 +49,9 @@ export const clearDevAuthTokens = () => {
   try {
     sessionStorage.removeItem(DEV_ACCESS_TOKEN_KEY);
     sessionStorage.removeItem(DEV_REFRESH_TOKEN_KEY);
-  } catch {
+  } catch (error) {
     // sessionStorage недоступен
+    reportClientIssue("devAuthTokenStorage#2", error);
   }
 };
 

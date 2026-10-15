@@ -1,3 +1,4 @@
+import { reportClientIssue } from "../shared/lib/reportClientIssue.js";
 // [TEMP DIAG] Маячок ошибок для отладки белого экрана на мобильных.
 // Шлёт message+stack в query-строке GET /__diagerr.gif → попадает в access.log nginx.
 // Импортируется ПЕРВЫМ в main.jsx, чтобы поймать ошибки последующих модулей и рендера.
@@ -13,8 +14,9 @@ if (typeof window !== "undefined") {
         label +
         "&e=" +
         encodeURIComponent(String(msg).slice(0, 600));
-    } catch {
+    } catch (error) {
       // ignore
+      reportClientIssue("__errorBeacon", error);
     }
   };
   window.addEventListener("error", (e) => {

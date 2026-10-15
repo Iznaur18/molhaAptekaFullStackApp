@@ -1,3 +1,4 @@
+import { reportClientIssue } from "./reportClientIssue.js";
 /**
  * Копирует текст в буфер. Clipboard API только в secure context (https/localhost);
  * на LAN IP — fallback через execCommand.
@@ -21,8 +22,9 @@ export async function copyTextToClipboard(text) {
     try {
       await navigator.clipboard.writeText(value);
       return;
-    } catch {
+    } catch (error) {
       // fall through to legacy
+      reportClientIssue("copyTextToClipboard", error);
     }
   }
 

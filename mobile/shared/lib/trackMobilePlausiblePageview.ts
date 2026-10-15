@@ -4,6 +4,7 @@ import {
   getMobilePlausibleUrlBase,
   isMobilePlausibleEnabled,
 } from "./plausibleEnv";
+import { reportClientIssue } from "@/shared/lib/reportClientIssue";
 
 /**
  * Pageview через Plausible Events API (без cookies).
@@ -31,7 +32,8 @@ export async function trackMobilePlausiblePageview(pathname: string): Promise<vo
         d: domain,
       }),
     });
-  } catch {
+  } catch (error) {
     // traffic analytics must not break navigation
+    reportClientIssue("trackMobilePlausiblePageview", error);
   }
 }

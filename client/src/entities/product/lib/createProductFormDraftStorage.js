@@ -1,5 +1,6 @@
 import { CREATE_PRODUCT_INITIAL_FORM } from "./createProductFormState.js";
 import { createImageRow } from "./productImageRowHelpers.js";
+import { reportClientIssue } from "../../../shared/lib/reportClientIssue.js";
 
 const CREATE_PRODUCT_FORM_DRAFT_STORAGE_KEY = "izibuy.createProductFormDraft.v1";
 
@@ -138,8 +139,9 @@ export function persistCreateProductFormDraft(draft) {
       CREATE_PRODUCT_FORM_DRAFT_STORAGE_KEY,
       JSON.stringify({ form: draft.form, stepIndex, savedAt: Date.now() }),
     );
-  } catch {
+  } catch (error) {
     // ignore quota / private mode
+    reportClientIssue("createProductFormDraftStorage#1", error);
   }
 }
 
@@ -149,7 +151,8 @@ export function clearCreateProductFormDraft() {
   }
   try {
     window.localStorage.removeItem(CREATE_PRODUCT_FORM_DRAFT_STORAGE_KEY);
-  } catch {
+  } catch (error) {
     // ignore
+    reportClientIssue("createProductFormDraftStorage#2", error);
   }
 }

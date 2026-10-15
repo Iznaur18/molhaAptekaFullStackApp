@@ -1,5 +1,6 @@
 import { apiClient } from "@/shared/api";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { reportClientIssue } from "@/shared/lib/reportClientIssue";
 
 export type PushTokenPlatform = "ios" | "android" | "web";
 
@@ -19,7 +20,8 @@ export const registerPushToken = async (token: string, platform: PushTokenPlatfo
 export const removePushToken = async (token: string) => {
   try {
     await apiClient.delete("/auth/me/push-token", { data: { token } });
-  } catch {
+  } catch (error) {
     // logout path — не блокируем выход
+    reportClientIssue("pushTokenApi", error);
   }
 };

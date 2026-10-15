@@ -143,8 +143,21 @@ export const useCartFulfillmentSectionStyles = createThemedStyles((theme) => ({
     color: theme.colors.danger,
     textAlign: "center",
   },
+  checkoutSuccess: {
+    fontSize: 13,
+    color: theme.colors.success,
+    textAlign: "center",
+  },
   checkoutButton: {
     marginTop: 4,
+  },
+  /** Форма оформления между товарами и итогом (web `checkoutBeforeDock`). */
+  checkoutForm: {
+    marginTop: 8,
+  },
+  /** Поля формы — в одну линию с итогом (у дока свои 12 px по бокам). */
+  checkoutFormFields: {
+    marginHorizontal: 12,
   },
   checkoutLegal: {
     fontSize: 12,

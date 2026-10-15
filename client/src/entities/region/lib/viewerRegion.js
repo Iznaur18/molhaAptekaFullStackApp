@@ -4,6 +4,7 @@ import {
   listRuRegions,
   resolveViewerRegionCode,
 } from "@molha/api-contract";
+import { reportClientIssue } from "../../../shared/lib/reportClientIssue.js";
 
 export const VIEWER_REGION_SESSION_STORAGE_KEY = "molha.viewerRegionCode";
 
@@ -42,8 +43,9 @@ export function writeSessionViewerRegionCode(code) {
       return;
     }
     sessionStorage.setItem(VIEWER_REGION_SESSION_STORAGE_KEY, String(code).trim());
-  } catch {
+  } catch (error) {
     /* ignore quota / private mode */
+    reportClientIssue("viewerRegion", error);
   }
 }
 

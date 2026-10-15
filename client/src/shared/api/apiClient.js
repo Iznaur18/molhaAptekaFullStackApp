@@ -17,6 +17,7 @@ import {
   isBearerAuthEnabled,
 } from "./web-auth-storage.js";
 import { emitAuthSessionDead } from "../lib/authSessionEvents.js";
+import { reportClientIssue } from "../lib/reportClientIssue.js";
 
 export const apiClient = createJsonApiClient({
   baseURL: API_BASE_URL,
@@ -31,8 +32,9 @@ if (import.meta.env.DEV) {
 export const clearLegacyAuthTokenStorage = () => {
   try {
     localStorage.removeItem("rassro_auth_token");
-  } catch {
+  } catch (error) {
     // storage недоступен
+    reportClientIssue("apiClient#1", error);
   }
 };
 
@@ -55,8 +57,9 @@ export const clearDeadAuthSession = async () => {
   emitAuthSessionDead();
   try {
     await apiClient.post("/auth/logout");
-  } catch {
+  } catch (error) {
     // гость или сеть
+    reportClientIssue("apiClient#2", error);
   }
 };
 

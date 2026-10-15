@@ -1,4 +1,5 @@
 import { resolveAuthContactChannel } from "@izibuy/shared-lib";
+import { reportClientIssue } from "../../../shared/lib/reportClientIssue.js";
 
 const REGISTER_FORM_DRAFT_STORAGE_KEY = "izibuy.registerFormDraft.v1";
 
@@ -67,8 +68,9 @@ export function persistRegisterFormDraft(draft) {
       REGISTER_FORM_DRAFT_STORAGE_KEY,
       JSON.stringify(draft),
     );
-  } catch {
+  } catch (error) {
     // ignore quota / private mode
+    reportClientIssue("registerFormDraftStorage#1", error);
   }
 }
 
@@ -78,7 +80,8 @@ export function clearRegisterFormDraft() {
   }
   try {
     window.sessionStorage.removeItem(REGISTER_FORM_DRAFT_STORAGE_KEY);
-  } catch {
+  } catch (error) {
     // ignore
+    reportClientIssue("registerFormDraftStorage#2", error);
   }
 }

@@ -1,4 +1,5 @@
 import { useCallback, useRef } from "react";
+import { reportClientIssue } from "../../../shared/lib/reportClientIssue.js";
 
 const DRAG_THRESHOLD_PX = 4;
 const IMAGE_DRAG_HANDLE_SELECTOR = ".curated-product-compact-card__image-wrap";
@@ -31,8 +32,9 @@ export function useCuratedCarouselImageDragScroll() {
     if (state.didDrag && state.pointerId === event.pointerId) {
       try {
         el.releasePointerCapture(event.pointerId);
-      } catch {
+      } catch (error) {
         /* pointer already released */
+        reportClientIssue("useCuratedCarouselImageDragScroll#1", error);
       }
     }
 
@@ -98,8 +100,9 @@ export function useCuratedCarouselImageDragScroll() {
       el.classList.add("is-drag-scrolling");
       try {
         el.setPointerCapture(event.pointerId);
-      } catch {
+      } catch (error) {
         /* capture may fail on some touch targets */
+        reportClientIssue("useCuratedCarouselImageDragScroll#2", error);
       }
     }
 

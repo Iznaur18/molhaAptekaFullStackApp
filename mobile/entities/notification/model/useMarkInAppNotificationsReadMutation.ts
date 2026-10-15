@@ -5,6 +5,7 @@ import { getExpoNotificationsModule } from "@/features/push-notifications/lib/ex
 
 import { markInAppNotificationsRead } from "../api/markInAppNotificationsRead";
 import { patchAuthMeInAppNotifications } from "../lib/patchAuthMeInAppNotifications";
+import { reportClientIssue } from "@/shared/lib/reportClientIssue";
 
 const clearNativeBadge = async (): Promise<void> => {
   const Notifications = getExpoNotificationsModule();
@@ -14,8 +15,9 @@ const clearNativeBadge = async (): Promise<void> => {
 
   try {
     await Notifications.setBadgeCountAsync(0);
-  } catch {
+  } catch (error) {
     // badge unsupported on some devices
+    reportClientIssue("useMarkInAppNotificationsReadMutation", error);
   }
 };
 

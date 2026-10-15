@@ -1,3 +1,4 @@
+import { reportClientIssue } from "@/shared/lib/reportClientIssue";
 /**
  * Идентификатор нового адреса. Порт `client/.../createUserSavedAddressId.js`:
  * `crypto.randomUUID` в RN может отсутствовать, поэтому есть запасной путь.
@@ -8,8 +9,9 @@ export const createUserSavedAddressId = (): string => {
   if (typeof globalCrypto?.randomUUID === "function") {
     try {
       return globalCrypto.randomUUID();
-    } catch {
+    } catch (error) {
       // Hermes без поддержки — уходим на запасной путь.
+      reportClientIssue("createUserSavedAddressId", error);
     }
   }
 

@@ -16,6 +16,7 @@ import {
   CART_ACTION_SET_QUANTITY,
   cartReducer,
 } from "./cartReducer.js";
+import { reportClientIssue } from "../../../shared/lib/reportClientIssue.js";
 
 /** @type {import('react').Context<import('./types.js').CartContextValue | null>} */
 export const CartContext = createContext(null);
@@ -100,8 +101,9 @@ export function CartProvider({ children }) {
   const flushRemoteCart = useCallback(async () => {
     try {
       await replaceCartMutation.mutateAsync(itemsRef.current);
-    } catch {
+    } catch (error) {
       // выход не блокируем
+      reportClientIssue("CartContext", error);
     }
   }, [replaceCartMutation]);
 

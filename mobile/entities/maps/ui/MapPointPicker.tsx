@@ -3,6 +3,7 @@ import { StyleSheet, View } from "react-native";
 import { WebView } from "react-native-webview";
 
 import { ADDRESS_DELIVERY_UI } from "@/shared/config";
+import { reportClientIssue } from "@/shared/lib/reportClientIssue";
 
 /** Синхрон с client mapPointPickerStyle (Carto Voyager + action pin). */
 const MAP_PIN_COLOR = "#1f6feb";
@@ -124,8 +125,9 @@ export const MapPointPicker = ({
               return;
             }
             onPointChange({ lat: nextLat, lon: nextLon });
-          } catch {
+          } catch (error) {
             /* ignore malformed */
+            reportClientIssue("MapPointPicker", error);
           }
         }}
       />

@@ -8,6 +8,7 @@ import { parseApiContractData } from "../../../shared/api/parseApiContract.js";
 import { postMultipart } from "@izibuy/shared-api";
 import { formatApiErrorMessage } from "@izibuy/shared-lib";
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import { reportClientIssue } from "../../../shared/lib/reportClientIssue.js";
 
 /**
  * @param {File} file
@@ -38,8 +39,9 @@ export async function submitProductBulkImport(file) {
           message: failed.message,
           errors: failed.errors,
         };
-      } catch {
+      } catch (error) {
         // fall through
+        reportClientIssue("submitProductBulkImport", error);
       }
     }
 

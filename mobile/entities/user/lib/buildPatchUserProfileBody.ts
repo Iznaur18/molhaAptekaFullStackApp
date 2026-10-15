@@ -17,6 +17,7 @@ import {
 import { getUserBackgroundFocus } from "./profileImageFocus";
 import type { EditProfileFormState } from "./mapUserToEditProfileForm";
 import { serializeUserBackground } from "./userBackgroundValue";
+import { reportClientIssue } from "@/shared/lib/reportClientIssue";
 
 export const buildPatchUserProfileBody = (
   form: EditProfileFormState,
@@ -96,8 +97,9 @@ export const buildPatchUserProfileBody = (
         presetId: form.backgroundPresetId,
         imageUrl: form.backgroundImageUrl,
       });
-    } catch {
+    } catch (error) {
       // skip if not yet valid (e.g. image mode with empty url)
+      reportClientIssue("buildPatchUserProfileBody", error);
     }
   }
 

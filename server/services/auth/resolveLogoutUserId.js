@@ -2,7 +2,27 @@ import {
   getAuthTokenFromRequest,
   getRefreshTokenFromRequest,
 } from "../../utils/authCookie.js";
+import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 import { verifyAccessToken, verifyRefreshToken } from "./authTokens.js";
+import { isJwtAuthFailure } from "./isJwtAuthFailure.js";
+
+/**
+ * Протухший или чужой токен при выходе — штатно: выходим без userId.
+ * Остальные ошибки тоже не мешают выходу, но пишутся в журнал.
+ *
+ * @param {unknown} error
+ * @param {string} tokenKind
+ */
+function noteUnexpectedTokenError(error, tokenKind) {
+  if (isJwtAuthFailure(error)) {
+    return;
+  }
+  logServerEvent("warn", {
+    event: "auth.logout_token_check_failed",
+    tokenKind,
+    ...formatLogError(error),
+  });
+}
 
 /**
  * @param {import('express').Request} req
@@ -17,8 +37,8 @@ export function resolveLogoutUserId(req) {
         return String(decoded._id);
       }
     }
-  } catch {
-    // ignore invalid access token on logout
+  } catch (error) {
+    noteUnexpectedTokenError(error, "access");
   }
 
   try {
@@ -29,8 +49,8 @@ export function resolveLogoutUserId(req) {
         return String(decoded._id);
       }
     }
-  } catch {
-    // ignore invalid refresh token on logout
+  } catch (error) {
+    noteUnexpectedTokenError(error, "refresh");
   }
 
   return null;

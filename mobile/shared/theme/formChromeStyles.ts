@@ -1008,6 +1008,10 @@ export const useCheckoutSellerDeliveryCostStyles = createThemedStyles((theme) =>
     borderRadius: 12,
     backgroundColor: theme.colors.surfaceMuted,
   },
+  /** web `.cart-fulfillment__dock .checkout-seller-delivery { margin-top: 4px }`. */
+  rootInDock: {
+    marginTop: 4,
+  },
   row: {
     flexDirection: "row",
     alignItems: "baseline",

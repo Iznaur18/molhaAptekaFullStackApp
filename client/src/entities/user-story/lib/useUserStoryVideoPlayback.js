@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
+import { reportClientIssue } from "../../../shared/lib/reportClientIssue.js";
 
 /**
  * @param {{
@@ -29,8 +30,9 @@ export function useUserStoryVideoPlayback({
     video.muted = false;
     try {
       await video.play();
-    } catch {
+    } catch (error) {
       // autoplay со звуком может быть заблокирован до тапа по viewer
+      reportClientIssue("useUserStoryVideoPlayback", error);
     }
   }, []);
 

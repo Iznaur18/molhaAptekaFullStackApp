@@ -6,6 +6,7 @@ import {
   markCookieNoticeAccepted,
 } from "../lib/cookieNoticeStorage.js";
 import { CookieNoticeSheet } from "./CookieNoticeSheet.jsx";
+import { reportClientIssue } from "../../../shared/lib/reportClientIssue.js";
 
 function shouldForceOpenCookieNotice() {
   try {
@@ -21,8 +22,9 @@ export function CookieNoticeHost() {
     if (shouldForceOpenCookieNotice()) {
       try {
         localStorage.removeItem(COOKIE_NOTICE_ACCEPTED_STORAGE_KEY);
-      } catch {
+      } catch (error) {
         // ignore
+        reportClientIssue("CookieNoticeHost", error);
       }
       return true;
     }

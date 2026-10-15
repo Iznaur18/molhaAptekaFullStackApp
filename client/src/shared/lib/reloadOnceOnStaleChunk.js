@@ -1,4 +1,5 @@
 import { isChunkLoadError } from "./isChunkLoadError.js";
+import { reportClientIssue } from "./reportClientIssue.js";
 
 const STORAGE_KEY = "gitorg:stale-chunk-reload";
 
@@ -36,8 +37,9 @@ export function clearStaleChunkReloadFlag() {
   }
   try {
     sessionStorage.removeItem(STORAGE_KEY);
-  } catch {
+  } catch (error) {
     // storage недоступен
+    reportClientIssue("reloadOnceOnStaleChunk", error);
   }
   window.__gitorgChunkReloaded = false;
 }

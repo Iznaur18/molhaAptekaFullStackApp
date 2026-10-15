@@ -1,5 +1,6 @@
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
+import { reportClientIssue } from "@/shared/lib/reportClientIssue";
 
 const ACCESS_TOKEN_KEY = "izibuy_access_token";
 const REFRESH_TOKEN_KEY = "izibuy_refresh_token";
@@ -35,16 +36,18 @@ const readSessionToken = (key: string): string | null => {
 const writeSessionToken = (key: string, value: string): void => {
   try {
     globalThis.sessionStorage?.setItem(key, value);
-  } catch {
+  } catch (error) {
     // sessionStorage недоступен
+    reportClientIssue("authTokenStorage#1", error);
   }
 };
 
 const removeSessionToken = (key: string): void => {
   try {
     globalThis.sessionStorage?.removeItem(key);
-  } catch {
+  } catch (error) {
     // sessionStorage недоступен
+    reportClientIssue("authTokenStorage#2", error);
   }
 };
 
@@ -103,14 +106,16 @@ export const clearAuthTokens = async (): Promise<void> => {
       try {
         globalThis.localStorage?.removeItem(ACCESS_TOKEN_KEY);
         globalThis.localStorage?.removeItem(REFRESH_TOKEN_KEY);
-      } catch {
+      } catch (error) {
         // localStorage недоступен
+        reportClientIssue("authTokenStorage#3", error);
       }
       return;
     }
     await SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY);
     await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
-  } catch {
+  } catch (error) {
     // storage недоступен
+    reportClientIssue("authTokenStorage#4", error);
   }
 };

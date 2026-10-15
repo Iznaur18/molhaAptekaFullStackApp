@@ -1,6 +1,7 @@
 import { ANALYTICS_CLIENT_EVENT_CHECKOUT_STARTED } from "@molha/api-contract";
 
 import { apiClient } from "../../../shared/api/index.js";
+import { reportClientIssue } from "../../../shared/lib/reportClientIssue.js";
 
 /**
  * Покупатель открыл оформление заказа. Сервер учитывает одно событие в сутки.
@@ -12,7 +13,8 @@ export async function trackCheckoutStarted() {
       kind: ANALYTICS_CLIENT_EVENT_CHECKOUT_STARTED,
       platform: "web",
     });
-  } catch {
+  } catch (error) {
     // ignore
+    reportClientIssue("trackClientAnalyticsEvent", error);
   }
 }

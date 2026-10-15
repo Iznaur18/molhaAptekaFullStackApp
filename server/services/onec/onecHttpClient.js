@@ -57,8 +57,11 @@ async function readErrorMessage(response, fallback) {
       if (typeof json?.error === "string" && json.error.trim()) {
         return json.error.trim().slice(0, 500);
       }
-    } catch {
-      // plain text
+    } catch (error) {
+      // Тело не JSON — штатно: 1С часто отвечает простым текстом, он ниже.
+      if (!(error instanceof SyntaxError)) {
+        throw error;
+      }
     }
     return text.slice(0, 500);
   } catch {

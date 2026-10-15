@@ -57,8 +57,11 @@ function buildUserNameFromEmail(email) {
     try {
       assertUserNameFormat(local);
       return local;
-    } catch {
-      // fall through
+    } catch (error) {
+      // Имя из почты не подошло по формату — придумаем другое ниже.
+      console.warn(
+        `Имя «${local}» из почты не подходит: ${error instanceof Error ? error.message : error}`,
+      );
     }
   }
   const suffix = Date.now().toString(36).slice(-6);

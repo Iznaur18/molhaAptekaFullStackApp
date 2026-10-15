@@ -3,6 +3,7 @@ import {
   PASSPORT_FORM_STEP_IDENTITY,
   PASSPORT_FORM_STEP_SELFIE,
 } from "./validatePassportFormStep.js";
+import { reportClientIssue } from "../../../shared/lib/reportClientIssue.js";
 
 const STORAGE_KEY_PREFIX = "izibuy.dataConfirmationFormDraft.v1.";
 
@@ -118,8 +119,9 @@ export function persistDataConfirmationFormDraft(userId, draft) {
         step: normalizeStep(draft.step),
       }),
     );
-  } catch {
+  } catch (error) {
     // ignore quota / private mode
+    reportClientIssue("dataConfirmationFormDraftStorage#1", error);
   }
 }
 
@@ -136,8 +138,9 @@ export function clearDataConfirmationFormDraft(userId) {
   }
   try {
     window.localStorage.removeItem(key);
-  } catch {
+  } catch (error) {
     // ignore
+    reportClientIssue("dataConfirmationFormDraftStorage#2", error);
   }
 }
 
@@ -157,7 +160,8 @@ export function clearAllDataConfirmationFormDrafts() {
     for (const key of keys) {
       window.localStorage.removeItem(key);
     }
-  } catch {
+  } catch (error) {
     // ignore
+    reportClientIssue("dataConfirmationFormDraftStorage#3", error);
   }
 }

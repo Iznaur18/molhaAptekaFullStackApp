@@ -9,6 +9,7 @@ import {
   switchAccountAndReload,
 } from "../../../features/account-switcher/lib/accountTransition.js";
 import { EMPTY_MY_PROFILE_PAGE } from "../lib/catalogShellConstants.js";
+import { reportClientIssue } from "../../../shared/lib/reportClientIssue.js";
 
 /**
  * Перед уходом из аккаунта (выход, переключение, добавление второго):
@@ -22,8 +23,9 @@ export const usePrepareAccountChange = ({ flushRemoteCart, flushRemoteWishlist }
     await flushRemoteWishlist();
     try {
       localStorage.removeItem(CART_STORAGE_KEY);
-    } catch {
+    } catch (error) {
       // storage недоступен
+      reportClientIssue("useHomeLogout", error);
     }
     clearAllDataConfirmationFormDrafts();
   }, [flushRemoteCart, flushRemoteWishlist]);

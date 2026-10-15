@@ -6,6 +6,7 @@ import {
 } from "@molha/api-contract";
 
 import { apiClient } from "../../../shared/api/index.js";
+import { reportClientIssue } from "../../../shared/lib/reportClientIssue.js";
 
 /**
  * @param {{
@@ -23,8 +24,9 @@ export async function trackAdAnalyticsEvent(payload) {
       subjectId: payload.subjectId,
       campaignId: payload.campaignId ?? null,
     });
-  } catch {
+  } catch (error) {
     // traffic analytics must not break UX
+    reportClientIssue("trackAdAnalyticsEvent", error);
   }
 }
 

@@ -11,6 +11,7 @@ import {
 } from "./wishlistReducer";
 import type { WishlistContextValue, WishlistItemsByProductId } from "./types";
 import { WishlistContext } from "./wishlistContext";
+import { reportClientIssue } from "@/shared/lib/reportClientIssue";
 
 export { useWishlist } from "./useWishlist";
 
@@ -49,8 +50,9 @@ export const WishlistProvider = ({ children }: WishlistProviderProps) => {
   const flushRemoteWishlist = useCallback(async () => {
     try {
       await replaceWishlistMutation.mutateAsync(itemsRef.current);
-    } catch {
+    } catch (error) {
       // выход не блокируем
+      reportClientIssue("WishlistProvider", error);
     }
   }, [replaceWishlistMutation]);
 

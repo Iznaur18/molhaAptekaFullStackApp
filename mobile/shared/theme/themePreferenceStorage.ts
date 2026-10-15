@@ -1,5 +1,6 @@
 import { Appearance } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import { reportClientIssue } from "@/shared/lib/reportClientIssue";
 
 export type ThemePreference = "light" | "dark" | "custom";
 
@@ -22,8 +23,9 @@ export const loadThemePreference = async (): Promise<ThemePreference> => {
     if (raw === "system") {
       return resolveThemePreferenceFromSystem();
     }
-  } catch {
+  } catch (error) {
     // ignore
+    reportClientIssue("themePreferenceStorage#1", error);
   }
   return resolveThemePreferenceFromSystem();
 };
@@ -36,7 +38,8 @@ export const saveThemePreference = async (
   }
   try {
     await SecureStore.setItemAsync(THEME_PREFERENCE_KEY, preference);
-  } catch {
+  } catch (error) {
     // ignore
+    reportClientIssue("themePreferenceStorage#2", error);
   }
 };

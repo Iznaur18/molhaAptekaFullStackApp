@@ -1,4 +1,5 @@
 import { APP_INTRO_SEEN_STORAGE_KEY } from "../model/introConstants.js";
+import { reportClientIssue } from "../../../shared/lib/reportClientIssue.js";
 
 export function hasSeenAppIntro() {
   try {
@@ -11,7 +12,8 @@ export function hasSeenAppIntro() {
 export function markAppIntroSeen() {
   try {
     localStorage.setItem(APP_INTRO_SEEN_STORAGE_KEY, "1");
-  } catch {
+  } catch (error) {
     // storage недоступен
+    reportClientIssue("introStorage", error);
   }
 }

@@ -5,6 +5,7 @@ import {
   isRuRegionCode,
   resolveViewerRegionCode,
 } from "@molha/api-contract";
+import { reportClientIssue } from "@/shared/lib/reportClientIssue";
 
 export const VIEWER_REGION_STORAGE_KEY = "molha.viewerRegionCode";
 
@@ -54,8 +55,9 @@ export async function writeSessionViewerRegionCode(
     } else {
       await SecureStore.setItemAsync(VIEWER_REGION_STORAGE_KEY, next);
     }
-  } catch {
+  } catch (error) {
     // storage недоступен / quota
+    reportClientIssue("viewerRegion", error);
   }
 }
 

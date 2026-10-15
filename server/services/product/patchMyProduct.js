@@ -17,6 +17,7 @@ import {
 } from "./productDiscount.js";
 
 import { buildProductPatchSet } from "./buildProductPatchSet.js";
+import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 import { resetBuyNFreeProgressForProduct } from "./applyBuyNFreeFields.js";
 import {
   loadProductWithSellerSnapshot,
@@ -169,8 +170,14 @@ export async function patchMyProduct({ userId, productId, body }) {
           );
     try {
       await notifyFollowersOfSellerProductDiscount(product, previousPercent);
-    } catch {
-      /* не блокируем patch */
+    } catch (error) {
+      // Правка товара уже сохранена — уведомления подписчикам не повод её
+      // откатывать, но неотправленную рассылку видно в журнале.
+      logServerEvent("warn", {
+        event: "product.discount_followers_notify_failed",
+        productId: String(product._id),
+        ...formatLogError(error),
+      });
     }
   }
 

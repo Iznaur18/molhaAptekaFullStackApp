@@ -9,6 +9,7 @@ import {
   WISHLIST_ACTION_TOGGLE,
   wishlistReducer,
 } from "./wishlistReducer.js";
+import { reportClientIssue } from "../../../shared/lib/reportClientIssue.js";
 
 /** @type {import('react').Context<import('./types.js').WishlistContextValue | null>} */
 export const WishlistContext = createContext(null);
@@ -51,8 +52,9 @@ export function WishlistProvider({ children }) {
   const flushRemoteWishlist = useCallback(async () => {
     try {
       await replaceWishlistMutation.mutateAsync(itemsRef.current);
-    } catch {
+    } catch (error) {
       // выход не блокируем
+      reportClientIssue("WishlistContext", error);
     }
   }, [replaceWishlistMutation]);
 

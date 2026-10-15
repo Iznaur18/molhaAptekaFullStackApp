@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 import { PRODUCT_SOLD_QUANTITY_COUNT_STATUSES } from "../../constants/productSoldQuantityConstants.js";
 import { OrderModel, ProductModel } from "../../models/index.js";
+import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 
 const COUNTED_STATUSES = new Set(PRODUCT_SOLD_QUANTITY_COUNT_STATUSES);
 
@@ -97,8 +98,14 @@ export const applySoldQuantityDeltaForItemStatusChange = async ({
         unitPriceAtOrder: analytics.unitPriceAtOrder ?? 0,
         status: String(nextStatus),
       });
-    } catch {
-      // analytics must not block soldQuantity
+    } catch (error) {
+      // Аналитика не должна срывать счётчик продаж, но потерю события видно в журнале.
+      logServerEvent("warn", {
+        event: "analytics.order_item_sold_emit_failed",
+        orderId: String(analytics.orderId),
+        productId: String(productId),
+        ...formatLogError(error),
+      });
     }
   }
 

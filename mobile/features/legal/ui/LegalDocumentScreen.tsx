@@ -3,6 +3,7 @@ import { Linking, Pressable, ScrollView, Text, View } from "react-native";
 import type { LegalSection } from "@/features/legal/model/legalSectionTypes";
 import { LEGAL_UI } from "@/shared/config";
 import { useLegalPageStyles } from "@/shared/theme/accountFeatureStyles";
+import { reportClientIssue } from "@/shared/lib/reportClientIssue";
 
 export type LegalDocumentBodyProps = {
   title: string;
@@ -16,8 +17,9 @@ export type LegalDocumentBodyProps = {
 const handleOpenWebVersion = async (webUrl: string) => {
   try {
     await Linking.openURL(webUrl);
-  } catch {
+  } catch (error) {
     // браузер недоступен
+    reportClientIssue("LegalDocumentScreen", error);
   }
 };
 

@@ -3,6 +3,7 @@ import {
   type YandexMapsPointInput,
 } from "@izibuy/shared-lib";
 import { Linking } from "react-native";
+import { reportClientIssue } from "@/shared/lib/reportClientIssue";
 
 export const openYandexMapsRoute = async (
   point: YandexMapsPointInput,
@@ -19,8 +20,9 @@ export const openYandexMapsRoute = async (
         await Linking.openURL(url);
         return;
       }
-    } catch {
+    } catch (error) {
       // try next candidate
+      reportClientIssue("openYandexMaps", error);
     }
   }
 

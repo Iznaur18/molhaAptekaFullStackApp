@@ -3,6 +3,7 @@ import {
   REFERRAL_QUERY_PARAM,
   normalizeReferralCode,
 } from "@izibuy/shared-lib";
+import { reportClientIssue } from "./reportClientIssue.js";
 
 export { REFERRAL_CODE_STORAGE_KEY, REFERRAL_QUERY_PARAM, normalizeReferralCode };
 
@@ -16,8 +17,9 @@ export function persistReferralCode(code) {
   }
   try {
     window.localStorage.setItem(REFERRAL_CODE_STORAGE_KEY, normalized);
-  } catch {
+  } catch (error) {
     // ignore quota / private mode
+    reportClientIssue("referralCodeStorage#1", error);
   }
 }
 
@@ -43,8 +45,9 @@ export function clearPersistedReferralCode() {
   }
   try {
     window.localStorage.removeItem(REFERRAL_CODE_STORAGE_KEY);
-  } catch {
+  } catch (error) {
     // ignore
+    reportClientIssue("referralCodeStorage#2", error);
   }
 }
 

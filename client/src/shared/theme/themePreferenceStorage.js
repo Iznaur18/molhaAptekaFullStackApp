@@ -1,3 +1,4 @@
+import { reportClientIssue } from "../lib/reportClientIssue.js";
 /** @typedef {"light" | "dark" | "custom"} ThemePreference */
 
 const THEME_PREFERENCE_KEY = "app-theme-preference";
@@ -22,8 +23,9 @@ export function resolveThemePreferenceFromSystem() {
     ) {
       return "dark";
     }
-  } catch {
+  } catch (error) {
     // matchMedia недоступен
+    reportClientIssue("themePreferenceStorage#1", error);
   }
   return "custom";
 }
@@ -41,8 +43,9 @@ export function loadThemePreference() {
     if (raw === "system") {
       return resolveThemePreferenceFromSystem();
     }
-  } catch {
+  } catch (error) {
     // storage недоступен
+    reportClientIssue("themePreferenceStorage#2", error);
   }
   return resolveThemePreferenceFromSystem();
 }
@@ -56,7 +59,8 @@ export function saveThemePreference(preference) {
   }
   try {
     localStorage.setItem(THEME_PREFERENCE_KEY, preference);
-  } catch {
+  } catch (error) {
     // storage недоступен
+    reportClientIssue("themePreferenceStorage#3", error);
   }
 }
