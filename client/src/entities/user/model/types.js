@@ -29,6 +29,7 @@
  * @property {number} [totalSalesCount] — число уникальных заказов с проданными позициями
  * @property {number} [totalPurchasesAmount] — сумма покупок как покупателя
  * @property {number} [totalDonatedRub] — сумма успешных пожертвований за всё время
+ * @property {number} [referredUsersCount] — сколько человек зарегистрировалось по его ссылке
  */
 
 /**

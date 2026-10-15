@@ -19,6 +19,7 @@ import {
   useRaffleFeaturedBannerStyles,
 } from "@/shared/theme/raffleFeaturedStyles";
 import { SquircleView } from "@/shared/ui/SquircleView";
+import { reportClientIssue } from "@/shared/lib/reportClientIssue";
 
 type RaffleFeaturedBannerProps = {
   raffle: RaffleFromApi;
@@ -63,8 +64,9 @@ export const RaffleFeaturedBanner = memo(
         if (canOpen) {
           await Linking.openURL(url);
         }
-      } catch {
+      } catch (error) {
         // ignore
+        reportClientIssue("RaffleFeaturedBanner", error);
       }
     };
 

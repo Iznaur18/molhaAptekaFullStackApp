@@ -183,3 +183,21 @@ test("экран корзины: список продавцов, оформле
   assert.match(cost, /fetchSellerDeliveryQuote/);
   assert.match(cost, /quoteCartSellerDelivery/);
 });
+
+test("на узком экране кнопка продавца уходит под имя — порог как на web", () => {
+  const webCss = read("../client/src/pages/cart/ui/CartSellerList.css");
+  const webBreakpoint =
+    /@media \(max-width: (\d+)px\)\s*\{\s*\.cart-seller-row__top/.exec(webCss)?.[1];
+  assert.ok(webBreakpoint, "в CartSellerList.css нет узкой раскладки строки продавца");
+
+  const styles = read("shared/theme/cartFulfillmentStyles.ts");
+  assert.match(
+    styles,
+    new RegExp(`CART_SELLER_ROW_STACK_MAX_WIDTH = ${webBreakpoint};`),
+  );
+
+  const row = read("entities/cart/ui/CartSellerList.tsx");
+  assert.match(row, /windowWidth <= CART_SELLER_ROW_STACK_MAX_WIDTH/);
+  assert.match(row, /styles\.topStacked/);
+  assert.match(row, /styles\.checkoutStacked/);
+});

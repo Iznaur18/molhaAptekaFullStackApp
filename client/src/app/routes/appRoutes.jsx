@@ -7,9 +7,10 @@ import { AppShellRoot } from "../ui/AppShellRoot.jsx";
 
 import { CatalogProductShellLayout } from "./CatalogProductShellLayout.jsx";
 import { EmptyRoutePage } from "./EmptyRoutePage.jsx";
-import { ProductRoutePage } from "./ProductRoutePage.jsx";
+import { loadProductRoutePage } from "./productRoutePageChunk.js";
 
 /** Home `/` stays sync; everything else is a separate chunk. */
+const LazyProductRoutePage = lazyNamedExport(loadProductRoutePage, "ProductRoutePage");
 const LazyCartRoutePage = lazyNamedExport(
   () => import("./CartRoutePage.jsx"),
   "CartRoutePage",
@@ -82,7 +83,7 @@ export function renderAppShellRoutes() {
       <Route element={<CatalogProductShellLayout />}>
         <Route path="/" element={<EmptyRoutePage />} />
         <Route path="/catalog" element={<EmptyRoutePage />} />
-        <Route path="/product/:productId" element={<ProductRoutePage />} />
+        <Route path="/product/:productId" element={<LazyProductRoutePage />} />
       </Route>
       <Route path="/user/:userId" element={<LazyUserRoutePage />} />
 

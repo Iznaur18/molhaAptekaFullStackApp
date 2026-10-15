@@ -1,11 +1,23 @@
 import {
-  PRODUCT_CATALOG_DELIVERY_FILTER_VALUES,
-  PRODUCT_CATALOG_RATING_MIN_VALUES,
   PRODUCT_CATALOG_SORT_VALUES,
   PRODUCT_PRICE_RUB_MAX,
 } from "@molha/api-contract";
+import {
+  EMPTY_CATALOG_EXTRA_FILTERS,
+  normalizeCatalogDeliveryFilter,
+  normalizeCatalogPriceRange,
+  pickCatalogExtraFilters,
+} from "@izibuy/shared-lib";
 
 import { CATALOG_SORT_NEWEST, PRODUCT_CATEGORIES } from "../model/productConstants.js";
+
+// Разбор фильтров окна общий с приложением — живёт в shared-lib.
+export {
+  EMPTY_CATALOG_EXTRA_FILTERS,
+  normalizeCatalogDeliveryFilter,
+  normalizeCatalogPriceRange,
+  pickCatalogExtraFilters,
+};
 
 export const CATALOG_QUERY_PARAM_SORT = "sort";
 export const CATALOG_QUERY_PARAM_CATEGORY = "category";
@@ -46,32 +58,7 @@ export const CATALOG_EXTRA_FILTER_QUERY_PARAMS = [
   CATALOG_QUERY_PARAM_SELLER_PREMIUM,
 ];
 
-/**
- * @typedef {{
- *   priceMin: number | null;
- *   priceMax: number | null;
- *   delivery: string[];
- *   pickupOnly: boolean;
- *   ratingMin: number | null;
- *   withReviews: boolean;
- *   returnOnly: boolean;
- *   sellerConfirmed: boolean;
- *   sellerPremium: boolean;
- * }} CatalogExtraFilters
- */
-
-/** @type {Readonly<CatalogExtraFilters>} */
-export const EMPTY_CATALOG_EXTRA_FILTERS = Object.freeze({
-  priceMin: null,
-  priceMax: null,
-  delivery: /** @type {string[]} */ (Object.freeze([])),
-  pickupOnly: false,
-  ratingMin: null,
-  withReviews: false,
-  returnOnly: false,
-  sellerConfirmed: false,
-  sellerPremium: false,
-});
+/** @typedef {import("@izibuy/shared-lib").CatalogExtraFilters} CatalogExtraFilters */
 
 /**
  * @param {string | null | undefined} raw
@@ -127,61 +114,6 @@ const parseCatalogPriceParam = (raw) => {
   }
   return toCatalogPriceFilter(Number(value));
 };
-
-/**
- * «От» больше «до» — меняем местами: сервер на такой диапазон отвечает 400.
- *
- * @param {number | null} priceMin
- * @param {number | null} priceMax
- * @returns {[number | null, number | null]}
- */
-export function normalizeCatalogPriceRange(priceMin, priceMax) {
-  if (priceMin != null && priceMax != null && priceMin > priceMax) {
-    return [priceMax, priceMin];
-  }
-  return [priceMin, priceMax];
-}
-
-/**
- * Без дублей и неизвестных значений, в порядке контракта — чтобы адрес
- * и ключ запроса не зависели от порядка нажатий.
- *
- * @param {readonly unknown[]} values
- * @returns {string[]}
- */
-export function normalizeCatalogDeliveryFilter(values) {
-  return PRODUCT_CATALOG_DELIVERY_FILTER_VALUES.filter((value) =>
-    values.includes(value),
-  );
-}
-
-/**
- * @param {Partial<CatalogExtraFilters> | null | undefined} query
- * @returns {CatalogExtraFilters}
- */
-export function pickCatalogExtraFilters(query) {
-  const [priceMin, priceMax] = normalizeCatalogPriceRange(
-    toCatalogPriceFilter(query?.priceMin),
-    toCatalogPriceFilter(query?.priceMax),
-  );
-  const ratingMin = Number(query?.ratingMin);
-  return {
-    priceMin,
-    priceMax,
-    delivery: normalizeCatalogDeliveryFilter(
-      Array.isArray(query?.delivery) ? query.delivery : [],
-    ),
-    pickupOnly: query?.pickupOnly === true,
-    ratingMin:
-      query?.ratingMin != null && PRODUCT_CATALOG_RATING_MIN_VALUES.includes(ratingMin)
-        ? ratingMin
-        : null,
-    withReviews: query?.withReviews === true,
-    returnOnly: query?.returnOnly === true,
-    sellerConfirmed: query?.sellerConfirmed === true,
-    sellerPremium: query?.sellerPremium === true,
-  };
-}
 
 /**
  * @param {CatalogExtraFilters} a

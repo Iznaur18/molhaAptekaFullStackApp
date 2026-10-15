@@ -1,10 +1,12 @@
-import { useRef } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 
 import { CatalogMainContent } from "../../pages/catalog/ui/CatalogMainContent.jsx";
 import { pathnameToCatalogMainView } from "../../shared/lib/catalogMainViewPaths.js";
 import { isProductDetailsPath } from "../../shared/lib/productDetailsPaths.js";
 import { useAppShell } from "../model/AppShellContext.jsx";
+
+import { prefetchProductRoutePage } from "./productRoutePageChunk.js";
 
 import "./CatalogProductShellLayout.css";
 
@@ -26,6 +28,10 @@ export function CatalogProductShellLayout() {
   if (pathCatalogView) {
     frozenCatalogViewRef.current = pathCatalogView;
   }
+
+  useEffect(() => {
+    prefetchProductRoutePage();
+  }, []);
 
   const catalogMainView = isProductDetails
     ? frozenCatalogViewRef.current
@@ -49,7 +55,11 @@ export function CatalogProductShellLayout() {
           catalogBrowserSection={catalogContentProps.catalogBrowserSection}
         />
       </div>
-      <Outlet />
+      {/* Своя граница: иначе на время загрузки чанка товара спряталась бы
+          вся оболочка вместе с лентой. */}
+      <Suspense fallback={null}>
+        <Outlet />
+      </Suspense>
     </>
   );
 }

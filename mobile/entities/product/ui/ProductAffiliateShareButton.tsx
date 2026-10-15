@@ -12,6 +12,7 @@ import { fetchMyReferralProgram } from "@/entities/user/api/referralProgram";
 import { ProductDetailsFeatureCard } from "@/entities/product/ui/ProductDetailsFeatureCard";
 import { PRODUCT_DETAILS_MODAL_UI } from "@/shared/config";
 import { WEB_APP_BASE_URL } from "@/shared/config/webAppBaseUrl";
+import { reportClientIssue } from "@/shared/lib/reportClientIssue";
 
 const COPIED_ICON_MS = 1600;
 
@@ -82,12 +83,14 @@ export const ProductAffiliateShareButton = ({
       await Clipboard.setStringAsync(url);
       try {
         await Share.share({ message: url });
-      } catch {
+      } catch (error) {
         // cancelled
+        reportClientIssue("ProductAffiliateShareButton#1", error);
       }
       flashCopied();
-    } catch {
+    } catch (error) {
       // parity: web logs only, no inline status
+      reportClientIssue("ProductAffiliateShareButton#2", error);
     }
   };
 

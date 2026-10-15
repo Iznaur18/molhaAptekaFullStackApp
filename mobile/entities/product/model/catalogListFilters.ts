@@ -20,6 +20,16 @@ export type CatalogListFilters = {
   originalOnly?: boolean;
   flashSaleOnly?: boolean;
   near?: boolean;
+  /** Окно фильтров: цена, получение, рейтинг, продавец. */
+  priceMin?: number;
+  priceMax?: number;
+  delivery?: string[];
+  pickupOnly?: boolean;
+  ratingMin?: number;
+  withReviews?: boolean;
+  returnOnly?: boolean;
+  sellerConfirmed?: boolean;
+  sellerPremium?: boolean;
   regionCode?: string;
 };
 
@@ -41,5 +51,15 @@ export const buildCatalogListQueryKey = (filters: CatalogListFilters) => ({
   originalOnly: filters.originalOnly === true ? true : undefined,
   flashSaleOnly: filters.flashSaleOnly === true ? true : undefined,
   near: filters.near === true ? true : undefined,
+  priceMin: filters.priceMin ?? undefined,
+  priceMax: filters.priceMax ?? undefined,
+  // Строкой: ключ сравнивается по значению, а не по ссылке на массив.
+  delivery: filters.delivery?.length ? filters.delivery.join(",") : undefined,
+  pickupOnly: filters.pickupOnly === true ? true : undefined,
+  ratingMin: filters.ratingMin ?? undefined,
+  withReviews: filters.withReviews === true ? true : undefined,
+  returnOnly: filters.returnOnly === true ? true : undefined,
+  sellerConfirmed: filters.sellerConfirmed === true ? true : undefined,
+  sellerPremium: filters.sellerPremium === true ? true : undefined,
   regionCode: filters.regionCode?.trim() || undefined,
 });

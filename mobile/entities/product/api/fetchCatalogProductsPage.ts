@@ -2,9 +2,7 @@ import { apiClient, parseCatalogProductsPageData } from "@/shared/api";
 import { API_CLIENT_UI, CATALOG_PAGE_SIZE } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 
-export type FetchCatalogProductsPageOptions = {
-  page?: number;
-  limit?: number;
+export type CatalogProductsRequestOptions = {
   search?: string;
   productCategory?: string;
   categoryId?: string;
@@ -21,12 +19,25 @@ export type FetchCatalogProductsPageOptions = {
   originalOnly?: boolean;
   flashSaleOnly?: boolean;
   near?: boolean;
+  priceMin?: number;
+  priceMax?: number;
+  delivery?: readonly string[];
+  pickupOnly?: boolean;
+  ratingMin?: number;
+  withReviews?: boolean;
+  returnOnly?: boolean;
+  sellerConfirmed?: boolean;
+  sellerPremium?: boolean;
   regionCode?: string;
 };
 
-export const fetchCatalogProductsPage = async ({
-  page = 1,
-  limit = CATALOG_PAGE_SIZE,
+export type FetchCatalogProductsPageOptions = CatalogProductsRequestOptions & {
+  page?: number;
+  limit?: number;
+};
+
+/** Query `GET /product` и `GET /product/facets` — один построитель, как на web. */
+export const buildCatalogProductsRequestParams = ({
   search,
   productCategory,
   categoryId,
@@ -43,32 +54,58 @@ export const fetchCatalogProductsPage = async ({
   originalOnly,
   flashSaleOnly,
   near,
+  priceMin,
+  priceMax,
+  delivery,
+  pickupOnly,
+  ratingMin,
+  withReviews,
+  returnOnly,
+  sellerConfirmed,
+  sellerPremium,
   regionCode,
+}: CatalogProductsRequestOptions = {}) => ({
+  ...(search?.trim() ? { search: search.trim() } : {}),
+  ...(productCategory?.trim() ? { productCategory: productCategory.trim() } : {}),
+  ...(categoryId?.trim() ? { categoryId: categoryId.trim() } : {}),
+  ...(sellerPersonalCategoryId?.trim()
+    ? { sellerPersonalCategoryId: sellerPersonalCategoryId.trim() }
+    : {}),
+  ...(sort ? { sort } : {}),
+  ...(followingOnly ? { followingOnly: "true" } : {}),
+  ...(auctionOnly ? { auctionOnly: "true" } : {}),
+  ...(installmentOnly ? { installmentOnly: "true" } : {}),
+  ...(saleOnly ? { saleOnly: "true" } : {}),
+  ...(rentalOnly ? { rentalOnly: "true" } : {}),
+  ...(affiliateOnly ? { affiliateOnly: "true" } : {}),
+  ...(wholesaleOnly ? { wholesaleOnly: "true" } : {}),
+  ...(buyNFreeOnly ? { buyNFreeOnly: "true" } : {}),
+  ...(originalOnly ? { originalOnly: "true" } : {}),
+  ...(flashSaleOnly ? { flashSaleOnly: "true" } : {}),
+  ...(near ? { near: "true" } : {}),
+  ...(priceMin != null ? { priceMin } : {}),
+  ...(priceMax != null ? { priceMax } : {}),
+  ...(delivery?.length ? { delivery: delivery.join(",") } : {}),
+  ...(pickupOnly ? { pickupOnly: "true" } : {}),
+  ...(ratingMin != null ? { ratingMin } : {}),
+  ...(withReviews ? { withReviews: "true" } : {}),
+  ...(returnOnly ? { returnOnly: "true" } : {}),
+  ...(sellerConfirmed ? { sellerConfirmed: "true" } : {}),
+  ...(sellerPremium ? { sellerPremium: "true" } : {}),
+  ...(regionCode?.trim() ? { regionCode: regionCode.trim() } : {}),
+});
+
+export const fetchCatalogProductsPage = async ({
+  page = 1,
+  limit = CATALOG_PAGE_SIZE,
+  ...options
 }: FetchCatalogProductsPageOptions = {}) => {
   try {
     const { data } = await apiClient.get("/product", {
       params: {
         page,
         limit,
-        ...(search?.trim() ? { search: search.trim() } : {}),
-        ...(productCategory?.trim() ? { productCategory: productCategory.trim() } : {}),
-        ...(categoryId?.trim() ? { categoryId: categoryId.trim() } : {}),
-        ...(sellerPersonalCategoryId?.trim()
-          ? { sellerPersonalCategoryId: sellerPersonalCategoryId.trim() }
-          : {}),
-        ...(sort ? { sort } : {}),
-        ...(followingOnly ? { followingOnly: "true" } : {}),
-        ...(auctionOnly ? { auctionOnly: "true" } : {}),
-        ...(installmentOnly ? { installmentOnly: "true" } : {}),
-        ...(saleOnly ? { saleOnly: "true" } : {}),
-        ...(rentalOnly ? { rentalOnly: "true" } : {}),
-        ...(affiliateOnly ? { affiliateOnly: "true" } : {}),
-        ...(wholesaleOnly ? { wholesaleOnly: "true" } : {}),
-        ...(buyNFreeOnly ? { buyNFreeOnly: "true" } : {}),
-        ...(originalOnly ? { originalOnly: "true" } : {}),
-        ...(flashSaleOnly ? { flashSaleOnly: "true" } : {}),
-        ...(near ? { near: "true" } : {}),
-        ...(regionCode?.trim() ? { regionCode: regionCode.trim() } : {}),
+        ...buildCatalogProductsRequestParams(options),
       },
     });
     const parsed = parseCatalogProductsPageData(data);

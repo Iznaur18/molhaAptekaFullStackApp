@@ -250,8 +250,8 @@ main().catch(async (error) => {
   console.error(error);
   try {
     await mongoose.disconnect();
-  } catch {
-    // ignore
+  } catch (disconnectError) {
+    console.error("Не удалось закрыть соединение с базой", disconnectError);
   }
   process.exit(1);
 });

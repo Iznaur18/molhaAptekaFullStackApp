@@ -120,6 +120,8 @@ export const USER_LIST_ROW_UI = {
   FOLLOWERS_LABEL: "Подписчики",
   LOYALTY_POINTS_LABEL: "Баллы",
   DONATIONS_LABEL: "Донаты",
+  REFERRALS_LABEL: "Привёл",
+  REFERRALS_TITLE: "Сколько человек зарегистрировалось по его ссылке",
 };
 
 /** Общий каркас админ-вкладок в профиле */

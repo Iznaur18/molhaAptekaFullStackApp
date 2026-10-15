@@ -7,7 +7,7 @@ import {
 } from "../../constants/geoRoutingConstants.js";
 import { AppError } from "../../errors/AppError.js";
 import { UserModel } from "../../models/index.js";
-import { logServerEvent } from "../../utils/logServerEvent.js";
+import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 import { geocodeCoarseWithDadata } from "../../utils/dadata/dadataGeocode.js";
 import { verifyRuDeliveryAddress } from "../../utils/dadata/verifyRuDeliveryAddress.js";
 import {
@@ -212,8 +212,13 @@ export async function resolveDeliveryOrigin({ sellerId, productRows }) {
     let verified = null;
     try {
       verified = await verifyRuDeliveryAddress({ addressLine: address });
-    } catch {
-      // Неполный по мнению DaData адрес всё ещё может найтись в OSM.
+    } catch (error) {
+      // Неполный по мнению DaData адрес всё ещё может найтись в OSM — идём
+      // дальше без проверки, но отказ DaData оставляем в журнале.
+      logServerEvent("warn", {
+        event: "delivery.seller_address_verify_failed",
+        ...formatLogError(error),
+      });
     }
     const found = await geocodeAddressBest({ line: address, verified });
     if (found) {

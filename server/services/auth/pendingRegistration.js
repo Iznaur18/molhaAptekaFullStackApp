@@ -21,7 +21,7 @@ import {
   PHONE_VERIFICATION_TOKEN_TTL_MS,
   SMS_DELIVERY_UNAVAILABLE_MESSAGE,
 } from "../../constants/phoneVerificationConstants.js";
-import { logServerEvent } from "../../utils/logServerEvent.js";
+import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 import { attachReferralAttribution } from "../referral/attachReferralAttribution.js";
 import { ensureUserReferralCode } from "../referral/ensureUserReferralCode.js";
 
@@ -368,8 +368,13 @@ export async function confirmPendingRegistration(registrationId, rawCode) {
       channel: isPhoneChannel ? "phone" : "email",
       attribution: registrationAttribution,
     });
-  } catch {
-    // analytics must not block registration
+  } catch (error) {
+    // Аналитика не должна срывать регистрацию, но потерю события видно в журнале.
+    logServerEvent("warn", {
+      event: "analytics.user_registered_emit_failed",
+      userId: String(user._id),
+      ...formatLogError(error),
+    });
   }
 
   return user;

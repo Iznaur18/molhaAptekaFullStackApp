@@ -21,7 +21,7 @@ import {
 import { rememberPrivateUploadOwner } from "../../services/upload/privateUploadOwnership.js";
 import { createPublicUploadImageThumbnailSafe } from "../../services/upload/uploadImageThumbnail.js";
 import { successRes, errorRes } from "../../services/http/index.js";
-import { logServerEvent } from "../../utils/logServerEvent.js";
+import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 
 /**
  * @param {import('express').Request} req
@@ -55,8 +55,15 @@ async function cleanupRejectedUpload(file) {
   }
   try {
     await fs.unlink(file.path);
-  } catch {
-    // best-effort
+  } catch (error) {
+    // Файла уже нет — то, чего и добивались. Иное (права, диск) — в журнал:
+    // отклонённые загрузки иначе копятся в uploads незаметно.
+    if (/** @type {{ code?: string }} */ (error)?.code !== "ENOENT") {
+      logServerEvent("warn", {
+        event: "upload.rejected_cleanup_failed",
+        ...formatLogError(error),
+      });
+    }
   }
 }
 

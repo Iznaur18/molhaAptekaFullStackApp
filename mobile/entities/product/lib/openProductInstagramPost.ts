@@ -1,4 +1,5 @@
 import { Linking } from "react-native";
+import { reportClientIssue } from "@/shared/lib/reportClientIssue";
 
 export async function openProductInstagramPost(postUrl: string) {
   const url = String(postUrl ?? "").trim();
@@ -11,7 +12,8 @@ export async function openProductInstagramPost(postUrl: string) {
     if (canOpen) {
       await Linking.openURL(url);
     }
-  } catch {
+  } catch (error) {
     // ignore — нет fallback UI на карточке
+    reportClientIssue("openProductInstagramPost", error);
   }
 }

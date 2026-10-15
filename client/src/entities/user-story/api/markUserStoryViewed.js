@@ -1,4 +1,5 @@
 import { apiClient } from "../../../shared/api/index.js";
+import { reportClientIssue } from "../../../shared/lib/reportClientIssue.js";
 
 /**
  * @param {string} storyId
@@ -6,7 +7,8 @@ import { apiClient } from "../../../shared/api/index.js";
 export async function markUserStoryViewed(storyId) {
   try {
     await apiClient.post(`/user/stories/${encodeURIComponent(storyId)}/view`);
-  } catch {
+  } catch (error) {
     // просмотр не блокирует UX
+    reportClientIssue("markUserStoryViewed", error);
   }
 }

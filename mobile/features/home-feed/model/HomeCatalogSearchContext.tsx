@@ -5,16 +5,18 @@ type HomeCatalogSearchContextValue = {
   onChange: (value: string) => void;
   /** Запуск поиска: только по «Найти» на клавиатуре, не по вводу. */
   onSubmit: () => void;
+  /** Окно фильтров открыто. */
+  filtersOpen: boolean;
+  /** В ленте выбраны фильтры окна. */
+  filtersActive: boolean;
+  onOpenFilters: () => void;
 };
 
 const HomeCatalogSearchContext = createContext<HomeCatalogSearchContextValue | null>(
   null,
 );
 
-type HomeCatalogSearchProviderProps = {
-  value: string;
-  onChange: (value: string) => void;
-  onSubmit: () => void;
+type HomeCatalogSearchProviderProps = HomeCatalogSearchContextValue & {
   children: ReactNode;
 };
 
@@ -22,6 +24,9 @@ export const HomeCatalogSearchProvider = ({
   value,
   onChange,
   onSubmit,
+  filtersOpen,
+  filtersActive,
+  onOpenFilters,
   children,
 }: HomeCatalogSearchProviderProps) => {
   const contextValue = useMemo(
@@ -29,8 +34,11 @@ export const HomeCatalogSearchProvider = ({
       value,
       onChange,
       onSubmit,
+      filtersOpen,
+      filtersActive,
+      onOpenFilters,
     }),
-    [onChange, onSubmit, value],
+    [filtersActive, filtersOpen, onChange, onOpenFilters, onSubmit, value],
   );
 
   return (

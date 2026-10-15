@@ -4,6 +4,7 @@ import {
   AFFILIATE_QUERY_PARAM,
   normalizeAffiliateCode,
 } from "@izibuy/shared-lib";
+import { reportClientIssue } from "./reportClientIssue.js";
 
 export {
   AFFILIATE_CLICK_TTL_DAYS,
@@ -25,8 +26,9 @@ export function persistAffiliateCode(code) {
       AFFILIATE_CODE_STORAGE_KEY,
       JSON.stringify({ code: normalized, savedAt: Date.now() }),
     );
-  } catch {
+  } catch (error) {
     // ignore quota / private mode
+    reportClientIssue("affiliateCodeStorage#1", error);
   }
 }
 
@@ -67,8 +69,9 @@ export function clearPersistedAffiliateCode() {
   }
   try {
     window.localStorage.removeItem(AFFILIATE_CODE_STORAGE_KEY);
-  } catch {
+  } catch (error) {
     // ignore
+    reportClientIssue("affiliateCodeStorage#2", error);
   }
 }
 

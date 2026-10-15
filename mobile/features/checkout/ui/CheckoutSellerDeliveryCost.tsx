@@ -22,6 +22,12 @@ type CheckoutSellerDeliveryCostProps = {
   address: RuDeliveryAddressValue;
   /** Адрес прошёл проверку формы — можно спрашивать расстояние. */
   isAddressValid: boolean;
+  /**
+   * Блок стоит в итоге корзины над «Оформить» (паритет web
+   * `.cart-fulfillment__dock .checkout-seller-delivery`): без строки-заголовка
+   * и подписи про карты — итог и так подписан.
+   */
+  inDock?: boolean;
 };
 
 /**
@@ -37,6 +43,7 @@ export const CheckoutSellerDeliveryCost = ({
   productIds,
   address,
   isAddressValid,
+  inDock = false,
 }: CheckoutSellerDeliveryCostProps) => {
   const styles = useCheckoutSellerDeliveryCostStyles();
   const normalized = normalizeSellerDeliveryTariff(sellerDelivery.tariff);
@@ -108,17 +115,19 @@ export const CheckoutSellerDeliveryCost = ({
   const billableKm = distanceKm == null ? null : Math.ceil(distanceKm);
 
   return (
-    <View style={styles.root}>
-      <View style={styles.row}>
-        <Text style={styles.legend}>{CHECKOUT_FORM_UI.SELLER_DELIVERY_LEGEND}</Text>
-        <Text style={styles.value}>
-          {isFree
-            ? CHECKOUT_FORM_UI.SELLER_DELIVERY_FREE
-            : isEstimate
-              ? CHECKOUT_FORM_UI.SELLER_DELIVERY_FROM(formatPriceRub(feeRub))
-              : formatPriceRub(feeRub)}
-        </Text>
-      </View>
+    <View style={[styles.root, inDock && styles.rootInDock]}>
+      {inDock ? null : (
+        <View style={styles.row}>
+          <Text style={styles.legend}>{CHECKOUT_FORM_UI.SELLER_DELIVERY_LEGEND}</Text>
+          <Text style={styles.value}>
+            {isFree
+              ? CHECKOUT_FORM_UI.SELLER_DELIVERY_FREE
+              : isEstimate
+                ? CHECKOUT_FORM_UI.SELLER_DELIVERY_FROM(formatPriceRub(feeRub))
+                : formatPriceRub(feeRub)}
+          </Text>
+        </View>
+      )}
 
       {isCalculating ? (
         <Text style={styles.hint}>{CHECKOUT_FORM_UI.SELLER_DELIVERY_CALCULATING}</Text>
@@ -171,7 +180,7 @@ export const CheckoutSellerDeliveryCost = ({
         </View>
       ) : null}
 
-      {!isFree && billableKm != null ? (
+      {!inDock && !isFree && billableKm != null ? (
         <Text style={styles.attribution}>
           {CHECKOUT_FORM_UI.SELLER_DELIVERY_MAP_ATTRIBUTION}
         </Text>

@@ -1,3 +1,4 @@
+import { reportClientIssue } from "../../../shared/lib/reportClientIssue.js";
 /**
  * @returns {string}
  */
@@ -5,8 +6,9 @@ export function createUserSavedAddressId() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
     try {
       return crypto.randomUUID();
-    } catch {
+    } catch (error) {
       // insecure context (LAN HTTP)
+      reportClientIssue("createUserSavedAddressId", error);
     }
   }
 

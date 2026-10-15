@@ -1,3 +1,4 @@
+import { reportClientIssue } from "../../../shared/lib/reportClientIssue.js";
 /**
  * Id платежа, с которым покупатель ушёл на форму оплаты.
  *
@@ -12,9 +13,10 @@ const PENDING_PAYMENT_STORAGE_KEY = "gitorg_pending_payment_id_v1";
 export function rememberPendingPaymentId(paymentId) {
   try {
     sessionStorage.setItem(PENDING_PAYMENT_STORAGE_KEY, String(paymentId));
-  } catch {
+  } catch (error) {
     // Приватный режим или заблокированное хранилище — статус просто добьётся
     // уведомлением от банка, а страница покажет обычный баланс.
+    reportClientIssue("pendingPaymentStorage#1", error);
   }
 }
 
@@ -30,7 +32,8 @@ export function readPendingPaymentId() {
 export function forgetPendingPaymentId() {
   try {
     sessionStorage.removeItem(PENDING_PAYMENT_STORAGE_KEY);
-  } catch {
+  } catch (error) {
     // См. выше: нечего чистить — и ладно.
+    reportClientIssue("pendingPaymentStorage#2", error);
   }
 }

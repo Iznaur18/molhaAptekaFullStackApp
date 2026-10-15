@@ -1,4 +1,5 @@
 import { apiClient } from "../../../shared/api/apiClient.js";
+import { reportClientIssue } from "../../../shared/lib/reportClientIssue.js";
 
 /**
  * Накладная СДЭК: продавец создаёт её ключом своего договора, а мы храним
@@ -78,8 +79,9 @@ export async function fetchCdekLabel(orderId) {
       let message = "";
       try {
         message = JSON.parse(await blob.text())?.message ?? "";
-      } catch {
+      } catch (error) {
         /* ответ не JSON — покажем общий текст */
+        reportClientIssue("cdekWaybillApi", error);
       }
       throw new Error(message || "СДЭК сейчас не отвечает");
     }

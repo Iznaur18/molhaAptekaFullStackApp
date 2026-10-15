@@ -1,4 +1,5 @@
 import { ADDRESS_PROMPT_SESSION_STORAGE_KEY } from "../model/addressPromptConstants.js";
+import { reportClientIssue } from "../../../shared/lib/reportClientIssue.js";
 
 /**
  * @param {unknown} userId
@@ -46,7 +47,8 @@ export function markAddressPromptSeenThisSession(userId) {
     const store = readSeenByUserId();
     store[id] = true;
     sessionStorage.setItem(ADDRESS_PROMPT_SESSION_STORAGE_KEY, JSON.stringify(store));
-  } catch {
+  } catch (error) {
     // private mode
+    reportClientIssue("addressPromptSession", error);
   }
 }

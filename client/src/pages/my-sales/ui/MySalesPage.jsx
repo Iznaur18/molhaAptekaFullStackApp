@@ -43,6 +43,7 @@ import { MySalesPageOverview } from "./MySalesPageOverview.jsx";
 import "./MySalesPage.css";
 import "./MySalesPageOverview.css";
 import { resolveOrderLineSellerId } from "@izibuy/shared-lib";
+import { reportClientIssue } from "../../../shared/lib/reportClientIssue.js";
 
 const EMPTY_ORDERS = [];
 
@@ -244,8 +245,9 @@ export function MySalesPage({
       setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
       try {
         await reloadSales();
-      } catch {
+      } catch (error) {
         /* откат списка не критичен при 429 после серии ошибок */
+        reportClientIssue("MySalesPage#1", error);
       }
     } finally {
       setPendingActionKey(null);
@@ -286,8 +288,9 @@ export function MySalesPage({
       setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
       try {
         await reloadSales();
-      } catch {
+      } catch (error) {
         /* откат списка не критичен при 429 после серии ошибок */
+        reportClientIssue("MySalesPage#2", error);
       }
     } finally {
       setPendingActionKey(null);
@@ -325,8 +328,9 @@ export function MySalesPage({
       setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
       try {
         await reloadSales();
-      } catch {
+      } catch (error) {
         /* откат списка не критичен при 429 после серии ошибок */
+        reportClientIssue("MySalesPage#3", error);
       }
     } finally {
       setPendingActionKey(null);
@@ -380,8 +384,9 @@ export function MySalesPage({
       setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
       try {
         await reloadSales();
-      } catch {
+      } catch (error) {
         /* откат списка не критичен при 429 после серии ошибок */
+        reportClientIssue("MySalesPage#4", error);
       }
     } finally {
       setPendingActionKey(null);
@@ -506,8 +511,9 @@ export function MySalesPage({
       setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
       try {
         await reloadSales();
-      } catch {
+      } catch (error) {
         /* откат списка не критичен при 429 после серии ошибок */
+        reportClientIssue("MySalesPage#5", error);
       }
     } finally {
       setPendingActionKey(null);

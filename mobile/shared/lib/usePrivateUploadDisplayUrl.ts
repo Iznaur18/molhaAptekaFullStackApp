@@ -5,6 +5,7 @@ import { apiClient } from "@/shared/api/apiClient";
 import { getAccessToken, isCookieAuthWeb } from "@/shared/api/mobile-auth-storage";
 import { API_BASE_URL } from "@/shared/config";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
+import { reportClientIssue } from "@/shared/lib/reportClientIssue";
 
 const PRIVATE_UPLOAD_PATH_RE = /\/upload\/private\/([^?#/]+)/i;
 
@@ -111,8 +112,9 @@ const fetchPrivateUploadBuffer = async (
   if (response.status === 401) {
     try {
       await apiClient.get("/auth/me");
-    } catch {
+    } catch (error) {
       // refresh interceptor в apiClient; ниже повторим fetch
+      reportClientIssue("usePrivateUploadDisplayUrl", error);
     }
     response = await requestOnce();
   }

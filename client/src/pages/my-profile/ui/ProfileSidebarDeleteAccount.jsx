@@ -6,6 +6,7 @@ import { clearDataConfirmationFormDraft } from "../../../entities/user-data-conf
 import { DELETE_ACCOUNT_UI } from "../../../shared/config/appUiCopy.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 import { PROFILE_NAV_ITEM_META } from "../lib/profileNavItemMeta.js";
+import { reportClientIssue } from "../../../shared/lib/reportClientIssue.js";
 
 /**
  * Самоудаление аккаунта из сайдбара профиля — рядом с выходом.
@@ -27,8 +28,9 @@ export function ProfileSidebarDeleteAccount({ user }) {
   const handleDeleted = () => {
     try {
       localStorage.removeItem(CART_STORAGE_KEY);
-    } catch {
+    } catch (error) {
       // storage недоступен
+      reportClientIssue("ProfileSidebarDeleteAccount", error);
     }
     clearDataConfirmationFormDraft(user._id);
     window.location.assign("/");

@@ -180,9 +180,22 @@ export const MyOrdersPage = () => {
     await invalidateOrderQueues();
   }, [ordersQuery, invalidateOrderQueues]);
 
+  // Повторное нажатие на плитку снимает фильтр (паритет web).
   const handleInProgressFilterClick = useCallback(() => {
-    setStatusFilter(MY_ORDERS_LIST_FILTER_IN_PROGRESS);
+    setStatusFilter((current) =>
+      current === MY_ORDERS_LIST_FILTER_IN_PROGRESS
+        ? ""
+        : MY_ORDERS_LIST_FILTER_IN_PROGRESS,
+    );
     setAttentionOnly(false);
+  }, []);
+
+  /** «Нужно действие» — отдельно от статуса: включая его, статус сбрасываем. */
+  const handleAttentionOnlyChange = useCallback((value: boolean) => {
+    setAttentionOnly(value);
+    if (value) {
+      setStatusFilter("");
+    }
   }, []);
 
   const handleConfirmDelivered = async ({
@@ -335,12 +348,12 @@ export const MyOrdersPage = () => {
       <MyOrdersPageToolbar
         summaryCountLabel={summaryCountLabel}
         statusFilter={statusFilter}
+        attentionOnly={attentionOnly}
         onStatusFilterChange={(value) => {
           setStatusFilter(value);
-          if (value) {
-            setAttentionOnly(false);
-          }
+          setAttentionOnly(false);
         }}
+        onAttentionOnlyChange={handleAttentionOnlyChange}
       />
       <MyOrdersPageOverview
         inProgressCount={summary.inProgressCount}
@@ -348,7 +361,7 @@ export const MyOrdersPage = () => {
         totalAmountRub={summary.totalAmountRub}
         attentionOnly={attentionOnly}
         onInProgressFilterClick={handleInProgressFilterClick}
-        onAttentionFilterChange={setAttentionOnly}
+        onAttentionFilterChange={handleAttentionOnlyChange}
       />
       {totalVisible > 0 && attentionOnly ? (
         <Text style={styles.filterHint}>{MY_ORDERS_PAGE_UI.ATTENTION_FILTER_HINT}</Text>

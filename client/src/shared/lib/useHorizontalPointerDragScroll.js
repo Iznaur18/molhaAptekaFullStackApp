@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
+import { reportClientIssue } from "./reportClientIssue.js";
 
 const DRAG_THRESHOLD_PX = 4;
 const AUTO_SCROLL_PX_PER_SEC = 16;
@@ -232,8 +233,9 @@ export function useHorizontalPointerDragScroll() {
       if (state.didDrag && state.pointerId === event.pointerId) {
         try {
           el.releasePointerCapture(event.pointerId);
-        } catch {
+        } catch (error) {
           /* pointer already released */
+          reportClientIssue("useHorizontalPointerDragScroll#1", error);
         }
       }
 
@@ -290,8 +292,9 @@ export function useHorizontalPointerDragScroll() {
         el.classList.add("is-drag-scrolling");
         try {
           el.setPointerCapture(event.pointerId);
-        } catch {
+        } catch (error) {
           /* capture may fail on some touch targets */
+          reportClientIssue("useHorizontalPointerDragScroll#2", error);
         }
       }
 

@@ -1,5 +1,6 @@
 import { Directory, File, Paths } from "expo-file-system";
 import { Platform } from "react-native";
+import { reportClientIssue } from "@/shared/lib/reportClientIssue";
 
 /**
  * Черновик формы создания товара.
@@ -63,9 +64,10 @@ const writeRaw = (raw: string): void => {
       directory.create({ intermediates: true, idempotent: true });
     }
     draftFile().write(raw);
-  } catch {
+  } catch (error) {
     // Диск заполнен или недоступен: черновик — удобство, ронять из-за него
     // мастер нельзя.
+    reportClientIssue("createProductFormDraftStorage#1", error);
   }
 };
 
@@ -79,8 +81,9 @@ export const clearCreateProductFormDraft = (): void => {
     if (file.exists) {
       file.delete();
     }
-  } catch {
+  } catch (error) {
     // см. writeRaw
+    reportClientIssue("createProductFormDraftStorage#2", error);
   }
 };
 
@@ -192,7 +195,8 @@ export const writeCreateProductFormDraft = (form: unknown, stepIndex: number): v
   };
   try {
     writeRaw(JSON.stringify(payload));
-  } catch {
+  } catch (error) {
     // JSON.stringify упал на цикле — черновик просто не сохранится.
+    reportClientIssue("createProductFormDraftStorage#3", error);
   }
 };

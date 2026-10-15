@@ -1,6 +1,7 @@
 import { apiClient } from "@/shared/api";
 import { API_CLIENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { reportClientIssue } from "@/shared/lib/reportClientIssue";
 
 export type UserStoryRing = {
   author: { _id: string; userName?: string; userAvatarUrl?: string | null };
@@ -60,7 +61,8 @@ export const fetchUserStoriesByAuthor = async (
 export const markUserStoryViewed = async (storyId: string) => {
   try {
     await apiClient.post(`/user/stories/${encodeURIComponent(storyId)}/view`);
-  } catch {
+  } catch (error) {
     /* non-critical */
+    reportClientIssue("userStoryApi", error);
   }
 };

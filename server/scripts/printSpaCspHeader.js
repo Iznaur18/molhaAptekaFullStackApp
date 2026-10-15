@@ -38,8 +38,11 @@ for (const candidate of htmlCandidates) {
     html = readFileSync(candidate, "utf8");
     htmlPath = candidate;
     break;
-  } catch {
-    // следующий кандидат
+  } catch (error) {
+    // Файла нет — пробуем следующий путь; иная ошибка чтения — стоп.
+    if (/** @type {{ code?: string }} */ (error)?.code !== "ENOENT") {
+      throw error;
+    }
   }
 }
 

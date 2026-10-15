@@ -30,12 +30,17 @@ import {
   applyCatalogFiltersDraft,
   buildCatalogFiltersFacetsParams,
   buildCatalogPricePresets,
-  CATALOG_FILTERS_RATING_MIN,
+  CATALOG_FILTERS_BENEFIT_FLAGS,
+  CATALOG_FILTERS_MORE_FLAGS,
+  CATALOG_FILTERS_SELLER_FLAGS,
   CATALOG_FILTERS_SHEET_SORTS,
   createCatalogFiltersDraft,
   createEmptyCatalogFiltersDraft,
   isCatalogFiltersDraftEmpty,
+  isCatalogPricePresetSelected,
   toggleCatalogFiltersDelivery,
+  toggleCatalogFiltersRating,
+  toggleCatalogPricePreset,
 } from "../lib/catalogFiltersDraft.js";
 
 import "./CatalogFiltersSheet.css";
@@ -50,21 +55,6 @@ const DELIVERY_OPTIONS = [
   { value: "seller", label: OPTION_UI.deliverySeller },
   { value: "courier", label: OPTION_UI.deliveryCourier },
   { value: "carrier", label: OPTION_UI.deliveryCarrier },
-];
-const BENEFIT_FLAGS = [
-  "saleOnly",
-  "flashSaleOnly",
-  "installmentOnly",
-  "wholesaleOnly",
-  "buyNFreeOnly",
-];
-const SELLER_FLAGS = ["sellerConfirmed", "sellerPremium"];
-const MORE_FLAGS = [
-  "originalOnly",
-  "returnOnly",
-  "auctionOnly",
-  "rentalOnly",
-  "affiliateOnly",
 ];
 
 /**
@@ -214,11 +204,7 @@ function CatalogFiltersSheetContent({
   };
 
   const handlePricePresetToggle = (value) => {
-    setDraft((prev) =>
-      prev.priceMin == null && prev.priceMax === value
-        ? { ...prev, priceMax: null }
-        : { ...prev, priceMin: null, priceMax: value },
-    );
+    setDraft((prev) => toggleCatalogPricePreset(prev, value));
   };
 
   const handleDeliveryToggle = (value) => {
@@ -229,10 +215,7 @@ function CatalogFiltersSheetContent({
   };
 
   const handleRatingToggle = () => {
-    setDraft((prev) => ({
-      ...prev,
-      ratingMin: prev.ratingMin == null ? CATALOG_FILTERS_RATING_MIN : null,
-    }));
+    setDraft(toggleCatalogFiltersRating);
   };
 
   const handleReset = () => {
@@ -398,7 +381,7 @@ function CatalogFiltersSheetContent({
               label={HOME_PAGE_UI.CATALOG_FILTERS_SHEET_PRICE_UP_TO(
                 formatIntegerGroupRu(value),
               )}
-              selected={draft.priceMin == null && draft.priceMax === value}
+              selected={isCatalogPricePresetSelected(draft, value)}
               onClick={() => handlePricePresetToggle(value)}
             />
           ))}
@@ -430,18 +413,18 @@ function CatalogFiltersSheetContent({
         </CatalogFiltersSection>
 
         <CatalogFiltersSection title={HOME_PAGE_UI.CATALOG_FILTERS_SHEET_BENEFIT}>
-          {BENEFIT_FLAGS.map(renderFlag)}
+          {CATALOG_FILTERS_BENEFIT_FLAGS.map(renderFlag)}
         </CatalogFiltersSection>
 
         <CatalogFiltersSection title={HOME_PAGE_UI.CATALOG_FILTERS_SHEET_SELLER}>
-          {SELLER_FLAGS.map(renderFlag)}
+          {CATALOG_FILTERS_SELLER_FLAGS.map(renderFlag)}
           {options?.followingOnly != null || draft.followingOnly
             ? renderFlag("followingOnly")
             : null}
         </CatalogFiltersSection>
 
         <CatalogFiltersSection title={HOME_PAGE_UI.CATALOG_FILTERS_SHEET_MORE}>
-          {MORE_FLAGS.map(renderFlag)}
+          {CATALOG_FILTERS_MORE_FLAGS.map(renderFlag)}
         </CatalogFiltersSection>
       </div>
       <footer className="catalog-filters-sheet__footer">

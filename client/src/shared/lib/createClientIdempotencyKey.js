@@ -1,3 +1,4 @@
+import { reportClientIssue } from "./reportClientIssue.js";
 /**
  * Idempotency key для мутаций. `crypto.randomUUID` только в secure context
  * (https / localhost) — на LAN HTTP нужен fallback.
@@ -8,8 +9,9 @@ export function createClientIdempotencyKey() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
     try {
       return crypto.randomUUID();
-    } catch {
+    } catch (error) {
       // insecure context
+      reportClientIssue("createClientIdempotencyKey", error);
     }
   }
 

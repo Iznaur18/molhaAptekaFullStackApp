@@ -15,6 +15,8 @@ type HomeCatalogMainViewParams = {
   originalOnly: boolean;
   flashSaleOnly?: boolean;
   near?: boolean;
+  /** Цена, получение, рейтинг, продавец из окна фильтров. */
+  hasExtraFilters?: boolean;
 };
 
 export const isHomeCatalogMainView = ({
@@ -34,6 +36,7 @@ export const isHomeCatalogMainView = ({
   originalOnly,
   flashSaleOnly = false,
   near = false,
+  hasExtraFilters = false,
 }: HomeCatalogMainViewParams) =>
   !search &&
   !selectedRootSlug &&
@@ -50,4 +53,5 @@ export const isHomeCatalogMainView = ({
   !buyNFreeOnly &&
   !originalOnly &&
   !flashSaleOnly &&
-  !near;
+  !near &&
+  !hasExtraFilters;

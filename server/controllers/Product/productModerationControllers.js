@@ -26,7 +26,7 @@ import { errorRes, successRes } from "../../services/http/index.js";
 import { refreshProductPriceMarketStatus } from "../../services/product/refreshProductPriceMarketStatus.js";
 import { emitProductPublishedEvent } from "../../services/analytics-events/index.js";
 import { setSellerProductModerationTrust } from "../../services/product/setSellerProductModerationTrust.js";
-import { logServerEvent } from "../../utils/logServerEvent.js";
+import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
@@ -118,8 +118,14 @@ export const approveProductModerationController = async (req, res) => {
         product.categoryBreadcrumbRu = categoryWrite.categoryBreadcrumbRu;
         product.productCategory = categoryWrite.productCategory;
         product.productDealType = categoryWrite.productDealType;
-      } catch {
-        /* keep legacy only */
+      } catch (error) {
+        // Одобрение не срываем: товар остаётся со старой категорией.
+        logServerEvent("warn", {
+          event: "product.moderation_category_resolve_failed",
+          requestId: req.requestId,
+          productId: String(product._id),
+          ...formatLogError(error),
+        });
       }
     }
   }
@@ -137,8 +143,14 @@ export const approveProductModerationController = async (req, res) => {
         categoryPathLabelRu: categoryWrite.categoryPathLabelRu,
         categorySearchKeywords: categoryWrite.categorySearchKeywords,
       };
-    } catch {
-      /* blob without node keywords */
+    } catch (error) {
+      // Поиск соберётся без ключевых слов категории — не повод срывать одобрение.
+      logServerEvent("warn", {
+        event: "product.moderation_category_keywords_failed",
+        requestId: req.requestId,
+        productId: String(product._id),
+        ...formatLogError(error),
+      });
     }
   }
 

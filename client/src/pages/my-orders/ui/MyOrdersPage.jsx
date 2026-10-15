@@ -1,3 +1,4 @@
+import { isMyOrdersListGroupFilter } from "@izibuy/shared-lib";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -487,12 +488,6 @@ const ORDERS_STATUS_FILTER_OPTIONS = ORDER_STATUSES.map((status) => ({
   label: ORDER_STATUS_LABEL_RU[status],
 }));
 
-const ORDERS_STATUS_GROUP_VALUES = new Set([
-  MY_ORDERS_LIST_FILTER_IN_PROGRESS,
-  MY_ORDERS_LIST_FILTER_DONE,
-  MY_ORDERS_LIST_FILTER_CLOSED,
-]);
-
 /**
  * @param {{
  *   summaryCountLabel: string;
@@ -514,7 +509,7 @@ function OrdersToolbar({
   isRefreshing = false,
 }) {
   const exactStatusSelected =
-    Boolean(statusFilter) && !ORDERS_STATUS_GROUP_VALUES.has(statusFilter);
+    Boolean(statusFilter) && !isMyOrdersListGroupFilter(statusFilter);
   const [showAllStatuses, setShowAllStatuses] = useState(exactStatusSelected);
   const groups = [
     {

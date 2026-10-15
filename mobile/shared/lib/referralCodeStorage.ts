@@ -5,6 +5,7 @@ import {
   REFERRAL_QUERY_PARAM,
   normalizeReferralCode,
 } from "@izibuy/shared-lib";
+import { reportClientIssue } from "@/shared/lib/reportClientIssue";
 
 export { REFERRAL_CODE_STORAGE_KEY, REFERRAL_QUERY_PARAM, normalizeReferralCode };
 
@@ -21,16 +22,18 @@ const webGet = (key: string): string | null => {
 const webSet = (key: string, value: string): void => {
   try {
     globalThis.localStorage?.setItem(key, value);
-  } catch {
+  } catch (error) {
     // ignore quota / private mode
+    reportClientIssue("referralCodeStorage#1", error);
   }
 };
 
 const webDelete = (key: string): void => {
   try {
     globalThis.localStorage?.removeItem(key);
-  } catch {
+  } catch (error) {
     // storage недоступен
+    reportClientIssue("referralCodeStorage#2", error);
   }
 };
 
@@ -45,8 +48,9 @@ export const persistReferralCode = async (code: string): Promise<void> => {
       return;
     }
     await SecureStore.setItemAsync(REFERRAL_CODE_STORAGE_KEY, normalized);
-  } catch {
+  } catch (error) {
     // ignore
+    reportClientIssue("referralCodeStorage#3", error);
   }
 };
 
@@ -68,8 +72,9 @@ export const clearPersistedReferralCode = async (): Promise<void> => {
       return;
     }
     await SecureStore.deleteItemAsync(REFERRAL_CODE_STORAGE_KEY);
-  } catch {
+  } catch (error) {
     // ignore
+    reportClientIssue("referralCodeStorage#4", error);
   }
 };
 

@@ -16,15 +16,10 @@ export const attachUserListDonationTotals = async (users) => {
     return /** @type {Record<string, unknown>[]} */ (users);
   }
 
-  const objectIds = [];
-  for (const user of users) {
-    if (user?._id == null) continue;
-    try {
-      objectIds.push(new mongoose.Types.ObjectId(String(user._id)));
-    } catch {
-      // skip invalid id
-    }
-  }
+  const objectIds = users
+    .map((user) => String(user?._id ?? ""))
+    .filter((id) => mongoose.isValidObjectId(id))
+    .map((id) => new mongoose.Types.ObjectId(id));
 
   if (objectIds.length === 0) {
     return users.map((user) => ({

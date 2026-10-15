@@ -23,7 +23,6 @@ import {
 
 import { buildCheckoutPickupGroups } from "@/entities/cart/lib/buildCheckoutPickupLocations";
 import { getCartLineExclusionReason } from "@/entities/cart/lib/getCartLineExclusionReason";
-import { resolveCartGroupDeliveryHint } from "@/entities/cart/lib/resolveCartGroupDeliveryHint";
 import { resolveCheckoutSellers } from "@/entities/cart/lib/resolveCheckoutSellers";
 import { useCdekAvailabilityQuery } from "@/entities/cdek/model/useCdekAvailabilityQuery";
 import { useYandexDeliveryAvailabilityQuery } from "@/entities/yandex-delivery/model/useYandexDeliveryAvailabilityQuery";
@@ -40,7 +39,10 @@ import { useCartProductsQuery } from "@/entities/cart/model/useCartProductsQuery
 import { useCartSelection } from "@/entities/cart/model/useCartSelection";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useMyCartQuery } from "@/entities/cart/model/useMyCartQuery";
-import { CartFulfillmentSection } from "@/entities/cart/ui/CartFulfillmentSection";
+import {
+  CartCheckoutDock,
+  CartFulfillmentSection,
+} from "@/entities/cart/ui/CartFulfillmentSection";
 import type { OrderFulfillmentMethod } from "@/entities/order/api/createOrder";
 import type { OrderPaymentMethod } from "@/entities/order/model/constants";
 import { useCreateOrderMutation } from "@/entities/order/model/useCreateOrderMutation";
@@ -51,6 +53,7 @@ import type { MyPriceOfferBid } from "@/entities/product-price-offer/api/incomin
 import { useMyAcceptedBidsQuery } from "@/entities/product-price-offer/model/useMyAcceptedBidsQuery";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { CartAuctionSection } from "@/features/cart-auction/ui/CartAuctionSection";
+import { CheckoutForm } from "@/features/checkout/ui/CheckoutForm";
 import { CheckoutSheetModal } from "@/features/checkout/ui/CheckoutSheetModal";
 import { orderQueryKeys, priceOfferQueryKeys } from "@/shared/api";
 import {
@@ -60,10 +63,13 @@ import {
   CART_PAGE_UI,
   CHECKOUT_FORM_UI,
 } from "@/shared/config";
-import { formatApiErrorMessage, formatPriceRub } from "@/shared/lib";
+import { formatApiErrorMessage } from "@/shared/lib";
 import { resolveMobileBottomNavLayoutHeight } from "@/shared/lib/mobileBottomNavLayout";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
-import { useCartSellerListStyles } from "@/shared/theme/cartFulfillmentStyles";
+import {
+  useCartFulfillmentSectionStyles,
+  useCartSellerListStyles,
+} from "@/shared/theme/cartFulfillmentStyles";
 import { useCartScreenStyles } from "@/shared/theme/catalogProductStyles";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { AppButton } from "@/shared/ui/AppButton";
@@ -74,6 +80,7 @@ export default function CartScreen() {
   const router = useRouter();
   const styles = useCartScreenStyles();
   const sellerListStyles = useCartSellerListStyles();
+  const fulfillmentStyles = useCartFulfillmentSectionStyles();
   const theme = useAppTheme();
   const insets = useSafeAreaInsets();
   const { contentPaddingTop, centeredContentStyle } = useScreenLayout();
@@ -87,7 +94,6 @@ export default function CartScreen() {
 
   /** Открытая корзина продавца; null — общий список продавцов. */
   const [activeSellerCartId, setActiveSellerCartId] = useState<string | null>(null);
-  const [isSellerCheckoutOpen, setIsSellerCheckoutOpen] = useState(false);
   /** Выбор покупателя по продавцам; пусто = способ по умолчанию у отправления. */
   const [chosenFulfillmentBySeller, setChosenFulfillmentBySeller] = useState<
     Record<string, OrderFulfillmentMethod>
@@ -235,7 +241,6 @@ export default function CartScreen() {
       !sellerGroups.some((group) => group.sellerId === activeSellerCartId)
     ) {
       setActiveSellerCartId(null);
-      setIsSellerCheckoutOpen(false);
     }
   }, [activeSellerCartId, sellerGroups]);
 
@@ -425,47 +430,20 @@ export default function CartScreen() {
     [activeSummary.selectedLines],
   );
 
-  /** Что известно о цене доставки у открытого продавца — в итоге корзины. */
-  const activeDeliveryHint = useMemo(() => {
-    if (!activeSellerEntry || checkoutMixedCarriers) {
-      return "";
-    }
-    const hint = resolveCartGroupDeliveryHint(
-      activeSellerEntry.group,
-      activeSummary.selectedTotal,
-    );
-    if (!hint) return "";
-    // Строка итога уже подписана «Доставка» — здесь только значение.
-    if (hint.kind === "free") return CART_PAGE_UI.DELIVERY_VALUE_FREE;
-    if (hint.kind === "from") {
-      return CART_PAGE_UI.DELIVERY_VALUE_FROM(formatPriceRub(hint.baseFeeRub));
-    }
-    return CART_PAGE_UI.DELIVERY_VALUE_BY_TARIFF;
-  }, [activeSellerEntry, checkoutMixedCarriers, activeSummary.selectedTotal]);
-
   const handleOpenAuctionCheckout = (bid: MyPriceOfferBid) => {
     setSubmitState({ isSubmitting: false, error: "", success: "" });
-    setIsSellerCheckoutOpen(false);
     setAuctionCheckoutBid(bid);
   };
 
   const openSellerCart = (sellerId: string) => {
     setAuctionCheckoutBid(null);
-    setIsSellerCheckoutOpen(false);
     setSubmitState({ isSubmitting: false, error: "", success: "" });
     setActiveSellerCartId(sellerId);
   };
 
   const closeSellerCart = () => {
-    setIsSellerCheckoutOpen(false);
     setSubmitState({ isSubmitting: false, error: "", success: "" });
     setActiveSellerCartId(null);
-  };
-
-  const openSellerCheckout = () => {
-    setAuctionCheckoutBid(null);
-    setSubmitState({ isSubmitting: false, error: "", success: "" });
-    setIsSellerCheckoutOpen(true);
   };
 
   const handleSellerFulfillmentChange = useCallback(
@@ -560,7 +538,6 @@ export default function CartScreen() {
           : {}),
       });
       await removeItems(orderedProductIds);
-      setIsSellerCheckoutOpen(false);
       setActiveSellerCartId(null);
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: orderQueryKeys.my() }),
@@ -651,6 +628,10 @@ export default function CartScreen() {
       <View style={[styles.container, centeredContentStyle]}>
         <ScrollView
           style={styles.container}
+          // Форма оформления стоит на странице: тап по кнопке не должен
+          // уходить на закрытие клавиатуры, поле — не прятаться под ней.
+          keyboardShouldPersistTaps="handled"
+          automaticallyAdjustKeyboardInsets
           contentContainerStyle={[
             styles.list,
             {
@@ -690,18 +671,58 @@ export default function CartScreen() {
                   CART_PAGE_UI.SECTION_SELLER_FALLBACK
                 }
                 note={checkoutMixedCarriers ? CART_PAGE_UI.MIXED_CARRIERS_NOTE : null}
-                deliveryHint={activeDeliveryHint}
                 lines={activeSellerEntry.group.lines}
                 selectedCount={selectedCountIn(activeSellerEntry.productIds)}
                 areAllSelected={areAllSelectedIn(activeSellerEntry.productIds)}
                 onToggleAll={() => toggleAllIn(activeSellerEntry.productIds)}
                 isLineSelected={isLineSelected}
                 onToggleSelected={toggleLine}
-                summary={activeSellerEntry.summary}
-                canCheckout={canCheckoutActive}
-                onCheckout={openSellerCheckout}
-                checkoutDisabled={isUpdating}
-              />
+              >
+                {/* Оформление прямо на странице, как на сайте: способ получения,
+                    адрес, оплата, итог и «Оформить». */}
+                <View style={fulfillmentStyles.checkoutForm}>
+                  <CheckoutForm
+                    key={sessionUser?._id != null ? String(sessionUser._id) : "guest"}
+                    defaultUser={sessionUser}
+                    pickupGroups={pickupGroups}
+                    // «Доставка» доступна и тогда, когда у продавца есть только СДЭК.
+                    deliveryAvailable={
+                      deliveryAvailable || cdekAvailable || yandexAvailable
+                    }
+                    pickupAvailable={pickupAvailable}
+                    allowedPaymentMethods={allowedPaymentMethods}
+                    cardPrepaidAvailable={cardPrepaidAvailable}
+                    sellerDeliveryAvailable={deliveryAvailable}
+                    cdek={cdekConfig}
+                    yandex={yandexConfig}
+                    sellerDelivery={sellerDelivery}
+                    deliveryProductIds={deliveryProductIds}
+                    initialFulfillmentMethod={
+                      fulfillmentBySellerId[activeSellerEntry.group.sellerId] ?? null
+                    }
+                    onFulfillmentMethodChange={handleSellerFulfillmentChange}
+                    isSubmitting={submitState.isSubmitting}
+                    submitError={submitState.error}
+                    submitSuccess={submitState.success}
+                    isDisabled={!canCheckoutActive}
+                    showHeading={false}
+                    fieldsStyle={fulfillmentStyles.checkoutFormFields}
+                    onSubmit={handleCheckoutSubmit}
+                    renderFooter={(footer) => (
+                      <CartCheckoutDock
+                        summary={activeSellerEntry.summary}
+                        canCheckout={canCheckoutActive}
+                        deliveryCost={footer.deliveryCost}
+                        error={footer.error}
+                        success={footer.success}
+                        isSubmitting={footer.isSubmitting}
+                        submitDisabled={footer.submitDisabled || isUpdating}
+                        onSubmit={footer.submit}
+                      />
+                    )}
+                  />
+                </View>
+              </CartFulfillmentSection>
             </>
           ) : (
             <>
@@ -715,34 +736,6 @@ export default function CartScreen() {
           )}
         </ScrollView>
       </View>
-
-      <CheckoutSheetModal
-        visible={isSellerCheckoutOpen && activeSellerEntry != null}
-        defaultUser={sessionQuery.data?.user}
-        pickupGroups={pickupGroups}
-        // «Доставка» доступна и тогда, когда у продавца есть только СДЭК.
-        deliveryAvailable={deliveryAvailable || cdekAvailable || yandexAvailable}
-        pickupAvailable={pickupAvailable}
-        allowedPaymentMethods={allowedPaymentMethods}
-        cardPrepaidAvailable={cardPrepaidAvailable}
-        sellerDeliveryAvailable={deliveryAvailable}
-        cdek={cdekConfig}
-        yandex={yandexConfig}
-        sellerDelivery={sellerDelivery}
-        deliveryProductIds={deliveryProductIds}
-        initialFulfillmentMethod={
-          activeSellerCartId
-            ? (fulfillmentBySellerId[activeSellerCartId] ?? null)
-            : null
-        }
-        onFulfillmentMethodChange={handleSellerFulfillmentChange}
-        isSubmitting={submitState.isSubmitting}
-        submitError={submitState.error}
-        submitSuccess={submitState.success}
-        isDisabled={!canCheckoutActive}
-        onClose={() => setIsSellerCheckoutOpen(false)}
-        onSubmit={handleCheckoutSubmit}
-      />
 
       <CheckoutSheetModal
         visible={auctionCheckoutBid != null}

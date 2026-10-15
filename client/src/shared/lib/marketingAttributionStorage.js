@@ -5,6 +5,7 @@ import {
   sanitizeMarketingAttribution,
   selectMarketingAttributionForSubmit,
 } from "@izibuy/shared-lib";
+import { reportClientIssue } from "./reportClientIssue.js";
 
 /** Свой сайт — переходы с него не считаются источником. */
 const SITE_HOSTS = ["gitorg.ru"];
@@ -57,8 +58,9 @@ export function captureMarketingAttribution(search, options = {}) {
       MARKETING_ATTRIBUTION_STORAGE_KEY,
       JSON.stringify(merged),
     );
-  } catch {
+  } catch (error) {
     // приватный режим или переполненное хранилище — атрибуция не критична
+    reportClientIssue("marketingAttributionStorage", error);
   }
   return merged;
 }

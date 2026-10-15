@@ -1,18 +1,18 @@
-import { isOrderInProgress } from "@/entities/order/lib/isOrderInProgress";
+import { orderMatchesStatusFilter } from "@izibuy/shared-lib";
+
 import { orderNeedsBuyerAttention } from "@/entities/order/lib/orderNeedsBuyerAttention";
-import { MY_ORDERS_LIST_FILTER_IN_PROGRESS } from "@/entities/order/model/myOrdersListFilters";
 
 type OrderRecord = { status?: string; items?: { status?: string }[] };
 
+/**
+ * Фильтр «Моих покупок»: группа («В работе», «Завершённые», «Отменённые»)
+ * или точный статус из «Ещё статусы». Правила групп — в shared-lib.
+ */
 export const orderMatchesMyOrdersFilters = (
   order: OrderRecord,
   { status = "", attentionOnly = false } = {},
 ): boolean => {
-  if (status === MY_ORDERS_LIST_FILTER_IN_PROGRESS) {
-    if (!isOrderInProgress(order)) {
-      return false;
-    }
-  } else if (status && order.status !== status) {
+  if (!orderMatchesStatusFilter(order, status)) {
     return false;
   }
 

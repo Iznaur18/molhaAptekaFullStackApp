@@ -6,6 +6,7 @@ import {
   AFFILIATE_QUERY_PARAM,
   normalizeAffiliateCode,
 } from "@izibuy/shared-lib";
+import { reportClientIssue } from "@/shared/lib/reportClientIssue";
 
 export {
   AFFILIATE_CLICK_TTL_DAYS,
@@ -27,16 +28,18 @@ const webGet = (key: string): string | null => {
 const webSet = (key: string, value: string): void => {
   try {
     globalThis.localStorage?.setItem(key, value);
-  } catch {
+  } catch (error) {
     // ignore
+    reportClientIssue("affiliateCodeStorage#1", error);
   }
 };
 
 const webDelete = (key: string): void => {
   try {
     globalThis.localStorage?.removeItem(key);
-  } catch {
+  } catch (error) {
     // ignore
+    reportClientIssue("affiliateCodeStorage#2", error);
   }
 };
 
@@ -57,8 +60,9 @@ export const persistAffiliateCode = async (code: string): Promise<void> => {
       return;
     }
     await SecureStore.setItemAsync(AFFILIATE_CODE_STORAGE_KEY, payload);
-  } catch {
+  } catch (error) {
     // ignore
+    reportClientIssue("affiliateCodeStorage#3", error);
   }
 };
 
@@ -96,8 +100,9 @@ export const clearPersistedAffiliateCode = async (): Promise<void> => {
       return;
     }
     await SecureStore.deleteItemAsync(AFFILIATE_CODE_STORAGE_KEY);
-  } catch {
+  } catch (error) {
     // ignore
+    reportClientIssue("affiliateCodeStorage#4", error);
   }
 };
 

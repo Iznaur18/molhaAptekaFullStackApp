@@ -5,6 +5,7 @@ import {
   getAuthTokenFromRequest,
 } from "../utils/authCookie.js";
 import { verifyAccessToken } from "../services/auth/authTokens.js";
+import { isJwtAuthFailure } from "../services/auth/isJwtAuthFailure.js";
 import { isRefreshTokenVersionValid } from "../services/auth/userAuthTokenVersion.js";
 import { errorRes } from "../services/http/index.js";
 import { trackUserActiveDay } from "../services/analytics-events/funnelAnalyticsEvents.js";
@@ -73,20 +74,6 @@ async function attachUserIdFromAccessToken(req, res) {
   // Удержание: первый запрос пользователя за сутки. Не ждём и не падаем.
   trackUserActiveDay(decoded._id);
   return null;
-}
-
-/**
- * @param {unknown} error
- */
-function isJwtAuthFailure(error) {
-  const name = error && typeof error === "object" ? error.name : "";
-  const message = error instanceof Error ? error.message : "";
-  return (
-    name === "JsonWebTokenError" ||
-    name === "TokenExpiredError" ||
-    name === "NotBeforeError" ||
-    message === "INVALID_TOKEN_TYPE"
-  );
 }
 
 export const checkAuthMW = async (req, res, next) => {

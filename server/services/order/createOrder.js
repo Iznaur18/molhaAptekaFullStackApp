@@ -87,7 +87,7 @@ import {
 import { resolveSelectedProductPickupLocation } from "../product/productPickupLocations.js";
 
 import { buildOrderStatusFromItems } from "./orderStatus.js";
-import { logServerEvent } from "../../utils/logServerEvent.js";
+import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 import { notifySellersAboutNewOrder } from "./notifySellersAboutNewOrder.js";
 import { logMoneyEvent, logMoneyFailure } from "../loyalty/logMoneyEvent.js";
 import {
@@ -1100,8 +1100,13 @@ export async function createOrder({
         sellerUserIds,
         attribution: marketingAttribution,
       });
-    } catch {
-      // analytics must not block order
+    } catch (error) {
+      // Аналитика не должна срывать заказ, но потерю события видно в журнале.
+      logServerEvent("warn", {
+        event: "analytics.order_created_emit_failed",
+        orderId: String(created._id),
+        ...formatLogError(error),
+      });
     }
 
     void notifySellersAboutNewOrder({

@@ -1,5 +1,7 @@
 import {
   isRuRegionCode,
+  PRODUCT_PICKUP_ADDRESS_MAX_LENGTH,
+  PRODUCT_PICKUP_ADDRESS_MIN_LENGTH,
   PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE,
   PRODUCT_PICKUP_COORDS_REQUIRED_MESSAGE,
   PRODUCT_SALE_REGION_FROM_ADDRESS_FAILED_MESSAGE,
@@ -13,10 +15,26 @@ import {
   isDadataSuggestConfigured,
 } from "../../utils/dadata/dadataClient.js";
 import { verifyRuDeliveryAddress } from "../../utils/dadata/verifyRuDeliveryAddress.js";
+import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 import {
   normalizeProductPickupAddress,
   normalizeProductPickupCoords,
 } from "./productPickup.js";
+
+/**
+ * Адрес из DaData, если он укладывается в лимиты поля; иначе — прежний.
+ * Длинную «чистую» строку DaData лучше не брать, чем срывать сохранение.
+ *
+ * @param {unknown} cleanAddress
+ * @param {string} fallbackAddress
+ */
+function pickCleanPickupAddress(cleanAddress, fallbackAddress) {
+  const clean = String(cleanAddress ?? "").trim();
+  return clean.length >= PRODUCT_PICKUP_ADDRESS_MIN_LENGTH &&
+    clean.length <= PRODUCT_PICKUP_ADDRESS_MAX_LENGTH
+    ? clean
+    : fallbackAddress;
+}
 
 /**
  * @param {number} lat
@@ -33,7 +51,12 @@ async function resolveRegionCodeByGeolocate(lat, lon) {
     return resolveRuRegionCodeFromDadataData(
       data && typeof data === "object" ? data : null,
     );
-  } catch {
+  } catch (error) {
+    // Регион тогда возьмётся из запасного варианта; сбой DaData — в журнал.
+    logServerEvent("warn", {
+      event: "product.sale_region_geolocate_failed",
+      ...formatLogError(error),
+    });
     return null;
   }
 }
@@ -92,14 +115,11 @@ export async function resolveProductSaleLocation({
           verified.geo.lat,
           verified.geo.lon,
         );
-        let nextAddress = productPickupAddress;
-        try {
-          nextAddress = normalizeProductPickupAddress(verified.displayAddress);
-        } catch {
-          /* leave client/normalized address if clean result too long */
-        }
         return {
-          productPickupAddress: nextAddress,
+          productPickupAddress: pickCleanPickupAddress(
+            verified.displayAddress,
+            productPickupAddress,
+          ),
           ...verifiedCoords,
           productRegionCode: verified.regionCode,
         };
@@ -114,21 +134,23 @@ export async function resolveProductSaleLocation({
             verified.geo.lat,
             verified.geo.lon,
           );
-          let nextAddress = productPickupAddress;
-          try {
-            nextAddress = normalizeProductPickupAddress(verified.displayAddress);
-          } catch {
-            /* leave client/normalized address if clean result too long */
-          }
           return {
-            productPickupAddress: nextAddress,
+            productPickupAddress: pickCleanPickupAddress(
+              verified.displayAddress,
+              productPickupAddress,
+            ),
             ...verifiedCoords,
             productRegionCode: regionFromGeo,
           };
         }
       }
-    } catch {
-      // pin / неполный адрес — geolocate по клиентским coords
+    } catch (error) {
+      // Метка на карте / неполный адрес — регион найдём по координатам клиента
+      // ниже. Отказ DaData оставляем в журнале.
+      logServerEvent("warn", {
+        event: "product.sale_address_verify_failed",
+        ...formatLogError(error),
+      });
     }
   }
 

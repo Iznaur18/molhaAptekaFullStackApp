@@ -1,5 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
-import { Alert, Pressable, Text, TextInput, View } from "react-native";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  Alert,
+  Pressable,
+  Text,
+  TextInput,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   ORDER_FULFILLMENT_DELIVERY,
@@ -75,6 +83,21 @@ export type CheckoutYandexConfig = {
   recipientPhone?: string;
 };
 
+/**
+ * Что форма отдаёт итогу корзины, когда стоит прямо на странице (паритет web
+ * `<button form=…>` в `.cart-fulfillment__dock`): отправка, её доступность,
+ * сообщения и цена доставки продавцом — она показывается в итоге, а не в форме.
+ */
+export type CheckoutFormFooter = {
+  submit: () => void;
+  submitDisabled: boolean;
+  isSubmitting: boolean;
+  error: string;
+  success: string;
+  /** Блок цены своей доставки продавца; `null` — самовывоз, служба или тарифа нет. */
+  deliveryCost: ReactNode | null;
+};
+
 type CheckoutFormProps = {
   defaultUser?: Record<string, unknown> | null;
   pickupGroups?: CheckoutProductPickupGroup[];
@@ -103,6 +126,13 @@ type CheckoutFormProps = {
   isDisabled?: boolean;
   showHeading?: boolean;
   pinSubmitToBottom?: boolean;
+  /**
+   * Форма на странице корзины: своей кнопки, сообщений и цены доставки не
+   * рисует — всё уходит в итог, который рисует этот рендер.
+   */
+  renderFooter?: (footer: CheckoutFormFooter) => ReactNode;
+  /** Отступы полей — на странице корзины они стоят в одну линию с итогом. */
+  fieldsStyle?: StyleProp<ViewStyle>;
   onSubmit: (payload: {
     fulfillmentMethod: OrderFulfillmentMethod;
     deliveryAddress: string;
@@ -136,6 +166,8 @@ export const CheckoutForm = ({
   isDisabled = false,
   showHeading = true,
   pinSubmitToBottom = false,
+  renderFooter,
+  fieldsStyle,
   onSubmit,
 }: CheckoutFormProps) => {
   const theme = useAppTheme();
@@ -426,10 +458,23 @@ export const CheckoutForm = ({
   const isFormDisabled =
     isDisabled || isSubmitting || !isAddressValid || !hasPaymentMethod;
   const displayError = localError || submitError;
+  // Своя доставка продавца — сумма зависит от адреса формы.
+  const sellerDeliveryCostVisible =
+    !isPickup && !cdekChosen && !yandexChosen && sellerDelivery != null;
+  const renderSellerDeliveryCost = (inDock: boolean) =>
+    sellerDeliveryCostVisible && sellerDelivery ? (
+      <CheckoutSellerDeliveryCost
+        sellerDelivery={sellerDelivery}
+        productIds={deliveryProductIds}
+        address={deliveryAddress}
+        isAddressValid={isAddressValid}
+        inDock={inDock}
+      />
+    ) : null;
 
   return (
     <View style={[checkoutStyles.form, pinSubmitToBottom && checkoutStyles.formPinned]}>
-      <View style={checkoutStyles.fields}>
+      <View style={[checkoutStyles.fields, fieldsStyle]}>
         {showHeading ? (
           <Text style={checkoutStyles.heading}>{CHECKOUT_FORM_UI.HEADING}</Text>
         ) : null}
@@ -698,14 +743,7 @@ export const CheckoutForm = ({
                     keyboardType="default"
                   />
 
-                  {sellerDelivery ? (
-                    <CheckoutSellerDeliveryCost
-                      sellerDelivery={sellerDelivery}
-                      productIds={deliveryProductIds}
-                      address={deliveryAddress}
-                      isAddressValid={isAddressValid}
-                    />
-                  ) : null}
+                  {renderFooter ? null : renderSellerDeliveryCost(false)}
                 </>
               )}
             </View>
@@ -720,25 +758,36 @@ export const CheckoutForm = ({
           allowedMethods={effectiveAllowedPaymentMethods}
         />
 
-        {displayError ? (
+        {!renderFooter && displayError ? (
           <Text style={checkoutStyles.feedbackError}>{displayError}</Text>
         ) : null}
-        {submitSuccess ? (
+        {!renderFooter && submitSuccess ? (
           <Text style={checkoutStyles.feedbackSuccess}>{submitSuccess}</Text>
         ) : null}
       </View>
 
-      <AppButton
-        label={CHECKOUT_FORM_UI.SUBMIT_IDLE}
-        variant="primary"
-        onPress={handleSubmit}
-        disabled={isFormDisabled}
-        style={[
-          checkoutStyles.submitSpacer,
-          pinSubmitToBottom && checkoutStyles.submitDocked,
-          pinSubmitToBottom ? { marginBottom: Math.max(insets.bottom, 12) } : null,
-        ]}
-      />
+      {renderFooter ? (
+        renderFooter({
+          submit: handleSubmit,
+          submitDisabled: isFormDisabled,
+          isSubmitting,
+          error: displayError,
+          success: submitSuccess,
+          deliveryCost: renderSellerDeliveryCost(true),
+        })
+      ) : (
+        <AppButton
+          label={CHECKOUT_FORM_UI.SUBMIT_IDLE}
+          variant="primary"
+          onPress={handleSubmit}
+          disabled={isFormDisabled}
+          style={[
+            checkoutStyles.submitSpacer,
+            pinSubmitToBottom && checkoutStyles.submitDocked,
+            pinSubmitToBottom ? { marginBottom: Math.max(insets.bottom, 12) } : null,
+          ]}
+        />
+      )}
     </View>
   );
 };

@@ -17,30 +17,15 @@ export const useCatalogProductsInfiniteQuery = (
 ) => {
   const queryKeyParams = buildCatalogListQueryKey(filters);
   const enabled = options.enabled !== false;
+  const { view: _view, ...requestOptions } = filters;
 
   const query = useInfiniteQuery({
     queryKey: catalogQueryKeys.list(queryKeyParams),
     enabled,
     queryFn: ({ pageParam }) =>
       fetchCatalogProductsPage({
+        ...requestOptions,
         page: pageParam,
-        search: filters.search,
-        productCategory: filters.productCategory,
-        categoryId: filters.categoryId,
-        sellerPersonalCategoryId: filters.sellerPersonalCategoryId,
-        sort: filters.sort,
-        followingOnly: filters.followingOnly,
-        auctionOnly: filters.auctionOnly,
-        installmentOnly: filters.installmentOnly,
-        saleOnly: filters.saleOnly,
-        rentalOnly: filters.rentalOnly,
-        affiliateOnly: filters.affiliateOnly,
-        wholesaleOnly: filters.wholesaleOnly,
-        buyNFreeOnly: filters.buyNFreeOnly,
-        originalOnly: filters.originalOnly,
-        flashSaleOnly: filters.flashSaleOnly,
-        near: filters.near,
-        regionCode: filters.regionCode,
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
