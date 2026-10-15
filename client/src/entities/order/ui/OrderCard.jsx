@@ -685,8 +685,12 @@ export function OrderCard({
   const shipmentStatusNow = buildOrderStatusFromItems(order.items);
   // Заказ оформлен с предоплатой, а деньги не пришли: продавцу не показываем
   // кнопки сборки, покупателю — кнопку оплаты, но только после подтверждения.
+  // Отменённый заказ платить не нужно: без этой проверки у него висели
+  // «Ожидает оплаты» и «Оплатить» — отметки об оплате у него так и нет.
   const awaitingPrepayment =
-    order.paymentMethod === "cardPrepaid" && !order.prepaidPaidAt;
+    order.paymentMethod === "cardPrepaid" &&
+    !order.prepaidPaidAt &&
+    shipmentStatusNow !== ORDER_STATUS_CANCELLED;
   // Оплата открывается после подтверждения продавцом: сначала он проверяет,
   // что товар есть, и только потом покупатель платит.
   const acceptedBySeller = shipmentStatusNow !== "pending";
