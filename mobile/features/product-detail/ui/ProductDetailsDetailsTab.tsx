@@ -1,4 +1,5 @@
 import { hasProductCharacteristicsContent } from "@izibuy/shared-lib";
+import { isCartDealType, normalizeCategoryDealType } from "@molha/api-contract";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 import { Platform, Pressable, ScrollView, Text, View } from "react-native";
@@ -35,6 +36,7 @@ import { ProductPromoCodeActivateSheet } from "@/features/product-detail/ui/Prod
 import { ProductDetailsSaleTeaser } from "@/features/product-detail/ui/ProductDetailsSaleTeaser";
 import { ProductDetailsWholesaleOffer } from "@/features/product-detail/ui/ProductDetailsWholesaleOffer";
 import { ProductDetailsBuyNFreeOffer } from "@/features/product-detail/ui/ProductDetailsBuyNFreeOffer";
+import { ProductDealOnWebNotice } from "@/features/product-detail/ui/ProductDealOnWebNotice";
 import { ProductDetailPurchaseActions } from "@/features/product-detail/ui/ProductDetailPurchaseActions";
 import { ProductPickupDetailsPanel } from "@/features/product-detail/ui/ProductPickupDetailsPanel";
 import { catalogQueryKeys } from "@/shared/api";
@@ -161,6 +163,13 @@ export const ProductDetailsDetailsTab = ({
     hasCharacteristics && resolvedContentTab === "characteristics";
   const showReturns = resolvedContentTab === "returns";
   const showDelivery = resolvedContentTab === "delivery";
+  // Осмотр (авто, недвижимость) и услуга: вкладка про место встречи, а не
+  // про доставку — паритет web `ProductDetailsContentSwitcher`.
+  const dealType = normalizeCategoryDealType(product.productDealType);
+  const deliveryTabLabel = isCartDealType(dealType)
+    ? PRODUCT_DETAILS_MODAL_UI.DELIVERY_TITLE
+    : (PRODUCT_DETAILS_MODAL_UI.DEAL_TAB_TITLE[dealType] ??
+      PRODUCT_DETAILS_MODAL_UI.DELIVERY_TITLE);
 
   const panelAriaLabel = showDelivery
     ? PRODUCT_DETAILS_MODAL_UI.DELIVERY_SECTION_ARIA
@@ -258,6 +267,7 @@ export const ProductDetailsDetailsTab = ({
         onLoyaltyBadgePress={openBadgeExplain}
       />
       <ProductFlashSaleCountdown product={product} onExpired={handleFlashSaleExpired} />
+      <ProductDealOnWebNotice product={product} isOwnProduct={isOwnProduct} />
       {showInlinePurchaseActions ? (
         <ProductDetailPurchaseActions
           productId={productId}
@@ -390,7 +400,7 @@ export const ProductDetailsDetailsTab = ({
                       styles.contentSwitcherTabTextActive,
                   ]}
                 >
-                  {PRODUCT_DETAILS_MODAL_UI.DELIVERY_TITLE}
+                  {deliveryTabLabel}
                 </Text>
               </Pressable>
               {hasCharacteristics ? (
@@ -523,6 +533,7 @@ export const ProductDetailsDetailsTab = ({
             product={product}
             onExpired={handleFlashSaleExpired}
           />
+          <ProductDealOnWebNotice product={product} isOwnProduct={isOwnProduct} />
           <ProductDetailsWholesaleOffer
             product={product}
             canShowAddToCart={canShowAddToCart}

@@ -445,6 +445,19 @@ export const PRODUCT_DETAILS_MODAL_UI = {
   RETURNS_NONE: "Возврат не предусмотрен.",
   DELIVERY_TITLE: "Получение",
   DELIVERY_SECTION_ARIA: "Доставка",
+  // У объявлений без корзины вкладка «Получение» говорит о месте встречи.
+  DEAL_TAB_TITLE: { viewing: "Осмотр", service: "Адрес" } as Record<string, string>,
+  /**
+   * Заявок в приложении пока нет: вместо «В корзину» — честная плашка.
+   * Ссылкой не открываем — приложение само перехватывает gitorg.ru/product.
+   */
+  DEAL_ON_WEB_NOTICE: {
+    viewing: "Записаться на осмотр пока можно только на сайте gitorg.ru",
+    service: "Заказать услугу пока можно только на сайте gitorg.ru",
+  } as Record<string, string>,
+  DEAL_ON_WEB_COPY: "Скопировать ссылку",
+  DEAL_ON_WEB_COPIED: "Ссылка скопирована — откройте её в браузере",
+  DEAL_ON_WEB_COPY_FAILED: "Не удалось скопировать ссылку",
   DELIVERY_IN_DEVELOPMENT: "В разработке",
   PROTOTYPE_SLOTS_ARIA: "Дополнительный раздел",
   PROTOTYPE_SLOT_1: "Блок 1",

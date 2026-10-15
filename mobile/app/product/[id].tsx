@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useQueryClient } from "@tanstack/react-query";
+import { isProductPurchasableViaCart } from "@molha/api-contract";
 
 import { resolveProductImageUrls } from "@/entities/product/lib/resolveProductImageUrls";
 import { resolveProductPreviewVideoUrl } from "@/entities/product/lib/resolveProductPreviewVideoUrl";
@@ -330,17 +331,26 @@ export default function ProductDetailScreen() {
     resolveProductPurchaseBlockState(productRecord);
   const { isSellerClosed, closedLabel: sellerClosedLabel } =
     resolveProductSellerClosedPurchaseState(productRecord);
+  // Авто, недвижимость и услуги в корзину не кладут: кнопки покупки у них нет
+  // вовсе, в том числе «Нет в наличии» и «У нас закрыто» — они про заказ
+  // (паритет web `resolveProductPurchaseButtonState.js`).
+  const viaCart = isProductPurchasableViaCart(productRecord);
   const canShowAddToCart =
+    viaCart &&
     !isOwnProduct &&
     isAvailable &&
     purchaseLimit > 0 &&
     !isProductOutOfStock &&
     !isPurchaseBlocked &&
     !isSellerClosed;
-  const showOutOfStockPurchaseButton = !isOwnProduct && isProductOutOfStock;
+  const showOutOfStockPurchaseButton = viaCart && !isOwnProduct && isProductOutOfStock;
   const showBlockedPurchaseButton = !isOwnProduct && isPurchaseBlocked;
   const showSellerClosedPurchaseButton =
-    !isOwnProduct && isSellerClosed && !isPurchaseBlocked && !isProductOutOfStock;
+    viaCart &&
+    !isOwnProduct &&
+    isSellerClosed &&
+    !isPurchaseBlocked &&
+    !isProductOutOfStock;
   const showManageActions = (isOwnProduct || isAdmin) && activeTab === "details";
   const hasOpenSalesLocked = productRecord.hasOpenSales === true;
   const showMobilePurchaseDock =
