@@ -36,7 +36,14 @@ jobs:
         # в нём нет @emnapi/runtime, который на Linux требует
         # @img/sharp-wasm32. Пересобрать lock под Linux с этой машины не
         # выходит, поэтому пока install.
-        run: npm install
+        # Реестр npm иногда рвёт соединение (exit 239) — даём три попытки.
+        run: |
+          for attempt in 1 2 3; do
+            npm install && exit 0
+            echo "npm install: попытка $attempt не удалась"
+            sleep 15
+          done
+          exit 1
 
       - name: Build shared-lib
         run: npm run build --workspace=@izibuy/shared-lib

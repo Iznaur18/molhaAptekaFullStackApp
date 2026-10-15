@@ -52,7 +52,14 @@ jobs:
       # postinstall («patch-package: not found»). Корневая установка заодно
       # связывает shared-lib и разрешает file:-зависимости на contract.
       - name: Install workspace dependencies
-        run: npm install
+        # Реестр npm иногда рвёт соединение (exit 239) — даём три попытки.
+        run: |
+          for attempt in 1 2 3; do
+            npm install && exit 0
+            echo "npm install: попытка $attempt не удалась"
+            sleep 15
+          done
+          exit 1
 
       - name: Install contract dependencies
         working-directory: contract
