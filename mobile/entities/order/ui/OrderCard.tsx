@@ -18,6 +18,8 @@ import {
   resolveOrderShippingTrackingUrl,
 } from "@molha/api-contract";
 import {
+  canCancelOrderItem,
+  canMarkOrderItemReturned,
   resolveOrderLineAffiliateSellerLine,
   summarizeOrderItems,
 } from "@izibuy/shared-lib";
@@ -50,7 +52,7 @@ import {
   ORDER_PAYMENT_METHOD_LABEL_RU,
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_DELIVERED,
-  ORDER_STATUS_PENDING,
+  ORDER_STATUS_RETURNED,
   type OrderPaymentMethod,
 } from "@/entities/order/model/constants";
 import {
@@ -153,6 +155,10 @@ type OrderCardProps = {
   onProductClick?: (item: unknown) => void;
   onConfirmDelivered?: (ctx: OrderItemActionContext) => void | Promise<void>;
   onCancelItem?: (ctx: OrderItemActionContext) => void | Promise<void>;
+  /** «Отказаться» (покупатель) / «Вернулся» (продавец) после отгрузки. */
+  onMarkReturned?: (ctx: OrderItemActionContext) => void | Promise<void>;
+  /** «Отменить заказ» — заказ продавца целиком, пока весь он у продавца. */
+  onCancelOrder?: (ctx: { orderId: string; sellerId: string }) => void | Promise<void>;
   onMarkShipped?: (ctx: OrderItemActionContext) => void | Promise<void>;
   onMarkDelivered?: (ctx: OrderItemActionContext) => void | Promise<void>;
   /** Продавец двигает отправление на следующую ступень сборки. */
@@ -190,10 +196,31 @@ const formatPrepaymentDue = (value: string | null): string => {
 };
 
 /** Ключ действия над отправлением целиком — рядом с ключами позиций. */
-export const orderShipmentActionKey = (orderId: string, action: "advance" | "pay") =>
-  `${orderId}:${action}`;
+export const orderShipmentActionKey = (
+  orderId: string,
+  action: "advance" | "pay" | "cancel",
+) => `${orderId}:${action}`;
 
 const formatLoyaltyPoints = (value: unknown) => Math.floor(Number(value) || 0);
+
+/**
+ * «покупатель отказался» / «оформил продавец» у возвращённой позиции: для
+ * продавца это разные ситуации — в первом случае товар ещё едет обратно.
+ */
+const resolveReturnedByLabel = (
+  item: { status?: string; returnedBy?: unknown },
+  buyerId: string,
+): string => {
+  if (item.status !== ORDER_STATUS_RETURNED || item.returnedBy == null) return "";
+  const returnedBy =
+    typeof item.returnedBy === "object"
+      ? String((item.returnedBy as { _id?: unknown })._id ?? "")
+      : String(item.returnedBy);
+  if (!returnedBy) return "";
+  return returnedBy === buyerId
+    ? ORDER_CARD_UI.ITEM_RETURNED_BY_BUYER
+    : ORDER_CARD_UI.ITEM_RETURNED_BY_SELLER;
+};
 
 const formatBuyerLabel = (buyer: OrderBuyer) => {
   if (buyer == null || typeof buyer === "string") {
@@ -359,6 +386,8 @@ export const OrderCard = ({
   onProductClick,
   onConfirmDelivered,
   onCancelItem,
+  onMarkReturned,
+  onCancelOrder,
   onMarkShipped,
   onMarkDelivered,
   onAdvanceShipment,
@@ -397,6 +426,12 @@ export const OrderCard = ({
   const shipment = resolveOrderShipmentActions(order, attentionRole);
   const advanceKey = orderShipmentActionKey(order._id, "advance");
   const payKey = orderShipmentActionKey(order._id, "pay");
+  const cancelOrderKey = orderShipmentActionKey(order._id, "cancel");
+  const buyerId = resolveBuyerId(order.userBuyerId) ?? "";
+  // Одна кнопка на весь заказ продавца — как на сайте, не построчно.
+  const canCancelOrder = Boolean(onCancelOrder) && shipment.canCancelOrder;
+  const isCancelOrderPending = pendingActionKey === cancelOrderKey;
+  const cancelOrderError = itemActionErrors[cancelOrderKey] ?? "";
   const isItemPending = (itemIndex: number) =>
     pendingActionKey === `${order._id}:${itemIndex}`;
   const shipmentAdvance = onAdvanceShipment ? shipment.advance : null;
@@ -408,10 +443,15 @@ export const OrderCard = ({
   const isDeliverPending = deliverItemIndexes.some(isItemPending);
   const isHandOverPending = handOverItemIndexes.some(isItemPending);
   const isShipmentBusy =
-    isAdvancePending || isShipPending || isDeliverPending || isHandOverPending;
+    isAdvancePending ||
+    isShipPending ||
+    isDeliverPending ||
+    isHandOverPending ||
+    isCancelOrderPending;
   // Ошибка отгрузки или выдачи привязана к позиции и показывается у неё.
   const shipmentActionError = itemActionErrors[advanceKey] ?? "";
   const hasShipmentActions =
+    canCancelOrder ||
     Boolean(shipmentAdvance) ||
     shipItemIndexes.length > 0 ||
     deliverItemIndexes.length > 0 ||
@@ -449,8 +489,10 @@ export const OrderCard = ({
       affiliateAmount?: number;
       affiliatePercentUsed?: number;
       affiliateReferrerUserId?: unknown;
+      returnedBy?: unknown;
     };
     const productName = resolveOrderLineItemName(item);
+    const returnedByLabel = resolveReturnedByLabel(source, buyerId);
     const loyaltyPerUnit = formatLoyaltyPoints(source.loyaltyPointsPerUnitAtOrder);
     const loyaltyReservedTotal = formatLoyaltyPoints(source.loyaltyPointsReservedTotal);
     const deliveredAtText = source.deliveredAt
@@ -497,6 +539,11 @@ export const OrderCard = ({
             {ORDER_CARD_UI.ITEM_CONFIRMED_AT_LABEL}: {confirmedAtText}
           </Text>
         ) : null}
+        {returnedByLabel ? (
+          <Text style={styles.itemTimestamp}>
+            {ORDER_CARD_UI.ITEM_RETURNED_AT_LABEL}: {returnedByLabel}
+          </Text>
+        ) : null}
       </View>
     );
   };
@@ -516,12 +563,21 @@ export const OrderCard = ({
       affiliateAmount?: number;
       affiliatePercentUsed?: number;
       affiliateReferrerUserId?: unknown;
+      returnedBy?: unknown;
     };
     const itemIndex = getOrderItemIndex(source, index);
     const actionKey = `${order._id}:${itemIndex}`;
     const isActionPending = pendingActionKey === actionKey;
     const actionError = itemActionErrors[actionKey] ?? "";
-    const canCancel = source.status === ORDER_STATUS_PENDING && Boolean(onCancelItem);
+    // Отменить можно, пока товар у продавца (все ступени до отгрузки), — как
+    // на сервере и сайте; раньше кнопка была только у «В обработке».
+    const canCancel = canCancelOrderItem(source.status) && Boolean(onCancelItem);
+    const canReturn =
+      canMarkOrderItemReturned({
+        status: source.status,
+        carrierTracksShipment: shipment.carrierTracksShipment,
+      }) && Boolean(onMarkReturned);
+    const returnedByLabel = resolveReturnedByLabel(source, buyerId);
     const canConfirm =
       source.status === ORDER_STATUS_DELIVERED && Boolean(onConfirmDelivered);
     const key = source._id ?? `item-${index}`;
@@ -546,7 +602,7 @@ export const OrderCard = ({
     const isCancelled = source.status === ORDER_STATUS_CANCELLED;
     // «Отгрузить», «Доставлен» и ступени сборки — в строке отправления ниже:
     // у позиции остаются только отмена и подтверждение получения.
-    const hasItemActions = canConfirm || canCancel;
+    const hasItemActions = canConfirm || canCancel || canReturn;
 
     return (
       <View
@@ -648,12 +704,18 @@ export const OrderCard = ({
                 {ORDER_CARD_UI.ITEM_CONFIRMED_AT_LABEL}: {confirmedAtText}
               </Text>
             ) : null}
+
+            {showSecondaryInline && returnedByLabel ? (
+              <Text style={styles.itemTimestamp}>
+                {ORDER_CARD_UI.ITEM_RETURNED_AT_LABEL}: {returnedByLabel}
+              </Text>
+            ) : null}
           </View>
         </View>
 
         {hasItemActions || actionError ? (
           <View style={styles.itemActionsRow}>
-            {canConfirm || canCancel ? (
+            {canConfirm || canCancel || canReturn ? (
               <>
                 {canCancel ? (
                   <Pressable
@@ -671,6 +733,28 @@ export const OrderCard = ({
                       {isActionPending
                         ? ORDER_CARD_UI.ACTION_PENDING
                         : ORDER_CARD_UI.ACTION_CANCEL}
+                    </Text>
+                  </Pressable>
+                ) : null}
+                {canReturn ? (
+                  <Pressable
+                    style={[
+                      styles.actionButton,
+                      styles.actionButtonCancel,
+                      isActionPending && styles.actionDisabled,
+                    ]}
+                    onPress={() => onMarkReturned?.({ orderId: order._id, itemIndex })}
+                    disabled={isActionPending}
+                    accessibilityRole="button"
+                  >
+                    <Text
+                      style={[styles.actionButtonText, styles.actionButtonTextCancel]}
+                    >
+                      {isActionPending
+                        ? ORDER_CARD_UI.ACTION_PENDING
+                        : attentionRole === "seller"
+                          ? ORDER_CARD_UI.ACTION_RETURN
+                          : ORDER_CARD_UI.ACTION_REFUSE}
                     </Text>
                   </Pressable>
                 ) : null}
@@ -763,8 +847,30 @@ export const OrderCard = ({
             {items.map((item, index) => renderLineItem(item, index))}
           </View>
 
-          {hasShipmentActions || shipmentActionError ? (
+          {hasShipmentActions || shipmentActionError || cancelOrderError ? (
             <View style={styles.itemActionsRow}>
+              {canCancelOrder ? (
+                <Pressable
+                  style={[
+                    styles.actionButton,
+                    styles.actionButtonCancel,
+                    isShipmentBusy && styles.actionDisabled,
+                  ]}
+                  onPress={() =>
+                    onCancelOrder?.({ orderId: order._id, sellerId: shipment.sellerId })
+                  }
+                  disabled={isShipmentBusy}
+                  accessibilityRole="button"
+                >
+                  <Text
+                    style={[styles.actionButtonText, styles.actionButtonTextCancel]}
+                  >
+                    {isCancelOrderPending
+                      ? ORDER_CARD_UI.ACTION_PENDING
+                      : ORDER_CARD_UI.ACTION_CANCEL_ORDER}
+                  </Text>
+                </Pressable>
+              ) : null}
               {shipmentAdvance ? (
                 <Pressable
                   style={[styles.actionButton, isShipmentBusy && styles.actionDisabled]}
@@ -824,6 +930,9 @@ export const OrderCard = ({
               ) : null}
               {shipmentActionError ? (
                 <Text style={styles.itemError}>{shipmentActionError}</Text>
+              ) : null}
+              {cancelOrderError ? (
+                <Text style={styles.itemError}>{cancelOrderError}</Text>
               ) : null}
             </View>
           ) : null}

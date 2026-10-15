@@ -15,10 +15,14 @@ import {
   orderNeedsSellerAttention,
   resolveSellerOrderCollapsedPreview,
 } from "../lib/orderNeedsSellerAttention.js";
-import { buildOrderStatusFromItems } from "@izibuy/shared-lib";
+import {
+  buildOrderStatusFromItems,
+  canCancelOrderItem,
+  canMarkOrderItemReturned,
+  isOrderShipmentTrackedByCarrier,
+} from "@izibuy/shared-lib";
 
 import {
-  ORDER_PRE_SHIPMENT_STATUSES,
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_READY_FOR_PICKUP,
   ORDER_STATUS_READY_TO_SHIP,
@@ -27,7 +31,6 @@ import {
 import { resolveShipmentAdvanceAction } from "../lib/resolveNextShipmentStatus.js";
 import { canCancelOrderShipment } from "../lib/canCancelOrderShipment.js";
 
-const PRE_SHIPMENT_STATUSES = new Set(ORDER_PRE_SHIPMENT_STATUSES);
 import { resolveOrderStatusLabelRu } from "../lib/resolveOrderStatusLabelRu.js";
 import { resolveOrderSellers } from "../lib/resolveOrderSellers.js";
 import {
@@ -43,9 +46,6 @@ import { resolveOrderLineSellerId, summarizeOrderItems } from "@izibuy/shared-li
 import {
   PRODUCT_DELIVERY_CARRIER_LOBO,
   PRODUCT_DELIVERY_CARRIER_SELLER,
-  SHIPPING_PROVIDER_CDEK,
-  SHIPPING_PROVIDER_YANDEX_DELIVERY,
-  SHIPPING_PROVIDER_YANDEX_EXPRESS,
   resolveOrderPrepaymentAmountRub,
   resolveProductDeliveryCarrier,
 } from "@molha/api-contract";
@@ -317,16 +317,17 @@ function OrderCardLineItem({
   // Отменить можно на любой ступени, пока товар не уехал: это отдельное право,
   // и с отгрузкой его связывать нельзя — иначе кнопка отмены пропадала вместе
   // с ярлыком отгрузки.
-  const canCancelItem = PRE_SHIPMENT_STATUSES.has(item.status);
+  const canCancelItem = canCancelOrderItem(item.status);
   // «Отгрузить» / «Доставлен» / «Выдал» / «Подтвердить» — в строке отправления.
   // Возврат оформляется, пока покупатель не подтвердил получение: товар уже
   // уехал, но сделка не состоялась — отказ у двери, неудачное вручение.
   // СДЭК и Яндекс сами отмечают возврат, когда посылка вернулась к продавцу.
   // Кнопка тут расходилась со службой: покупатель «отказался», а посылка
   // продолжала ехать в пункт, и заказ застревал в «Возвращён».
-  const canMarkReturned =
-    !carrierTracksShipment &&
-    (item.status === ORDER_STATUS_SHIPPED || item.status === ORDER_STATUS_DELIVERED);
+  const canMarkReturned = canMarkOrderItemReturned({
+    status: item.status,
+    carrierTracksShipment,
+  });
   // Для продавца «клиент отказался» и «я принял назад» — разные ситуации:
   // в первом случае товар ещё едет обратно.
   const returnedByLabel =
@@ -672,11 +673,10 @@ export function OrderCard({
       : null;
 
   // СДЭК, Яндекс и «Экспресс»: «Отгружен» и «Доставлен» ставит опрос статусов службы, не продавец.
-  const cdekTracksThisShipment =
-    shipmentMethod === "delivery" &&
-    (shipmentOwn?.deliveryCarrier === SHIPPING_PROVIDER_CDEK ||
-      shipmentOwn?.deliveryCarrier === SHIPPING_PROVIDER_YANDEX_DELIVERY ||
-      shipmentOwn?.deliveryCarrier === SHIPPING_PROVIDER_YANDEX_EXPRESS);
+  const cdekTracksThisShipment = isOrderShipmentTrackedByCarrier({
+    fulfillment: shipmentMethod,
+    deliveryCarrier: shipmentOwn?.deliveryCarrier,
+  });
   const sellerDeliversThisShipment =
     shipmentMethod === "delivery" &&
     shipmentCarrier === PRODUCT_DELIVERY_CARRIER_SELLER &&

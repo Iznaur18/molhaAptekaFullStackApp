@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { z } from "zod";
-import { Alert, AppState, Linking, Pressable, Text, View } from "react-native";
+import { AppState, Linking, Pressable, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
@@ -15,6 +15,7 @@ import { summarizeMyOrders } from "@/entities/order/lib/summarizeMyOrders";
 import {
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_CONFIRMED,
+  ORDER_STATUS_RETURNED,
 } from "@/entities/order/model/constants";
 import { MY_ORDERS_LIST_FILTER_IN_PROGRESS } from "@/entities/order/model/myOrdersListFilters";
 import { useMyOrdersQuery } from "@/entities/order/model/useMyOrdersQuery";
@@ -39,6 +40,7 @@ import {
   PRODUCT_REPORT_UI,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { confirmDestructiveAction } from "@/shared/lib/confirmDestructiveAction";
 import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useMyOrdersPageStyles } from "@/shared/theme/myOrdersPageStyles";
@@ -63,7 +65,12 @@ export const MyOrdersPage = () => {
   const queryClient = useQueryClient();
   const isAuthorized = useIsAuthorized();
   const ordersQuery = useMyOrdersQuery();
-  const { confirmItemMutation, cancelItemMutation } = useOrderMutations();
+  const {
+    confirmItemMutation,
+    cancelItemMutation,
+    returnItemMutation,
+    cancelShipmentMutation,
+  } = useOrderMutations();
   const createOrderPaymentMutation = useCreateOrderPaymentMutation();
   const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [statusFilter, setStatusFilter] = useState("");
@@ -250,31 +257,37 @@ export const MyOrdersPage = () => {
     }
   };
 
-  const handleCancelItem = ({
-    orderId,
-    itemIndex,
-  }: {
-    orderId: string;
-    itemIndex: number;
-  }) => {
-    Alert.alert(ORDER_CARD_UI.ACTION_CANCEL, ORDER_CARD_UI.BUYER_CANCEL_CONFIRM, [
-      { text: PRODUCT_REPORT_UI.CANCEL, style: "cancel" },
-      {
-        text: ORDER_CARD_UI.ACTION_CANCEL,
-        style: "destructive",
-        onPress: () => {
-          void runCancelItem({ orderId, itemIndex });
-        },
+  /** Спросить подтверждение и выполнить действие — как всплывающий вопрос на сайте. */
+  const confirmAction = (
+    title: string,
+    question: string,
+    confirmLabel: string,
+    run: () => Promise<void>,
+  ) => {
+    // На телефоне — системный диалог, в веб-сборке — window.confirm
+    // (Alert в react-native-web ничего не показывает).
+    confirmDestructiveAction({
+      title,
+      message: question,
+      confirmLabel,
+      cancelLabel: PRODUCT_REPORT_UI.CANCEL,
+      onConfirm: () => {
+        void run();
       },
-    ]);
+    });
   };
 
-  const runCancelItem = async ({
+  /** Действие над позицией: сразу показываем новый статус, потом — ответ сервера. */
+  const runItemAction = async ({
     orderId,
     itemIndex,
+    optimisticStatus,
+    mutate,
   }: {
     orderId: string;
     itemIndex: number;
+    optimisticStatus: string;
+    mutate: () => Promise<OrderRecord>;
   }) => {
     const actionKey = `${orderId}:${itemIndex}`;
     setPendingActionKey(actionKey);
@@ -289,14 +302,14 @@ export const MyOrdersPage = () => {
           if (getOrderItemIndex(item as { itemIndex?: number }, index) !== itemIndex) {
             return item;
           }
-          return { ...item, status: ORDER_STATUS_CANCELLED };
+          return { ...item, status: optimisticStatus };
         });
         return { ...order, items: nextItems };
       }),
     );
 
     try {
-      const updatedOrder = await cancelItemMutation.mutateAsync({ orderId, itemIndex });
+      const updatedOrder = await mutate();
       patchOrders((prev) =>
         prev.map((order) => (order._id === orderId ? updatedOrder : order)),
       );
@@ -312,6 +325,89 @@ export const MyOrdersPage = () => {
     } finally {
       setPendingActionKey(null);
     }
+  };
+
+  const handleCancelItem = ({
+    orderId,
+    itemIndex,
+  }: {
+    orderId: string;
+    itemIndex: number;
+  }) => {
+    confirmAction(
+      ORDER_CARD_UI.ACTION_CANCEL,
+      ORDER_CARD_UI.ITEM_CANCEL_CONFIRM,
+      ORDER_CARD_UI.ACTION_CANCEL,
+      () =>
+        runItemAction({
+          orderId,
+          itemIndex,
+          optimisticStatus: ORDER_STATUS_CANCELLED,
+          mutate: () => cancelItemMutation.mutateAsync({ orderId, itemIndex }),
+        }),
+    );
+  };
+
+  /** «Отказаться»: товар уехал, но покупатель его не берёт. */
+  const handleMarkReturned = ({
+    orderId,
+    itemIndex,
+  }: {
+    orderId: string;
+    itemIndex: number;
+  }) => {
+    confirmAction(
+      ORDER_CARD_UI.ACTION_REFUSE,
+      ORDER_CARD_UI.ACTION_REFUSE_CONFIRM,
+      ORDER_CARD_UI.ACTION_REFUSE,
+      () =>
+        runItemAction({
+          orderId,
+          itemIndex,
+          optimisticStatus: ORDER_STATUS_RETURNED,
+          mutate: () => returnItemMutation.mutateAsync({ orderId, itemIndex }),
+        }),
+    );
+  };
+
+  /** «Отменить заказ»: весь заказ продавца разом, пока он у продавца. */
+  const handleCancelOrder = ({
+    orderId,
+    sellerId,
+  }: {
+    orderId: string;
+    sellerId: string;
+  }) => {
+    confirmAction(
+      ORDER_CARD_UI.ACTION_CANCEL_ORDER,
+      ORDER_CARD_UI.BUYER_CANCEL_CONFIRM,
+      ORDER_CARD_UI.ACTION_CANCEL_ORDER,
+      async () => {
+        const actionKey = orderShipmentActionKey(orderId, "cancel");
+        setPendingActionKey(actionKey);
+        setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
+        try {
+          const updatedOrder = await cancelShipmentMutation.mutateAsync({
+            orderId,
+            sellerId,
+          });
+          patchOrders((prev) =>
+            prev.map((order) => (order._id === orderId ? updatedOrder : order)),
+          );
+          await invalidateOrderQueues();
+          void ordersQuery.refetch();
+        } catch (error) {
+          const message = formatApiErrorMessage(
+            error,
+            API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK,
+          );
+          setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
+          void ordersQuery.refetch();
+        } finally {
+          setPendingActionKey(null);
+        }
+      },
+    );
   };
 
   const handleProductClick = useCallback(
@@ -441,6 +537,8 @@ export const MyOrdersPage = () => {
               onProductClick={handleProductClick}
               onConfirmDelivered={handleConfirmDelivered}
               onCancelItem={handleCancelItem}
+              onMarkReturned={handleMarkReturned}
+              onCancelOrder={handleCancelOrder}
               onPayOrder={handlePayOrder}
               pendingActionKey={pendingActionKey}
               itemActionErrors={itemActionErrors}

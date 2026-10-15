@@ -418,6 +418,12 @@ export {
   orderMatchesStatusFilter,
 } from "./orderListFilters.js";
 export type { MyOrdersListGroupFilter } from "./orderListFilters.js";
+export {
+  canCancelOrderItem,
+  canCancelOrderShipment,
+  canMarkOrderItemReturned,
+  isOrderShipmentTrackedByCarrier,
+} from "./orderCancellation.js";
 export type {
   CatalogExtraFilters,
   CatalogFacetsPrice,

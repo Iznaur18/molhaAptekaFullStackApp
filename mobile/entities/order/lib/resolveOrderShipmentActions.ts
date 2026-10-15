@@ -1,28 +1,22 @@
 import {
   PRODUCT_DELIVERY_CARRIER_SELLER,
-  SHIPPING_PROVIDER_CDEK,
-  SHIPPING_PROVIDER_YANDEX_DELIVERY,
-  SHIPPING_PROVIDER_YANDEX_EXPRESS,
   resolveOrderPrepaymentAmountRub,
   resolveProductDeliveryCarrier,
 } from "@molha/api-contract";
 import {
   ORDER_STATUS_ACCEPTED,
+  ORDER_STATUS_CANCELLED,
   ORDER_STATUS_PENDING,
   ORDER_STATUS_READY_FOR_PICKUP,
   ORDER_STATUS_READY_TO_SHIP,
   ORDER_STATUS_SHIPPED,
   buildOrderStatusFromItems,
+  canCancelOrderShipment,
   isOrderAwaitingPrepayment,
+  isOrderShipmentTrackedByCarrier,
   resolveOrderLineSellerId,
   resolveShipmentAdvanceAction,
 } from "@izibuy/shared-lib";
-
-const CARRIER_TRACKED_PROVIDERS = new Set<string>([
-  SHIPPING_PROVIDER_CDEK,
-  SHIPPING_PROVIDER_YANDEX_DELIVERY,
-  SHIPPING_PROVIDER_YANDEX_EXPRESS,
-]);
 
 type ShipmentActionsLine = {
   status?: string;
@@ -61,6 +55,12 @@ export type OrderShipmentActions = {
   deliverItemIndexes: number[];
   /** Самовывоз: позиции «Готов к выдаче» — их выдают покупателю. */
   handOverItemIndexes: number[];
+  /** Продавец отправления: им адресуется «Отменить заказ». */
+  sellerId: string;
+  /** Отправление ведёт служба (СДЭК, Яндекс): возврат она отмечает сама. */
+  carrierTracksShipment: boolean;
+  /** Все живые позиции ещё у продавца — заказ можно снять целиком. */
+  canCancelOrder: boolean;
 };
 
 const itemIndexesInStatus = (items: ShipmentActionsLine[], status: string): number[] =>
@@ -103,15 +103,19 @@ export function resolveOrderShipmentActions(
   // СДЭК, Яндекс и «Экспресс»: «Отгружен» и «Доставлен» ставит опрос статусов
   // службы, не продавец. Их нет среди перевозчиков товара, поэтому резолвер
   // выше принял бы такое отправление за доставку продавцом.
-  const carrierTracksShipment = CARRIER_TRACKED_PROVIDERS.has(
-    String(shipmentOwn?.deliveryCarrier ?? ""),
-  );
+  const carrierTracksShipment = isOrderShipmentTrackedByCarrier({
+    fulfillment: shipmentMethod,
+    deliveryCarrier: shipmentOwn?.deliveryCarrier as string | undefined,
+  });
   // ЛОБО и курьеры площадки резолвер различает сам — у них свой перевозчик.
   const sellerDelivers =
     isDelivery && carrier === PRODUCT_DELIVERY_CARRIER_SELLER && !carrierTracksShipment;
 
   const statusNow = buildOrderStatusFromItems(items);
-  const awaitingPrepayment = isOrderAwaitingPrepayment(order);
+  // Отменённый заказ платить не нужно: без этой проверки у него висели
+  // «Ожидает оплаты» и «Оплатить» — отметки об оплате у него так и нет.
+  const awaitingPrepayment =
+    isOrderAwaitingPrepayment(order) && statusNow !== ORDER_STATUS_CANCELLED;
   // Оплата открывается после подтверждения продавцом: сначала он проверяет,
   // что товар есть, и только потом покупатель платит.
   const acceptedBySeller = statusNow !== ORDER_STATUS_PENDING;
@@ -151,5 +155,8 @@ export function resolveOrderShipmentActions(
       sellerCanMove && !isDelivery
         ? itemIndexesInStatus(items, ORDER_STATUS_READY_FOR_PICKUP)
         : [],
+    sellerId: cardSellerId,
+    carrierTracksShipment,
+    canCancelOrder: canCancelOrderShipment({ sellerId: cardSellerId, items }),
   };
 }

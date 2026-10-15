@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import type { z } from "zod";
-import { Alert, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
@@ -14,6 +14,7 @@ import { summarizeMySales } from "@/entities/order/lib/summarizeMySales";
 import {
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_DELIVERED,
+  ORDER_STATUS_RETURNED,
   ORDER_STATUS_SHIPPED,
 } from "@/entities/order/model/constants";
 import { MY_ORDERS_LIST_FILTER_IN_PROGRESS } from "@/entities/order/model/myOrdersListFilters";
@@ -38,6 +39,7 @@ import {
   PRODUCT_REPORT_UI,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { confirmDestructiveAction } from "@/shared/lib/confirmDestructiveAction";
 import { useDebouncedValue } from "@/shared/lib/useDebouncedValue";
 import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
@@ -90,6 +92,8 @@ export const MySalesPage = () => {
     shipItemMutation,
     deliverItemMutation,
     advanceShipmentMutation,
+    returnItemMutation,
+    cancelShipmentMutation,
   } = useOrderMutations();
   const [pendingActionKey, setPendingActionKey] = useState<string | null>(null);
   const [itemActionErrors, setItemActionErrors] = useState<Record<string, string>>({});
@@ -279,21 +283,87 @@ export const MySalesPage = () => {
     orderId: string;
     itemIndex: number;
   }) => {
-    Alert.alert(ORDER_CARD_UI.ACTION_CANCEL, ORDER_CARD_UI.CANCEL_CONFIRM, [
-      { text: PRODUCT_REPORT_UI.CANCEL, style: "cancel" },
-      {
-        text: ORDER_CARD_UI.ACTION_CANCEL,
-        style: "destructive",
-        onPress: () => {
-          void runSellerAction({
-            orderId,
-            itemIndex,
-            optimisticStatus: ORDER_STATUS_CANCELLED,
-            mutate: () => cancelItemMutation.mutateAsync({ orderId, itemIndex }),
-          });
-        },
+    confirmDestructiveAction({
+      title: ORDER_CARD_UI.ACTION_CANCEL,
+      message: ORDER_CARD_UI.ITEM_CANCEL_CONFIRM,
+      confirmLabel: ORDER_CARD_UI.ACTION_CANCEL,
+      cancelLabel: PRODUCT_REPORT_UI.CANCEL,
+      onConfirm: () => {
+        void runSellerAction({
+          orderId,
+          itemIndex,
+          optimisticStatus: ORDER_STATUS_CANCELLED,
+          mutate: () => cancelItemMutation.mutateAsync({ orderId, itemIndex }),
+        });
       },
-    ]);
+    });
+  };
+
+  /** «Вернулся»: товар уехал и вернулся к продавцу — снова в остатке. */
+  const handleMarkReturned = ({
+    orderId,
+    itemIndex,
+  }: {
+    orderId: string;
+    itemIndex: number;
+  }) => {
+    confirmDestructiveAction({
+      title: ORDER_CARD_UI.ACTION_RETURN,
+      message: ORDER_CARD_UI.ACTION_RETURN_CONFIRM,
+      confirmLabel: ORDER_CARD_UI.ACTION_RETURN,
+      cancelLabel: PRODUCT_REPORT_UI.CANCEL,
+      onConfirm: () => {
+        void runSellerAction({
+          orderId,
+          itemIndex,
+          optimisticStatus: ORDER_STATUS_RETURNED,
+          mutate: () => returnItemMutation.mutateAsync({ orderId, itemIndex }),
+        });
+      },
+    });
+  };
+
+  /** «Отменить заказ»: заказ покупателя целиком, пока весь он у продавца. */
+  const handleCancelOrder = ({
+    orderId,
+    sellerId,
+  }: {
+    orderId: string;
+    sellerId: string;
+  }) => {
+    confirmDestructiveAction({
+      title: ORDER_CARD_UI.ACTION_CANCEL_ORDER,
+      message: ORDER_CARD_UI.CANCEL_CONFIRM,
+      confirmLabel: ORDER_CARD_UI.ACTION_CANCEL_ORDER,
+      cancelLabel: PRODUCT_REPORT_UI.CANCEL,
+      onConfirm: () => {
+        void (async () => {
+          const actionKey = orderShipmentActionKey(orderId, "cancel");
+          setPendingActionKey(actionKey);
+          setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
+          try {
+            const updatedOrder = await cancelShipmentMutation.mutateAsync({
+              orderId,
+              sellerId,
+            });
+            patchSalesCaches((prev) =>
+              prev.map((order) => (order._id === orderId ? updatedOrder : order)),
+            );
+            await invalidateSalesQueues();
+            void handleRefresh();
+          } catch (error) {
+            const message = formatApiErrorMessage(
+              error,
+              API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK,
+            );
+            setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
+            void handleRefresh();
+          } finally {
+            setPendingActionKey(null);
+          }
+        })();
+      },
+    });
   };
 
   const handleProductClick = useCallback(
@@ -424,6 +494,8 @@ export const MySalesPage = () => {
               onMarkDelivered={handleMarkDelivered}
               onAdvanceShipment={handleAdvanceShipment}
               onCancelItem={handleCancelItem}
+              onMarkReturned={handleMarkReturned}
+              onCancelOrder={handleCancelOrder}
               pendingActionKey={pendingActionKey}
               itemActionErrors={itemActionErrors}
             />

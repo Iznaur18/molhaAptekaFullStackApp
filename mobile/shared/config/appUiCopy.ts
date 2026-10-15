@@ -1408,9 +1408,20 @@ export const ORDER_CARD_UI = {
   DETAILS_FOLD_SUMMARY: "Подробности заказа",
   ACTION_CONFIRM: "Подтвердить получение",
   ACTION_CANCEL: "Отменить",
+  ACTION_CANCEL_ORDER: "Отменить заказ",
   ACTION_SHIPPED: "Отгрузить",
   ACTION_DELIVERED: "Доставлен",
   ACTION_HANDED_TO_BUYER: "Выдал покупателю",
+  /** Возврат после отгрузки — паритет web `ORDER_CARD_UI`. */
+  ACTION_RETURN: "Вернулся",
+  ACTION_RETURN_CONFIRM:
+    "Оформить возврат? Товар вернётся в остаток, покупатель получит уведомление.",
+  ACTION_REFUSE: "Отказаться",
+  ACTION_REFUSE_CONFIRM:
+    "Отказаться от товара? Заказ закроется, продавец получит уведомление. Отменить это будет нельзя.",
+  ITEM_RETURNED_AT_LABEL: "Возвращён",
+  ITEM_RETURNED_BY_BUYER: "покупатель отказался",
+  ITEM_RETURNED_BY_SELLER: "оформил продавец",
   AWAITING_ACCEPT: "Ждём подтверждения продавца",
   AWAITING_ACCEPT_BUYER_HINT:
     "Продавец проверяет, что товар есть. Оплата откроется после подтверждения.",
@@ -1429,6 +1440,9 @@ export const ORDER_CARD_UI = {
   CANCEL_CONFIRM: "Отменить заказ покупателя?",
   BUYER_CANCEL_CONFIRM: "Отменить заказ?",
   SELLER_CANCEL_CONFIRM: "Отменить заказ покупателя?",
+  // Кнопка у строки убирает одну позицию, кнопка отправления — весь заказ.
+  // Один и тот же вопрос на обеих делал их неразличимыми.
+  ITEM_CANCEL_CONFIRM: "Убрать эту позицию из заказа?",
   ITEM_CANCELLED_BADGE: "Отмена",
   DELETED_PRODUCT_NAME: "Товар удалён",
   LOYALTY_POINTS_LINE: (points: number) =>
