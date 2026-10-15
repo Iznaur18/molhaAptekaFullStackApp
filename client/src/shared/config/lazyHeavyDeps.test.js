@@ -73,4 +73,22 @@ describe("тяжёлые зависимости остаются ленивым�
       );
     }
   });
+
+  it("страница товара — отдельный чанк, а не часть entry", () => {
+    // Вместе со страницей едут оформление заказа, рассрочка, торг, отзывы:
+    // статический импорт вернул бы ~250 КБ (63 КБ gzip) в первую загрузку.
+    const routes = read("src/app/routes/appRoutes.jsx");
+    expect(routes).not.toMatch(/^import\s*\{[^}]*\bProductRoutePage\b[^}]*\}\s*from/mu);
+    expect(routes).toContain("LazyProductRoutePage");
+
+    const chunk = read("src/app/routes/productRoutePageChunk.js");
+    expect(chunk).toMatch(/import\(\s*"\.\/ProductRoutePage\.jsx"\s*\)/u);
+  });
+
+  it("страница товара отрисована внутри своей Suspense", () => {
+    // Без своей границы на время загрузки чанка спряталась бы вся оболочка
+    // вместе с лентой под карточкой.
+    const layout = read("src/app/routes/CatalogProductShellLayout.jsx");
+    expect(layout).toMatch(/<Suspense[^>]*>\s*<Outlet\s*\/>/u);
+  });
 });
