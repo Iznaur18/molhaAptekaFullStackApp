@@ -17,7 +17,10 @@ import {
   ORDER_STATUS_RETURNED,
   ORDER_STATUS_SHIPPED,
 } from "@/entities/order/model/constants";
-import { MY_ORDERS_LIST_FILTER_IN_PROGRESS } from "@/entities/order/model/myOrdersListFilters";
+import {
+  isMyOrdersListGroupFilter,
+  MY_ORDERS_LIST_FILTER_IN_PROGRESS,
+} from "@/entities/order/model/myOrdersListFilters";
 import { useMySalesQuery } from "@/entities/order/model/useMySalesQuery";
 import { useOrderMutations } from "@/entities/order/model/useOrderMutations";
 import { OrderCard, orderShipmentActionKey } from "@/entities/order/ui/OrderCard";
@@ -70,8 +73,10 @@ export const MySalesPage = () => {
   const isSearchPending = searchTerm !== debouncedSearchTerm;
   const hasSearchQuery = debouncedSearchTerm.trim() !== "";
 
-  const serverStatusFilter =
-    statusFilter === MY_ORDERS_LIST_FILTER_IN_PROGRESS ? "" : statusFilter;
+  // Группу статусов считает приложение, серверу уходит только точный статус
+  // (он групп не знает и отклонил бы «done» как незнакомый статус).
+  const isGroupFilter = isMyOrdersListGroupFilter(statusFilter);
+  const serverStatusFilter = isGroupFilter ? "" : statusFilter;
 
   const salesParams = useMemo(
     () => ({
@@ -113,8 +118,7 @@ export const MySalesPage = () => {
 
   const totalServer = serverOrders.length;
   const totalVisible = filteredOrders.length;
-  const hasClientFilters =
-    statusFilter === MY_ORDERS_LIST_FILTER_IN_PROGRESS || attentionOnly;
+  const hasClientFilters = isGroupFilter || attentionOnly;
   const hasFilters = Boolean(serverStatusFilter) || hasSearchQuery || hasClientFilters;
   const summaryCountLabel = hasFilters
     ? MY_SALES_PAGE_UI.COUNT_FILTERED(totalVisible, totalServer)
@@ -140,9 +144,22 @@ export const MySalesPage = () => {
     await invalidateSalesQueues();
   }, [salesQuery, overviewQuery, invalidateSalesQueues]);
 
+  // Повторное нажатие на плитку снимает фильтр (паритет web).
   const handleInProgressFilterClick = useCallback(() => {
-    setStatusFilter(MY_ORDERS_LIST_FILTER_IN_PROGRESS);
+    setStatusFilter((current) =>
+      current === MY_ORDERS_LIST_FILTER_IN_PROGRESS
+        ? ""
+        : MY_ORDERS_LIST_FILTER_IN_PROGRESS,
+    );
     setAttentionOnly(false);
+  }, []);
+
+  /** «Нужно действие» — отдельно от статуса: включая его, статус сбрасываем. */
+  const handleAttentionOnlyChange = useCallback((value: boolean) => {
+    setAttentionOnly(value);
+    if (value) {
+      setStatusFilter("");
+    }
   }, []);
 
   const patchSalesCaches = useCallback(
@@ -400,12 +417,12 @@ export const MySalesPage = () => {
         summaryCountLabel={summaryCountLabel}
         totalSalesCount={sellerTotalSalesCount}
         statusFilter={statusFilter}
+        attentionOnly={attentionOnly}
         onStatusFilterChange={(value) => {
           setStatusFilter(value);
-          if (value) {
-            setAttentionOnly(false);
-          }
+          setAttentionOnly(false);
         }}
+        onAttentionOnlyChange={handleAttentionOnlyChange}
         searchTerm={searchTerm}
         onSearchTermChange={setSearchTerm}
         isSearchPending={isSearchPending}
@@ -416,7 +433,7 @@ export const MySalesPage = () => {
         totalAmountRub={summary.totalAmountRub}
         attentionOnly={attentionOnly}
         onInProgressFilterClick={handleInProgressFilterClick}
-        onAttentionFilterChange={setAttentionOnly}
+        onAttentionFilterChange={handleAttentionOnlyChange}
       />
       {totalVisible > 0 && attentionOnly ? (
         <Text style={styles.filterHint}>{MY_SALES_PAGE_UI.ATTENTION_FILTER_HINT}</Text>
