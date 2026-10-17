@@ -96,7 +96,8 @@ export async function getCdekToken(credentials) {
       signal: AbortSignal.timeout(CDEK_HTTP_TIMEOUT_MS),
     });
   } catch (error) {
-    logServerEvent("cdek.token_network_error", {
+    logServerEvent("warn", {
+      event: "cdek.token_network_error",
       environment: credentials.environment ?? "prod",
       error: error instanceof Error ? error.message : String(error),
     });
@@ -110,14 +111,18 @@ export async function getCdekToken(credentials) {
 
   if (!response.ok) {
     const detail = await readErrorText(response);
-    logServerEvent("cdek.token_failed", { status: response.status, detail });
+    logServerEvent("warn", {
+      event: "cdek.token_failed",
+      status: response.status,
+      detail,
+    });
     throw new AppError(502, CDEK_UNAVAILABLE_MESSAGE);
   }
 
   const payload = await response.json().catch(() => null);
   const token = String(payload?.access_token ?? "").trim();
   if (!token) {
-    logServerEvent("cdek.token_empty", { status: response.status });
+    logServerEvent("warn", { event: "cdek.token_empty", status: response.status });
     throw new AppError(502, CDEK_UNAVAILABLE_MESSAGE);
   }
 
@@ -160,7 +165,8 @@ export async function cdekRequest(credentials, { method = "GET", path, query, bo
       signal: AbortSignal.timeout(CDEK_HTTP_TIMEOUT_MS),
     });
   } catch (error) {
-    logServerEvent("cdek.request_network_error", {
+    logServerEvent("warn", {
+      event: "cdek.request_network_error",
       path,
       error: error instanceof Error ? error.message : String(error),
     });
@@ -175,7 +181,12 @@ export async function cdekRequest(credentials, { method = "GET", path, query, bo
 
   if (!response.ok) {
     const detail = await readErrorText(response);
-    logServerEvent("cdek.request_failed", { path, status: response.status, detail });
+    logServerEvent("warn", {
+      event: "cdek.request_failed",
+      path,
+      status: response.status,
+      detail,
+    });
     throw new AppError(502, detail || CDEK_UNAVAILABLE_MESSAGE);
   }
 
@@ -204,14 +215,19 @@ export async function cdekDownload(credentials, fileUrl) {
       signal: AbortSignal.timeout(CDEK_HTTP_TIMEOUT_MS),
     });
   } catch (error) {
-    logServerEvent("cdek.download_network_error", {
+    logServerEvent("warn", {
+      event: "cdek.download_network_error",
       error: error instanceof Error ? error.message : String(error),
     });
     throw new AppError(502, CDEK_UNAVAILABLE_MESSAGE);
   }
   if (!response.ok) {
     const detail = await readErrorText(response);
-    logServerEvent("cdek.download_failed", { status: response.status, detail });
+    logServerEvent("warn", {
+      event: "cdek.download_failed",
+      status: response.status,
+      detail,
+    });
     throw new AppError(502, detail || CDEK_UNAVAILABLE_MESSAGE);
   }
   return Buffer.from(await response.arrayBuffer());

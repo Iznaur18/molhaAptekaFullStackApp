@@ -101,7 +101,12 @@ export const getReservedQuantityByProductIds = async (productIds, session = null
     {
       $match: {
         "items.productId": { $in: objectIds },
-        "items.status": { $in: STOCK_RESERVATION_ITEM_STATUSES },
+        // Отменённая по «Не вручён» позиция держит остаток, пока посылка
+        // не вернулась к продавцу.
+        $or: [
+          { "items.status": { $in: STOCK_RESERVATION_ITEM_STATUSES } },
+          { "items.awaitingCarrierReturn": true },
+        ],
       },
     },
     {

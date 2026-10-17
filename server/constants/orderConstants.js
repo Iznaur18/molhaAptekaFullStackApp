@@ -209,6 +209,13 @@ export const BUYER_ORDER_PREPAYMENT_EXPIRED_MESSAGE =
   "Заказ отменён: оплата не пришла за сутки после подтверждения";
 export const SELLER_ORDER_PREPAYMENT_EXPIRED_MESSAGE =
   "Покупатель не оплатил заказ за сутки — заказ отменён, товар снова в продаже";
+/** @param {boolean} prepaid */
+export const BUYER_ORDER_CARRIER_NOT_DELIVERED_MESSAGE = (prepaid) =>
+  prepaid
+    ? "Заказ отменён: посылку не забрали в пункте выдачи, она возвращается продавцу. Деньги за заказ вернём"
+    : "Заказ отменён: посылку не забрали в пункте выдачи, она возвращается продавцу";
+export const SELLER_ORDER_CARRIER_NOT_DELIVERED_MESSAGE =
+  "Покупатель не забрал посылку — заказ отменён. Товар снова появится в продаже, когда служба доставки вернёт его вам";
 export const BUYER_ORDER_PAID_AFTER_CANCEL_MESSAGE =
   "Оплата пришла после отмены заказа — вернём деньги";
 

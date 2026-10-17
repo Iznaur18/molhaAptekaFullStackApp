@@ -312,7 +312,8 @@ export async function createYandexDeliveryRequest({ orderId, sellerId }) {
     error: null,
   };
   await saveRequest(orderId, sellerId, request);
-  logServerEvent("yandex_delivery.request_created", {
+  logServerEvent("info", {
+    event: "yandex_delivery.request_created",
     orderId: String(orderId),
     requestId: request.requestId,
   });
@@ -403,7 +404,8 @@ export async function cancelYandexDeliveryRequest({ orderId, sellerId }) {
       ...current,
       cancelError: message.slice(0, 300),
     });
-    logServerEvent("yandex_delivery.request_cancel_failed", {
+    logServerEvent("warn", {
+      event: "yandex_delivery.request_cancel_failed",
       orderId: String(orderId),
       error: message,
     });
@@ -479,7 +481,8 @@ export async function syncYandexDeliveryRequests({ limit = SYNC_BATCH_LIMIT } = 
         });
       } catch (error) {
         failed += 1;
-        logServerEvent("yandex_delivery.request_sync_failed", {
+        logServerEvent("warn", {
+          event: "yandex_delivery.request_sync_failed",
           orderId: String(order._id),
           error: error instanceof Error ? error.message : String(error),
         });

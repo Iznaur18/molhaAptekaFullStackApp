@@ -18,6 +18,7 @@ import { logServerEvent } from "../../../utils/logServerEvent.js";
 
 import { assertOrderPrepaid } from "../../order/assertOrderPrepaid.js";
 import {
+  applyCarrierNotDeliveredToOrder,
   applyCarrierReturnToOrder,
   applyCarrierStepToOrder,
 } from "../carrierOrderSteps.js";
@@ -44,6 +45,13 @@ const isBeforeCdekHandover = (statusCode) =>
 
 /** Посылку забрал получатель — дальше опрашивать нечего. */
 const CDEK_DELIVERED_STATUS_CODES = new Set(["DELIVERED", "POSTOMAT_RECEIVED"]);
+
+/**
+ * Покупатель посылку не забрал. У СДЭК это итоговый статус самого заказа;
+ * обратную дорогу везёт отдельный возвратный заказ (`returnUuid`), поэтому
+ * пропущенный опросом момент ничего не ломает — статус останется этим.
+ */
+const CDEK_NOT_DELIVERED_STATUS_CODES = new Set(["NOT_DELIVERED"]);
 
 /** Накладная есть, но посылка ещё у продавца. */
 const CDEK_NOT_HANDED_OVER_STATUS_CODES = new Set(["ACCEPTED", "CREATED", "INVALID"]);
@@ -301,7 +309,7 @@ export async function createCdekWaybill({
   });
   const uuid = /** @type {any} */ (created)?.entity?.uuid;
   if (!uuid) {
-    logServerEvent("cdek.waybill_no_uuid", { orderId: String(orderId) });
+    logServerEvent("warn", { event: "cdek.waybill_no_uuid", orderId: String(orderId) });
     throw new AppError(502, "СДЭК не вернул номер отправления — попробуйте ещё раз");
   }
 
@@ -314,7 +322,8 @@ export async function createCdekWaybill({
     error: null,
   };
   await saveWaybill(orderId, sellerId, waybill);
-  logServerEvent("cdek.waybill_created", {
+  logServerEvent("info", {
+    event: "cdek.waybill_created",
     orderId: String(orderId),
     uuid: waybill.uuid,
   });
@@ -370,7 +379,8 @@ export async function refreshCdekWaybill({ orderId, sellerId }) {
         await refreshCdekIntake({ orderId, sellerId, waybill, credentials }),
       );
     } catch (error) {
-      logServerEvent("cdek.intake_refresh_failed", {
+      logServerEvent("warn", {
+        event: "cdek.intake_refresh_failed",
         orderId: String(orderId),
         error: error instanceof Error ? error.message : String(error),
       });
@@ -379,6 +389,11 @@ export async function refreshCdekWaybill({ orderId, sellerId }) {
 
   await saveWaybill(orderId, sellerId, waybill);
   await applyCdekStatusToOrder({ orderId, sellerId, statusCode: waybill.statusCode });
+  // «Не вручён» и дальнейший возврат: покупатель посылку не забрал — заказ
+  // закрываем сами, не дожидаясь, пока возврат доедет до продавца.
+  if (CDEK_NOT_DELIVERED_STATUS_CODES.has(String(waybill.statusCode ?? ""))) {
+    await applyCarrierNotDeliveredToOrder({ orderId, sellerId, carrier: "cdek" });
+  }
   if (CDEK_DELIVERED_STATUS_CODES.has(String(waybill.returnStatusCode ?? ""))) {
     await applyCdekReturnToOrder({ orderId, sellerId });
   }
@@ -431,7 +446,10 @@ export async function cancelCdekWaybill({ orderId, sellerId }) {
       cancelledAt: new Date(),
       cancelError: null,
     });
-    logServerEvent("cdek.waybill_cancelled", { orderId: String(orderId) });
+    logServerEvent("info", {
+      event: "cdek.waybill_cancelled",
+      orderId: String(orderId),
+    });
     return { ok: true };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -439,7 +457,8 @@ export async function cancelCdekWaybill({ orderId, sellerId }) {
       ...current,
       cancelError: message.slice(0, 300),
     });
-    logServerEvent("cdek.waybill_cancel_failed", {
+    logServerEvent("warn", {
+      event: "cdek.waybill_cancel_failed",
       orderId: String(orderId),
       error: message,
     });
@@ -504,7 +523,12 @@ export async function syncCdekWaybillStatuses({ limit = CDEK_SYNC_BATCH_LIMIT } 
         "cdekWaybill.cancelledAt": { $in: [null] },
       },
     },
-    "items.status": { $in: [...PRE_SHIPMENT, ORDER_STATUS_SHIPPED] },
+    // Отменённые по «Не вручён» позиции опрашиваем дальше: ждём, когда
+    // возврат вручат продавцу, чтобы отпустить остаток.
+    $or: [
+      { "items.status": { $in: [...PRE_SHIPMENT, ORDER_STATUS_SHIPPED] } },
+      { "items.awaitingCarrierReturn": true },
+    ],
   })
     .select("shipments")
     .sort({ updatedAt: 1 })
@@ -526,7 +550,8 @@ export async function syncCdekWaybillStatuses({ limit = CDEK_SYNC_BATCH_LIMIT } 
         });
       } catch (error) {
         failed += 1;
-        logServerEvent("cdek.waybill_sync_failed", {
+        logServerEvent("warn", {
+          event: "cdek.waybill_sync_failed",
           orderId: String(order._id),
           error: error instanceof Error ? error.message : String(error),
         });

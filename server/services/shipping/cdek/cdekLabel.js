@@ -74,7 +74,10 @@ export async function getCdekLabelPdf({ orderId, sellerId, sleepFn = sleep }) {
     }
     if (state.ready && state.url) {
       const pdf = await cdekDownload(credentials, state.url);
-      logServerEvent("cdek.label_downloaded", { orderId: String(orderId) });
+      logServerEvent("info", {
+        event: "cdek.label_downloaded",
+        orderId: String(orderId),
+      });
       return { pdf, fileName: `cdek-${waybill.cdekNumber}.pdf` };
     }
     await sleepFn(LABEL_POLL_DELAY_MS);

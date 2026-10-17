@@ -18,7 +18,8 @@ export async function syncCarrierStatuses() {
     try {
       result[name] = await run();
     } catch (error) {
-      logServerEvent("carrier.status_sync_failed", {
+      logServerEvent("warn", {
+        event: "carrier.status_sync_failed",
         carrier: name,
         error: error instanceof Error ? error.message : String(error),
       });

@@ -77,7 +77,8 @@ export async function resolveSellerCdekCredentials(
   try {
     secure = openCdekSecret(raw.secureSealed);
   } catch (error) {
-    logServerEvent("cdek.secret_unreadable", {
+    logServerEvent("warn", {
+      event: "cdek.secret_unreadable",
       sellerId: String(sellerId),
       error: error instanceof Error ? error.message : String(error),
     });
@@ -92,9 +93,13 @@ export async function resolveSellerCdekCredentials(
         { _id: sellerId, "cdekIntegration.secureSealed": raw.secureSealed },
         { $set: { "cdekIntegration.secureSealed": sealCdekSecret(secure) } },
       );
-      logServerEvent("cdek.secret_resealed", { sellerId: String(sellerId) });
+      logServerEvent("info", {
+        event: "cdek.secret_resealed",
+        sellerId: String(sellerId),
+      });
     } catch (error) {
-      logServerEvent("cdek.secret_reseal_failed", {
+      logServerEvent("warn", {
+        event: "cdek.secret_reseal_failed",
         sellerId: String(sellerId),
         error: error instanceof Error ? error.message : String(error),
       });
@@ -142,7 +147,8 @@ export async function saveSellerCdekCredentials({
     throw new AppError(404, "Пользователь не найден");
   }
 
-  logServerEvent("cdek.credentials_saved", {
+  logServerEvent("info", {
+    event: "cdek.credentials_saved",
     sellerId: String(sellerId),
     environment,
   });
@@ -182,7 +188,10 @@ export async function removeSellerCdekCredentials(sellerId) {
     throw new AppError(404, "Пользователь не найден");
   }
 
-  logServerEvent("cdek.credentials_removed", { sellerId: String(sellerId) });
+  logServerEvent("info", {
+    event: "cdek.credentials_removed",
+    sellerId: String(sellerId),
+  });
   return readCdekConnectionState(updated.cdekIntegration);
 }
 
@@ -207,7 +216,8 @@ export async function setSellerCdekEnabled({ sellerId, enabled }) {
     { new: true, projection: "cdekIntegration" },
   ).lean();
 
-  logServerEvent("cdek.toggled", {
+  logServerEvent("info", {
+    event: "cdek.toggled",
     sellerId: String(sellerId),
     enabled: enabled === true,
   });

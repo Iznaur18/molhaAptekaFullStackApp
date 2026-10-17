@@ -94,7 +94,8 @@ export async function resolveSellerYandexDeliveryCredentials(
   try {
     token = openYandexDeliveryToken(raw.tokenSealed);
   } catch (error) {
-    logServerEvent("yandex_delivery.token_unreadable", {
+    logServerEvent("warn", {
+      event: "yandex_delivery.token_unreadable",
       sellerId: String(sellerId),
       error: error instanceof Error ? error.message : String(error),
     });
@@ -156,7 +157,8 @@ export async function saveSellerYandexDeliveryToken({
     throw new AppError(404, "Пользователь не найден");
   }
 
-  logServerEvent("yandex_delivery.token_saved", {
+  logServerEvent("info", {
+    event: "yandex_delivery.token_saved",
     sellerId: String(sellerId),
     environment: credentials.environment,
   });
@@ -180,7 +182,10 @@ export async function removeSellerYandexDeliveryToken(sellerId) {
   if (!updated) {
     throw new AppError(404, "Пользователь не найден");
   }
-  logServerEvent("yandex_delivery.token_removed", { sellerId: String(sellerId) });
+  logServerEvent("info", {
+    event: "yandex_delivery.token_removed",
+    sellerId: String(sellerId),
+  });
   return readYandexDeliveryConnectionState(updated.yandexDeliveryIntegration);
 }
 
@@ -207,7 +212,8 @@ export async function setSellerYandexDeliveryEnabled({ sellerId, enabled }) {
     { $set: { "yandexDeliveryIntegration.enabled": enabled === true } },
     { new: true, projection: "yandexDeliveryIntegration" },
   ).lean();
-  logServerEvent("yandex_delivery.toggled", {
+  logServerEvent("info", {
+    event: "yandex_delivery.toggled",
     sellerId: String(sellerId),
     enabled: enabled === true,
   });
@@ -256,6 +262,9 @@ export async function setSellerYandexDropoffStation({ sellerId, stationId }) {
     },
     { new: true, projection: "yandexDeliveryIntegration" },
   ).lean();
-  logServerEvent("yandex_delivery.dropoff_set", { sellerId: String(sellerId) });
+  logServerEvent("info", {
+    event: "yandex_delivery.dropoff_set",
+    sellerId: String(sellerId),
+  });
   return readYandexDeliveryConnectionState(updated?.yandexDeliveryIntegration);
 }
