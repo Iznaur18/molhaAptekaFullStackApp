@@ -23,9 +23,7 @@ const PendingRegistrationSchema = new mongoose.Schema(
       required: false,
       lowercase: true,
       trim: true,
-      // одна активная заявка на email: повторная регистрация заменяет старую
-      unique: true,
-      sparse: true,
+      // Одна активная заявка на email — индекс ниже.
     },
     passwordHash: {
       type: String,
@@ -40,10 +38,8 @@ const PendingRegistrationSchema = new mongoose.Schema(
     userPhoneNumber: {
       type: String,
       trim: true,
-      default: null,
-      // phone-канал: одна активная заявка на номер
-      unique: true,
-      sparse: true,
+      // Без default: null — у заявки по почте поля просто нет. Одна активная
+      // заявка на номер — индекс ниже.
     },
     userAvatarUrl: {
       type: String,
@@ -125,6 +121,23 @@ const PendingRegistrationSchema = new mongoose.Schema(
 
 // TTL: MongoDB удаляет просроченные заявки автоматически
 PendingRegistrationSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+
+// Уникальность только среди заполненных значений. Раньше индексы были
+// `sparse`, а sparse пропускает лишь ОТСУТСТВУЮЩЕЕ поле, не `null`: заявка по
+// почте писала `userPhoneNumber: null`, и пока она висела (сутки), любая
+// следующая регистрация по почте падала с E11000 (17.10.2026).
+// syncCriticalIndexes пересоздаёт эти индексы при старте API.
+PendingRegistrationSchema.index(
+  { email: 1 },
+  { unique: true, partialFilterExpression: { email: { $type: "string" } } },
+);
+PendingRegistrationSchema.index(
+  { userPhoneNumber: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { userPhoneNumber: { $type: "string" } },
+  },
+);
 
 export const PendingRegistrationModel = mongoose.model(
   "PendingRegistration",
