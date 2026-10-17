@@ -161,3 +161,26 @@ test("просроченная заявка не подтверждается", 
   assert.equal(response.status, 400);
   assert.equal(await UserModel.countDocuments({}), 0);
 });
+
+test("две незавершённые регистрации по почте без телефона не мешают друг другу", async () => {
+  // 17.10.2026: заявка по почте писала userPhoneNumber: null, sparse-индекс
+  // null не пропускает — вторая регистрация падала с E11000 на экране.
+  await PendingRegistrationModel.syncIndexes();
+
+  await startRegistration(payload("nullphonea"));
+  const second = await postJson("/auth/register", payload("nullphoneb"));
+
+  assert.equal(second.status, 200, await second.clone().text());
+  assert.equal(await PendingRegistrationModel.countDocuments({}), 2);
+  assert.equal(
+    await PendingRegistrationModel.countDocuments({ userPhoneNumber: null }),
+    2,
+    "у заявок по почте поля телефона просто нет",
+  );
+  assert.equal(
+    await PendingRegistrationModel.countDocuments({
+      userPhoneNumber: { $exists: true },
+    }),
+    0,
+  );
+});
