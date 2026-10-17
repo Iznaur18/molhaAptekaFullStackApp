@@ -9,11 +9,16 @@ const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollectio
   await import("./helpers/mongoTestDb.js");
 const { createOrderLoyaltyFixture, createOrderWithReserveTransaction } =
   await import("./helpers/orderLoyaltyTestHelpers.js");
-const { OrderModel, UserModel } = await import("../models/index.js");
+const { EscrowLedgerEntryModel, OrderModel, UserInAppNotificationModel, UserModel } =
+  await import("../models/index.js");
+const { openEscrowForPaidOrder } = await import("../services/payments/escrowLedger.js");
+const { getReservedQuantityByProductIds } =
+  await import("../services/product/productStock.js");
 const { sealCdekSecret } =
   await import("../services/shipping/cdek/cdekCredentialsCrypto.js");
 const { forgetCdekToken } = await import("../services/shipping/cdek/cdekClient.js");
-const { refreshCdekWaybill } = await import("../services/shipping/cdek/cdekWaybill.js");
+const { refreshCdekWaybill, syncCdekWaybillStatuses } =
+  await import("../services/shipping/cdek/cdekWaybill.js");
 const { markOrderItemCancelled } =
   await import("../services/order/cancelOrderItems.js");
 
@@ -85,7 +90,7 @@ async function createCdekOrder({ itemStatus }) {
       },
     },
   );
-  return { seller, buyer, orderId: String(order._id) };
+  return { seller, buyer, product, orderId: String(order._id) };
 }
 
 const readShipment = async (orderId) => {
@@ -144,84 +149,161 @@ describe("СДЭК: отмена заказа и возврат посылки",
     assert.equal(shipment.cdekWaybill.cancelError, "Заказ уже в пути");
   });
 
-  it("возвратный заказ вручён продавцу — позиция «Вернулся»", async () => {
-    mockCdek({
-      "GET /orders/u-1": {
-        body: {
-          entity: {
-            cdek_number: "100",
-            statuses: [
-              {
-                code: "NOT_DELIVERED",
-                name: "Не вручен",
-                date_time: "2026-09-25T10:00:00+0000",
-              },
-            ],
-            related_entities: [{ type: "return_order", uuid: "r-1" }],
-          },
-        },
-      },
-      "GET /orders/r-1": {
-        body: {
-          entity: {
-            statuses: [
-              {
-                code: "DELIVERED",
-                name: "Вручен",
-                date_time: "2026-09-28T10:00:00+0000",
-              },
-            ],
-          },
-        },
-      },
+  it("«Не вручён» — заказ отменён сам, остаток держим, пока посылка едет назад", async () => {
+    const calls = mockCdek(notDeliveredRoutes("SENT_TO_TRANSIT_CITY"));
+    const { seller, buyer, product, orderId } = await createCdekOrder({
+      itemStatus: "shipped",
     });
-    const { seller, orderId } = await createCdekOrder({ itemStatus: "shipped" });
-
-    const waybill = await refreshCdekWaybill({ orderId, sellerId: String(seller._id) });
-
-    assert.equal(waybill.returnUuid, "r-1");
-    assert.equal(waybill.returnStatusCode, "DELIVERED");
-    const { order } = await readShipment(orderId);
-    assert.equal(order.items[0].status, "returned");
-  });
-
-  it("посылка ещё едет обратно — заказ не трогаем", async () => {
-    mockCdek({
-      "GET /orders/u-1": {
-        body: {
-          entity: {
-            cdek_number: "100",
-            statuses: [
-              {
-                code: "NOT_DELIVERED",
-                name: "Не вручен",
-                date_time: "2026-09-25T10:00:00+0000",
-              },
-            ],
-            related_entities: [{ type: "return_order", uuid: "r-1" }],
-          },
-        },
-      },
-      "GET /orders/r-1": {
-        body: {
-          entity: {
-            statuses: [
-              {
-                code: "SENT_TO_TRANSIT_CITY",
-                name: "Отправлен в г. транзит",
-                date_time: "2026-09-26T10:00:00+0000",
-              },
-            ],
-          },
-        },
-      },
-    });
-    const { seller, orderId } = await createCdekOrder({ itemStatus: "shipped" });
 
     const waybill = await refreshCdekWaybill({ orderId, sellerId: String(seller._id) });
 
     assert.equal(waybill.returnStatus, "Отправлен в г. транзит");
+    const { order, shipment } = await readShipment(orderId);
+    assert.equal(order.items[0].status, "cancelled");
+    assert.equal(order.items[0].awaitingCarrierReturn, true);
+    assert.ok(order.items[0].carrierNotDeliveredAt);
+    assert.equal(order.status, "cancelled");
+    // По накладной едет возврат — снимать её у СДЭК нельзя.
+    assert.ok(!calls.includes("DELETE /orders/u-1"));
+    assert.equal(shipment.cdekWaybill.cancelledAt ?? null, null);
+    // Товара у продавца ещё нет — второй раз его не продаём.
+    const reserved = await getReservedQuantityByProductIds([String(product._id)]);
+    assert.equal(reserved[String(product._id)], 1);
+    assert.equal(await countNotifications(buyer._id), 1);
+    assert.equal(await countNotifications(seller._id), 1);
+  });
+
+  it("повторный опрос с тем же «Не вручён» ничего не дублирует", async () => {
+    mockCdek(notDeliveredRoutes("SENT_TO_TRANSIT_CITY"));
+    const { seller, buyer, orderId } = await createCdekOrder({ itemStatus: "shipped" });
+
+    await refreshCdekWaybill({ orderId, sellerId: String(seller._id) });
+    await refreshCdekWaybill({ orderId, sellerId: String(seller._id) });
+
+    assert.equal(await countNotifications(buyer._id), 1);
+    assert.equal(await countNotifications(seller._id), 1);
+  });
+
+  it("возврат вручён продавцу — остаток отпускаем, заказ остаётся отменённым", async () => {
+    mockCdek(notDeliveredRoutes("SENT_TO_TRANSIT_CITY"));
+    const { seller, product, orderId } = await createCdekOrder({
+      itemStatus: "shipped",
+    });
+    await refreshCdekWaybill({ orderId, sellerId: String(seller._id) });
+
+    // Опрос по расписанию находит отменённый заказ, который ждёт возврата.
+    mockCdek(notDeliveredRoutes("DELIVERED"));
+    const result = await syncCdekWaybillStatuses();
+
+    assert.equal(result.checked, 1);
+    const { order, shipment } = await readShipment(orderId);
+    assert.equal(shipment.cdekWaybill.returnStatusCode, "DELIVERED");
+    assert.equal(order.items[0].status, "cancelled");
+    assert.equal(order.items[0].awaitingCarrierReturn, false);
+    const reserved = await getReservedQuantityByProductIds([String(product._id)]);
+    assert.equal(reserved[String(product._id)] ?? 0, 0);
+  });
+
+  it("опрос пропустил «Не вручён», а возврат уже у продавца — всё за один проход", async () => {
+    mockCdek(notDeliveredRoutes("DELIVERED"));
+    const { seller, product, orderId } = await createCdekOrder({
+      itemStatus: "shipped",
+    });
+
+    await refreshCdekWaybill({ orderId, sellerId: String(seller._id) });
+
     const { order } = await readShipment(orderId);
-    assert.equal(order.items[0].status, "shipped");
+    assert.equal(order.items[0].status, "cancelled");
+    assert.equal(order.items[0].awaitingCarrierReturn, false);
+    const reserved = await getReservedQuantityByProductIds([String(product._id)]);
+    assert.equal(reserved[String(product._id)] ?? 0, 0);
+  });
+
+  it("предоплата: деньги за «Не вручён» становятся долгом перед покупателем", async () => {
+    mockCdek(notDeliveredRoutes("SENT_TO_TRANSIT_CITY"));
+    const { seller, buyer, orderId } = await createCdekOrder({ itemStatus: "shipped" });
+    await OrderModel.updateOne(
+      { _id: orderId },
+      {
+        $set: {
+          paymentMethod: "cardPrepaid",
+          prepaidPaidAt: new Date(),
+          "shipments.0.sellerDeliveryFeeRub": 300,
+          "shipments.0.platformCommissionPercentAtOrder": 2,
+        },
+      },
+    );
+    await openEscrowForPaidOrder({
+      order: await OrderModel.findById(orderId).lean(),
+    });
+
+    await refreshCdekWaybill({ orderId, sellerId: String(seller._id) });
+
+    const entry = await EscrowLedgerEntryModel.findOne({
+      orderId,
+      sellerId: seller._id,
+    }).lean();
+    const goods = entry.lines.find((line) => line.kind === "goods");
+    const delivery = entry.lines.find((line) => line.kind === "delivery");
+    assert.equal(goods.state, "refundable");
+    assert.equal(goods.refundReason, "item_returned");
+    // Ничего не вручено — доставку тоже возвращаем покупателю.
+    assert.equal(delivery.state, "refundable");
+    const buyerNote = await UserInAppNotificationModel.findOne({
+      userId: buyer._id,
+    }).lean();
+    assert.match(buyerNote.message, /Деньги за заказ вернём/);
+  });
+
+  it("вручённый заказ «Не вручён» не трогает", async () => {
+    mockCdek(notDeliveredRoutes("SENT_TO_TRANSIT_CITY"));
+    const { seller, orderId } = await createCdekOrder({ itemStatus: "delivered" });
+
+    await refreshCdekWaybill({ orderId, sellerId: String(seller._id) });
+
+    const { order } = await readShipment(orderId);
+    assert.equal(order.items[0].status, "delivered");
   });
 });
+
+/**
+ * Основной заказ «Не вручён», возвратный — со статусом `returnCode`.
+ *
+ * @param {string} returnCode
+ */
+function notDeliveredRoutes(returnCode) {
+  return {
+    "GET /orders/u-1": {
+      body: {
+        entity: {
+          cdek_number: "100",
+          statuses: [
+            {
+              code: "NOT_DELIVERED",
+              name: "Не вручен",
+              date_time: "2026-09-25T10:00:00+0000",
+            },
+          ],
+          related_entities: [{ type: "return_order", uuid: "r-1" }],
+        },
+      },
+    },
+    "GET /orders/r-1": {
+      body: {
+        entity: {
+          statuses: [
+            {
+              code: returnCode,
+              name: returnCode === "DELIVERED" ? "Вручен" : "Отправлен в г. транзит",
+              date_time: "2026-09-26T10:00:00+0000",
+            },
+          ],
+        },
+      },
+    },
+  };
+}
+
+/** @param {unknown} userId */
+const countNotifications = (userId) =>
+  UserInAppNotificationModel.countDocuments({ userId });

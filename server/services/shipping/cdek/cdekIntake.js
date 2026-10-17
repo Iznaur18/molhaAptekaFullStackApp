@@ -99,7 +99,8 @@ export async function createCdekIntake({
     },
   };
   await saveWaybill(orderId, sellerId, next);
-  logServerEvent("cdek.intake_created", {
+  logServerEvent("info", {
+    event: "cdek.intake_created",
     orderId: String(orderId),
     uuid: String(uuid),
   });

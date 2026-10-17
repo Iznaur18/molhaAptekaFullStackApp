@@ -1,7 +1,9 @@
 import {
   ORDER_PRE_SHIPMENT_STATUSES,
   ORDER_STATUS_CANCELLED,
+  ORDER_STATUS_IN_DELIVERY,
   ORDER_STATUS_RETURNED,
+  ORDER_STATUS_SHIPPED,
 } from "../../constants/orderConstants.js";
 import {
   INSTALLMENT_CONTRACT_STATUS_CANCELLED,
@@ -9,11 +11,15 @@ import {
 } from "../../constants/installmentConstants.js";
 import { SHIPPING_PROVIDER_CDEK } from "@molha/api-contract";
 
-import { ESCROW_REFUND_REASON_ITEM_CANCELLED } from "../../constants/escrowConstants.js";
+import {
+  ESCROW_REFUND_REASON_ITEM_CANCELLED,
+  ESCROW_REFUND_REASON_ITEM_RETURNED,
+} from "../../constants/escrowConstants.js";
 import { AppError } from "../../errors/AppError.js";
 import { InstallmentContractModel } from "../../models/index.js";
 import { markEscrowLineRefundable } from "../payments/escrowLedger.js";
 import { releaseBuyNFreeRedemptionClaim } from "../product/productBuyNFreeProgress.js";
+import { applySoldQuantityDeltaForItemStatusChange } from "../product/productSoldQuantityDenorm.js";
 import { runInTransaction } from "../../utils/mongoTransaction.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 
@@ -424,4 +430,78 @@ export async function cancelOrderShipment({
   const itemIndexes = resolveCancellableItemIndexes({ order, sellerId });
 
   return cancelOrderItems({ orderId, itemIndexes, requestUserId, userId, reason });
+}
+
+/** Посылка у службы доставки — ровно эти позиции может закрыть «Не вручён». */
+const IN_CARRIER_HANDS = new Set([ORDER_STATUS_SHIPPED, ORDER_STATUS_IN_DELIVERY]);
+
+/**
+ * Служба доставки сообщила «Не вручён»: покупатель посылку не забрал, она
+ * едет обратно. Закрываем позиции продавца сами, от имени площадки.
+ *
+ * Отличия от обычной отмены:
+ * - отменяем то, что уже в пути (обычная отмена — только пока товар у продавца);
+ * - остаток держим занятым (`awaitingCarrierReturn`), пока служба не вручит
+ *   возврат продавцу: товара на руках ещё нет;
+ * - накладную у службы НЕ снимаем — по ней едет возврат.
+ * Деньги — как у возврата: предоплата становится долгом перед покупателем.
+ * Уведомления — на вызывающем.
+ *
+ * @param {{ orderId: string; sellerId: string }} input
+ * @returns {Promise<{ cancelledCount: number; buyerId: string; prepaid: boolean }>}
+ */
+export async function cancelOrderItemsNotDeliveredByCarrier({ orderId, sellerId }) {
+  const order = await loadOrderWithItems(orderId);
+  const buyerId = resolveBuyerId(order);
+  const prepaid = Boolean(order.prepaidPaidAt);
+
+  const cancelledIndexes = await runInTransaction(async (session) => {
+    const txnOrder = await loadOrderWithItems(orderId, session);
+    const now = new Date();
+    const releaseLines = [];
+    const indexes = [];
+
+    for (const [itemIndex, item] of (txnOrder.items ?? []).entries()) {
+      if (resolveOrderItemSellerId(item) !== String(sellerId)) continue;
+      if (!IN_CARRIER_HANDS.has(item.status)) continue;
+
+      const previousStatus = item.status;
+      releaseLines.push({ ...(item.toObject?.() ?? item), productId: item.productId });
+      item.status = ORDER_STATUS_CANCELLED;
+      item.carrierNotDeliveredAt = now;
+      item.awaitingCarrierReturn = true;
+      markOrderLineLoyaltyReserveReleased(item);
+      indexes.push(itemIndex);
+
+      await applySoldQuantityDeltaForItemStatusChange({
+        productId: resolveProductIdFromItem(item.productId),
+        previousStatus,
+        nextStatus: ORDER_STATUS_CANCELLED,
+        quantity: item.quantity,
+        session,
+      });
+    }
+
+    if (indexes.length === 0) return indexes;
+
+    txnOrder.status = buildOrderStatusFromItems(txnOrder.items);
+    if (txnOrder.status === ORDER_STATUS_CANCELLED) {
+      clearBuyerPassportShareOnOrder(txnOrder);
+    }
+    await txnOrder.save({ session });
+    await releaseUnawardedLoyaltyReservesForOrder(releaseLines, session);
+    await releaseBuyNFreeClaims({ releaseLines, buyerId, orderId, session });
+    return indexes;
+  });
+
+  for (const itemIndex of cancelledIndexes) {
+    await markEscrowLineRefundable({
+      orderId,
+      sellerId: String(sellerId),
+      itemIndex,
+      reason: ESCROW_REFUND_REASON_ITEM_RETURNED,
+    });
+  }
+
+  return { cancelledCount: cancelledIndexes.length, buyerId, prepaid };
 }

@@ -106,6 +106,23 @@ const OrderLineItemSchema = new mongoose.Schema(
       ref: "User",
       default: null,
     },
+    /**
+     * Служба доставки сообщила «Не вручён» — позицию отменили сами.
+     * Товар при этом ещё едет обратно продавцу.
+     */
+    carrierNotDeliveredAt: {
+      type: Date,
+      default: null,
+    },
+    /**
+     * Отменённая позиция, посылка которой едет обратно: остаток держим
+     * занятым, пока служба не вручит возврат продавцу, — иначе товар
+     * продался бы второй раз, пока его нет на руках.
+     */
+    awaitingCarrierReturn: {
+      type: Boolean,
+      default: false,
+    },
     deliveredBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
