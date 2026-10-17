@@ -87,7 +87,8 @@ export async function yandexDeliveryRequest(
       signal: AbortSignal.timeout(YANDEX_DELIVERY_HTTP_TIMEOUT_MS),
     });
   } catch (error) {
-    logServerEvent("yandex_delivery.request_network_error", {
+    logServerEvent("warn", {
+      event: "yandex_delivery.request_network_error",
       path,
       error: error instanceof Error ? error.message : String(error),
     });
@@ -105,7 +106,8 @@ export async function yandexDeliveryRequest(
 
   if (!response.ok) {
     const detail = await readErrorText(response);
-    logServerEvent("yandex_delivery.request_failed", {
+    logServerEvent("warn", {
+      event: "yandex_delivery.request_failed",
       api,
       path,
       status: response.status,
@@ -139,7 +141,8 @@ export async function yandexDeliveryRequestFile(credentials, { path, body }) {
       signal: AbortSignal.timeout(YANDEX_DELIVERY_HTTP_TIMEOUT_MS),
     });
   } catch (error) {
-    logServerEvent("yandex_delivery.file_network_error", {
+    logServerEvent("warn", {
+      event: "yandex_delivery.file_network_error",
       path,
       error: error instanceof Error ? error.message : String(error),
     });
@@ -150,7 +153,8 @@ export async function yandexDeliveryRequestFile(credentials, { path, body }) {
   }
   if (!response.ok) {
     const detail = await readErrorText(response);
-    logServerEvent("yandex_delivery.file_failed", {
+    logServerEvent("warn", {
+      event: "yandex_delivery.file_failed",
       path,
       status: response.status,
       detail,

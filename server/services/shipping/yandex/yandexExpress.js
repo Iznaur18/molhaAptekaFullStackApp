@@ -159,7 +159,8 @@ export async function setSellerYandexExpress({ sellerId, enabled, phone }) {
     },
     { new: true, projection: EXPRESS_USER_FIELDS },
   ).lean();
-  logServerEvent("yandex_express.settings_saved", {
+  logServerEvent("info", {
+    event: "yandex_express.settings_saved",
     sellerId: String(sellerId),
     enabled: enabled === true,
   });
@@ -587,7 +588,8 @@ export async function createYandexExpressClaim({ orderId, sellerId, sleepFn = sl
       ? { claimId: current.claimId, status: current.status }
       : null,
   });
-  logServerEvent("yandex_express.claim_created", {
+  logServerEvent("info", {
+    event: "yandex_express.claim_created",
     orderId: String(orderId),
     claimId: String(created.id),
   });
@@ -723,7 +725,8 @@ export async function cancelYandexExpressClaim({ orderId, sellerId }) {
       ...current,
       cancelError: message.slice(0, 300),
     });
-    logServerEvent("yandex_express.claim_cancel_failed", {
+    logServerEvent("warn", {
+      event: "yandex_express.claim_cancel_failed",
       orderId: String(orderId),
       error: message,
     });
@@ -765,7 +768,8 @@ export async function syncYandexExpressClaims({ limit = SYNC_BATCH_LIMIT } = {})
         });
       } catch (error) {
         failed += 1;
-        logServerEvent("yandex_express.claim_sync_failed", {
+        logServerEvent("warn", {
+          event: "yandex_express.claim_sync_failed",
           orderId: String(order._id),
           error: error instanceof Error ? error.message : String(error),
         });
