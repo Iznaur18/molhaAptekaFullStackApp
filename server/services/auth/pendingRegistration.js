@@ -110,11 +110,18 @@ export async function createPendingRegistration(fields) {
     .toUpperCase();
   const referralCode = referralCodeRaw || null;
 
+  // Пустой номер — убрать поле, а не писать null: иначе две заявки без
+  // телефона столкнутся на уникальном индексе номера.
+  const { userPhoneNumber: rawPhone, ...restFields } = fields;
+  const userPhoneNumber =
+    typeof rawPhone === "string" && rawPhone.trim() ? rawPhone.trim() : null;
+
   const pending = await PendingRegistrationModel.findOneAndUpdate(
     { email },
     {
       $set: {
-        ...fields,
+        ...restFields,
+        ...(userPhoneNumber ? { userPhoneNumber } : {}),
         channel: "email",
         email,
         referralCode,
@@ -122,6 +129,7 @@ export async function createPendingRegistration(fields) {
         codeAttemptCount: 0,
         expiresAt,
       },
+      ...(userPhoneNumber ? {} : { $unset: { userPhoneNumber: "" } }),
     },
     { upsert: true, new: true, setDefaultsOnInsert: true },
   );
@@ -182,7 +190,6 @@ export async function createPendingPhoneRegistration(fields) {
         ...fields,
         channel: "phone",
         userPhoneNumber,
-        email: undefined,
         referralCode,
         codeHash,
         codeAttemptCount: 0,

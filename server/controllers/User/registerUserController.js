@@ -8,7 +8,14 @@ import {
   createPendingRegistration,
   resendPendingRegistrationCode,
 } from "../../services/auth/pendingRegistration.js";
-import { EMAIL_VERIFICATION_SENT_MESSAGE } from "../../constants/emailVerificationConstants.js";
+import {
+  EMAIL_VERIFICATION_SENT_MESSAGE,
+  PENDING_REGISTRATION_TAKEN_MESSAGE,
+} from "../../constants/emailVerificationConstants.js";
+import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
+
+const REGISTRATION_START_FAILED_MESSAGE =
+  "Не удалось начать регистрацию. Попробуйте ещё раз через минуту";
 import { PHONE_VERIFICATION_SENT_MESSAGE } from "../../constants/phoneVerificationConstants.js";
 import { DEFAULT_AVATAR_URL } from "../../constants/constants.js";
 import {
@@ -91,7 +98,17 @@ export const registerUserController = async (req, res) => {
     if (message === "EMAIL_DELIVERY_UNAVAILABLE") {
       return errorRes(res, 503, "Не удалось отправить письмо. Попробуйте позже");
     }
-    return errorRes(res, 400, message);
+    if (message === PENDING_REGISTRATION_TAKEN_MESSAGE) {
+      return errorRes(res, 400, message);
+    }
+    // Всё остальное — сбой сервера (база и т. п.): сырой текст ошибки
+    // пользователю не показываем (17.10.2026 на экран попал E11000 Mongo).
+    logServerEvent("error", {
+      event: "auth.register_start_failed",
+      requestId: req.requestId,
+      ...formatLogError(registrationError),
+    });
+    return errorRes(res, 500, REGISTRATION_START_FAILED_MESSAGE);
   }
 
   return successRes(res, {
