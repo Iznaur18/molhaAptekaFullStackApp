@@ -1,6 +1,6 @@
 import { resolveOrderShippingTrackingUrl } from "@molha/api-contract";
 import { useState } from "react";
-import { Bike, Phone } from "lucide-react";
+import { Bike, Phone, Store, Truck } from "lucide-react";
 
 import {
   ORDER_STATUS_DELIVERED,
@@ -940,12 +940,25 @@ export function OrderCard({
           какую часть он забирает сам, а какую ему везут. Кнопка — только
           продавцу, и только пока есть куда двигать. */}
       <div className="order-card__shipment-row">
-        <span className="order-card__shipment-label">
-          {ORDER_CARD_UI.SHIPMENT_HEADING}:{" "}
-          {shipmentFulfillment === "delivery"
-            ? ORDER_CARD_UI.SHIPMENT_DELIVERY
-            : ORDER_CARD_UI.SHIPMENT_PICKUP}
-        </span>
+        <div className="order-card__shipment-method">
+          <span className="order-card__shipment-icon" aria-hidden="true">
+            {shipmentFulfillment === "delivery" ? (
+              <Truck size={18} strokeWidth={2} />
+            ) : (
+              <Store size={18} strokeWidth={2} />
+            )}
+          </span>
+          <span className="order-card__shipment-method-copy">
+            <span className="order-card__shipment-method-caption">
+              {ORDER_CARD_UI.SHIPMENT_HEADING}
+            </span>
+            <span className="order-card__shipment-method-value">
+              {shipmentFulfillment === "delivery"
+                ? ORDER_CARD_UI.SHIPMENT_DELIVERY
+                : ORDER_CARD_UI.SHIPMENT_PICKUP}
+            </span>
+          </span>
+        </div>
         <div className="order-card__shipment-actions">
           {canCancelOrder ? (
             <ConfirmButton
@@ -1192,10 +1205,17 @@ export function OrderCard({
 
       {canRaiseFee ? (
         <div className="order-card__fee">
-          <span>{ORDER_CARD_UI.SHIPMENT_FEE(formatPriceRub(deliveryFeeRub))}</span>
+          <div className="order-card__fee-copy">
+            <span className="order-card__fee-label">
+              {ORDER_CARD_UI.SHIPMENT_FEE_LABEL}
+            </span>
+            <span className="order-card__fee-value">
+              {formatPriceRub(deliveryFeeRub)}
+            </span>
+          </div>
           <button
             type="button"
-            className="order-card__item-action-button"
+            className="order-card__fee-raise"
             onClick={() =>
               onRaiseDeliveryFee({
                 orderId: order._id,

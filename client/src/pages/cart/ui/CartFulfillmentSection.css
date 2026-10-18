@@ -190,8 +190,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2.75rem;
+  height: 2.75rem;
   margin: 0;
   padding: 0;
   border: none;
@@ -199,8 +199,8 @@
   background: var(--iz-color-surface, var(--iz-color-bg));
   color: var(--iz-color-text);
   font: inherit;
-  font-size: 1.15rem;
-  font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 700;
   line-height: 1;
   box-shadow: 0 1px 2px color-mix(in srgb, var(--iz-color-ink) 8%, transparent);
   cursor: pointer;
@@ -234,8 +234,14 @@
     gap: 12px;
   }
 
+  /* На телефоне степпер во всю ширину: −/+ по краям, сумма ровно по центру. */
   .cart-fulfillment__fee-controls {
-    align-self: flex-end;
+    align-self: stretch;
+    justify-content: space-between;
+  }
+
+  .cart-fulfillment__fee-value {
+    flex: 1 1 auto;
   }
 }
 
