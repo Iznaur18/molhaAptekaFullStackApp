@@ -774,6 +774,8 @@ export const PRODUCT_REVIEW_UI = {
   LOADING: "Загрузка отзывов…",
   EMPTY: "Отзывов пока нет",
   NO_REVIEWS: "Отзывов пока нет",
+  /** Следующая страница отзывов — паритет web. */
+  LOAD_MORE: "Показать ещё",
   RATING_LINE: "★ {rating} · {count}",
   FETCH_FALLBACK: "Не удалось загрузить отзывы",
   SUMMARY_LINE: (rating: number, count: number) =>
@@ -1091,6 +1093,7 @@ export const INSTALLMENT_UI = {
   PASSPORT_SHARE_SELFIE_LOAD_ERROR: "Не удалось загрузить фото",
   MODERATION_PENDING: "Программа на модерации",
   MODERATION_REJECTED: "Программа отклонена",
+  MODERATION_APPROVED: "Рассрочка активна",
   SELLER_TAB_HINT: "Настройте планы в «Изменить товар» → «Продать в рассрочку».",
   SELLER_PROFILE_ARIA: (sellerName: string) => `Профиль продавца: ${sellerName}`,
   CONTRACT_PRODUCT: "Товар",

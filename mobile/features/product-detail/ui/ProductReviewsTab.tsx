@@ -2,9 +2,11 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { FlatList, Pressable, Text, TextInput, View } from "react-native";
 
+import { PRODUCT_REVIEW_TEXT_MAX_LENGTH } from "@molha/api-contract";
+
 import {
   useProductReviewSummaryQuery,
-  useProductReviewsPageQuery,
+  useProductReviewsInfiniteQuery,
 } from "@/entities/product-review/model/useProductReviewsQuery";
 import { useSubmitProductReviewMutation } from "@/entities/product-review/model/useSubmitProductReviewMutation";
 import { ProductReviewListItem } from "@/entities/product-review/ui/ProductReviewListItem";
@@ -36,17 +38,23 @@ export const ProductReviewsTab = ({
   const theme = useAppTheme();
   const styles = useProductDetailTabStyles();
   const summaryQuery = useProductReviewSummaryQuery(productId);
-  const reviewsQuery = useProductReviewsPageQuery(productId);
+  const reviewsQuery = useProductReviewsInfiniteQuery(productId);
   const submitMutation = useSubmitProductReviewMutation(productId);
   const [rating, setRating] = useState(0);
   const [text, setText] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
+  // Не подгрузилась «ещё» страница — уже показанные отзывы не прячем,
+  // ошибку пишем под списком.
+  const loadMoreError = reviewsQuery.isFetchNextPageError
+    ? formatApiErrorMessage(reviewsQuery.error, PRODUCT_REVIEW_UI.FETCH_FALLBACK)
+    : "";
+
   if (summaryQuery.isPending || reviewsQuery.isPending) {
     return <ScreenLoadingState message={PRODUCT_REVIEW_UI.LOADING} />;
   }
 
-  if (summaryQuery.isError || reviewsQuery.isError) {
+  if (summaryQuery.isError || (reviewsQuery.isError && !reviewsQuery.data)) {
     return (
       <ScreenErrorState
         message={formatApiErrorMessage(
@@ -62,7 +70,7 @@ export const ProductReviewsTab = ({
   }
 
   const summary = summaryQuery.data;
-  const allReviews = reviewsQuery.data?.reviews ?? [];
+  const allReviews = reviewsQuery.data?.pages.flatMap((page) => page.reviews) ?? [];
   const myReview = summary.myReview ?? null;
   const otherReviews = myReview
     ? allReviews.filter((r) => r._id !== myReview._id)
@@ -123,6 +131,8 @@ export const ProductReviewsTab = ({
           placeholder={PRODUCT_REVIEW_UI.TEXT_PLACEHOLDER}
           placeholderTextColor={theme.colors.textMuted}
           multiline
+          // Как на сайте: длиннее сервер не примет.
+          maxLength={PRODUCT_REVIEW_TEXT_MAX_LENGTH}
           {...textInputFocusScrollProps}
         />
         {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
@@ -163,6 +173,22 @@ export const ProductReviewsTab = ({
           renderItem={({ item }) => <ProductReviewListItem review={item} />}
         />
       ) : null}
+
+      {reviewsQuery.hasNextPage ? (
+        <AppButton
+          label={
+            reviewsQuery.isFetchingNextPage
+              ? PRODUCT_REVIEW_UI.LOADING
+              : PRODUCT_REVIEW_UI.LOAD_MORE
+          }
+          variant="secondary"
+          disabled={reviewsQuery.isFetchingNextPage}
+          onPress={() => {
+            void reviewsQuery.fetchNextPage();
+          }}
+        />
+      ) : null}
+      {loadMoreError ? <Text style={styles.error}>{loadMoreError}</Text> : null}
     </View>
   );
 };
