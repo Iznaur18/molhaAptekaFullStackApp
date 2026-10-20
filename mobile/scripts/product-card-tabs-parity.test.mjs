@@ -42,3 +42,31 @@ test("рассрочка: продавец видит статус своей п
     new RegExp(`MODERATION_APPROVED: "${approved}"`),
   );
 });
+
+test("аукцион своего товара: ставки с «Принять»/«Отклонить» и архив, как на сайте", () => {
+  const tab = read("features/product-detail/ui/ProductAuctionTab.tsx");
+  // Продавец видит свою секцию до заглушки «аукцион не проводился».
+  assert.ok(
+    tab.indexOf("<ProductAuctionSellerSection") < tab.indexOf("if (!auctionActive)"),
+  );
+  assert.match(tab, /showArchive=\{completedOnce && !auctionActive\}/);
+
+  const section = read("features/product-detail/ui/ProductAuctionSellerSection.tsx");
+  assert.match(section, /acceptMutation\.mutateAsync\(offerId\)/);
+  assert.match(section, /rejectMutation\.mutateAsync\(offerId\)/);
+  assert.match(section, /PRODUCT_PRICE_OFFER_UI\.ARCHIVE_SECTION_TITLE/);
+  // Без подтверждения — как на сайте.
+  assert.doesNotMatch(section, /confirmDestructiveAction|Alert\.alert/);
+
+  const api = read("entities/product-price-offer/api/sellerProductPriceOffersApi.ts");
+  assert.match(api, /\/price-offers\/archive/);
+  assert.match(api, /data\.data\.offers/);
+
+  const web = read("../client/src/shared/config/copy/product-detail.js");
+  const mobile = read("shared/config/appUiCopy.ts");
+  for (const key of ["ARCHIVE_SECTION_TITLE", "SELLER_EMPTY"]) {
+    const value = new RegExp(`${key}: "([^"]+)"`).exec(web)?.[1];
+    assert.ok(value, key);
+    assert.match(mobile, new RegExp(`${key}: "${value}"`));
+  }
+});

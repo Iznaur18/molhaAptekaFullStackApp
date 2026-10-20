@@ -89,6 +89,10 @@ export const priceOfferQueryKeys = {
   my: (productId: string) => [...priceOfferQueryKeys.all, "me", productId] as const,
   incoming: () => [...priceOfferQueryKeys.all, "incoming"] as const,
   myBids: () => [...priceOfferQueryKeys.all, "my-bids"] as const,
+  seller: (productId: string) =>
+    [...priceOfferQueryKeys.all, "seller", productId] as const,
+  sellerArchive: (productId: string) =>
+    [...priceOfferQueryKeys.all, "seller-archive", productId] as const,
 };
 
 export const curatedProductListQueryKeys = {

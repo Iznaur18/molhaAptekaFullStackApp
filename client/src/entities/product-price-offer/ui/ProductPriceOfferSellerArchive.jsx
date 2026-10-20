@@ -1,3 +1,4 @@
+import { resolvePriceOfferStatusLabel } from "../lib/resolvePriceOfferStatusLabel.js";
 import { useSellerPriceOfferArchiveQuery } from "../model/useSellerPriceOfferArchiveQuery.js";
 import { UserPremiumDisplayName } from "../../user/ui/UserPremiumDisplayName.jsx";
 import { formatIsoDateTime } from "../../../shared/lib/formatIsoDateTime.js";
@@ -96,7 +97,8 @@ export function ProductPriceOfferSellerArchive({ productId, onOpenBuyer }) {
                 </span>
               </div>
               <p className="product-price-offer__seller-meta">
-                {formatIsoDateTime(row.updatedAt ?? row.createdAt)} · {row.status}
+                {formatIsoDateTime(row.updatedAt ?? row.createdAt)} ·{" "}
+                {resolvePriceOfferStatusLabel(row.status)}
               </p>
             </li>
           );

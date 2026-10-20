@@ -5,6 +5,7 @@ import { Text, TextInput, View } from "react-native";
 import { useMyPriceOfferQuery } from "@/entities/product-price-offer/model/useMyPriceOfferQuery";
 import { usePriceOfferMutations } from "@/entities/product-price-offer/model/usePriceOfferMutations";
 import { useTopPriceOffersQuery } from "@/entities/product-price-offer/model/useTopPriceOffersQuery";
+import { ProductAuctionSellerSection } from "@/features/product-detail/ui/ProductAuctionSellerSection";
 import { ProductPriceOfferTopList } from "@/features/product-detail/ui/ProductPriceOfferTopList";
 import { API_CLIENT_UI, PRODUCT_PRICE_OFFER_UI, PRODUCT_UI } from "@/shared/config";
 import { BlockedPurchaseButton } from "@/shared/ui/BlockedPurchaseButton";
@@ -192,6 +193,15 @@ export const ProductAuctionTab = ({
     },
     [onDockFooterChange],
   );
+
+  if (isOwnProduct) {
+    return (
+      <ProductAuctionSellerSection
+        productId={productId}
+        showArchive={completedOnce && !auctionActive}
+      />
+    );
+  }
 
   if (!auctionActive) {
     return (

@@ -84,6 +84,7 @@ export const API_CLIENT_UI = {
   SUBMIT_PRICE_OFFER_FALLBACK: "Не удалось отправить предложение цены",
   FETCH_PRICE_OFFER_FALLBACK: "Не удалось загрузить предложение цены",
   FETCH_INCOMING_PRICE_OFFERS_FALLBACK: "Не удалось загрузить входящие ставки",
+  FETCH_SELLER_PRICE_OFFERS_FALLBACK: "Не удалось загрузить аукцион",
   FETCH_MY_PRICE_OFFER_BIDS_FALLBACK: "Не удалось загрузить ваши ставки",
   ACCEPT_PRICE_OFFER_FALLBACK: "Не удалось принять ставку",
   REJECT_PRICE_OFFER_FALLBACK: "Не удалось отклонить ставку",
@@ -862,6 +863,11 @@ export const PRODUCT_PRICE_OFFER_UI = {
   ACTION_PENDING: "Сохраняем…",
   ACCEPTED_BADGE: "Ожидает оплаты",
   GO_TO_CART: "Перейти в корзину",
+  /** Вкладка «Аукцион» своего товара — паритет web `ProductPriceOfferSellerTab`. */
+  SELLER_EMPTY: "Предложений пока нет",
+  SELLER_LOADING: "Загрузка…",
+  ARCHIVE_SECTION_TITLE: "История ставок",
+  ARCHIVE_EMPTY: "Архив пуст",
 } as const;
 
 export const AUCTION_PAGE_UI = {
