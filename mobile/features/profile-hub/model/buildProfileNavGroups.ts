@@ -158,6 +158,15 @@ export const buildProfileNavGroups = (
           },
         ];
       }
+      if (sectionId === "deal-requests") {
+        return [
+          {
+            sectionId,
+            label: MY_PROFILE_PAGE_UI.TAB_DEAL_REQUESTS,
+            disabled: !access.isProfileReady,
+          },
+        ];
+      }
       if (sectionId === "auction" && access.canUseAuction) {
         return [
           {

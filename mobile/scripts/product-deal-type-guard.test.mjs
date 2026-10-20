@@ -39,19 +39,27 @@ test("осмотр и услуга: без «В корзину», «Нет в н
   assert.match(screen, /const showSellerClosedPurchaseButton =\s*viaCart &&/);
 });
 
-test("вместо «В корзину» — плашка «только на сайте» и копирование ссылки", () => {
-  const notice = read("features/product-detail/ui/ProductDealOnWebNotice.tsx");
+test("вместо «В корзину» — заявка и телефон, как на сайте", () => {
+  const actions = read("entities/deal-request/ui/ProductDealActions.tsx");
   // Не для своего объявления и не для обычного товара.
-  assert.match(notice, /if \(isOwnProduct \|\| isCartDealType\(dealType\)/);
-  // Ссылку копируем, а не открываем: приложение перехватывает gitorg.ru/product.
-  assert.match(notice, /Clipboard\.setStringAsync\(url\)/);
-  assert.doesNotMatch(notice, /Linking\.openURL/);
-  // Ошибка копирования видна пользователю, а не глотается.
-  assert.match(notice, /DEAL_ON_WEB_COPY_FAILED/);
+  assert.ok(
+    actions.includes("if (isCartDealType(dealType) || isOwnProduct || !productId)"),
+  );
+  assert.ok(actions.includes("isSellerPhoneOpenBeforeRequest(dealType)"));
+  assert.match(actions, /<DealRequestSheet/);
+
+  const screen = read("app/product/[id].tsx");
+  // В узкой раскладке — в нижней панели на месте «В корзину».
+  assert.match(screen, /const showMobileDealDock =/);
+  assert.match(
+    screen,
+    /<ProductDealActions\s+product=\{productRecord\}[^>]*variant="dock"/,
+  );
 
   const tab = read("features/product-detail/ui/ProductDetailsDetailsTab.tsx");
-  // В обеих раскладках вкладки — под ценой.
-  assert.equal((tab.match(/<ProductDealOnWebNotice/g) ?? []).length, 2);
+  // В широкой — под ценой; плашки «только на сайте» больше нет.
+  assert.match(tab, /showInlinePurchaseActions \? \(\s*<ProductDealActions/);
+  assert.doesNotMatch(tab, /ProductDealOnWebNotice/);
 });
 
 test("панель адреса: место встречи у осмотра и услуги, свои подписи ЛОБО и курьеров", () => {

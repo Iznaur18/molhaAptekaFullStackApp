@@ -95,6 +95,11 @@ export const priceOfferQueryKeys = {
     [...priceOfferQueryKeys.all, "seller-archive", productId] as const,
 };
 
+export const dealRequestQueryKeys = {
+  all: ["deal-request"] as const,
+  mine: (role: string) => [...dealRequestQueryKeys.all, "me", role] as const,
+};
+
 export const curatedProductListQueryKeys = {
   all: ["curated-product-lists"] as const,
   home: (regionCode = "") =>

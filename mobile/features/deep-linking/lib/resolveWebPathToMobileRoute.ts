@@ -47,6 +47,8 @@ const STATIC_PATH_ROUTES: Record<string, string> = {
   "/my-orders": "/hub/my-orders",
   "/orders": "/orders",
   "/auction": "/hub/auction",
+  // Web `HOME_MAIN_VIEW_PATH["deal-requests"]`: `/deal-requests` занят API в nginx.
+  "/profile/deal-requests": "/hub/deal-requests",
   "/installment-payments": "/hub/installment-payments",
   "/installment-sales": "/hub/installment-sales",
 

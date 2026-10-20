@@ -9,6 +9,7 @@ import {
   type ProductBadgeExplainRequest,
 } from "@/entities/product-badge-explain/lib/resolveProductBadgeExplainSheet";
 import { useProductBadgeExplainsQuery } from "@/entities/product-badge-explain/model/useProductBadgeExplainsQuery";
+import { ProductDealActions } from "@/entities/deal-request/ui/ProductDealActions";
 import { ProductBadgeExplainSheet } from "@/entities/product-badge-explain/ui/ProductBadgeExplainSheet";
 import {
   getProductFieldReadLayout,
@@ -36,7 +37,6 @@ import { ProductPromoCodeActivateSheet } from "@/features/product-detail/ui/Prod
 import { ProductDetailsSaleTeaser } from "@/features/product-detail/ui/ProductDetailsSaleTeaser";
 import { ProductDetailsWholesaleOffer } from "@/features/product-detail/ui/ProductDetailsWholesaleOffer";
 import { ProductDetailsBuyNFreeOffer } from "@/features/product-detail/ui/ProductDetailsBuyNFreeOffer";
-import { ProductDealOnWebNotice } from "@/features/product-detail/ui/ProductDealOnWebNotice";
 import { ProductDetailPurchaseActions } from "@/features/product-detail/ui/ProductDetailPurchaseActions";
 import { ProductPickupDetailsPanel } from "@/features/product-detail/ui/ProductPickupDetailsPanel";
 import { catalogQueryKeys } from "@/shared/api";
@@ -277,7 +277,11 @@ export const ProductDetailsDetailsTab = ({
         onLoyaltyBadgePress={openBadgeExplain}
       />
       <ProductFlashSaleCountdown product={product} onExpired={handleFlashSaleExpired} />
-      <ProductDealOnWebNotice product={product} isOwnProduct={isOwnProduct} />
+      {/* Объявление без корзины: вместо «В корзину» — заявка и телефон. В узкой
+          раскладке кнопки в нижней панели, как «В корзину». */}
+      {showInlinePurchaseActions ? (
+        <ProductDealActions product={product} isOwnProduct={isOwnProduct} />
+      ) : null}
       {showInlinePurchaseActions ? (
         <ProductDetailPurchaseActions
           productId={productId}
@@ -543,7 +547,6 @@ export const ProductDetailsDetailsTab = ({
             product={product}
             onExpired={handleFlashSaleExpired}
           />
-          <ProductDealOnWebNotice product={product} isOwnProduct={isOwnProduct} />
           <ProductDetailsWholesaleOffer
             product={product}
             canShowAddToCart={canShowAddToCart}

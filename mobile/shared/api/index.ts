@@ -46,6 +46,7 @@ export {
   curatedProductListQueryKeys,
   dataConfirmationQueryKeys,
   dataConfirmationStaffQueryKeys,
+  dealRequestQueryKeys,
   installmentQueryKeys,
   introAdQueryKeys,
   loyaltyPointsQueryKeys,

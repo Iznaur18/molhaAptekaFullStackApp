@@ -12,6 +12,7 @@ export { default as KeyRound } from "lucide-react-native/icons/key-round";
 export { default as MapPin } from "lucide-react-native/icons/map-pin";
 export { default as MessageCircle } from "lucide-react-native/icons/message-circle";
 export { default as MonitorSmartphone } from "lucide-react-native/icons/monitor-smartphone";
+export { default as Phone } from "lucide-react-native/icons/phone";
 export { default as Truck } from "lucide-react-native/icons/truck";
 export { default as Share2 } from "lucide-react-native/icons/share-2";
 export { default as Tag } from "lucide-react-native/icons/tag";

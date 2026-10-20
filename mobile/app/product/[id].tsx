@@ -41,6 +41,7 @@ import { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyalt
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
+import { ProductDealActions } from "@/entities/deal-request/ui/ProductDealActions";
 import { ProductDetailPurchaseActions } from "@/features/product-detail/ui/ProductDetailPurchaseActions";
 import { ProductDetailMediaSection } from "@/features/product-detail/ui/ProductDetailMediaSection";
 import { ProductDetailTabBar } from "@/features/product-detail/ui/ProductDetailTabBar";
@@ -362,9 +363,17 @@ export default function ProductDetailScreen() {
       showSellerClosedPurchaseButton ||
       auctionUi.auctionActive ||
       installmentActive);
+  // Авто, недвижимость, услуги: в панели вместо «В корзину» — заявка и телефон
+  // (паритет web `showMobileDealDock`).
+  const showMobileDealDock =
+    !pageLayout.isPageSplit &&
+    activeTab === "details" &&
+    !showMobilePurchaseDock &&
+    !viaCart &&
+    !isOwnProduct;
   const scrollPaddingBottom = pageLayout.resolveScrollPaddingBottom(
     insets.bottom,
-    showMobilePurchaseDock,
+    showMobilePurchaseDock || showMobileDealDock,
   );
   const showInstallmentDock =
     !pageLayout.isPageSplit && activeTab === "installment" && installmentDock != null;
@@ -821,6 +830,7 @@ export default function ProductDetailScreen() {
               styles.container,
               pageLayout.isPageSplit && styles.containerSplit,
               !showMobilePurchaseDock &&
+                !showMobileDealDock &&
                 !showInstallmentDock &&
                 !showAuctionDock &&
                 styles.containerNoDock,
@@ -974,6 +984,23 @@ export default function ProductDetailScreen() {
               blockedPurchaseLabel={blockedLabel}
               showSellerClosedPurchaseButton={showSellerClosedPurchaseButton}
               sellerClosedPurchaseLabel={sellerClosedLabel}
+              variant="dock"
+            />
+          </SquircleView>
+        ) : null}
+
+        {showMobileDealDock && keyboardBottomInset === 0 ? (
+          <SquircleView
+            radius={PRODUCT_DETAIL_PURCHASE_DOCK_TOP_RADIUS}
+            outerStyle={styles.purchaseDock}
+            style={[
+              styles.purchaseDockInner,
+              { paddingBottom: Math.max(insets.bottom, 10.4) },
+            ]}
+          >
+            <ProductDealActions
+              product={productRecord}
+              isOwnProduct={false}
               variant="dock"
             />
           </SquircleView>

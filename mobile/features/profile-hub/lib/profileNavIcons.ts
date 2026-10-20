@@ -10,6 +10,7 @@ const PROFILE_NAV_ICON_MAP: Partial<
   "my-products": "inventory-2",
   "my-sales": "store",
   "my-orders": "shopping-bag",
+  "deal-requests": "event-available",
   auction: "gavel",
   "installment-payments": "credit-card",
   "installment-sales": "account-balance-wallet",

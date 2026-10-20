@@ -64,6 +64,7 @@ const PROFILE_NAV_SECTION_TONE_MAP = {
   "my-products": "blue",
   "my-sales": "green",
   "my-orders": "blue",
+  "deal-requests": "green",
   auction: "amber",
   "installment-payments": "green",
   "installment-sales": "slate",
