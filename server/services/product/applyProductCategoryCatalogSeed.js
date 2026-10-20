@@ -231,3 +231,110 @@ export const applyProductCategoryCatalogSeed = async ({
 
   return summary;
 };
+
+/**
+ * Дописывает в базу узлы сида, которых там ещё нет, и больше ничего не
+ * трогает: существующие узлы (в том числе переименованные или добавленные в
+ * админке) остаются как есть, лишние не удаляются. Для пополнения дерева
+ * после того, как `applyProductCategoryCatalogSeed` уже накатан на прод.
+ *
+ * Новый узел встаёт под родителя, найденного по слагу в базе. Родитель-лист
+ * не превращается в ветку — с него пришлось бы снимать товары, это делает
+ * только полный `applyProductCategoryCatalogSeed`.
+ *
+ * `dryRun` ничего не пишет и возвращает те же счётчики.
+ *
+ * @param {{ seed?: typeof PRODUCT_CATEGORY_CATALOG_SEED; dryRun?: boolean }} [options]
+ */
+export const addMissingProductCategorySeedNodes = async ({
+  seed = PRODUCT_CATEGORY_CATALOG_SEED,
+  dryRun = false,
+} = {}) => {
+  await assertSeedSlugsDoNotCollide(seed);
+
+  const summary = {
+    skippedRoots: /** @type {string[]} */ ([]),
+    insertedCategories: 0,
+    insertedSlugs: /** @type {string[]} */ ([]),
+  };
+
+  for (const { rootSlug, nodes } of seed) {
+    const root = await ProductCategoryModel.findOne({
+      slug: rootSlug,
+      parentId: null,
+    }).lean();
+
+    if (!root) {
+      summary.skippedRoots.push(rootSlug);
+      continue;
+    }
+
+    const existing = await ProductCategoryModel.find({
+      slug: { $in: nodes.map((node) => node.slug) },
+    })
+      .select("slug depth pathSlugs pathIds pathLabelRu isLeaf")
+      .lean();
+    /** Узлы, под которые можно вешать детей: из базы и только что вставленные. */
+    const known = new Map([
+      [root.slug, { ...root, pathIds: [] }],
+      ...existing.map((doc) => /** @type {const} */ ([doc.slug, doc])),
+    ]);
+    const parentSlugs = new Set(nodes.map((node) => node.parentSlug ?? root.slug));
+    const siblingCounts = new Map();
+
+    for (const node of nodes) {
+      const parentSlug = node.parentSlug ?? root.slug;
+      const siblingIndex = (siblingCounts.get(parentSlug) ?? 0) + 1;
+      siblingCounts.set(parentSlug, siblingIndex);
+
+      if (known.has(node.slug)) continue;
+
+      const parent = known.get(parentSlug);
+      if (!parent) {
+        throw new Error(
+          `addMissingProductCategorySeedNodes: родитель "${parentSlug}" не найден для "${node.slug}"`,
+        );
+      }
+      if (parent.isLeaf === true) {
+        throw new Error(
+          `addMissingProductCategorySeedNodes: "${parentSlug}" — лист, под него нельзя добавить "${node.slug}" (дерево 20261006-catalog-category-tree не накатано?)`,
+        );
+      }
+
+      const depth = parent.depth + 1;
+      if (depth > PRODUCT_CATEGORY_TREE_MAX_DEPTH) {
+        throw new Error(
+          `addMissingProductCategorySeedNodes: превышена глубина дерева на "${node.slug}"`,
+        );
+      }
+
+      const doc = {
+        slug: node.slug,
+        labelRu: node.labelRu,
+        parentId: parent._id,
+        depth,
+        pathSlugs: [...parent.pathSlugs, node.slug],
+        pathIds: [...parent.pathIds, parent._id],
+        pathLabelRu: [...parent.pathLabelRu, node.labelRu],
+        searchKeywords: normalizeProductCategorySearchKeywords(
+          node.searchKeywords ?? [],
+        ),
+        isLeaf: !parentSlugs.has(node.slug),
+        sortOrder: siblingIndex * SIBLING_SORT_ORDER_STEP,
+      };
+
+      summary.insertedCategories += 1;
+      summary.insertedSlugs.push(node.slug);
+
+      if (dryRun) {
+        known.set(node.slug, { ...doc, _id: null });
+        continue;
+      }
+
+      const created = await ProductCategoryModel.create(doc);
+      known.set(node.slug, { ...doc, _id: created._id });
+    }
+  }
+
+  return summary;
+};
