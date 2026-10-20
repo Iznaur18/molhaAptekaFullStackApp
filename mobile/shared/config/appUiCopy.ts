@@ -444,9 +444,13 @@ export const PRODUCT_DETAILS_MODAL_UI = {
   RETURNS_PLACEHOLDER: "Сведения о возврате появятся позже.",
   RETURNS_NONE: "Возврат не предусмотрен.",
   DELIVERY_TITLE: "Получение",
-  DELIVERY_SECTION_ARIA: "Доставка",
+  DELIVERY_SECTION_ARIA: "Самовывоз и доставка",
   // У объявлений без корзины вкладка «Получение» говорит о месте встречи.
   DEAL_TAB_TITLE: { viewing: "Осмотр", service: "Адрес" } as Record<string, string>,
+  DEAL_SECTION_ARIA: {
+    viewing: "Место осмотра",
+    service: "Адрес исполнителя",
+  } as Record<string, string>,
   /**
    * Заявок в приложении пока нет: вместо «В корзину» — честная плашка.
    * Ссылкой не открываем — приложение само перехватывает gitorg.ru/product.
@@ -1328,6 +1332,25 @@ export const PRODUCT_PICKUP_UI = {
   DETAILS_NO_ADDRESS: "Адрес самовывоза не указан",
   DETAILS_LOCATION_DEFAULT: "По умолчанию",
   DETAILS_DELIVERY_HINT: "Адрес укажете при оформлении заказа",
+  /** Перевозчик в панели «Получение» — паритет web `PRODUCT_PICKUP_UI`. */
+  FULFILLMENT_DELIVERY_ANY: "Доставка",
+  FULFILLMENT_COURIER: "Курьеры Gitorg",
+  DETAILS_LOBO_HINT:
+    "Курьер до двери по Чеченской Республике. Доставку оплатите курьеру наличными — цену покажем при оформлении",
+  // Объявления без корзины: адрес — место встречи, а не точка выдачи.
+  DEAL_DETAILS_TITLE: {
+    viewing: "Место осмотра",
+    service: "Адрес исполнителя",
+  } as Record<string, string>,
+  DEAL_DETAILS_NO_ADDRESS: {
+    viewing: "Место осмотра не указано",
+    service: "Адрес исполнителя не указан",
+  } as Record<string, string>,
+  DEAL_SERVICE_LOCATION_HINTS: {
+    at_client: "Исполнитель приедет к вам",
+    at_provider: "Приходите по адресу исполнителя",
+    online: "Удалённо, по видеосвязи или в переписке",
+  } as Record<string, string>,
 } as const;
 
 export const ADDRESS_DELIVERY_UI = {

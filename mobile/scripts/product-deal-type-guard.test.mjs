@@ -54,6 +54,44 @@ test("вместо «В корзину» — плашка «только на с
   assert.equal((tab.match(/<ProductDealOnWebNotice/g) ?? []).length, 2);
 });
 
+test("панель адреса: место встречи у осмотра и услуги, свои подписи ЛОБО и курьеров", () => {
+  const panel = read("features/product-detail/ui/ProductPickupDetailsPanel.tsx");
+  // Без корзины доставки нет, адрес — место встречи.
+  assert.match(
+    panel,
+    /const deliveryOn = isCartDeal && productShipsToBuyer\(product\);/,
+  );
+  assert.match(panel, /PRODUCT_PICKUP_UI\.DEAL_DETAILS_TITLE\[dealType\]/);
+  assert.match(panel, /PRODUCT_PICKUP_UI\.DEAL_DETAILS_NO_ADDRESS\[dealType\]/);
+  assert.match(
+    panel,
+    /normalizeProductServiceLocations\(product\.productServiceLocations\)/,
+  );
+  assert.match(panel, /PRODUCT_PICKUP_UI\.DETAILS_LOBO_HINT/);
+  assert.match(panel, /PRODUCT_PICKUP_UI\.FULFILLMENT_COURIER/);
+
+  const web = read("../client/src/shared/config/copy/cart-checkout.js");
+  const mobile = read("shared/config/appUiCopy.ts");
+  for (const text of [
+    "Место осмотра",
+    "Адрес исполнителя не указан",
+    "Исполнитель приедет к вам",
+    "Курьер до двери по Чеченской Республике",
+  ]) {
+    // Текст есть на сайте и дословно в приложении.
+    assert.ok(web.includes(text), `на сайте нет: ${text}`);
+    assert.ok(mobile.includes(text), text);
+  }
+});
+
+test("вкладка по умолчанию — описание, иначе характеристики, иначе возврат (как на сайте)", () => {
+  const tab = read("features/product-detail/ui/ProductDetailsDetailsTab.tsx");
+  assert.match(
+    tab,
+    /const defaultContentTab: ContentTabId = hasDescription\s*\?\s*"description"\s*:\s*hasCharacteristics\s*\?\s*"characteristics"\s*:\s*"returns";/,
+  );
+});
+
 test("вкладка «Получение» у осмотра и услуги — «Осмотр» и «Адрес», как на сайте", () => {
   const tab = read("features/product-detail/ui/ProductDetailsDetailsTab.tsx");
   assert.match(tab, /PRODUCT_DETAILS_MODAL_UI\.DEAL_TAB_TITLE\[dealType\]/);

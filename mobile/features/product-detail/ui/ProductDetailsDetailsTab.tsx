@@ -149,9 +149,16 @@ export const ProductDetailsDetailsTab = ({
     ...(hasCharacteristics ? (["characteristics"] as const) : []),
     "returns",
   ];
+  // По умолчанию — как на сайте (`resolveProductDetailsContentPanels`):
+  // описание, иначе характеристики, иначе возврат; «Получение» — только по нажатию.
+  const defaultContentTab: ContentTabId = hasDescription
+    ? "description"
+    : hasCharacteristics
+      ? "characteristics"
+      : "returns";
   const resolvedContentTab = availableContentTabs.includes(contentTab)
     ? contentTab
-    : (availableContentTabs[0] ?? "returns");
+    : defaultContentTab;
   const showContentTabs = true;
 
   const charItems = Array.isArray(characteristics)
@@ -172,7 +179,10 @@ export const ProductDetailsDetailsTab = ({
       PRODUCT_DETAILS_MODAL_UI.DELIVERY_TITLE);
 
   const panelAriaLabel = showDelivery
-    ? PRODUCT_DETAILS_MODAL_UI.DELIVERY_SECTION_ARIA
+    ? isCartDealType(dealType)
+      ? PRODUCT_DETAILS_MODAL_UI.DELIVERY_SECTION_ARIA
+      : (PRODUCT_DETAILS_MODAL_UI.DEAL_SECTION_ARIA[dealType] ??
+        PRODUCT_DETAILS_MODAL_UI.DELIVERY_SECTION_ARIA)
     : showReturns
       ? PRODUCT_DETAILS_MODAL_UI.RETURNS_SECTION_ARIA
       : showCharacteristics
