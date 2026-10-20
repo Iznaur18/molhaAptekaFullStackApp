@@ -24,7 +24,7 @@ const { default: OneCCategoryMappingModel } =
   await import("../models/OneCCategoryMappingModel.js");
 const { default: ProductModel } = await import("../models/ProductModel.js");
 const { UserModel } = await import("../models/index.js");
-const { applyProductCategoryCatalogSeed } =
+const { addMissingProductCategorySeedNodes, applyProductCategoryCatalogSeed } =
   await import("../services/product/applyProductCategoryCatalogSeed.js");
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -279,5 +279,65 @@ describe("applyProductCategoryCatalogSeed", () => {
       /уже занят в корне "electronics"/,
     );
     assert.equal(await ProductCategoryModel.countDocuments({}), 3);
+  });
+});
+
+describe("addMissingProductCategorySeedNodes", () => {
+  before(async () => {
+    await connectMongoTestReplSet();
+  });
+
+  after(async () => {
+    await disconnectMongoTestReplSet();
+  });
+
+  beforeEach(async () => {
+    await clearMongoCollections();
+  });
+
+  it("дописывает только новые узлы, правки админки и лишние узлы не трогает", async () => {
+    const root = await createRoot();
+    await applyProductCategoryCatalogSeed({
+      seed: [{ rootSlug: "autos", nodes: TEST_SEED[0].nodes.slice(0, 3) }],
+    });
+    await ProductCategoryModel.updateOne(
+      { slug: "autos-parts" },
+      { $set: { labelRu: "Запчасти (админ)" } },
+    );
+    await createLeafUnder(root, "autos-admin-only", "Заведено в админке");
+
+    const dry = await addMissingProductCategorySeedNodes({
+      seed: TEST_SEED,
+      dryRun: true,
+    });
+    assert.deepEqual(dry.insertedSlugs, ["autos-wheels"]);
+    assert.equal(await ProductCategoryModel.countDocuments({}), 5);
+
+    const summary = await addMissingProductCategorySeedNodes({ seed: TEST_SEED });
+
+    assert.equal(summary.insertedCategories, 1);
+    const wheels = await ProductCategoryModel.findOne({ slug: "autos-wheels" }).lean();
+    assert.deepEqual(wheels?.pathSlugs, ["autos", "autos-wheels"]);
+    assert.equal(wheels?.isLeaf, true);
+    assert.equal(wheels?.sortOrder, 20);
+    assert.equal(
+      (await ProductCategoryModel.findOne({ slug: "autos-parts" }).lean())?.labelRu,
+      "Запчасти (админ)",
+    );
+    assert.ok(await ProductCategoryModel.exists({ slug: "autos-admin-only" }));
+
+    const second = await addMissingProductCategorySeedNodes({ seed: TEST_SEED });
+    assert.equal(second.insertedCategories, 0);
+  });
+
+  it("не вешает новый узел под лист", async () => {
+    const root = await createRoot();
+    await createLeafUnder(root, "autos-parts", "Запчасти");
+
+    await assert.rejects(
+      addMissingProductCategorySeedNodes({ seed: TEST_SEED }),
+      /"autos-parts" — лист/,
+    );
+    assert.equal(await ProductCategoryModel.countDocuments({}), 2);
   });
 });
