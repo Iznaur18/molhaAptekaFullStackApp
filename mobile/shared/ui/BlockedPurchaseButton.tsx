@@ -8,7 +8,8 @@ import { SquircleView } from "@/shared/ui/SquircleView";
 
 type BlockedPurchaseButtonProps = {
   label?: string;
-  variant?: "default" | "detailDock" | "teaser" | "installment" | "offer";
+  /** `card` — карточка главного экрана, высота как у «В корзину» там же. */
+  variant?: "default" | "detailDock" | "teaser" | "installment" | "offer" | "card";
 };
 
 export const BlockedPurchaseButton = ({
@@ -27,6 +28,20 @@ export const BlockedPurchaseButton = ({
           {label}
         </Text>
       </View>
+    );
+  }
+
+  if (variant === "card") {
+    return (
+      <SquircleView
+        radius={OOS_BTN.borderRadius}
+        style={[styles.detailOutOfStockButton, styles.cardBlockedButton]}
+        accessibilityRole="text"
+      >
+        <Text style={[styles.detailOutOfStockButtonText, styles.cardButtonText]}>
+          {label}
+        </Text>
+      </SquircleView>
     );
   }
 

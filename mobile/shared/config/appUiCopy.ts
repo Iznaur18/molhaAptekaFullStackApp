@@ -316,6 +316,7 @@ export const ADD_TO_CART_UI = {
   SELLER_CLOSED_OVERLAY_FALLBACK: "Закрыто",
   GO_TO_CART: "Перейти в корзину",
   LOGIN_TO_ADD: "Войти, чтобы купить",
+  OWN_PRODUCT: "Свой товар",
   ADD_FAILED: "Не удалось добавить в корзину",
   DECREASE_ARIA: "Уменьшить количество",
   INCREASE_ARIA: "Увеличить количество",

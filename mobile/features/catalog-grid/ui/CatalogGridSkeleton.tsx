@@ -11,6 +11,8 @@ type CatalogGridSkeletonProps = {
   tileWidth: number;
   gap: number;
   rows?: number;
+  /** Главный экран: под карточками кнопка — скелетон рисует место под неё. */
+  withActionButton?: boolean;
 };
 
 /**
@@ -24,6 +26,7 @@ export const CatalogGridSkeleton = ({
   tileWidth,
   gap,
   rows = 3,
+  withActionButton = false,
 }: CatalogGridSkeletonProps) => {
   const styles = useHomeFeedSkeletonStyles();
 
@@ -36,7 +39,15 @@ export const CatalogGridSkeleton = ({
               <View
                 style={[
                   styles.catalogTile,
-                  { minHeight: resolveProductCardCatalogGridTotalHeight(tileWidth) },
+                  {
+                    minHeight: resolveProductCardCatalogGridTotalHeight(
+                      tileWidth,
+                      undefined,
+                      {
+                        withAction: withActionButton,
+                      },
+                    ),
+                  },
                 ]}
               >
                 <View style={styles.catalogTileImage} />
@@ -44,6 +55,7 @@ export const CatalogGridSkeleton = ({
                   <View style={styles.catalogTileLine} />
                   <View style={[styles.catalogTileLine, styles.catalogTileLineShort]} />
                 </View>
+                {withActionButton ? <View style={styles.catalogTileAction} /> : null}
               </View>
             </View>
           ))}

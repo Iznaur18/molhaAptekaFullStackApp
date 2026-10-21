@@ -30,9 +30,10 @@ type ProductDealActionsProps = {
   /**
    * Где стоит блок: под ценой (`inline`, широкая раскладка) или в нижней
    * панели на месте «В корзину» (`dock`). В панели подписи короче, телефон —
-   * одной трубкой.
+   * одной трубкой. `card` — карточка ленты главного экрана: одна компактная
+   * кнопка без телефона, на месте «В корзину».
    */
-  variant?: "inline" | "dock";
+  variant?: "inline" | "dock" | "card";
 };
 
 /**
@@ -59,7 +60,8 @@ export const ProductDealActions = ({
   }
 
   const isDock = variant === "dock";
-  const canShowPhone = isSellerPhoneOpenBeforeRequest(dealType);
+  const isCard = variant === "card";
+  const canShowPhone = !isCard && isSellerPhoneOpenBeforeRequest(dealType);
 
   const requireLogin = () => {
     if (isAuthorized) {
@@ -103,6 +105,36 @@ export const ProductDealActions = ({
 
   const readyPhone = phoneState.status === "ready" ? phoneState.phone : null;
   const phoneIcon = <Phone size={20} color={theme.colors.text} strokeWidth={2.25} />;
+
+  const sheet = (
+    <DealRequestSheet
+      visible={isSheetOpen}
+      onClose={() => setIsSheetOpen(false)}
+      productId={productId}
+      dealType={dealType}
+    />
+  );
+
+  if (isCard) {
+    return (
+      <View style={styles.root}>
+        <Pressable
+          style={({ pressed }) => [
+            styles.cardButton,
+            pressed && styles.cardButtonPressed,
+          ]}
+          onPress={handleOpenSheet}
+          accessibilityRole="button"
+          accessibilityLabel={PRODUCT_DEAL_ACTIONS_UI.REQUEST_BUTTON[dealType]}
+        >
+          <Text style={styles.cardButtonText} numberOfLines={1}>
+            {PRODUCT_DEAL_ACTIONS_UI.REQUEST_BUTTON_SHORT[dealType]}
+          </Text>
+        </Pressable>
+        {sheet}
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.root, !isDock && styles.rootInline]}>
@@ -162,12 +194,7 @@ export const ProductDealActions = ({
         </Text>
       ) : null}
 
-      <DealRequestSheet
-        visible={isSheetOpen}
-        onClose={() => setIsSheetOpen(false)}
-        productId={productId}
-        dealType={dealType}
-      />
+      {sheet}
     </View>
   );
 };

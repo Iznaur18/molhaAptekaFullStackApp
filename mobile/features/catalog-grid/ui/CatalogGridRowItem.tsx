@@ -4,6 +4,7 @@ import { View } from "react-native";
 import { ProductCard } from "@/entities/product/ui/ProductCard";
 import { ProductCardBanner } from "@/entities/product/ui/ProductCardBanner";
 import { CatalogGridRowEnteringShell } from "@/features/catalog-grid/ui/CatalogGridRowEnteringShell";
+import { renderProductCardPurchaseAction } from "@/features/catalog-grid/ui/ProductCardPurchaseAction";
 import { resolveFlexGridItemWidthStyle } from "@/shared/lib/resolveFlexGridItemWidth";
 import { AppText } from "@/shared/ui/AppText";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
@@ -20,6 +21,8 @@ type CatalogGridRowItemProps = {
   rowIndex?: number;
   disableEntering?: boolean;
   highlightRaffleProduct?: boolean;
+  /** Главный экран: под карточкой «В корзину» / «Записаться», как на сайте. */
+  showPurchaseAction?: boolean;
 };
 
 export const CatalogGridRowItem = memo(
@@ -32,6 +35,7 @@ export const CatalogGridRowItem = memo(
     rowIndex = 0,
     disableEntering = false,
     highlightRaffleProduct = false,
+    showPurchaseAction = false,
   }: CatalogGridRowItemProps) => {
     const theme = useAppTheme();
 
@@ -70,6 +74,9 @@ export const CatalogGridRowItem = memo(
                 layout="catalog-grid"
                 catalogGridTileWidth={tileWidth}
                 highlightRaffleProduct={highlightRaffleProduct}
+                renderPurchaseAction={
+                  showPurchaseAction ? renderProductCardPurchaseAction : undefined
+                }
               />
             </View>
           ))}

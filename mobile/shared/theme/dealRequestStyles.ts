@@ -1,5 +1,6 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
+import { PRODUCT_CARD_MOBILE_CATALOG_LAYOUT } from "@/entities/product/lib/productCardMobileCatalogLayout";
 import { PROFILE_ACCOUNT_STACK_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
@@ -144,6 +145,25 @@ export const useProductDealActionsStyles = createThemedStyles((theme) => ({
   },
   requestButton: {
     flex: 1,
+  },
+  /** web `.product-deal-actions_card .product-deal-actions__button`. */
+  cardButton: {
+    width: "100%",
+    height: PRODUCT_CARD_MOBILE_CATALOG_LAYOUT.actionHeight,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: theme.colors.action,
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+  },
+  cardButtonPressed: {
+    opacity: 0.85,
+  },
+  cardButtonText: {
+    fontSize: 14.4,
+    fontWeight: "600",
+    color: theme.colors.onContrast,
   },
   phoneButton: {
     flexDirection: "row",

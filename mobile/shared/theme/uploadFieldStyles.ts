@@ -4,6 +4,7 @@ import {
   ADD_TO_CART_BUTTON_LAYOUT as CART_BTN,
   ADD_TO_CART_STEPPER_LAYOUT as CART_STEPPER,
 } from "@/entities/product/lib/addToCartButtonLayout";
+import { PRODUCT_CARD_MOBILE_CATALOG_LAYOUT } from "@/entities/product/lib/productCardMobileCatalogLayout";
 import { PRODUCT_DETAIL_OUT_OF_STOCK_BUTTON_LAYOUT as OOS_BTN } from "@/entities/product/lib/productDetailOutOfStockButtonLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { semanticColors } from "@/shared/theme/semanticColors";
@@ -394,6 +395,28 @@ export const useAddToCartButtonStyles = createThemedStyles((theme) => ({
     borderRadius: CART_STEPPER.borderRadius,
     backgroundColor: theme.colors.actionSoft,
     ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+  },
+  /**
+   * Карточка главного экрана — web `ProductCardMobileCatalog.css`: кнопка и
+   * степпер 2.15rem, padding 0.35rem 0.65rem, шрифт 0.78rem.
+   */
+  cardButton: {
+    height: PRODUCT_CARD_MOBILE_CATALOG_LAYOUT.actionHeight,
+    paddingVertical: 5.6,
+    paddingHorizontal: 10.4,
+  },
+  cardButtonText: {
+    fontSize: 12.48,
+  },
+  cardStepper: {
+    height: PRODUCT_CARD_MOBILE_CATALOG_LAYOUT.actionHeight,
+    paddingVertical: 0,
+  },
+  cardBlockedButton: {
+    minHeight: 0,
+    height: PRODUCT_CARD_MOBILE_CATALOG_LAYOUT.actionHeight,
+    paddingVertical: 5.6,
+    paddingHorizontal: 10.4,
   },
   buttonDisabled: {
     opacity: 0.5,

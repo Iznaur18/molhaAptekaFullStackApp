@@ -55,6 +55,14 @@ export const useHomeFeedSkeletonStyles = createThemedStyles((theme) => ({
     paddingTop: MCL.bodyGap,
     gap: MCL.bodyGap * 2,
   },
+  /** Место под «В корзину» на главной: web `.catalog-grid-skeleton__action`. */
+  catalogTileAction: {
+    height: MCL.actionHeight,
+    marginTop: MCL.actionTopGap,
+    marginHorizontal: MCL.contentInsetX,
+    borderRadius: 16,
+    backgroundColor: theme.colors.surfaceMuted,
+  },
   catalogTileLine: {
     height: 12,
     width: "85%",

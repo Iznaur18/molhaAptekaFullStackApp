@@ -669,6 +669,7 @@ export default function CatalogScreen() {
               tileWidth={productGrid.tileWidth}
               rowIndex={productRowIndex}
               disableEntering
+              showPurchaseAction
             />
           </View>
         </RowVisibilityBoundary>
@@ -711,6 +712,7 @@ export default function CatalogScreen() {
             tileWidth={productGrid.tileWidth}
             rowIndex={index}
             disableEntering
+            showPurchaseAction
           />
         </RowVisibilityBoundary>
       );
@@ -752,6 +754,7 @@ export default function CatalogScreen() {
                   columns={productGrid.columns}
                   tileWidth={productGrid.tileWidth}
                   gap={productGrid.gap}
+                  withActionButton
                 />
               </View>
             </View>
@@ -775,6 +778,7 @@ export default function CatalogScreen() {
             columns={productGrid.columns}
             tileWidth={productGrid.tileWidth}
             gap={productGrid.gap}
+            withActionButton
           />
         </View>
       </View>

@@ -22,7 +22,8 @@ import { SquircleView } from "@/shared/ui/SquircleView";
 type AddToCartButtonProps = {
   productId: string;
   product?: unknown;
-  variant?: "default" | "detailDock";
+  /** `card` — карточка главного экрана: компактная кнопка, гость видит «В корзину». */
+  variant?: "default" | "detailDock" | "card";
 };
 
 const showCartError = (error: unknown) => {
@@ -43,6 +44,7 @@ export const AddToCartButton = ({
   const cartQuery = useMyCartQuery();
   const { addItem, setItemQuantity, removeItem, isUpdating } = useCartActions();
   const isDetailDock = variant === "detailDock";
+  const isCard = variant === "card";
   const fixedFontProps = isDetailDock ? FIXED_FONT_PROPS : {};
 
   const quantity = cartQuery.data?.[productId] ?? 0;
@@ -67,7 +69,7 @@ export const AddToCartButton = ({
     return (
       <BlockedPurchaseButton
         label={blockedLabel}
-        variant={isDetailDock ? "detailDock" : "default"}
+        variant={isDetailDock ? "detailDock" : isCard ? "card" : "default"}
       />
     );
   }
@@ -76,7 +78,7 @@ export const AddToCartButton = ({
     return (
       <BlockedPurchaseButton
         label={sellerClosedLabel}
-        variant={isDetailDock ? "detailDock" : "default"}
+        variant={isDetailDock ? "detailDock" : isCard ? "card" : "default"}
       />
     );
   }
@@ -112,6 +114,26 @@ export const AddToCartButton = ({
           >
             <Text style={styles.detailDockLoginButtonText} {...fixedFontProps}>
               {ADD_TO_CART_UI.LOGIN_TO_ADD}
+            </Text>
+          </SquircleView>
+        </Pressable>
+      );
+    }
+
+    if (isCard) {
+      return (
+        <Pressable
+          style={styles.addButtonPressable}
+          onPress={handleLogin}
+          accessibilityRole="button"
+          accessibilityLabel={ADD_TO_CART_UI.LOGIN_TO_ADD}
+        >
+          <SquircleView
+            radius={ADD_TO_CART_BUTTON_LAYOUT.borderRadius}
+            style={[styles.addButton, styles.cardButton]}
+          >
+            <Text style={[styles.addButtonText, styles.cardButtonText]}>
+              {ADD_TO_CART_UI.ADD}
             </Text>
           </SquircleView>
         </Pressable>
@@ -167,12 +189,19 @@ export const AddToCartButton = ({
       >
         <SquircleView
           radius={ADD_TO_CART_BUTTON_LAYOUT.borderRadius}
-          style={[styles.addButton, disabled && styles.buttonDisabled]}
+          style={[
+            styles.addButton,
+            isCard && styles.cardButton,
+            disabled && styles.buttonDisabled,
+          ]}
         >
           {isUpdating ? (
             <ActivityIndicator color={theme.colors.onContrast} />
           ) : (
-            <Text style={styles.addButtonText} {...fixedFontProps}>
+            <Text
+              style={[styles.addButtonText, isCard && styles.cardButtonText]}
+              {...fixedFontProps}
+            >
               {ADD_TO_CART_UI.ADD}
             </Text>
           )}
@@ -204,7 +233,7 @@ export const AddToCartButton = ({
   const increaseDisabled = isUpdating || (hasStockLimit && quantity >= purchaseLimit);
 
   return (
-    <View style={styles.stepper}>
+    <View style={[styles.stepper, isCard && styles.cardStepper]}>
       <Pressable
         style={styles.stepButton}
         onPress={handleDecrease}
