@@ -681,6 +681,13 @@ export const useProductCardBannerStyles = createThemedStyles((theme) => {
       alignItems: "center",
       gap: 6,
     },
+    /** web `.product-card__banner-actions`: слева, по ширине кнопки, отступ 0.35rem. */
+    actions: {
+      alignItems: "flex-start",
+      gap: 7.2,
+      paddingTop: 5.6,
+      width: "100%",
+    },
     metaText: {
       fontSize: 13.1,
       lineHeight: 16,

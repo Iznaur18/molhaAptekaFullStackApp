@@ -9,7 +9,14 @@ import { SquircleView } from "@/shared/ui/SquircleView";
 type BlockedPurchaseButtonProps = {
   label?: string;
   /** `card` — карточка главного экрана, высота как у «В корзину» там же. */
-  variant?: "default" | "detailDock" | "teaser" | "installment" | "offer" | "card";
+  variant?:
+    | "default"
+    | "detailDock"
+    | "teaser"
+    | "installment"
+    | "offer"
+    | "card"
+    | "banner";
 };
 
 export const BlockedPurchaseButton = ({
@@ -27,6 +34,17 @@ export const BlockedPurchaseButton = ({
         <Text style={styles.teaserBlockedButtonText} {...fixedFontProps}>
           {label}
         </Text>
+      </View>
+    );
+  }
+
+  if (variant === "banner") {
+    return (
+      <View
+        style={[styles.detailOutOfStockButton, styles.bannerBlockedButton]}
+        accessibilityRole="text"
+      >
+        <Text style={styles.detailOutOfStockButtonText}>{label}</Text>
       </View>
     );
   }

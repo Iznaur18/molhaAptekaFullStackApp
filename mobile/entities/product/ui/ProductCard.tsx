@@ -92,7 +92,10 @@ type ProductCardProps = {
    * Передаётся снаружи, чтобы карточка-сущность не тянула фичу корзины.
    * Место под кнопку резервируется всегда — карточки ряда одной высоты.
    */
-  renderPurchaseAction?: (product: ProductCardProps["product"]) => ReactNode;
+  renderPurchaseAction?: (
+    product: ProductCardProps["product"],
+    placement?: "card" | "banner",
+  ) => ReactNode;
 };
 
 export const ProductCard = memo(
@@ -171,7 +174,14 @@ export const ProductCard = memo(
     const cardMediaStyles = useProductCardMediaStyles();
 
     if (flags.showBannerLayout) {
-      return <ProductCardBanner product={product} />;
+      return (
+        <ProductCardBanner
+          product={product}
+          renderPurchaseAction={
+            isMineMode || isModerationQueue ? undefined : renderPurchaseAction
+          }
+        />
+      );
     }
 
     const name = product.productName?.trim() || "Без названия";

@@ -15,6 +15,7 @@ export { default as MonitorSmartphone } from "lucide-react-native/icons/monitor-
 export { default as Phone } from "lucide-react-native/icons/phone";
 export { default as Truck } from "lucide-react-native/icons/truck";
 export { default as Share2 } from "lucide-react-native/icons/share-2";
+export { default as ShoppingCart } from "lucide-react-native/icons/shopping-cart";
 export { default as Tag } from "lucide-react-native/icons/tag";
 export { default as TicketPercent } from "lucide-react-native/icons/ticket-percent";
 

@@ -157,6 +157,18 @@ export const useProductDealActionsStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.action,
     ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
+  /** web: в `.product-card__banner-actions` блок по ширине надписи, слева. */
+  rootBanner: {
+    alignSelf: "flex-start",
+    maxWidth: "100%",
+  },
+  cardButtonBanner: {
+    width: "auto",
+    height: undefined,
+    paddingVertical: 8.8,
+    paddingHorizontal: 13.6,
+    borderRadius: 10.5,
+  },
   cardButtonPressed: {
     opacity: 0.85,
   },

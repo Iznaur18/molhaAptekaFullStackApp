@@ -38,7 +38,8 @@ test("кнопка только на главной: «В корзину», со
   }
 
   const action = read("features/catalog-grid/ui/ProductCardPurchaseAction.tsx");
-  assert.match(action, /variant="card"/);
+  assert.match(action, /variant=\{placement\}/);
+  assert.match(action, /placement = "card"/);
   assert.match(action, /ADD_TO_CART_UI\.OWN_PRODUCT/);
   assert.match(action, /state\.showDealButton/);
   assert.match(action, /product\.productIsAvailable === false/);
@@ -50,6 +51,28 @@ test("кнопка только на главной: «В корзину», со
   // В карточке ленты у заявки нет телефона — одна кнопка.
   const deal = read("entities/deal-request/ui/ProductDealActions.tsx");
   assert.match(deal, /const canShowPhone = !isCard &&/);
+});
+
+test("баннер в ленте: кнопка под текстом, по ширине надписи, только на главной", () => {
+  const banner = read("entities/product/ui/ProductCardBanner.tsx");
+  assert.match(banner, /renderPurchaseAction\(product, "banner"\)/);
+  // Под «У нас закрыто» кнопки нет — карточка не кликается.
+  assert.match(banner, /renderPurchaseAction && !showSellerClosedOverlay/);
+
+  const row = read("features/catalog-grid/ui/CatalogGridRowItem.tsx");
+  assert.match(
+    row,
+    /<ProductCardBanner[\s\S]*?showPurchaseAction \? renderProductCardPurchaseAction : undefined/,
+  );
+
+  const cart = read("features/cart-add/ui/AddToCartButton.tsx");
+  assert.match(cart, /<ShoppingCart/);
+  assert.match(cart, /isBanner && styles\.bannerStepper/);
+  assert.match(read("shared/ui/BlockedPurchaseButton.tsx"), /variant === "banner"/);
+  assert.match(
+    read("entities/deal-request/ui/ProductDealActions.tsx"),
+    /styles\.rootBanner/,
+  );
 });
 
 test("подписи совпадают с сайтом", () => {

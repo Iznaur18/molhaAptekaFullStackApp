@@ -31,9 +31,10 @@ type ProductDealActionsProps = {
    * Где стоит блок: под ценой (`inline`, широкая раскладка) или в нижней
    * панели на месте «В корзину» (`dock`). В панели подписи короче, телефон —
    * одной трубкой. `card` — карточка ленты главного экрана: одна компактная
-   * кнопка без телефона, на месте «В корзину».
+   * кнопка без телефона, на месте «В корзину»; `banner` — то же в баннере
+   * ленты, по ширине надписи.
    */
-  variant?: "inline" | "dock" | "card";
+  variant?: "inline" | "dock" | "card" | "banner";
 };
 
 /**
@@ -60,7 +61,8 @@ export const ProductDealActions = ({
   }
 
   const isDock = variant === "dock";
-  const isCard = variant === "card";
+  const isBanner = variant === "banner";
+  const isCard = variant === "card" || isBanner;
   const canShowPhone = !isCard && isSellerPhoneOpenBeforeRequest(dealType);
 
   const requireLogin = () => {
@@ -117,10 +119,11 @@ export const ProductDealActions = ({
 
   if (isCard) {
     return (
-      <View style={styles.root}>
+      <View style={isBanner ? styles.rootBanner : styles.root}>
         <Pressable
           style={({ pressed }) => [
             styles.cardButton,
+            isBanner && styles.cardButtonBanner,
             pressed && styles.cardButtonPressed,
           ]}
           onPress={handleOpenSheet}

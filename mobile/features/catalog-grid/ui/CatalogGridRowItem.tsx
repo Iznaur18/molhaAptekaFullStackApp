@@ -64,7 +64,12 @@ export const CatalogGridRowItem = memo(
           {row.title}
         </AppText>
       ) : row.kind === "tier3-banner" ? (
-        <ProductCardBanner product={row.product} />
+        <ProductCardBanner
+          product={row.product}
+          renderPurchaseAction={
+            showPurchaseAction ? renderProductCardPurchaseAction : undefined
+          }
+        />
       ) : (
         <View style={[catalogGridRowStyles.row, { gap }]}>
           {row.products.map((product) => (

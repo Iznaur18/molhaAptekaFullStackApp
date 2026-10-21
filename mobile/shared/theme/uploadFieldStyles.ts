@@ -418,6 +418,52 @@ export const useAddToCartButtonStyles = createThemedStyles((theme) => ({
     paddingVertical: 5.6,
     paddingHorizontal: 10.4,
   },
+  /**
+   * Баннер в ленте — web `ProductCardBannerLayout.css` `.product-card__banner-actions`:
+   * кнопка по ширине надписи, слева, цвет акцента баннера, у «В корзину» тележка.
+   */
+  bannerPressable: {
+    alignSelf: "flex-start",
+    maxWidth: "100%",
+  },
+  bannerButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 7.2,
+    paddingVertical: 8.8,
+    paddingHorizontal: 13.6,
+    borderWidth: 1,
+    borderColor: theme.colors.danger,
+    borderRadius: 10.5,
+    backgroundColor: theme.colors.danger,
+  },
+  bannerButtonText: {
+    color: theme.colors.onContrast,
+    fontSize: 14.72,
+    fontWeight: "600",
+    lineHeight: 17.7,
+  },
+  bannerStepper: {
+    alignSelf: "flex-start",
+    width: "auto",
+    paddingVertical: 6.4,
+    paddingHorizontal: 8.8,
+    borderColor: theme.colors.danger,
+    borderRadius: 10.5,
+    backgroundColor: theme.colors.surface,
+  },
+  bannerStepButtonText: {
+    color: theme.colors.danger,
+  },
+  bannerBlockedButton: {
+    alignSelf: "flex-start",
+    width: "auto",
+    minHeight: 0,
+    paddingVertical: 8.8,
+    paddingHorizontal: 13.6,
+    borderRadius: 10.5,
+  },
   buttonDisabled: {
     opacity: 0.5,
   },
