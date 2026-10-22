@@ -108,6 +108,7 @@ const EMPTY_SAVED_DELIVERY_ADDRESSES = [];
  *   showSubmitButton?: boolean;
  *   id?: string;
  *   paymentMethodPortalTarget?: Element | null;
+ *   paidWithLoyaltyPoints?: boolean;
  *   fulfillmentMethodPortalTarget?: Element | null;
  *   submitPortalTarget?: Element | null;
  *   cdekAvailable?: boolean;
@@ -150,6 +151,7 @@ export function CheckoutForm({
   showSubmitButton = true,
   id: formIdProp,
   paymentMethodPortalTarget = null,
+  paidWithLoyaltyPoints = false,
   fulfillmentMethodPortalTarget = null,
   submitPortalTarget = null,
   cdekAvailable = false,
@@ -600,22 +602,29 @@ export function CheckoutForm({
         )
       : null;
 
-  const paymentMethodPicker = (
-    <CheckoutPaymentMethodPicker
-      value={paymentMethod}
-      onChange={setPaymentMethod}
-      disabled={isDisabled || isSubmitting}
-      legend={CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD}
-      cardPrepaidAvailable={cardPrepaidAvailable}
-      allowedMethods={effectiveAllowedPaymentMethods}
-      hiddenMethods={
-        gitorgCourierDelivery ? [ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY] : []
-      }
-    />
-  );
+  // Товар за баллы: рублями платится только доставка. При самовывозе платить
+  // рублями нечего — выбор способа оплаты не показываем вовсе.
+  const paymentMethodPicker =
+    paidWithLoyaltyPoints && needsPickup && !needsDelivery ? null : (
+      <CheckoutPaymentMethodPicker
+        value={paymentMethod}
+        onChange={setPaymentMethod}
+        disabled={isDisabled || isSubmitting}
+        legend={
+          paidWithLoyaltyPoints
+            ? CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD_DELIVERY
+            : CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD
+        }
+        cardPrepaidAvailable={cardPrepaidAvailable}
+        allowedMethods={effectiveAllowedPaymentMethods}
+        hiddenMethods={
+          gitorgCourierDelivery ? [ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY] : []
+        }
+      />
+    );
 
   const portaledPaymentMethod =
-    paymentMethodPortalTarget instanceof Element
+    paymentMethodPicker && paymentMethodPortalTarget instanceof Element
       ? createPortal(paymentMethodPicker, paymentMethodPortalTarget)
       : null;
 

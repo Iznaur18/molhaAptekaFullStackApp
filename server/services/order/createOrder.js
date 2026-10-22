@@ -7,6 +7,13 @@ import {
   CATEGORY_DEAL_TYPES_WITHOUT_CART,
   PRODUCT_PICKUP_MISSING_FOR_ORDER_MESSAGE,
   PRODUCT_PICKUP_NOT_ENABLED_FOR_ITEMS_MESSAGE,
+  PRODUCT_POINTS_SALE_MIXED_ORDER_MESSAGE,
+  PRODUCT_POINTS_SALE_OFFER_FORBIDDEN_MESSAGE,
+  PRODUCT_POINTS_SALE_PREPAID_FORBIDDEN_MESSAGE,
+  buildPointsPerBuyerLimitExceededMessage,
+  isProductPointsSaleActive,
+  normalizeProductPointsPerBuyerLimit,
+  normalizeProductPointsPrice,
 } from "@molha/api-contract";
 import {
   PRODUCT_DELIVERY_CARRIER_GITORG,
@@ -45,6 +52,8 @@ import {
   ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY,
   ORDER_PAYMENT_METHOD_CARD_PREPAID,
   ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
+  ORDER_STATUS_CANCELLED,
+  ORDER_STATUS_RETURNED,
   SELLER_PAYOUT_REQUISITES_REQUIRED_MESSAGE,
 } from "../../constants/orderConstants.js";
 import { ADDRESS_LINE_MAX_LENGTH } from "../../constants/dadataConstants.js";
@@ -71,6 +80,10 @@ import {
   buildOrderLineLoyaltySnapshot,
   reserveLoyaltyPointsForNewOrder,
 } from "./orderLoyaltyPoints.js";
+import {
+  buildOrderLinePointsSnapshot,
+  holdPointsForNewOrder,
+} from "./orderPointsPayment.js";
 import {
   finalizeOffersAfterOrderConfirmed,
   resolveAcceptedOfferForOrder,
@@ -153,6 +166,9 @@ const buildItemsWithPriceSnapshot = (
   return items.map((item) => {
     const productKey = String(item.productId);
     const snapshot = productById[productKey];
+    if (snapshot.pointsSaleActive === true) {
+      return buildPointsSaleLineSnapshot(item, snapshot, pickupByProductId);
+    }
     const promo = promoByProductId[productKey] ?? null;
     const unitPrice = resolveProductUnitPriceWithPromo({
       productPrice: snapshot.price,
@@ -200,8 +216,48 @@ const buildItemsWithPriceSnapshot = (
       pickupLonAtOrder: pickup?.lon ?? null,
       ...loyalty,
       ...affiliate,
+      ...buildOrderLinePointsSnapshot({ pointsPrice: null, quantity: item.quantity }),
     };
   });
+};
+
+/**
+ * Позиция товара за баллы: рублей за товар нет, а вместе с ними нет и всего,
+ * что от рублей считается — скидок, промокодов, опта, «N+1», кешбэка и
+ * партнёрки (решение пользователя 21.10.2026: «ничего не может быть включено»).
+ * Поля на товаре и так выключены при включении продажи за баллы, здесь —
+ * вторая стена на случай товара, правленного в обход управления.
+ *
+ * @param {{ productId: unknown; quantity: number }} item
+ * @param {Record<string, any>} snapshot
+ * @param {Record<string, { id: string; address: string; lat: number | null; lon: number | null }> | null} pickupByProductId
+ */
+const buildPointsSaleLineSnapshot = (item, snapshot, pickupByProductId) => {
+  const pickup = pickupByProductId?.[String(item.productId)] ?? null;
+  return {
+    productId: item.productId,
+    quantity: item.quantity,
+    unitPriceAtOrder: 0,
+    buyNFreeUnitsAtOrder: 0,
+    buyNFreeProgressApplied: false,
+    buyNFreeProgressAction: null,
+    buyNFreeProgressCountBefore: 0,
+    productNameAtOrder: snapshot.name,
+    sellerIdAtOrder: snapshot.sellerId ?? null,
+    promoCodeAtOrder: null,
+    promoDiscountPercentAtOrder: null,
+    pickupLocationIdAtOrder: pickup?.id ?? null,
+    pickupAddressAtOrder: pickup?.address ?? null,
+    pickupLatAtOrder: pickup?.lat ?? null,
+    pickupLonAtOrder: pickup?.lon ?? null,
+    ...buildOrderLineLoyaltySnapshot({ loyaltyPointsPerUnit: 0, quantity: 0 }),
+    affiliateReferrerUserId: null,
+    affiliateStatus: "none",
+    ...buildOrderLinePointsSnapshot({
+      pointsPrice: snapshot.pointsPrice,
+      quantity: item.quantity,
+    }),
+  };
 };
 
 /**
@@ -224,6 +280,104 @@ export const assertProductsPurchasableViaCart = async (productIds) => {
 };
 
 /**
+ * Продаётся ли товар за баллы и на каких условиях — снимком на момент заказа.
+ *
+ * @param {Record<string, unknown>} product
+ */
+const buildPointsSaleSnapshot = (product) => {
+  const active = isProductPointsSaleActive(product);
+  return {
+    pointsSaleActive: active,
+    pointsPrice: active
+      ? normalizeProductPointsPrice(product.productPointsPrice)
+      : null,
+    pointsPerBuyerLimit: normalizeProductPointsPerBuyerLimit(
+      product.productPointsPerBuyerLimit,
+    ),
+  };
+};
+
+/**
+ * Заказ либо целиком за баллы, либо целиком за рубли: у них разная судьба
+ * денег (резерв баллов против эскроу рублей), и одна позиция не может жить
+ * по двум правилам. Корзина разводит их по разным заказам сама.
+ *
+ * @param {Record<string, { pointsSaleActive?: boolean }>} productById
+ * @returns {boolean} заказ за баллы
+ */
+const resolvePointsOrderMode = (productById) => {
+  const rows = Object.values(productById);
+  const pointsCount = rows.filter((row) => row?.pointsSaleActive === true).length;
+  if (pointsCount > 0 && pointsCount < rows.length) {
+    throw new AppError(400, PRODUCT_POINTS_SALE_MIXED_ORDER_MESSAGE);
+  }
+  return rows.length > 0 && pointsCount === rows.length;
+};
+
+/**
+ * Лимит в одни руки для товаров за баллы: считаем штуки во всех заказах
+ * покупателя, кроме отменённых и возвращённых, плюс текущий заказ.
+ *
+ * Проверка внутри транзакции заказа. От двух одновременных заказов одного
+ * покупателя она не страхует полностью (снимок транзакции), но лимит —
+ * защита продавца от перекупщика, а не от денег: баллы всё равно списываются
+ * за каждую штуку.
+ *
+ * @param {{
+ *   buyerId: string;
+ *   items: Array<{ productId: unknown; quantity: number }>;
+ *   productById: Record<string, { pointsPerBuyerLimit?: number | null }>;
+ *   session: import("mongoose").ClientSession | null;
+ * }} params
+ */
+const assertPointsPerBuyerLimit = async ({ buyerId, items, productById, session }) => {
+  /** @type {Map<string, number>} */
+  const requested = new Map();
+  for (const item of items) {
+    const id = String(item.productId);
+    requested.set(
+      id,
+      (requested.get(id) ?? 0) + Math.floor(Number(item.quantity) || 0),
+    );
+  }
+  const limited = [...requested.keys()].filter(
+    (id) => productById[id]?.pointsPerBuyerLimit != null,
+  );
+  if (limited.length === 0) {
+    return;
+  }
+
+  const objectIds = limited.map((id) => new mongoose.Types.ObjectId(id));
+  const rows = await OrderModel.aggregate([
+    {
+      $match: {
+        userBuyerId: new mongoose.Types.ObjectId(String(buyerId)),
+        "items.productId": { $in: objectIds },
+      },
+    },
+    { $unwind: "$items" },
+    {
+      $match: {
+        "items.productId": { $in: objectIds },
+        "items.status": { $nin: [ORDER_STATUS_CANCELLED, ORDER_STATUS_RETURNED] },
+      },
+    },
+    { $group: { _id: "$items.productId", quantity: { $sum: "$items.quantity" } } },
+  ]).session(session ?? null);
+
+  /** @type {Map<string, number>} */
+  const bought = new Map(
+    rows.map((row) => [String(row._id), Number(row.quantity) || 0]),
+  );
+  for (const id of limited) {
+    const limit = Number(productById[id].pointsPerBuyerLimit);
+    if ((bought.get(id) ?? 0) + (requested.get(id) ?? 0) > limit) {
+      throw new AppError(400, buildPointsPerBuyerLimitExceededMessage(limit));
+    }
+  }
+};
+
+/**
  * @param {string[]} productIds
  */
 export const fetchAvailableProductsForOrder = async (productIds) => {
@@ -240,7 +394,7 @@ export const fetchAvailableProductsForOrder = async (productIds) => {
       // productDeliveryCarrier обязателен: у ЛОБО оба старых флага сняты,
       // и без явного поля resolveProductDeliveryCarrier возвращал null —
       // заказ падал с «Доставка недоступна для одного из товаров».
-      "_id productPrice productName loyaltyPointsPerUnit productSeller productPickupAddress productPickupLat productPickupLon productPickupLocations productPickupEnabled productDeliveryEnabled productCourierDeliveryEnabled productDeliveryCarrier productRegionCode productWholesaleEnabled productWholesaleMinQty productWholesalePrice affiliateEnabled affiliatePercent productBuyNFreeEnabled productBuyNFreeThreshold",
+      "_id productPrice productName loyaltyPointsPerUnit productSeller productPickupAddress productPickupLat productPickupLon productPickupLocations productPickupEnabled productDeliveryEnabled productCourierDeliveryEnabled productDeliveryCarrier productRegionCode productWholesaleEnabled productWholesaleMinQty productWholesalePrice affiliateEnabled affiliatePercent productBuyNFreeEnabled productBuyNFreeThreshold productPointsSaleEnabled productPointsPrice productPointsPerBuyerLimit",
     )
     .lean();
 
@@ -250,6 +404,7 @@ export const fetchAvailableProductsForOrder = async (productIds) => {
     const id = String(product._id);
     const name = String(product.productName ?? "").trim();
     byId[id] = {
+      ...buildPointsSaleSnapshot(product),
       price: product.productPrice,
       name: name.length > 0 ? name : "Товар без названия",
       loyaltyPointsPerUnit: normalizeProductLoyaltyPointsPerUnit(
@@ -586,11 +741,16 @@ export async function createOrder({
       await assertProductsPurchasableViaCart([productId]);
       const product = await ProductModel.findById(productId)
         .select(
-          "loyaltyPointsPerUnit productSeller productPickupAddress productPickupLat productPickupLon productPickupLocations productPickupEnabled productDeliveryEnabled productCourierDeliveryEnabled productRegionCode affiliateEnabled affiliatePercent productBuyNFreeEnabled productBuyNFreeThreshold",
+          "loyaltyPointsPerUnit productSeller productPickupAddress productPickupLat productPickupLon productPickupLocations productPickupEnabled productDeliveryEnabled productCourierDeliveryEnabled productRegionCode affiliateEnabled affiliatePercent productBuyNFreeEnabled productBuyNFreeThreshold productPointsSaleEnabled productPointsPrice",
         )
         .lean();
       if (!product) {
         throw new AppError(400, "Товар не найден");
+      }
+      // Предложение цены — торг в рублях; товар за баллы так не продаётся,
+      // даже если предложение приняли до того, как включили продажу за баллы.
+      if (isProductPointsSaleActive(product)) {
+        throw new AppError(400, PRODUCT_POINTS_SALE_OFFER_FORBIDDEN_MESSAGE);
       }
       productById[productId] = {
         price: resolved.price,
@@ -644,12 +804,21 @@ export async function createOrder({
   await assertSellersOpenForProducts(productById);
   assertCreateOrderSingleSeller(productById);
 
-  await assertSellersAcceptPaymentMethod(
-    [
-      ...new Set(Object.values(productById).map((row) => String(row?.sellerId ?? ""))),
-    ].filter(Boolean),
-    paymentMethod,
-  );
+  const isPointsOrder = resolvePointsOrderMode(productById);
+  const orderSellerIds = [
+    ...new Set(Object.values(productById).map((row) => String(row?.sellerId ?? ""))),
+  ].filter(Boolean);
+
+  // У заказа за баллы рублями платится только доставка — и только при
+  // получении: предоплата открыла бы рублёвый эскроу на заказ без рублёвого
+  // товара. Способ оплаты продавца проверяем ниже, когда станет ясно, едет
+  // ли заказ вообще: за самовывоз за баллы рублей не платят.
+  if (isPointsOrder && paymentMethod === ORDER_PAYMENT_METHOD_CARD_PREPAID) {
+    throw new AppError(400, PRODUCT_POINTS_SALE_PREPAID_FORBIDDEN_MESSAGE);
+  }
+  if (!isPointsOrder) {
+    await assertSellersAcceptPaymentMethod(orderSellerIds, paymentMethod);
+  }
 
   // СДЭК везёт по договору продавца: товару не нужна своя «доставка
   // продавцом». Выбор проверяем до транзакции — это запросы во внешнюю службу.
@@ -707,6 +876,10 @@ export async function createOrder({
         : ORDER_FULFILLMENT_PICKUP,
   });
   const resolvedFulfillment = fulfillmentSplit.orderFulfillmentMethod;
+
+  if (isPointsOrder && fulfillmentSplit.hasDelivery) {
+    await assertSellersAcceptPaymentMethod(orderSellerIds, paymentMethod);
+  }
 
   // Проверяем каждую половину своим правилом: в смешанном заказе товар
   // самовывозного продавца не обязан поддерживать доставку, и наоборот.
@@ -873,10 +1046,13 @@ export async function createOrder({
   });
 
   const referrerUserId = await resolveAffiliateReferrerUserId(affiliateCode);
-  const appliedPromos = await listAppliedProductPromosForUser({
-    userId: String(userId),
-    productIds: uniqueProductIds,
-  });
+  // Промокод — скидка в рублях; у заказа за баллы их нет.
+  const appliedPromos = isPointsOrder
+    ? []
+    : await listAppliedProductPromosForUser({
+        userId: String(userId),
+        productIds: uniqueProductIds,
+      });
   /** @type {Record<string, { code: string; discountPercent: number }>} */
   const promoByProductId = {};
   for (const row of appliedPromos) {
@@ -889,6 +1065,14 @@ export async function createOrder({
   try {
     const created = await runInTransaction(async (session) => {
       await guardOrderItemsStockInTransaction(items, userId, session);
+      if (isPointsOrder) {
+        await assertPointsPerBuyerLimit({
+          buyerId: String(userId),
+          items,
+          productById,
+          session,
+        });
+      }
 
       const orderId = new mongoose.Types.ObjectId();
       /** @type {Record<string, number>} */
@@ -903,6 +1087,7 @@ export async function createOrder({
         claimAttemptedProductIds.add(productId);
         const snapshot = productById[productId];
         if (
+          snapshot?.pointsSaleActive === true ||
           !isProductBuyNFreeActive({
             productBuyNFreeEnabled: snapshot?.buyNFreeEnabled === true,
             productBuyNFreeThreshold: snapshot?.buyNFreeThreshold,
@@ -956,6 +1141,15 @@ export async function createOrder({
         },
       }));
       await reserveLoyaltyPointsForNewOrder(reserveLines, session);
+      const loyaltyPointsTotal = pricedItems.reduce(
+        (sum, line) => sum + (Number(line.pointsPaidTotal) || 0),
+        0,
+      );
+      await holdPointsForNewOrder({
+        buyerId: String(userId),
+        total: loyaltyPointsTotal,
+        session,
+      });
 
       const [createdOrder] = await OrderModel.create(
         [
@@ -964,6 +1158,8 @@ export async function createOrder({
             userBuyerId: userId,
             items: pricedItems,
             totalAmount,
+            paidWithLoyaltyPoints: isPointsOrder,
+            loyaltyPointsTotal,
             deliveryAddress: addressForOrder.displayAddress,
             deliveryAddressFlat: addressForOrder.flat ?? "",
             deliveryAddressFiasId: addressForOrder.fiasId ?? "",

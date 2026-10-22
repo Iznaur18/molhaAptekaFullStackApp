@@ -14,6 +14,8 @@ import { hasMixedDeliveryCarriers } from "../../../entities/cart/lib/hasMixedDel
 import { resolveProductImageUrl } from "../../../entities/product/lib/resolveProductImageUrl.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../../entities/product/model/productConstants.js";
 import { CART_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { formatLoyaltyPointsAmount } from "@molha/api-contract";
+
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 
@@ -66,8 +68,9 @@ function CartSellerProductThumb({ line }) {
  *   summary: {
  *     selectedLines: Array<{ quantity?: number; product?: Record<string, any> }>;
  *     selectedTotal: number;
+ *     selectedPointsTotal?: number;
  *   };
- *   onOpen: (sellerId: string) => void;
+ *   onOpen: (cartGroupId: string) => void;
  * }} props
  */
 function CartSellerRow({ group, summary, onOpen }) {
@@ -86,7 +89,11 @@ function CartSellerRow({ group, summary, onOpen }) {
   const avatarObjectPosition = formatProfileImageObjectPosition(
     getUserAvatarFocus(sellerForPhoto),
   );
-  const displayName = group.sellerName?.trim() || CART_PAGE_UI.SECTION_SELLER_FALLBACK;
+  const sellerName = group.sellerName?.trim() || CART_PAGE_UI.SECTION_SELLER_FALLBACK;
+  // Товары за баллы — отдельный заказ у того же продавца, и строка своя.
+  const displayName = group.paidWithLoyaltyPoints
+    ? `${sellerName} · ${CART_PAGE_UI.POINTS_GROUP_SUFFIX}`
+    : sellerName;
   const itemsCount = summary.selectedLines.reduce(
     (sum, line) => sum + (Number(line?.quantity) || 0),
     0,
@@ -108,7 +115,7 @@ function CartSellerRow({ group, summary, onOpen }) {
         <button
           type="button"
           className="cart-seller-row__main"
-          onClick={() => onOpen(group.sellerId)}
+          onClick={() => onOpen(group.cartGroupId)}
         >
           <UserPremiumAvatar
             className="cart-seller-row__avatar"
@@ -139,10 +146,12 @@ function CartSellerRow({ group, summary, onOpen }) {
         <button
           type="button"
           className="cart-seller-row__checkout"
-          onClick={() => onOpen(group.sellerId)}
+          onClick={() => onOpen(group.cartGroupId)}
         >
           <span className="cart-seller-row__checkout-price">
-            {formatPriceRub(summary.selectedTotal)}
+            {group.paidWithLoyaltyPoints
+              ? formatLoyaltyPointsAmount(summary.selectedPointsTotal)
+              : formatPriceRub(summary.selectedTotal)}
           </span>
           <span className="cart-seller-row__checkout-label">
             {CART_PAGE_UI.SELLER_ROW_OPEN}
@@ -175,9 +184,10 @@ function CartSellerRow({ group, summary, onOpen }) {
  *     summary: {
  *       selectedLines: Array<{ quantity?: number; product?: Record<string, any> }>;
  *       selectedTotal: number;
+ *       selectedPointsTotal?: number;
  *     };
  *   }>;
- *   onOpenSeller: (sellerId: string) => void;
+ *   onOpenSeller: (cartGroupId: string) => void;
  * }} props
  */
 export function CartSellerList({ entries, onOpenSeller }) {
@@ -189,7 +199,7 @@ export function CartSellerList({ entries, onOpenSeller }) {
     <ul className="cart-seller-list" role="list">
       {entries.map(({ group, summary }) => (
         <li
-          key={group.sellerId || "unknown-seller"}
+          key={group.cartGroupId || "unknown-seller"}
           className="cart-seller-list__item"
           role="listitem"
         >

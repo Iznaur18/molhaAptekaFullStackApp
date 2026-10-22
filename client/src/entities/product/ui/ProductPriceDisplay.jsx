@@ -1,4 +1,4 @@
-import { formatProductDealPrice } from "@molha/api-contract";
+import { formatProductDealPrice, isProductPointsSaleActive } from "@molha/api-contract";
 
 import { PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
@@ -41,8 +41,10 @@ export function ProductPriceDisplay({
   onDiscountBadgePress,
   onLoyaltyBadgePress,
 }) {
+  // Товар за баллы: цена одна — в баллах, без старой цены, скидок и кешбэка.
+  const isPointsSale = isProductPointsSaleActive(product);
   const discountPercent = resolveProductDiscountPercent(product);
-  const hasDiscount = hasProductCatalogDiscount(product);
+  const hasDiscount = !isPointsSale && hasProductCatalogDiscount(product);
   // У услуги цена бывает «от 1 500 ₽ / час» или «Договорная».
   const currentPriceText = formatProductDealPrice(
     product,
@@ -57,6 +59,7 @@ export function ProductPriceDisplay({
   const rootClassName = [
     "product-price-display",
     `product-price-display--${variant}`,
+    isPointsSale ? "product-price-display--points" : "",
     className,
   ]
     .filter(Boolean)
@@ -73,14 +76,14 @@ export function ProductPriceDisplay({
       {hasDiscount ? (
         <span className="product-price-display__old">{oldPriceText}</span>
       ) : null}
-      {showDiscountBadge ? (
+      {showDiscountBadge && !isPointsSale ? (
         <ProductDiscountBadge
           discountPercent={discountPercent}
           className="product-price-display__discount"
           onPress={onDiscountBadgePress}
         />
       ) : null}
-      {showLoyaltyBadge ? (
+      {showLoyaltyBadge && !isPointsSale ? (
         <ProductLoyaltyPointsBadge
           product={product}
           isAuthorized={isAuthorized}

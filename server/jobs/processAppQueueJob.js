@@ -25,6 +25,7 @@ import {
 import { sendEmailVerificationForUser } from "../services/auth/emailVerification.js";
 import { processCourierStuckShipmentCronTasks } from "../services/courier/courierStuckShipmentsCron.js";
 import { processEscrowReleaseCronTasks } from "../services/payments/escrowReleaseCron.js";
+import { processPointsPaymentReleaseCronTasks } from "../services/order/orderPointsPayment.js";
 import { processDealRequestCronTasks } from "../services/deal-request/dealRequestCron.js";
 import { processOrderPrepaymentDeadlines } from "../services/payments/orderPrepaymentDeadline.js";
 import { processLoboCronTasks } from "../services/shipping/lobo/loboStatusSync.js";
@@ -84,8 +85,13 @@ export async function processAppQueueJob(job) {
       return runAnalyticsReconciliation();
     case JOB_PROCESS_COURIER_STUCK_SHIPMENTS:
       return processCourierStuckShipmentCronTasks();
-    case JOB_PROCESS_ESCROW_RELEASE:
-      return processEscrowReleaseCronTasks();
+    case JOB_PROCESS_ESCROW_RELEASE: {
+      // Баллы за товары «за баллы» размораживает тот же часовой крон, что и
+      // рубли: срок у них один — 7 дней после вручения.
+      const rub = await processEscrowReleaseCronTasks();
+      const points = await processPointsPaymentReleaseCronTasks();
+      return { ...rub, points };
+    }
     case JOB_PROCESS_DEAL_REQUESTS:
       return processDealRequestCronTasks();
     case JOB_PROCESS_ORDER_PREPAYMENT_DEADLINES:

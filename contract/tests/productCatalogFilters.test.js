@@ -103,6 +103,7 @@ test("ответ фасетов: счётчики «Рядом» и подпис
       affiliateOnly: 0,
       originalOnly: 0,
       returnOnly: 0,
+      pointsSaleOnly: 0,
       sellerConfirmed: 3,
       sellerPremium: 0,
       followingOnly: null,

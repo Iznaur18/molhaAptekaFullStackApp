@@ -23,6 +23,7 @@ const emptyExtraFilters = {
   ratingMin: null,
   withReviews: null,
   returnOnly: null,
+  pointsSaleOnly: null,
   sellerConfirmed: null,
   sellerPremium: null,
 };
@@ -110,6 +111,7 @@ describe("buildCatalogListQueryParams", () => {
         ratingMin: 4,
         withReviews: true,
         returnOnly: true,
+        pointsSaleOnly: true,
         sellerConfirmed: true,
         sellerPremium: true,
       },
@@ -123,6 +125,7 @@ describe("buildCatalogListQueryParams", () => {
       ratingMin: 4,
       withReviews: true,
       returnOnly: true,
+      pointsSaleOnly: true,
       sellerConfirmed: true,
       sellerPremium: true,
     });

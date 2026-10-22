@@ -2,6 +2,11 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
+import {
+  formatLoyaltyPointsAmount,
+  isProductPointsSaleActive,
+} from "@molha/api-contract";
+
 import { resolveProductImageUrl } from "@/entities/product/lib/resolveProductImageUrl";
 import { useWishlist } from "@/entities/wishlist/model/WishlistProvider";
 import { WISHLIST_PAGE_UI } from "@/shared/config";
@@ -13,6 +18,8 @@ type WishlistProduct = {
   _id: string;
   productName?: string;
   productPrice?: number;
+  productPointsSaleEnabled?: boolean | null;
+  productPointsPrice?: number | null;
   productImageUrls?: unknown;
   productImageUrl?: unknown;
 };
@@ -46,7 +53,11 @@ export const WishlistRow = ({ product, onProductPress }: WishlistRowProps) => {
             {heading}
           </Text>
         </Pressable>
-        <Text style={styles.price}>{formatPriceRub(product.productPrice)}</Text>
+        <Text style={styles.price}>
+          {isProductPointsSaleActive(product)
+            ? formatLoyaltyPointsAmount(product.productPointsPrice)
+            : formatPriceRub(product.productPrice)}
+        </Text>
       </View>
       <Pressable
         style={[styles.remove, removePressed && styles.removePressed]}

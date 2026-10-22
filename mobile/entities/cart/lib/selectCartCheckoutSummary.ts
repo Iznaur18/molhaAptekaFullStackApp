@@ -15,6 +15,8 @@ export type CartCheckoutSummary = {
   selectedLines: CartLine[];
   checkoutBlockReason: string | null;
   selectedTotal: number;
+  /** Сумма в баллах по отмеченным товарам за баллы. */
+  selectedPointsTotal: number;
   selectedListTotal: number;
   selectedDiscount: number;
   selectedPromoDiscount: number;
@@ -84,6 +86,10 @@ export const selectCartCheckoutSummary = (
       currentUserId,
     ),
     selectedTotal: sumLineTotals(selectedLines),
+    selectedPointsTotal: selectedLines.reduce(
+      (sum, line) => sum + (line.pointsLineTotal ?? 0),
+      0,
+    ),
     selectedListTotal: sumCartLinesCatalogListTotal(selectedLines),
     selectedDiscount: sumCartLinesCatalogDiscount(selectedLines),
     selectedPromoDiscount: sumCartLinesPromoDiscount(selectedLines),

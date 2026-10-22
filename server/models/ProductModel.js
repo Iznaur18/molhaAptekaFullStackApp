@@ -621,6 +621,25 @@ const ProductSchema = new Schema(
       default: 0,
       min: 0,
     },
+    /**
+     * Продажа за баллы: пока включена, товар покупают только баллами по
+     * productPointsPrice. Рублёвая цена остаётся и вернётся при выключении.
+     */
+    productPointsSaleEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    productPointsPrice: {
+      type: Number,
+      default: null,
+      min: 1,
+    },
+    /** Сколько штук один покупатель может купить за баллы; null — без ограничения. */
+    productPointsPerBuyerLimit: {
+      type: Number,
+      default: 1,
+      min: 1,
+    },
     /** Партнёрская услуга на объявлении: % шареру с продажи. */
     affiliateEnabled: {
       type: Boolean,

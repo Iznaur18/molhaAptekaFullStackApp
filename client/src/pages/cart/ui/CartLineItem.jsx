@@ -1,8 +1,10 @@
 import { useState } from "react";
 
+import { formatLoyaltyPointsAmount } from "@molha/api-contract";
+
 import { useCart } from "../../../entities/cart/model/useCart.js";
 import { getCartLineStockHint } from "../../../entities/cart/lib/getCartLineStockHint.js";
-import { getProductPurchaseLimit } from "../../../entities/product/lib/getProductPurchaseLimit.js";
+import { getProductCartQuantityLimit } from "../../../entities/product/lib/getProductPurchaseLimit.js";
 import { resolveProductImageUrl } from "../../../entities/product/lib/resolveProductImageUrl.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../../entities/product/model/productConstants.js";
 import {
@@ -45,19 +47,26 @@ export function CartLineItem({
   const heading = product?.productName?.trim() || COMMON_UI.EM_DASH;
   const retailPrice = Math.floor(Number(product?.productPrice)) || 0;
   const unitPrice = Math.floor(Number(line.unitPrice)) || 0;
+  const isPointsSale = line.isPointsSale === true;
   const showRetailStrike =
+    !isPointsSale &&
     retailPrice > unitPrice &&
     (line.isPromoApplied === true || line.isWholesaleApplied === true);
-  const unitPriceText = formatPriceRub(unitPrice);
+  // Товар за баллы: и цена, и сумма строки — в баллах.
+  const unitPriceText = isPointsSale
+    ? formatLoyaltyPointsAmount(line.pointsUnitPrice)
+    : formatPriceRub(unitPrice);
   const retailPriceText = formatPriceRub(retailPrice);
-  const lineTotalText = formatPriceRub(line.lineTotal);
+  const lineTotalText = isPointsSale
+    ? formatLoyaltyPointsAmount(line.pointsLineTotal)
+    : formatPriceRub(line.lineTotal);
   const buyNFreeUnits = Math.floor(Number(line.buyNFreeUnits) || 0);
   const paidQty = Math.max(0, line.quantity - buyNFreeUnits);
   const buyNFreeHint =
     buyNFreeUnits > 0
       ? PRODUCT_BUY_N_FREE_UI.CART_LINE_HINT(paidQty, unitPriceText)
       : null;
-  const purchaseLimit = getProductPurchaseLimit(product);
+  const purchaseLimit = getProductCartQuantityLimit(product);
   const stockHint = getCartLineStockHint(purchaseLimit, line.quantity);
   const resolvedImage = resolveProductImageUrl(product);
   const imageUrl =

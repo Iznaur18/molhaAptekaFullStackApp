@@ -1,4 +1,8 @@
 import {
+  isProductPointsSaleActive,
+  normalizeProductPointsPrice,
+} from "@molha/api-contract";
+import {
   resolveBuyNFreeFreeUnitsForCart,
   resolveBuyNFreeLineTotal,
   resolveProductUnitPriceWithPromo,
@@ -23,6 +27,9 @@ import { normalizeStaleFlashSaleProduct } from "../../product/lib/isProductFlash
  * @property {number | null} unitPriceSnapshot
  * @property {boolean} priceIncreasedSinceAdd
  * @property {number} buyNFreeUnits
+ * @property {boolean} isPointsSale товар продаётся за баллы: рублёвые суммы строки — 0
+ * @property {number} pointsUnitPrice
+ * @property {number} pointsLineTotal
  */
 
 /**
@@ -78,6 +85,31 @@ export const selectCartLines = (
     const product =
       rawProduct != null ? normalizeStaleFlashSaleProduct(rawProduct, nowMs) : null;
     const qty = Math.floor(Number(quantity)) || 0;
+    // Товар за баллы: ни рублёвой цены, ни промокода, ни опта, ни «N+1» —
+    // в заказе их тоже не будет (см. createOrder на сервере).
+    if (product != null && isProductPointsSaleActive(product)) {
+      const pointsUnitPrice =
+        normalizeProductPointsPrice(product.productPointsPrice) ?? 0;
+      return {
+        productId,
+        quantity: qty,
+        product,
+        unitPrice: 0,
+        lineTotal: 0,
+        isMissing: false,
+        isWholesaleApplied: false,
+        wholesaleSavings: 0,
+        promoDiscountPercent: null,
+        promoCode: null,
+        isPromoApplied: false,
+        unitPriceSnapshot: null,
+        priceIncreasedSinceAdd: false,
+        buyNFreeUnits: 0,
+        isPointsSale: true,
+        pointsUnitPrice,
+        pointsLineTotal: pointsUnitPrice * qty,
+      };
+    }
     const promo = promoByProductId.get(productId) ?? null;
     const promoDiscountPercent =
       promo != null ? Math.floor(Number(promo.discountPercent)) || null : null;
@@ -131,6 +163,9 @@ export const selectCartLines = (
       unitPriceSnapshot,
       priceIncreasedSinceAdd,
       buyNFreeUnits,
+      isPointsSale: false,
+      pointsUnitPrice: 0,
+      pointsLineTotal: 0,
     };
   });
 

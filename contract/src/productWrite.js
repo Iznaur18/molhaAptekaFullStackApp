@@ -19,6 +19,7 @@ import {
   productPickupLocationsFieldSchema,
 } from "./productPickupLocations.js";
 import { productBuyNFreePatchFieldsShape } from "./productBuyNFree.js";
+import { productPointsSalePatchFieldsShape } from "./productPointsSale.js";
 import { productWholesalePatchFieldsShape } from "./productWholesale.js";
 import { productRentalPatchFieldsShape } from "./productRental.js";
 import { productDealTermsFieldsShape } from "./productDealTerms.js";
@@ -450,6 +451,7 @@ const patchFieldShape = {
   ...productDealTermsFieldsShape,
   ...productAffiliatePatchFieldsShape,
   ...productFlashSalePatchFieldsShape,
+  ...productPointsSalePatchFieldsShape,
   loyaltyPointsPerUnit: z.coerce.number().int().min(0).optional(),
   productCharacteristics: z
     .array(productCharacteristicSchema)

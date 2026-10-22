@@ -63,6 +63,7 @@ import { isAwaitingGitorgCourier } from "../lib/isAwaitingGitorgCourier.js";
 import { BuyerPassportSharePanel } from "../../installment/ui/BuyerPassportSharePanel.jsx";
 import { formatIsoDateTime } from "../../../shared/lib/formatIsoDateTime.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
+import { formatLoyaltyPointsAmount } from "@molha/api-contract";
 import {
   formatRuPhoneDisplayOrEmpty,
   toRuPhoneTelHref,
@@ -262,7 +263,16 @@ function OrderCardMeta({
       ) : null}
       <div className="order-card__meta-row">
         <dt>{ORDER_CARD_UI.PAYMENT_LABEL}</dt>
-        <dd>{formatPaymentMethod(order.paymentMethod)}</dd>
+        <dd>
+          {/* Заказ за баллы: товар оплачен баллами, рублями — только доставка. */}
+          {order.paidWithLoyaltyPoints === true
+            ? isPickupShipment
+              ? ORDER_CARD_UI.PAYMENT_POINTS
+              : ORDER_CARD_UI.PAYMENT_POINTS_WITH_DELIVERY(
+                  formatPaymentMethod(order.paymentMethod),
+                )
+            : formatPaymentMethod(order.paymentMethod)}
+        </dd>
       </div>
       {isInstallmentOrder && order.installmentContract ? (
         <div className="order-card__meta-row">
@@ -342,6 +352,15 @@ function OrderCardLineItem({
   const quantity = Math.max(0, Math.floor(Number(item.quantity) || 0));
   const unitPriceRub = Number(item.unitPriceAtOrder) || 0;
   const lineTotalRub = unitPriceRub * quantity;
+  // Позиция за баллы: рублёвая цена у неё 0, показываем цену в баллах.
+  const pointsUnitPrice = Math.max(0, Math.floor(Number(item.pointsPriceAtOrder) || 0));
+  const isPointsLine = pointsUnitPrice > 0;
+  const unitPriceText = isPointsLine
+    ? formatLoyaltyPointsAmount(pointsUnitPrice)
+    : formatPriceRub(unitPriceRub);
+  const lineTotalText = isPointsLine
+    ? formatLoyaltyPointsAmount(pointsUnitPrice * quantity)
+    : formatPriceRub(lineTotalRub);
   const productName = resolveOrderLineItemProductName(item);
   const affiliateSellerLine = resolveOrderLineAffiliateSellerLine({
     item,
@@ -446,24 +465,17 @@ function OrderCardLineItem({
               // Сумма позиции напротив названия; при нескольких штуках — ещё
               // «количество × цена за штуку», чтобы было видно, из чего она.
               <span className="order-card__item-price-block">
-                <span className="order-card__item-price">
-                  {formatPriceRub(lineTotalRub)}
-                </span>
+                <span className="order-card__item-price">{lineTotalText}</span>
                 {quantity > 1 ? (
                   <span className="order-card__item-price-unit">
-                    {ORDER_CARD_UI.ITEM_QUANTITY_UNIT_PRICE(
-                      quantity,
-                      formatPriceRub(unitPriceRub),
-                    )}
+                    {ORDER_CARD_UI.ITEM_QUANTITY_UNIT_PRICE(quantity, unitPriceText)}
                   </span>
                 ) : null}
               </span>
             ) : (
               <>
                 <span className="order-card__item-quantity">×{item.quantity}</span>
-                <span className="order-card__item-price">
-                  {formatPriceRub(item.unitPriceAtOrder)}
-                </span>
+                <span className="order-card__item-price">{unitPriceText}</span>
               </>
             )}
           </div>
@@ -889,9 +901,18 @@ export function OrderCard({
   // отменены — отправления нет, и доставку не показываем.
   const courierDeliveryFeeRub =
     shipmentOwn?.courierDelivery === true ? deliveryFeeRub : 0;
-  const orderDeliveryRub =
-    itemsSummary.totalAmount > 0 ? sellerDeliveryFeeRub + courierDeliveryFeeRub : 0;
+  const hasBillableItems = itemsSummary.totalAmount > 0 || itemsSummary.pointsTotal > 0;
+  const orderDeliveryRub = hasBillableItems
+    ? sellerDeliveryFeeRub + courierDeliveryFeeRub
+    : 0;
   const orderTotalWithDeliveryRub = itemsSummary.totalAmount + orderDeliveryRub;
+  // Заказ за баллы: товар — баллами, доставка (если есть) — рублями отдельно.
+  const orderTotalText =
+    itemsSummary.pointsTotal > 0
+      ? orderDeliveryRub > 0
+        ? `${formatLoyaltyPointsAmount(itemsSummary.pointsTotal)} + ${formatPriceRub(orderDeliveryRub)}`
+        : formatLoyaltyPointsAmount(itemsSummary.pointsTotal)
+      : formatPriceRub(orderTotalWithDeliveryRub);
   const awaitingGitorgCourier = isAwaitingGitorgCourier({
     status: shipmentStatusNow,
     shipment: shipmentOwn,
@@ -1440,9 +1461,7 @@ export function OrderCard({
             <span className="order-card__quantity">×{itemsSummary.quantity}</span>
           ) : null}
           <span className="order-card__total-block">
-            <span className="order-card__total">
-              {formatPriceRub(orderTotalWithDeliveryRub)}
-            </span>
+            <span className="order-card__total">{orderTotalText}</span>
             {orderDeliveryRub > 0 ? (
               <span className="order-card__total-note">
                 {ORDER_CARD_UI.TOTAL_WITH_DELIVERY_NOTE}

@@ -107,6 +107,8 @@ type CheckoutFormProps = {
   allowedPaymentMethods?: readonly string[] | null;
   /** Продавцы входят в список предоплаты площадки — доступна СБП. */
   cardPrepaidAvailable?: boolean;
+  /** Товары за баллы: рублями платится только доставка. */
+  paidWithLoyaltyPoints?: boolean;
   /** Везёт ли продавец сам; по умолчанию — как `deliveryAvailable`. */
   sellerDeliveryAvailable?: boolean;
   /** СДЭК у этого продавца подключён; `null` — службы нет. */
@@ -153,6 +155,7 @@ export const CheckoutForm = ({
   pickupAvailable = true,
   allowedPaymentMethods = null,
   cardPrepaidAvailable = false,
+  paidWithLoyaltyPoints = false,
   sellerDeliveryAvailable,
   cdek = null,
   yandex = null,
@@ -750,13 +753,21 @@ export const CheckoutForm = ({
           </View>
         )}
 
-        <CheckoutPaymentMethodPicker
-          value={paymentMethod}
-          onChange={setPaymentMethod}
-          disabled={isDisabled || isSubmitting}
-          cardPrepaidAvailable={cardPrepaidAvailable}
-          allowedMethods={effectiveAllowedPaymentMethods}
-        />
+        {/* Товар за баллы: при самовывозе рублями платить нечего — выбора нет. */}
+        {paidWithLoyaltyPoints && isPickup ? null : (
+          <CheckoutPaymentMethodPicker
+            value={paymentMethod}
+            onChange={setPaymentMethod}
+            disabled={isDisabled || isSubmitting}
+            cardPrepaidAvailable={cardPrepaidAvailable}
+            allowedMethods={effectiveAllowedPaymentMethods}
+            legend={
+              paidWithLoyaltyPoints
+                ? CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD_DELIVERY
+                : CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD
+            }
+          />
+        )}
 
         {!renderFooter && displayError ? (
           <Text style={checkoutStyles.feedbackError}>{displayError}</Text>

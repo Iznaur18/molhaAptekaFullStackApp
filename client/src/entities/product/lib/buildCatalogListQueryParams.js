@@ -64,6 +64,7 @@ export function buildCatalogListQueryParams({
     ratingMin: extra.ratingMin,
     withReviews: extra.withReviews ? true : null,
     returnOnly: extra.returnOnly ? true : null,
+    pointsSaleOnly: extra.pointsSaleOnly ? true : null,
     sellerConfirmed: extra.sellerConfirmed ? true : null,
     sellerPremium: extra.sellerPremium ? true : null,
     regionCode: isMineMode ? null : viewerRegionCode || null,

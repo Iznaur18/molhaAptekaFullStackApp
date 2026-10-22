@@ -1,3 +1,5 @@
+import { PRODUCT_POINTS_SALE_PROMOTION_FORBIDDEN_MESSAGE } from "@molha/api-contract";
+
 import { ProductModel, ProductPromotionModel, UserModel } from "../../models/index.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import {
@@ -147,6 +149,9 @@ async function requestProductPromotionOnce({
   }
   if (product.productIsAvailable === false) {
     throw new AppError(409, "Скрытый товар нельзя продвигать");
+  }
+  if (product.productPointsSaleEnabled === true) {
+    throw new AppError(409, PRODUCT_POINTS_SALE_PROMOTION_FORBIDDEN_MESSAGE);
   }
   if (isProductCatalogPromotionActive(product)) {
     throw new AppError(409, buildProductPromotionAlreadyActiveMessage(product));
@@ -572,6 +577,9 @@ export async function approveProductPromotion({ staffId, promotionId }) {
   }
   if (product.productIsAvailable === false) {
     throw new AppError(409, "Скрытый товар нельзя продвигать");
+  }
+  if (product.productPointsSaleEnabled === true) {
+    throw new AppError(409, PRODUCT_POINTS_SALE_PROMOTION_FORBIDDEN_MESSAGE);
   }
   if (isProductCatalogPromotionActive(product)) {
     throw new AppError(409, buildProductPromotionAlreadyActiveMessage(product));

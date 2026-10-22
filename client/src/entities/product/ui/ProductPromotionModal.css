@@ -384,3 +384,11 @@
     grid-template-columns: 1fr;
   }
 }
+
+.product-promotion-modal__points-note {
+  margin: 0;
+  padding: var(--iz-space-4, 1rem) 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--iz-color-text-muted);
+}

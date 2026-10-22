@@ -154,4 +154,41 @@ describe("выбор способа по продавцам", () => {
     expect(group.deliveryAvailable).toBe(true);
     expect(group.courierDelivery).toBe(false);
   });
+
+  it("товары за баллы того же продавца — отдельная группа и отдельный заказ", () => {
+    const pointsLine = {
+      productId: "p-points",
+      quantity: 1,
+      product: {
+        productSeller: { _id: "s1", userName: "Иван" },
+        productPickupEnabled: true,
+        productPointsSaleEnabled: true,
+        productPointsPrice: 300,
+      },
+    };
+
+    const groups = groupCartLinesBySeller([line("s1"), pointsLine]);
+
+    expect(groups).toHaveLength(2);
+    expect(groups.map((group) => group.cartGroupId)).toEqual(["s1", "s1:points"]);
+    expect(groups.every((group) => group.sellerId === "s1")).toBe(true);
+    expect(groups[1].paidWithLoyaltyPoints).toBe(true);
+    expect(groups[1].lines).toEqual([pointsLine]);
+  });
+
+  it("флаг без цены в баллах — обычный товар за рубли", () => {
+    const [group] = groupCartLinesBySeller([
+      {
+        productId: "p1",
+        quantity: 1,
+        product: {
+          productSeller: { _id: "s1" },
+          productPointsSaleEnabled: true,
+          productPointsPrice: null,
+        },
+      },
+    ]);
+
+    expect(group.paidWithLoyaltyPoints).toBe(false);
+  });
 });

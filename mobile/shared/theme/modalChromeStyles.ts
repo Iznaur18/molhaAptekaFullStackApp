@@ -733,6 +733,12 @@ export const useProductEditManageSectionStyles = createThemedStyles((theme) => (
   root: {
     gap: 12,
   },
+  /** Паритет web `.product-edit-manage__note`. */
+  note: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: theme.colors.textMuted,
+  },
   warningBanner: {
     flexDirection: "row",
     alignItems: "flex-start",

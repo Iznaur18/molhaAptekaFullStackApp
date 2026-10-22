@@ -29,6 +29,7 @@ import "./ProductPromotionManageSection.css";
  * @property {boolean} [isSubmitting]
  * @property {() => void} [onOpenInstallmentProgram]
  * @property {() => void} [onOpenOutOfStockSettings]
+ * @property {() => void} [onOpenPointsSaleSettings]
  * @property {boolean} [embeddedInTab]
  */
 
@@ -74,6 +75,7 @@ export function ProductPromotionManageSection({
   onOpenPromoCodesSettings,
   onOpenOutOfStockSettings,
   onOpenFlashSaleSettings,
+  onOpenPointsSaleSettings,
   onSetFlashSale,
   onSetLoyaltyPoints,
   onSetBuyNFree,
@@ -146,6 +148,7 @@ export function ProductPromotionManageSection({
         onOpenPromoCodesSettings={onOpenPromoCodesSettings}
         onOpenOutOfStockSettings={onOpenOutOfStockSettings}
         onOpenFlashSaleSettings={onOpenFlashSaleSettings}
+        onOpenPointsSaleSettings={onOpenPointsSaleSettings}
         onSetFlashSale={onSetFlashSale}
         onSetLoyaltyPoints={onSetLoyaltyPoints}
         onSetBuyNFree={onSetBuyNFree}

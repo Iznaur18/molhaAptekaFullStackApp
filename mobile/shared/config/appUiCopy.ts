@@ -371,6 +371,11 @@ export const CART_PAGE_UI = {
   DELIVERY_HINT_FROM: (formatted: string) => `Доставка от ${formatted}`,
   DELIVERY_HINT_BY_TARIFF: "Доставка по тарифу продавца",
   SELLER_ROW_OPEN: "Перейти",
+  /** Подпись группы товаров за баллы: отдельный заказ у того же продавца. */
+  POINTS_GROUP_SUFFIX: "за баллы",
+  POINTS_PAYABLE_LABEL: "Баллами",
+  POINTS_PAYMENT_NOTE:
+    "Баллы спишутся со счёта при оформлении и перейдут продавцу после получения товара. Если заказ отменят — вернутся. Доставку, если она платная, оплачивают рублями при получении.",
   BACK_TO_SELLERS: "К продавцам",
   STOCK_REMAINING: (left: number) => `Осталось ${left} шт`,
   STOCK_QUANTITY_LIMITED: "Количество ограничено",
@@ -1278,6 +1283,7 @@ export const CHECKOUT_FORM_UI = {
   LABEL_FLAT: "Комментарий",
   PLACEHOLDER_FLAT: "подъезд, этаж, кв",
   LABEL_PAYMENT_METHOD: "Способ оплаты",
+  LABEL_PAYMENT_METHOD_DELIVERY: "Оплата доставки",
   PAYMENT_METHOD_CARD_SOON: "Скоро",
   PAYMENT_METHOD_NOT_ACCEPTED: "Продавец не принимает",
   LABEL_SHIPPING_PROVIDER: "Служба доставки",
@@ -1434,6 +1440,9 @@ export const ORDER_CARD_UI = {
   CDEK_STATUS_LABEL: "СДЭК",
   CDEK_PICK_UP_BY_LABEL: "Забрать до",
   PAYMENT_LABEL: "Оплата",
+  PAYMENT_POINTS: "Баллами",
+  PAYMENT_POINTS_WITH_DELIVERY: (deliveryMethodLabel: string) =>
+    `Баллами, доставка — ${deliveryMethodLabel.toLowerCase()}`,
   CREATED_LABEL: "Создан",
   BUYER_LABEL: "Покупатель",
   SELLER_LABEL: "Продавец",
@@ -2369,6 +2378,27 @@ export const CREATE_PRODUCT_UI = {
   LOYALTY_MODAL_CLOSE: "Закрыть",
   LOYALTY_MODAL_PENDING: "Сохраняем…",
   LOYALTY_MODAL_ERROR_REQUIRED: "Укажите целое число ≥ 0",
+  MANAGE_POINTS_SALE_TITLE: "Продажа за баллы",
+  MANAGE_POINTS_SALE_HINT:
+    "Покупатели оплатят товар баллами, баллы придут вам после получения товара",
+  MANAGE_POINTS_SALE_HINT_ON: (priceText: string, limit: number | null) =>
+    limit == null
+      ? `Цена ${priceText}, без ограничения в одни руки`
+      : `Цена ${priceText}, в одни руки до ${limit} шт.`,
+  MANAGE_POINTS_SALE_LOCKED_NOTE:
+    "Товар продаётся за баллы — акции, кешбэк, партнёрка и продвижение для него выключены",
+  POINTS_SALE_MODAL_TITLE: "Продажа за баллы",
+  POINTS_SALE_MODAL_PRICE_LABEL: "Цена в баллах",
+  POINTS_SALE_MODAL_LIMIT_LABEL: "В одни руки, шт.",
+  POINTS_SALE_MODAL_NO_LIMIT: "Без ограничения",
+  POINTS_SALE_MODAL_HINT:
+    "Пока продажа за баллы включена, товар покупают только баллами. Баллы держатся до получения и приходят вам за вычетом 2% комиссии — после подтверждения покупателем или через 7 дней после вручения. Акции, кешбэк и партнёрка для товара выключатся. Доставку покупатель оплачивает рублями при получении, как обычно.",
+  POINTS_SALE_MODAL_SAVE: "Включить продажу за баллы",
+  POINTS_SALE_MODAL_UPDATE: "Сохранить",
+  POINTS_SALE_MODAL_DISABLE: "Выключить продажу за баллы",
+  POINTS_SALE_MODAL_CLOSE: "Закрыть",
+  POINTS_SALE_MODAL_ERROR_PRICE: "Укажите цену в баллах — целое число от 1",
+  POINTS_SALE_MODAL_ERROR_LIMIT: "Лимит в одни руки — от 1 до 1000 шт.",
   MANAGE_BUY_N_FREE_TITLE: "Бесплатно от N",
   MANAGE_BUY_N_FREE_HINT:
     "После N завершённых заказов покупатель получит 1 шт. бесплатно",

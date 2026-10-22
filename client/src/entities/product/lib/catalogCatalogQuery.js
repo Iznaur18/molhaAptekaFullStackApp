@@ -42,6 +42,7 @@ export const CATALOG_QUERY_PARAM_PICKUP_ONLY = "pickupOnly";
 export const CATALOG_QUERY_PARAM_RATING_MIN = "ratingMin";
 export const CATALOG_QUERY_PARAM_WITH_REVIEWS = "withReviews";
 export const CATALOG_QUERY_PARAM_RETURN_ONLY = "returnOnly";
+export const CATALOG_QUERY_PARAM_POINTS_SALE_ONLY = "pointsSaleOnly";
 export const CATALOG_QUERY_PARAM_SELLER_CONFIRMED = "sellerConfirmed";
 export const CATALOG_QUERY_PARAM_SELLER_PREMIUM = "sellerPremium";
 
@@ -54,6 +55,7 @@ export const CATALOG_EXTRA_FILTER_QUERY_PARAMS = [
   CATALOG_QUERY_PARAM_RATING_MIN,
   CATALOG_QUERY_PARAM_WITH_REVIEWS,
   CATALOG_QUERY_PARAM_RETURN_ONLY,
+  CATALOG_QUERY_PARAM_POINTS_SALE_ONLY,
   CATALOG_QUERY_PARAM_SELLER_CONFIRMED,
   CATALOG_QUERY_PARAM_SELLER_PREMIUM,
 ];
@@ -128,6 +130,7 @@ export function areCatalogExtraFiltersEqual(a, b) {
     a.ratingMin === b.ratingMin &&
     a.withReviews === b.withReviews &&
     a.returnOnly === b.returnOnly &&
+    a.pointsSaleOnly === b.pointsSaleOnly &&
     a.sellerConfirmed === b.sellerConfirmed &&
     a.sellerPremium === b.sellerPremium
   );
@@ -160,6 +163,7 @@ function parseCatalogExtraFiltersFromSearchParams(searchParams) {
     ratingMin: searchParams.has(CATALOG_QUERY_PARAM_RATING_MIN) ? ratingMin : null,
     withReviews: searchParams.get(CATALOG_QUERY_PARAM_WITH_REVIEWS) === "true",
     returnOnly: searchParams.get(CATALOG_QUERY_PARAM_RETURN_ONLY) === "true",
+    pointsSaleOnly: searchParams.get(CATALOG_QUERY_PARAM_POINTS_SALE_ONLY) === "true",
     sellerConfirmed: searchParams.get(CATALOG_QUERY_PARAM_SELLER_CONFIRMED) === "true",
     sellerPremium: searchParams.get(CATALOG_QUERY_PARAM_SELLER_PREMIUM) === "true",
   });
@@ -191,6 +195,9 @@ function appendCatalogExtraFilterParams(params, query) {
   }
   if (extra.returnOnly) {
     params.set(CATALOG_QUERY_PARAM_RETURN_ONLY, "true");
+  }
+  if (extra.pointsSaleOnly) {
+    params.set(CATALOG_QUERY_PARAM_POINTS_SALE_ONLY, "true");
   }
   if (extra.sellerConfirmed) {
     params.set(CATALOG_QUERY_PARAM_SELLER_CONFIRMED, "true");

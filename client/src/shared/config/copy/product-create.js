@@ -152,6 +152,28 @@ export const CREATE_PRODUCT_MODAL_UI = {
   WHOLESALE_MODAL_ERROR_MIN_QTY: "Минимум 2 шт.",
   WHOLESALE_MODAL_ERROR_PRICE: "Оптовая цена должна быть меньше обычной",
   WHOLESALE_TOGGLE_PENDING: "Обновляем опт…",
+  MANAGE_POINTS_SALE_TITLE: "Продажа за баллы",
+  MANAGE_POINTS_SALE_HINT:
+    "Покупатели оплатят товар баллами, баллы придут вам после получения товара",
+  MANAGE_POINTS_SALE_HINT_ON: (priceText, limit) =>
+    limit == null
+      ? `Цена ${priceText}, без ограничения в одни руки`
+      : `Цена ${priceText}, в одни руки до ${limit} шт.`,
+  MANAGE_POINTS_SALE_LOCKED_NOTE:
+    "Товар продаётся за баллы — акции, кешбэк, партнёрка и продвижение для него выключены",
+  POINTS_SALE_MODAL_TITLE: "Продажа за баллы",
+  POINTS_SALE_MODAL_PRICE_LABEL: "Цена в баллах",
+  POINTS_SALE_MODAL_LIMIT_LABEL: "В одни руки, шт.",
+  POINTS_SALE_MODAL_NO_LIMIT: "Без ограничения",
+  POINTS_SALE_MODAL_HINT:
+    "Пока продажа за баллы включена, товар покупают только баллами. Баллы держатся до получения и приходят вам за вычетом 2% комиссии — после подтверждения покупателем или через 7 дней после вручения. Акции, кешбэк и партнёрка для товара выключатся. Доставку покупатель оплачивает рублями при получении, как обычно.",
+  POINTS_SALE_MODAL_SAVE: "Включить продажу за баллы",
+  POINTS_SALE_MODAL_UPDATE: "Сохранить",
+  POINTS_SALE_MODAL_DISABLE: "Выключить продажу за баллы",
+  POINTS_SALE_MODAL_CLOSE: "Закрыть",
+  POINTS_SALE_MODAL_PENDING: "Сохраняем…",
+  POINTS_SALE_MODAL_ERROR_PRICE: "Укажите цену в баллах — целое число от 1",
+  POINTS_SALE_MODAL_ERROR_LIMIT: "Лимит в одни руки — от 1 до 1000 шт.",
   MANAGE_BUY_N_FREE_TITLE: "Бесплатно от N",
   MANAGE_BUY_N_FREE_HINT:
     "После N завершённых заказов покупатель получит 1 шт. бесплатно",

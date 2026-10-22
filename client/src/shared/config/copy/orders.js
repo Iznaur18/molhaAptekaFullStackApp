@@ -15,6 +15,10 @@ export const ORDER_CARD_UI = {
   PICKUP_ADDRESS_LABEL: "Забрать по адресу",
   TRACKING_LABEL: "Трек-номер",
   PAYMENT_LABEL: "Оплата",
+  PAYMENT_POINTS: "Баллами",
+  /** @param {string} deliveryMethodLabel «Наличными» */
+  PAYMENT_POINTS_WITH_DELIVERY: (deliveryMethodLabel) =>
+    `Баллами, доставка — ${deliveryMethodLabel.toLowerCase()}`,
   STATUS_LABEL: "Статус",
   ITEM_STATUS_LABEL: "Статус позиции",
   /**

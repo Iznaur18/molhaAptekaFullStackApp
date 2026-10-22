@@ -5,7 +5,7 @@ import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native";
 import { useCartActions } from "@/entities/cart/model/useCartActions";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useMyCartQuery } from "@/entities/cart/model/useMyCartQuery";
-import { getProductPurchaseLimit } from "@/entities/product/lib/getProductPurchaseLimit";
+import { getProductCartQuantityLimit } from "@/entities/product/lib/getProductPurchaseLimit";
 import { resolveProductPurchaseBlockState } from "@/entities/product/lib/resolveProductPurchaseBlockState";
 import { resolveProductSellerClosedPurchaseState } from "@/entities/product/lib/resolveProductSellerClosedPurchaseState";
 import { ADD_TO_CART_BUTTON_LAYOUT } from "@/entities/product/lib/addToCartButtonLayout";
@@ -60,7 +60,7 @@ export const AddToCartButton = ({
   const fixedFontProps = isDetailDock ? FIXED_FONT_PROPS : {};
 
   const quantity = cartQuery.data?.[productId] ?? 0;
-  const purchaseLimit = getProductPurchaseLimit(product);
+  const purchaseLimit = getProductCartQuantityLimit(product);
   const hasStockLimit = purchaseLimit > 0;
   const { isPurchaseBlocked, blockedLabel } = resolveProductPurchaseBlockState(
     product as Record<string, unknown> | null | undefined,

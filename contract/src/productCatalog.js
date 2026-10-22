@@ -273,6 +273,8 @@ export const catalogProductsQuerySchema = z
     withReviews: optionalTruthyFlag,
     /** Продавец принимает возврат. */
     returnOnly: optionalTruthyFlag,
+    /** Товары, которые продаются за баллы. */
+    pointsSaleOnly: optionalTruthyFlag,
     /** Продавцы с подтверждёнными данными (раньше `sort=confirmed`). */
     sellerConfirmed: optionalTruthyFlag,
     /** Премиум-продавцы (раньше `sort=premium`). */
@@ -350,6 +352,7 @@ export const catalogProductFacetsDataSchema = z.object({
     affiliateOnly: facetCountSchema,
     originalOnly: facetCountSchema,
     returnOnly: facetCountSchema,
+    pointsSaleOnly: facetCountSchema,
     sellerConfirmed: facetCountSchema,
     sellerPremium: facetCountSchema,
     /** null — гость: подписок нет. */

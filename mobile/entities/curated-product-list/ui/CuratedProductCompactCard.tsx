@@ -2,6 +2,11 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 
+import {
+  formatLoyaltyPointsAmount,
+  isProductPointsSaleActive,
+} from "@molha/api-contract";
+
 import { resolveProductCatalogPriceRub } from "@/entities/product/lib/resolveProductCatalogPriceRub";
 import { resolveProductImageUrls } from "@/entities/product/lib/resolveProductImageUrls";
 import { CURATED_PRODUCT_COMPACT_CARD_UI } from "@/shared/config";
@@ -25,7 +30,9 @@ export const CuratedProductCompactCard = ({
   const styles = useCuratedProductCompactCardStyles();
   const imageUrls = resolveProductImageUrls(product);
   const imageUrl = imageUrls[0] ?? "";
-  const priceLabel = formatPriceRub(resolveProductCatalogPriceRub(product));
+  const priceLabel = isProductPointsSaleActive(product)
+    ? formatLoyaltyPointsAmount(product.productPointsPrice)
+    : formatPriceRub(resolveProductCatalogPriceRub(product));
   const productName = String(product.productName ?? "").trim();
 
   const handleOpen = () => {

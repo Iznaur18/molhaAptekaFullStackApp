@@ -1,3 +1,5 @@
+import { PRODUCT_POINTS_SALE_FEATURE_LOCKED_MESSAGE } from "@molha/api-contract";
+
 import { AppError } from "../../errors/AppError.js";
 import { ProductModel } from "../../models/index.js";
 import { attachProductSellerSnapshots } from "../product/attachProductSellerSnapshots.js";
@@ -44,6 +46,10 @@ export async function setProductRaffleParticipation({ sellerId, productId, enabl
   const product = await ProductModel.findById(productId);
   if (!product) {
     throw new AppError(404, "Товар не найден");
+  }
+
+  if (product.productPointsSaleEnabled === true) {
+    throw new AppError(409, PRODUCT_POINTS_SALE_FEATURE_LOCKED_MESSAGE);
   }
 
   product.activeRaffleId = check.raffle._id;

@@ -2,10 +2,12 @@ import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 
+import { formatLoyaltyPointsAmount } from "@molha/api-contract";
+
 import { getCartLineStockHint } from "@/entities/cart/lib/getCartLineStockHint";
 import { useCartActions } from "@/entities/cart/model/useCartActions";
 import { resolveProductImageUrl } from "@/entities/product/lib/resolveProductImageUrl";
-import { getProductPurchaseLimit } from "@/entities/product/lib/getProductPurchaseLimit";
+import { getProductCartQuantityLimit } from "@/entities/product/lib/getProductPurchaseLimit";
 import {
   CART_LINE_CARD_BORDER_RADIUS,
   CART_PAGE_UI,
@@ -40,14 +42,22 @@ export const CartLineItem = ({
   const product = line.product;
   const name = product?.productName?.trim() || "—";
   const imageUrl = resolveProductImageUrl(product);
-  const purchaseLimit = getProductPurchaseLimit(product);
+  const purchaseLimit = getProductCartQuantityLimit(product);
   const stockHint = getCartLineStockHint(purchaseLimit, line.quantity);
   const retailPrice = Math.floor(Number(product?.productPrice)) || 0;
   const unitPrice = Math.floor(Number(line.unitPrice)) || 0;
+  const isPointsSale = line.isPointsSale === true;
   const showRetailStrike =
+    !isPointsSale &&
     retailPrice > unitPrice &&
     (line.isPromoApplied === true || line.isWholesaleApplied === true);
-  const unitPriceText = formatPriceRub(unitPrice);
+  // Товар за баллы: и цена, и сумма строки — в баллах.
+  const unitPriceText = isPointsSale
+    ? formatLoyaltyPointsAmount(line.pointsUnitPrice)
+    : formatPriceRub(unitPrice);
+  const lineTotalText = isPointsSale
+    ? formatLoyaltyPointsAmount(line.pointsLineTotal)
+    : formatPriceRub(line.lineTotal);
   const buyNFreeUnits = Math.floor(Number(line.buyNFreeUnits) || 0);
   const paidQty = Math.max(0, line.quantity - buyNFreeUnits);
   const buyNFreeHint =
@@ -98,9 +108,9 @@ export const CartLineItem = ({
               <Text
                 style={styles.unitPrice}
                 numberOfLines={1}
-                accessibilityLabel={`Цена ${formatPriceRub(unitPrice)}`}
+                accessibilityLabel={`Цена ${unitPriceText}`}
               >
-                {formatPriceRub(unitPrice)}
+                {unitPriceText}
               </Text>
               {showRetailStrike ? (
                 <Text style={styles.unitPriceOld} numberOfLines={1}>
@@ -169,7 +179,7 @@ export const CartLineItem = ({
             </View>
           </View>
 
-          <Text style={styles.lineTotal}>{formatPriceRub(line.lineTotal)}</Text>
+          <Text style={styles.lineTotal}>{lineTotalText}</Text>
         </View>
       </SquircleView>
 

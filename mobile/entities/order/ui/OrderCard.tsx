@@ -62,6 +62,7 @@ import {
   PRODUCT_CARD_UI,
 } from "@/shared/config";
 import { formatIsoDateTime, formatPriceRub } from "@/shared/lib";
+import { formatLoyaltyPointsAmount } from "@molha/api-contract";
 import { useOrderCardStyles } from "@/shared/theme/commerceScreenStyles";
 import { CommerceCardExpandToggle } from "@/shared/ui/CommerceCardExpandToggle";
 import {
@@ -84,6 +85,8 @@ type OrderCardOrder = {
   _id: string;
   status?: string;
   totalAmount?: number;
+  /** Товар оплачен баллами; рублями — только доставка. */
+  paidWithLoyaltyPoints?: boolean;
   deliveryAddress?: string;
   paymentMethod?: string;
   /** Когда прошла предоплата по СБП; пусто — заказ ещё ждёт денег. */
@@ -359,7 +362,15 @@ const OrderCardMeta = ({
       ) : null}
       <View style={styles.metaRow}>
         <Text style={styles.metaLabel}>{ORDER_CARD_UI.PAYMENT_LABEL}:</Text>
-        <Text style={styles.metaValue}>{formatPayment(order.paymentMethod)}</Text>
+        <Text style={styles.metaValue}>
+          {order.paidWithLoyaltyPoints === true
+            ? order.fulfillmentMethod === "delivery"
+              ? ORDER_CARD_UI.PAYMENT_POINTS_WITH_DELIVERY(
+                  formatPayment(order.paymentMethod),
+                )
+              : ORDER_CARD_UI.PAYMENT_POINTS
+            : formatPayment(order.paymentMethod)}
+        </Text>
       </View>
       {isInstallmentOrder && order.installmentContract ? (
         <View style={styles.metaRow}>
@@ -555,6 +566,7 @@ export const OrderCard = ({
       status?: string;
       itemIndex?: number;
       unitPriceAtOrder?: number;
+      pointsPriceAtOrder?: number;
       loyaltyPointsPerUnitAtOrder?: number;
       loyaltyPointsReservedTotal?: number;
       deliveredAt?: string;
@@ -666,7 +678,9 @@ export const OrderCard = ({
                   isCancelled ? styles.itemTextCancelled : undefined,
                 ]}
               >
-                {formatPriceRub(source.unitPriceAtOrder)}
+                {Number(source.pointsPriceAtOrder) > 0
+                  ? formatLoyaltyPointsAmount(source.pointsPriceAtOrder)
+                  : formatPriceRub(source.unitPriceAtOrder)}
               </Text>
             </View>
 
@@ -817,7 +831,10 @@ export const OrderCard = ({
           ) : null}
         </View>
         <Text style={styles.total}>
-          {formatPriceRub(summarizeOrderItems(order.items).totalAmount)}
+          {/* Заказ за баллы: сумма в баллах, рублёвая у него 0. */}
+          {summarizeOrderItems(order.items).pointsTotal > 0
+            ? formatLoyaltyPointsAmount(summarizeOrderItems(order.items).pointsTotal)
+            : formatPriceRub(summarizeOrderItems(order.items).totalAmount)}
         </Text>
       </View>
 

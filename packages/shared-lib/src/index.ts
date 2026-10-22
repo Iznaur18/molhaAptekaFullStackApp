@@ -362,6 +362,7 @@ export type {
   MarketingTouchSummary,
 } from "./marketingAttribution.js";
 export {
+  buildCartGroupId,
   groupCartLinesBySeller,
   hasMixedDeliveryCarriers,
   quoteCartSellerDelivery,

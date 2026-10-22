@@ -1,5 +1,9 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import {
+  formatLoyaltyPointsAmount,
+  isProductPointsSaleActive,
+} from "@molha/api-contract";
 
 import { resolveProductImageUrl } from "../../../entities/product/lib/resolveProductImageUrl.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../../entities/product/model/productConstants.js";
@@ -26,7 +30,9 @@ export function WishlistRow({ product, onProductClick, onProductStatsUpdate }) {
   const { removeItem } = useWishlist();
   const [imageFailed, setImageFailed] = useState(false);
   const heading = product.productName?.trim() || COMMON_UI.EM_DASH;
-  const priceText = formatPriceRub(product.productPrice);
+  const priceText = isProductPointsSaleActive(product)
+    ? formatLoyaltyPointsAmount(product.productPointsPrice)
+    : formatPriceRub(product.productPrice);
   const resolvedImage = resolveProductImageUrl(product);
   const imageUrl =
     imageFailed || !resolvedImage ? PRODUCT_IMAGE_PLACEHOLDER_URL : resolvedImage;

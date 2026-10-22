@@ -14,6 +14,7 @@ import { UserPremiumAvatar } from "@/entities/user/ui/UserPremiumAvatar";
 import { UserPremiumDisplayName } from "@/entities/user/ui/UserPremiumDisplayName";
 import { CART_PAGE_UI } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
+import { formatLoyaltyPointsAmount } from "@molha/api-contract";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import {
   CART_SELLER_ROW_STACK_MAX_WIDTH,
@@ -48,7 +49,7 @@ const CartSellerRow = ({
 }: {
   group: CartSellerGroup<CartLine>;
   summary: CartCheckoutSummary;
-  onOpen: (sellerId: string) => void;
+  onOpen: (cartGroupId: string) => void;
 }) => {
   const styles = useCartSellerListStyles();
   const theme = useAppTheme();
@@ -65,7 +66,11 @@ const CartSellerRow = ({
   );
   const picked = pickUserProfilePhotoUrl(sellerForPhoto);
   const avatarUri = !avatarFailed && picked ? picked : DEFAULT_USER_AVATAR_URL;
-  const displayName = group.sellerName.trim() || CART_PAGE_UI.SECTION_SELLER_FALLBACK;
+  const sellerName = group.sellerName.trim() || CART_PAGE_UI.SECTION_SELLER_FALLBACK;
+  // Товары за баллы — отдельный заказ у того же продавца, и строка своя.
+  const displayName = group.paidWithLoyaltyPoints
+    ? `${sellerName} · ${CART_PAGE_UI.POINTS_GROUP_SUFFIX}`
+    : sellerName;
 
   const itemsCount = summary.selectedLines.reduce(
     (sum, line) => sum + (Number(line.quantity) || 0),
@@ -80,7 +85,7 @@ const CartSellerRow = ({
   const deliveryHint = mixedCarriers
     ? ""
     : formatDeliveryHint(group, summary.selectedTotal);
-  const open = () => onOpen(group.sellerId);
+  const open = () => onOpen(group.cartGroupId);
 
   return (
     <View style={styles.row}>
@@ -119,7 +124,9 @@ const CartSellerRow = ({
           accessibilityRole="button"
         >
           <Text style={styles.checkoutPrice}>
-            {formatPriceRub(summary.selectedTotal)}
+            {group.paidWithLoyaltyPoints
+              ? formatLoyaltyPointsAmount(summary.selectedPointsTotal)
+              : formatPriceRub(summary.selectedTotal)}
           </Text>
           <View style={styles.checkoutLabel}>
             <Text style={styles.checkoutLabelText}>{CART_PAGE_UI.SELLER_ROW_OPEN}</Text>
@@ -160,7 +167,7 @@ export const CartSellerList = ({
   onOpenSeller,
 }: {
   entries: CartSellerEntry[];
-  onOpenSeller: (sellerId: string) => void;
+  onOpenSeller: (cartGroupId: string) => void;
 }) => {
   const styles = useCartSellerListStyles();
 
@@ -172,7 +179,7 @@ export const CartSellerList = ({
     <View style={styles.list}>
       {entries.map(({ group, summary }) => (
         <CartSellerRow
-          key={group.sellerId || "unknown-seller"}
+          key={group.cartGroupId || "unknown-seller"}
           group={group}
           summary={summary}
           onOpen={onOpenSeller}

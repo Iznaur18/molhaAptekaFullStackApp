@@ -20,6 +20,7 @@ import {
   markOrderLineLoyaltyReserveReleased,
   releaseUnawardedLoyaltyReservesForOrder,
 } from "../../services/order/orderLoyaltyPoints.js";
+import { refundPointsPaymentForItems } from "../../services/order/orderPointsPayment.js";
 import { clearBuyerPassportShareOnOrder } from "../../services/order/buyerPassportShare.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 import {
@@ -110,6 +111,11 @@ export const updateOrderStatusController = async (req, res) => {
           markOrderLineLoyaltyReserveReleased(item);
         }
       }
+      await refundPointsPaymentForItems({
+        items: txnOrder.items,
+        buyerId,
+        session,
+      });
 
       for (const item of txnOrder.items) {
         if (item.status === ORDER_STATUS_CANCELLED || item.productId == null) {

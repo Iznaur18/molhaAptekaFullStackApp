@@ -10,6 +10,11 @@ import { ProductRentalManageModal } from "./ProductRentalManageModal.jsx";
 import { AffiliatePercentModal } from "./AffiliatePercentModal.jsx";
 import { ProductLoyaltyPointsModal } from "./ProductLoyaltyPointsModal.jsx";
 import { ProductBuyNFreeModal } from "./ProductBuyNFreeModal.jsx";
+import { ProductPointsSaleModal } from "./ProductPointsSaleModal.jsx";
+import {
+  PRODUCT_POINTS_SALE_PROMOTION_FORBIDDEN_MESSAGE,
+  isProductPointsSaleActive,
+} from "@molha/api-contract";
 import { ProductOutOfStockLabelModal } from "./ProductOutOfStockLabelModal.jsx";
 import { calculateProductPromotionAmountRub } from "../lib/calculateProductPromotionPointsCost.js";
 import { applyPromoReturnStreakDiscount } from "../../promo-return-streak/lib/promoReturnStreakPricing.js";
@@ -185,6 +190,7 @@ export function ProductPromotionModal({
   const [isAffiliateOpen, setIsAffiliateOpen] = useState(false);
   const [isLoyaltyOpen, setIsLoyaltyOpen] = useState(false);
   const [isBuyNFreeOpen, setIsBuyNFreeOpen] = useState(false);
+  const [isPointsSaleOpen, setIsPointsSaleOpen] = useState(false);
   const [isOutOfStockLabelOpen, setIsOutOfStockLabelOpen] = useState(false);
   const [isPromoCodesOpen, setIsPromoCodesOpen] = useState(false);
   const defaultTier = tiers[0]?.tier ?? 1;
@@ -204,6 +210,7 @@ export function ProductPromotionModal({
       setIsAffiliateOpen(false);
       setIsLoyaltyOpen(false);
       setIsBuyNFreeOpen(false);
+      setIsPointsSaleOpen(false);
       setIsOutOfStockLabelOpen(false);
       setIsPromoCodesOpen(false);
     }
@@ -268,30 +275,35 @@ export function ProductPromotionModal({
     tiers.length > 0 &&
     !(payWithPoints && loyaltyPointsAvailable < chargeAmountRub);
 
-  const footer = isPromotionTab ? (
-    <div className="product-promotion-modal__actions">
-      <button
-        type="button"
-        className="app-btn app-btn--cancel"
-        onClick={onClose}
-        disabled={isSubmitting}
-      >
-        {PRODUCT_PROMOTION_UI.CANCEL}
-      </button>
-      <button
-        type="button"
-        className="app-btn app-btn--primary"
-        disabled={!canSubmit}
-        onClick={handleSubmit}
-      >
-        {isSubmitting
-          ? PRODUCT_PROMOTION_UI.SUBMIT_PENDING
-          : payWithPoints
-            ? PRODUCT_PROMOTION_UI.SUBMIT_POINTS
-            : PRODUCT_PROMOTION_UI.SUBMIT_RUB}
-      </button>
-    </div>
-  ) : null;
+  // Товар за баллы не продвигается (решение 21.10.2026): вместо формы оплаты —
+  // объяснение, кнопки оплаты нет вовсе.
+  const isPointsSale = isProductPointsSaleActive(product);
+
+  const footer =
+    isPromotionTab && !isPointsSale ? (
+      <div className="product-promotion-modal__actions">
+        <button
+          type="button"
+          className="app-btn app-btn--cancel"
+          onClick={onClose}
+          disabled={isSubmitting}
+        >
+          {PRODUCT_PROMOTION_UI.CANCEL}
+        </button>
+        <button
+          type="button"
+          className="app-btn app-btn--primary"
+          disabled={!canSubmit}
+          onClick={handleSubmit}
+        >
+          {isSubmitting
+            ? PRODUCT_PROMOTION_UI.SUBMIT_PENDING
+            : payWithPoints
+              ? PRODUCT_PROMOTION_UI.SUBMIT_POINTS
+              : PRODUCT_PROMOTION_UI.SUBMIT_RUB}
+        </button>
+      </div>
+    ) : null;
 
   const headerAddon = showManageSection ? (
     <ProductPromotionModalTabs
@@ -316,7 +328,11 @@ export function ProductPromotionModal({
         headerAddon={headerAddon}
         hideTitle
       >
-        {isPromotionTab ? (
+        {isPromotionTab && isPointsSale ? (
+          <p className="product-promotion-modal__points-note" role="status">
+            {PRODUCT_POINTS_SALE_PROMOTION_FORBIDDEN_MESSAGE}
+          </p>
+        ) : isPromotionTab ? (
           <ProductPromotionFormPanel
             productName={resolvedProductName}
             tiers={tiers}
@@ -386,6 +402,7 @@ export function ProductPromotionModal({
             onOpenAffiliateSettings={() => setIsAffiliateOpen(true)}
             onOpenLoyaltySettings={() => setIsLoyaltyOpen(true)}
             onOpenBuyNFreeSettings={() => setIsBuyNFreeOpen(true)}
+            onOpenPointsSaleSettings={() => setIsPointsSaleOpen(true)}
             onOpenOutOfStockSettings={() => setIsOutOfStockLabelOpen(true)}
             onOpenPromoCodesSettings={() => setIsPromoCodesOpen(true)}
           />
@@ -431,6 +448,12 @@ export function ProductPromotionModal({
         isOpen={isLoyaltyOpen}
         product={product}
         onClose={() => setIsLoyaltyOpen(false)}
+        onSaved={onWholesaleSaved}
+      />
+      <ProductPointsSaleModal
+        isOpen={isPointsSaleOpen}
+        product={product}
+        onClose={() => setIsPointsSaleOpen(false)}
         onSaved={onWholesaleSaved}
       />
       <ProductBuyNFreeModal

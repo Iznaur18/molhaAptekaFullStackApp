@@ -109,13 +109,17 @@ export const syncProductInstallmentEnabledFlag = async (productId) => {
     .lean();
 
   const product = await ProductModel.findById(productId)
-    .select("productIsAvailable productModerationStatus productInstallmentEnabled")
+    .select(
+      "productIsAvailable productModerationStatus productInstallmentEnabled productPointsSaleEnabled",
+    )
     .lean();
 
   const enabled =
     Boolean(program) &&
     product?.productModerationStatus === PRODUCT_MODERATION_APPROVED &&
-    product?.productIsAvailable !== false;
+    product?.productIsAvailable !== false &&
+    // Товар за баллы в рассрочку не продаётся: рассрочка — рубли.
+    product?.productPointsSaleEnabled !== true;
 
   await ProductModel.updateOne(
     { _id: productId },
