@@ -189,16 +189,8 @@ export const SellerProductsPage = () => {
     return <ScreenLoadingState message={SELLER_PRODUCTS_PAGE_UI.LOADING} />;
   }
 
-  if (!isAuthorized) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.hint}>{SELLER_PRODUCTS_PAGE_UI.LOGIN_HINT}</Text>
-        <Pressable style={styles.button} onPress={() => router.push("/(auth)/login")}>
-          <Text style={styles.buttonText}>{SELLER_PRODUCTS_PAGE_UI.LOGIN_BUTTON}</Text>
-        </Pressable>
-      </View>
-    );
-  }
+  // Витрина открыта всем, как на сайте: профиль, товары, полки и телефон
+  // сервер отдаёт без входа. Гостя на вход ведут только подписка и избранное.
 
   const isPageLoading =
     profileQuery.isPending ||

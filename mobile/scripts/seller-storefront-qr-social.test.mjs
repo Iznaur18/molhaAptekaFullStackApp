@@ -93,6 +93,15 @@ test("витрина: кнопки как на сайте — на баннер�
   assert.match(social, /setOpenError\(SELLER_SOCIAL_LINKS_UI\.OPEN_ERROR\)/);
 });
 
+test("витрина открыта гостю, как на сайте", () => {
+  const page = read("features/seller-products-page/ui/SellerProductsPage.tsx");
+  // Раньше гость видел только «Войдите, чтобы посмотреть товары продавца».
+  assert.doesNotMatch(page, /if \(!isAuthorized\) \{/);
+  assert.doesNotMatch(page, /LOGIN_HINT/);
+  // Подписка по-прежнему знает о входе и сама ведёт на него.
+  assert.match(page, /isAuthorized=\{isAuthorized\}/);
+});
+
 test("тексты окон совпадают с сайтом", () => {
   const webQr = read("../client/src/shared/config/copy/seller-qr.js");
   const webSocial = read("../client/src/shared/config/copy/seller-social.js");

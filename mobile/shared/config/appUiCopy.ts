@@ -1885,8 +1885,6 @@ export const SELLER_PRODUCTS_PAGE_UI = {
   TITLE: "Товары продавца",
   BACK_ARIA: "Назад",
   LOADING: "Загрузка…",
-  LOGIN_HINT: "Войдите, чтобы посмотреть товары продавца.",
-  LOGIN_BUTTON: "Войти",
   FETCH_PROFILE_FALLBACK: "Не удалось загрузить профиль продавца",
   EMPTY: "У продавца пока нет товаров в каталоге.",
   SHARE_LINK_ARIA: "Ссылка",
