@@ -3524,3 +3524,43 @@ export const DEAL_REQUESTS_PAGE_UI = {
     "После «Сделка состоялась» объявление уйдёт с витрины, а остальные заявки на него закроются.",
   ACTION_FALLBACK_ERROR: "Не удалось выполнить действие",
 } as const;
+
+/** QR-код витрины продавца (паритет web `copy/seller-qr.js`). */
+export const SELLER_QR_UI = {
+  BUTTON_ARIA: "QR-код витрины",
+  TITLE: "QR-код витрины",
+  CLOSE: "Закрыть",
+  // В приложении картинку не сохранить (нужен нативный модуль) — подсказка честная.
+  HINT: "Покупатель наводит камеру телефона на код и попадает на вашу витрину. Покажите код с экрана или отправьте ссылку.",
+  HINT_VISITOR:
+    "Наведите камеру телефона на код — откроется эта витрина. Код можно показать с экрана или отправить ссылкой.",
+  SHARE_MESSAGE: (sellerName: string, url: string) =>
+    sellerName ? `Витрина ${sellerName} в Gitorg: ${url}` : url,
+  CARD_CAPTION: "Наведите камеру — откроется витрина",
+  BRAND: "Gitorg",
+  QR_ALT: "QR-код со ссылкой на витрину",
+  SHARE: "Поделиться",
+  SHARE_ERROR: "Не удалось открыть «Поделиться». Попробуйте ещё раз.",
+  STATS_TITLE: "Переходы по коду",
+  STATS_LOADING: "Считаем переходы…",
+  STATS_FALLBACK: "Не удалось загрузить переходы по QR-коду",
+  STATS_EMPTY: "По коду пока никто не переходил.",
+  STATS_TOTAL: (total: number) =>
+    `${total} ${pluralizeRu(total, ["переход", "перехода", "переходов"])} за всё время`,
+  STATS_RECENT: (recent: number, days: number) => `${recent} за последние ${days} дней`,
+  STATS_NOTE: "Один человек считается не чаще раза в день. Ваши заходы не считаются.",
+} as const;
+
+/** Окно «Соцсети и сайт» на витрине (паритет web `copy/seller-social.js`). */
+export const SELLER_SOCIAL_LINKS_UI = {
+  BUTTON_ARIA: "Соцсети и сайт продавца",
+  TITLE: "Соцсети и сайт",
+  CLOSE: "Закрыть",
+  OPEN_ARIA: (label: string) => `Открыть ${label}`,
+  OPEN_ERROR: "Не удалось открыть ссылку",
+  ADD_TITLE: "Ещё не добавлено",
+  ADD_HINT:
+    "Нажмите — откроется редактирование профиля. Покупатели увидят ссылку на вашей витрине.",
+  ADD_ROW_HINT: "Добавить в профиле",
+  ADD_ARIA: (label: string) => `Добавить ${label} в редактировании профиля`,
+} as const;

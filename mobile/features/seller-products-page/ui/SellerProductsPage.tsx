@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { SELLER_QR_SOURCE_VALUE } from "@molha/api-contract";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
@@ -15,7 +16,13 @@ import { useSellerProductsInfiniteQuery } from "@/entities/user/model/useSellerP
 import { useUserProfileQuery } from "@/entities/user/model/useUserProfileQuery";
 import { ProfileOverviewBanner } from "@/entities/user/ui/ProfileOverviewBanner";
 import { SellerProfileQuickStats } from "@/entities/user/ui/SellerProfileQuickStats";
+import { SellerQrButton } from "@/entities/user/ui/SellerQrButton";
 import { SellerShareLinkButton } from "@/entities/user/ui/SellerShareLinkButton";
+import { SellerSocialLinksButton } from "@/entities/user/ui/SellerSocialLinksButton";
+import { getSellerSocialLinks } from "@/entities/user/lib/getSellerSocialLinks";
+import { pickUserProfilePhotoUrl } from "@/entities/user/lib/pickUserProfilePhotoUrl";
+import { resolveUserProfileBackgroundFromUser } from "@/entities/user/lib/resolveUserProfileBackgroundFromUser";
+import { useTrackSellerQrScan } from "@/entities/seller-qr/model/useSellerQrAnalytics";
 import { UserPremiumDisplayName } from "@/entities/user/ui/UserPremiumDisplayName";
 import { UserFollowButton } from "@/features/user-follow/ui/UserFollowButton";
 import { buildCatalogGridRows } from "@/features/catalog-grid/lib/buildCatalogGridRows";
@@ -45,7 +52,7 @@ export const SellerProductsPage = () => {
   const productGrid = useProductGridLayout();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
   const queryClient = useQueryClient();
-  const params = useLocalSearchParams<{ userId?: string }>();
+  const params = useLocalSearchParams<{ userId?: string; src?: string }>();
   const sellerId = String(params.userId ?? "").trim();
 
   const sessionQuery = useAuthSessionQuery();
@@ -80,6 +87,65 @@ export const SellerProductsPage = () => {
   const isSelf = currentUserId != null && sellerId === currentUserId;
   const displayName =
     String(seller?.userName ?? "").trim() || USER_LIST_ROW_UI.MISSING_NAME;
+  const photoUrl = useMemo(
+    () => (seller ? pickUserProfilePhotoUrl(seller) : null) ?? "",
+    [seller],
+  );
+  // Как web `showProfileBanner`: есть фон или фото — три кнопки стоят на баннере.
+  const hasProfileBanner = useMemo(() => {
+    if (!seller) {
+      return false;
+    }
+    const background = resolveUserProfileBackgroundFromUser(seller);
+    return (
+      background.kind === "preset" || background.kind === "image" || Boolean(photoUrl)
+    );
+  }, [photoUrl, seller]);
+  const socialLinks = useMemo(() => getSellerSocialLinks(seller), [seller]);
+  const handleAddSocialLink = useCallback(() => {
+    router.push("/profile/edit");
+  }, [router]);
+
+  // Витрину открыли по напечатанному QR-коду — засчитываем переход, как сайт.
+  useTrackSellerQrScan({
+    sellerId,
+    isSelf,
+    cameFromQr: params.src === SELLER_QR_SOURCE_VALUE,
+    enabled: isSessionReady && seller != null,
+  });
+
+  const storefrontActions = (placement: "banner" | "meta") => (
+    <>
+      {placement === "meta" ? (
+        <SellerShareLinkButton
+          sellerId={sellerId}
+          sellerName={displayName}
+          variant="meta"
+        />
+      ) : null}
+      <SellerSocialLinksButton
+        links={socialLinks}
+        isSelf={isSelf}
+        onAddLink={isSelf ? handleAddSocialLink : undefined}
+        variant={placement}
+      />
+      <SellerQrButton
+        sellerId={sellerId}
+        sellerName={displayName}
+        avatarUrl={photoUrl}
+        variant={placement}
+        isOwn={isSelf}
+      />
+      {/* На баннере «Поделиться» крайняя справа — порядок web-слотов first/second/third. */}
+      {placement === "banner" ? (
+        <SellerShareLinkButton
+          sellerId={sellerId}
+          sellerName={displayName}
+          variant="banner"
+        />
+      ) : null}
+    </>
+  );
 
   const handleFollowChange = useCallback(
     (patch: { isFollowing: boolean }) => {
@@ -216,15 +282,7 @@ export const SellerProductsPage = () => {
                 <>
                   <ProfileOverviewBanner
                     user={seller}
-                    bannerAction={
-                      isSelf ? (
-                        <SellerShareLinkButton
-                          sellerId={sellerId}
-                          sellerName={displayName}
-                          variant="banner"
-                        />
-                      ) : null
-                    }
+                    bannerAction={storefrontActions("banner")}
                   />
 
                   <SellerProfileQuickStats
@@ -255,13 +313,15 @@ export const SellerProductsPage = () => {
                         />
                       </Pressable>
                     </View>
+                    {isSelf && !hasProfileBanner ? (
+                      <View style={styles.sellerMetaActions}>
+                        {storefrontActions("meta")}
+                      </View>
+                    ) : null}
                     {!isSelf ? (
                       <View style={styles.sellerMetaActions}>
-                        <SellerShareLinkButton
-                          sellerId={sellerId}
-                          sellerName={displayName}
-                          variant="meta"
-                        />
+                        {/* С баннером эти кнопки уже стоят на нём. */}
+                        {!hasProfileBanner ? storefrontActions("meta") : null}
                         <UserFollowButton
                           targetUserId={sellerId}
                           isFollowing={isFollowing}

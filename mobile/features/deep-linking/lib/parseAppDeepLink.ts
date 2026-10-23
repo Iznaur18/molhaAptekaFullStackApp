@@ -19,6 +19,17 @@ const APP_HOSTS = new Set(["gitorg.ru", "www.gitorg.ru", "izibuy.ru", "www.izibu
 const resolveOwnLink = (rawPath: string): string =>
   resolveWebPathToMobileRoute(rawPath) ?? HOME_ROUTE;
 
+/**
+ * Напечатанный QR-код витрины ведёт на `/seller/:id?src=qr`. Метку передаём
+ * экрану витрины — он засчитывает переход, как сайт (`useTrackSellerQrScan`).
+ */
+const SELLER_QR_QUERY = "src=qr";
+
+const keepSellerQrMark = (route: string, search: string): string =>
+  route.startsWith("/seller/") && new URLSearchParams(search).get("src") === "qr"
+    ? `${route}?${SELLER_QR_QUERY}`
+    : route;
+
 export const parseAppDeepLink = (url: string): string | null => {
   try {
     const parsed = new URL(url);
@@ -33,7 +44,10 @@ export const parseAppDeepLink = (url: string): string | null => {
     }
 
     if (APP_HOSTS.has(parsed.hostname.toLowerCase())) {
-      return resolveOwnLink(normalizeWebPath(parsed.pathname));
+      return keepSellerQrMark(
+        resolveOwnLink(normalizeWebPath(parsed.pathname)),
+        parsed.search,
+      );
     }
   } catch {
     // Не URL — но это может быть `gitorg://…` в форме, которую не осилил парсер.
