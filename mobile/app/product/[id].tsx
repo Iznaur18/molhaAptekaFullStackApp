@@ -352,6 +352,8 @@ export default function ProductDetailScreen() {
     isSellerClosed &&
     !isPurchaseBlocked &&
     !isProductOutOfStock;
+  // Своё объявление: на месте «В корзину» неактивная «Свой товар», как на сайте.
+  const showOwnProductPurchaseButton = isOwnProduct;
   const showManageActions = (isOwnProduct || isAdmin) && activeTab === "details";
   const hasOpenSalesLocked = productRecord.hasOpenSales === true;
   const showMobilePurchaseDock =
@@ -361,6 +363,7 @@ export default function ProductDetailScreen() {
       showOutOfStockPurchaseButton ||
       showBlockedPurchaseButton ||
       showSellerClosedPurchaseButton ||
+      showOwnProductPurchaseButton ||
       auctionUi.auctionActive ||
       installmentActive);
   // Авто, недвижимость, услуги: в панели вместо «В корзину» — заявка и телефон
@@ -712,6 +715,7 @@ export default function ProductDetailScreen() {
     blockedPurchaseLabel: blockedLabel,
     showSellerClosedPurchaseButton,
     sellerClosedPurchaseLabel: sellerClosedLabel,
+    showOwnProductPurchaseButton,
     showInlinePurchaseActions: pageLayout.isPageSplit,
     isAuthorized,
     onRequestLogin: () => {
@@ -983,6 +987,7 @@ export default function ProductDetailScreen() {
               showBlockedPurchaseButton={showBlockedPurchaseButton}
               blockedPurchaseLabel={blockedLabel}
               showSellerClosedPurchaseButton={showSellerClosedPurchaseButton}
+              showOwnProductPurchaseButton={showOwnProductPurchaseButton}
               sellerClosedPurchaseLabel={sellerClosedLabel}
               variant="dock"
             />

@@ -14,6 +14,8 @@ type ProductDetailPurchaseActionsProps = {
   showOutOfStockPurchaseButton?: boolean;
   showBlockedPurchaseButton?: boolean;
   showSellerClosedPurchaseButton?: boolean;
+  /** Своё объявление — неактивная «Свой товар» (web `showOwnProductPurchaseButton`). */
+  showOwnProductPurchaseButton?: boolean;
   blockedPurchaseLabel?: string;
   sellerClosedPurchaseLabel?: string;
   variant?: "inline" | "dock";
@@ -26,6 +28,7 @@ export const ProductDetailPurchaseActions = ({
   showOutOfStockPurchaseButton = false,
   showBlockedPurchaseButton = false,
   showSellerClosedPurchaseButton = false,
+  showOwnProductPurchaseButton = false,
   blockedPurchaseLabel = ADD_TO_CART_UI.BLOCKED,
   sellerClosedPurchaseLabel = ADD_TO_CART_UI.SELLER_CLOSED,
   variant = "inline",
@@ -41,9 +44,24 @@ export const ProductDetailPurchaseActions = ({
     !showOutOfStockPurchaseButton &&
     !showBlockedPurchaseButton &&
     !showSellerClosedPurchaseButton &&
+    !showOwnProductPurchaseButton &&
     !outOfStock
   ) {
     return null;
+  }
+
+  // Первым, как в web `ProductPurchaseCartButton`: своё — даже если нет в наличии.
+  if (showOwnProductPurchaseButton) {
+    return (
+      <View style={variant === "dock" ? styles.dockRoot : styles.inlineRoot}>
+        <View style={variant === "dock" ? styles.cartSlot : undefined}>
+          <BlockedPurchaseButton
+            label={ADD_TO_CART_UI.OWN_PRODUCT}
+            variant={buttonVariant}
+          />
+        </View>
+      </View>
+    );
   }
 
   if (showBlockedPurchaseButton) {

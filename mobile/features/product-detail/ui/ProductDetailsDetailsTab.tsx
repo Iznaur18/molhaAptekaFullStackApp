@@ -71,6 +71,7 @@ type ProductDetailsDetailsTabProps = {
   showBlockedPurchaseButton?: boolean;
   blockedPurchaseLabel?: string;
   showSellerClosedPurchaseButton?: boolean;
+  showOwnProductPurchaseButton?: boolean;
   sellerClosedPurchaseLabel?: string;
   showInlinePurchaseActions?: boolean;
   presentation?: ProductDetailsDetailsPresentation;
@@ -94,6 +95,7 @@ export const ProductDetailsDetailsTab = ({
   showBlockedPurchaseButton = false,
   blockedPurchaseLabel = "",
   showSellerClosedPurchaseButton = false,
+  showOwnProductPurchaseButton = false,
   sellerClosedPurchaseLabel = "",
   showInlinePurchaseActions = false,
   presentation = "default",
@@ -292,6 +294,7 @@ export const ProductDetailsDetailsTab = ({
           blockedPurchaseLabel={blockedPurchaseLabel}
           showSellerClosedPurchaseButton={showSellerClosedPurchaseButton}
           sellerClosedPurchaseLabel={sellerClosedPurchaseLabel}
+          showOwnProductPurchaseButton={showOwnProductPurchaseButton}
           variant="inline"
         />
       ) : null}

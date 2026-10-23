@@ -75,6 +75,27 @@ test("баннер в ленте: кнопка под текстом, по ши�
   );
 });
 
+test("своё объявление: «Свой товар» в нижней панели и под ценой, как на сайте", () => {
+  const screen = read("app/product/[id].tsx");
+  assert.match(screen, /const showOwnProductPurchaseButton = isOwnProduct;/);
+  assert.match(
+    screen,
+    /showSellerClosedPurchaseButton \|\|\s*showOwnProductPurchaseButton \|\|/,
+  );
+  assert.match(screen, /showOwnProductPurchaseButton=\{showOwnProductPurchaseButton\}/);
+
+  const actions = read("features/product-detail/ui/ProductDetailPurchaseActions.tsx");
+  // Своё — раньше «Нет в наличии» и блокировки, как в web ProductPurchaseCartButton.
+  assert.ok(
+    actions.indexOf("if (showOwnProductPurchaseButton)") <
+      actions.indexOf("if (showBlockedPurchaseButton)"),
+  );
+  assert.match(actions, /ADD_TO_CART_UI\.OWN_PRODUCT/);
+
+  const tab = read("features/product-detail/ui/ProductDetailsDetailsTab.tsx");
+  assert.match(tab, /showOwnProductPurchaseButton=\{showOwnProductPurchaseButton\}/);
+});
+
 test("подписи совпадают с сайтом", () => {
   const web = read("../client/src/shared/config/copy/catalog.js");
   const mobile = read("shared/config/appUiCopy.ts");
