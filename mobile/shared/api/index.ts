@@ -59,6 +59,7 @@ export {
   productPromotionQueryKeys,
   raffleQueryKeys,
   searchSynonymAdminQueryKeys,
+  sellerSafeDealQueryKeys,
   sellerPersonalCategoryQueryKeys,
   staffBadgeQueryKeys,
   appIntroSettingsQueryKeys,

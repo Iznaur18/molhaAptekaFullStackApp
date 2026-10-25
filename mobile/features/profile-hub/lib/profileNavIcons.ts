@@ -11,6 +11,7 @@ const PROFILE_NAV_ICON_MAP: Partial<
   "my-sales": "store",
   "my-orders": "shopping-bag",
   "deal-requests": "event-available",
+  "safe-deal": "gpp-good",
   auction: "gavel",
   "installment-payments": "credit-card",
   "installment-sales": "account-balance-wallet",

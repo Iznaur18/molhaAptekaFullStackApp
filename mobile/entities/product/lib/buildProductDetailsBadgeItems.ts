@@ -1,5 +1,6 @@
 import {
   formatCatalogNearDistanceLabel,
+  isSellerSafeDealApproved,
   PRODUCT_PRICE_MARKET_STATUS_UNKNOWN,
 } from "@molha/api-contract";
 import {
@@ -14,6 +15,8 @@ import {
   PRODUCT_RENTAL_UI,
   PRODUCT_WHOLESALE_UI,
 } from "@/shared/config";
+
+import { resolveSafeDealBadgeCopy } from "@/entities/seller-safe-deal/lib/safeDealBadgeCopy";
 
 import { isProductOriginalBadgeVisible } from "./productIsOriginal";
 import { sortProductDetailsBadgesByLabelLength } from "./sortProductDetailsBadgesByLabelLength";
@@ -30,6 +33,7 @@ export type ProductDetailsBadgeItem = {
   label: string;
 } & (
   | { kind: "original" }
+  | { kind: "safeDeal" }
   | { kind: "raffle" }
   | { kind: "affiliate" }
   | { kind: "auction" }
@@ -65,6 +69,15 @@ export const buildProductDetailsBadgeItems = ({
       key: "original",
       kind: "original",
       label: PRODUCT_DETAILS_MODAL_UI.ORIGINAL_BADGE,
+    });
+  }
+
+  // Значок продавца, а не товара, но покупатель решает здесь — рядом с ценой.
+  if (isSellerSafeDealApproved(product.productSeller)) {
+    items.push({
+      key: "safeDeal",
+      kind: "safeDeal",
+      label: resolveSafeDealBadgeCopy().LABEL,
     });
   }
 

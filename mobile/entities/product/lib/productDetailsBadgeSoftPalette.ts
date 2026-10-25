@@ -16,6 +16,7 @@ export const PRODUCT_DETAILS_BADGE_SOFT_COLORS = {
   wholesale: { backgroundColor: "#e0e7ff", color: "#3730a3" },
   rental: { backgroundColor: "#fef9c3", color: "#854d0e" },
   nearDistance: { backgroundColor: "#f1f5f9", color: "#334155" },
+  safeDeal: { backgroundColor: "#dcfce7", color: "#15803d" },
 } as const;
 
 type SoftBadgeTone = {

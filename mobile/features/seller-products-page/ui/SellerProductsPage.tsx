@@ -1,6 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { SELLER_QR_SOURCE_VALUE } from "@molha/api-contract";
+import { isSellerSafeDealApproved, SELLER_QR_SOURCE_VALUE } from "@molha/api-contract";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
@@ -300,6 +300,7 @@ export const SellerProductsPage = () => {
                           name={displayName}
                           isPremium={seller.isPremiumUser === true}
                           isUserDataConfirmed={seller.isUserDataConfirmed === true}
+                          hasSafeDeal={isSellerSafeDealApproved(seller)}
                           textStyle={styles.sellerName}
                           singleLine
                         />

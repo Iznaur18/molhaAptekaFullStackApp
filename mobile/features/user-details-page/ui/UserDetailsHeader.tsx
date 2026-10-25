@@ -1,3 +1,4 @@
+import { isSellerSafeDealApproved } from "@molha/api-contract";
 import { View } from "react-native";
 
 import { UserPremiumDisplayName } from "@/entities/user/ui/UserPremiumDisplayName";
@@ -40,6 +41,7 @@ export const UserDetailsHeader = ({
               name={displayName}
               isPremium={user.isPremiumUser === true}
               isUserDataConfirmed={user.isUserDataConfirmed === true}
+              hasSafeDeal={isSellerSafeDealApproved(user)}
               textStyle={styles.titleText}
             />
           </View>

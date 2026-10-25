@@ -119,6 +119,8 @@ export const canAccessProfileSection = (
     "my-orders": hubAccess.canUseMyOrders,
     // Как web `canUseDealRequests`: готовый профиль — и покупатель, и продавец.
     "deal-requests": hubAccess.isProfileReady,
+    // Как web `canUseSafeDeal`: заявку подаёт любой вошедший продавец.
+    "safe-deal": hubAccess.isProfileReady,
     auction: hubAccess.canUseAuction,
     subscriptions: hubAccess.canUseSubscriptions,
     wishlist: hubAccess.canUseWishlist,

@@ -145,6 +145,8 @@ export {
   DEAL_REQUESTS_PAGE_UI,
   SELLER_QR_UI,
   SELLER_SOCIAL_LINKS_UI,
+  SAFE_DEAL_UI,
+  SAFE_DEAL_BADGE_UI,
 } from "./appUiCopy";
 export { IS_REQUIRE_ADDRESS_FROM_DADATA_SUGGEST_ENABLED } from "./featureFlags";
 export {

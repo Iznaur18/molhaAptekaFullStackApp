@@ -100,6 +100,11 @@ export const dealRequestQueryKeys = {
   mine: (role: string) => [...dealRequestQueryKeys.all, "me", role] as const,
 };
 
+export const sellerSafeDealQueryKeys = {
+  all: ["seller-safe-deal"] as const,
+  me: () => [...sellerSafeDealQueryKeys.all, "me"] as const,
+};
+
 export const curatedProductListQueryKeys = {
   all: ["curated-product-lists"] as const,
   home: (regionCode = "") =>

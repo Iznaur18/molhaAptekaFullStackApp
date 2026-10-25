@@ -1,3 +1,5 @@
+import { isSellerSafeDealApproved } from "@molha/api-contract";
+
 import { getProductSellerDisplayName } from "@/entities/product/lib/getProductSellerDisplayName";
 import { getProductSellerId } from "@/entities/product/lib/getProductSellerId";
 
@@ -6,6 +8,8 @@ export type ProductSellerProfile = {
   displayName: string;
   isPremiumUser: boolean;
   isUserDataConfirmed: boolean;
+  /** Безопасная сделка подключена — щит у имени (web `renderProductCardSellerValue`). */
+  hasSafeDeal: boolean;
 };
 
 export const getProductSellerProfile = (
@@ -34,5 +38,6 @@ export const getProductSellerProfile = (
     displayName,
     isPremiumUser,
     isUserDataConfirmed,
+    hasSafeDeal: isPopulatedSeller && isSellerSafeDealApproved(seller),
   };
 };
