@@ -29,7 +29,13 @@ test("корзина продавца оформляется на страниц
 test("итог корзины: цена доставки продавцом вместо «К оплате», ошибка над кнопкой", () => {
   const section = read("entities/cart/ui/CartFulfillmentSection.tsx");
   assert.match(section, /export const CartCheckoutDock/);
-  assert.match(section, /\{deliveryCost \?\? \(/);
+  // Цена доставки продавцом встаёт на место «К оплате»; у товаров за баллы
+  // рублёвой строки нет вовсе — сумма в баллах идёт отдельной строкой.
+  assert.match(
+    section,
+    /\{deliveryCost \?\?\s*\(pointsTotal != null \? null : \(\s*<View style=\{styles\.totalRow\}>\s*<Text style=\{styles\.payableLabel\}>\{CART_PAGE_UI\.PAYABLE_LABEL\}/,
+  );
+  assert.match(section, /CART_PAGE_UI\.POINTS_PAYABLE_LABEL/);
   assert.match(section, /CART_PAGE_UI\.CHECKOUT_SELLER/);
   assert.match(section, /CHECKOUT_FORM_UI\.SUBMIT_LOADING/);
   // Порядок в доке: причина блокировки и ошибка — над кнопкой.
