@@ -67,9 +67,13 @@ import { AddressSuggestInput } from "@/entities/address/ui/AddressSuggestInput";
 import { CheckoutSavedAddressPicker } from "@/features/checkout/ui/CheckoutSavedAddressPicker";
 import { CheckoutSellerDeliveryCost } from "@/features/checkout/ui/CheckoutSellerDeliveryCost";
 import {
-  CheckoutShippingEstimateCost,
+  CheckoutShippingEstimateNotice,
   useShippingEstimate,
 } from "@/features/checkout/ui/CheckoutShippingEstimate";
+import {
+  CheckoutCarrierDeliveryCost,
+  type CarrierDeliveryCost,
+} from "@/features/checkout/ui/CheckoutCarrierDeliveryCost";
 import { YandexExpressPanel } from "@/features/checkout/ui/YandexExpressPanel";
 import {
   resolveOrderDeliveryGeo,
@@ -144,6 +148,8 @@ type CheckoutFormProps = {
   sellerDelivery?: CartSellerDelivery | null;
   /** Товары, которые везут: по ним считается расстояние. */
   deliveryProductIds?: readonly string[];
+  /** Сумма отмеченных товаров — к ней итог прибавляет цену службы. */
+  goodsTotalRub?: number;
   /** Способ, выбранный покупателем у этого продавца раньше. */
   initialFulfillmentMethod?: OrderFulfillmentMethod | null;
   onFulfillmentMethodChange?: (method: OrderFulfillmentMethod) => void;
@@ -192,6 +198,7 @@ export const CheckoutForm = ({
   productCarrier = null,
   sellerDelivery = null,
   deliveryProductIds = EMPTY_PRODUCT_IDS,
+  goodsTotalRub = 0,
   initialFulfillmentMethod = null,
   onFulfillmentMethodChange,
   isSubmitting,
@@ -242,6 +249,8 @@ export const CheckoutForm = ({
     useState<YandexDeliveryOrderSelection | null>(null);
   const [expressSelection, setExpressSelection] =
     useState<YandexExpressOrderSelection | null>(null);
+  /** Цена, которую назвала выбранная служба (СДЭК, Яндекс, Экспресс). */
+  const [carrierCost, setCarrierCost] = useState<CarrierDeliveryCost | null>(null);
   const [localError, setLocalError] = useState("");
   const [selectedPickupByProductId, setSelectedPickupByProductId] = useState<
     Record<string, string>
@@ -421,13 +430,16 @@ export const CheckoutForm = ({
   ]);
 
   // ЛОБО: примерная цена по точке адреса и запрет, если адрес вне зоны службы.
-  const { estimate: shippingEstimate, blockMessage: shippingBlockMessage } =
-    useShippingEstimate({
-      productIds: deliveryProductIds,
-      geo: deliveryAddress.geo,
-      addressLine: deliveryAddress.line,
-      enabled: !isPickup && loboOwnDelivery,
-    });
+  const {
+    estimate: shippingEstimate,
+    blockMessage: shippingBlockMessage,
+    cost: loboCost,
+  } = useShippingEstimate({
+    productIds: deliveryProductIds,
+    geo: deliveryAddress.geo,
+    addressLine: deliveryAddress.line,
+    enabled: !isPickup && loboOwnDelivery,
+  });
 
   const deliveryOptionHint = !PRODUCT_DELIVERY_FULFILLMENT_ENABLED
     ? SHIPPING_PROVIDERS_CHECKOUT_SOON_HINT
@@ -555,12 +567,18 @@ export const CheckoutForm = ({
     !expressChosen &&
     !loboOwnDelivery &&
     sellerDelivery != null;
+  // Служба назвала цену — в итоге она и сумма вместе с товарами вместо
+  // «К оплате» (паритет web `CheckoutCarrierDeliveryCost`). У ЛОБО цена примерная.
+  const serviceCost = isPickup
+    ? null
+    : cdekChosen || yandexChosen || expressChosen
+      ? carrierCost
+      : loboOwnDelivery
+        ? loboCost
+        : null;
   const renderSellerDeliveryCost = (inDock: boolean) =>
-    !isPickup && loboOwnDelivery ? (
-      <CheckoutShippingEstimateCost
-        estimate={shippingEstimate}
-        blockMessage={shippingBlockMessage}
-      />
+    serviceCost && serviceCost.feeRub > 0 ? (
+      <CheckoutCarrierDeliveryCost cost={serviceCost} goodsTotalRub={goodsTotalRub} />
     ) : sellerDeliveryCostVisible && sellerDelivery ? (
       <CheckoutSellerDeliveryCost
         sellerDelivery={sellerDelivery}
@@ -800,6 +818,7 @@ export const CheckoutForm = ({
                     initialRecipientPhone={yandex.recipientPhone}
                     disabled={isDisabled || isSubmitting}
                     onChange={setYandexSelection}
+                    onCost={setCarrierCost}
                   />
                 </>
               ) : cdekChosen && cdek ? (
@@ -810,6 +829,7 @@ export const CheckoutForm = ({
                   initialRecipientPhone={cdek.recipientPhone}
                   disabled={isDisabled || isSubmitting}
                   onChange={setCdekSelection}
+                  onCost={setCarrierCost}
                 />
               ) : (
                 <>
@@ -859,13 +879,21 @@ export const CheckoutForm = ({
                         initialRecipientPhone={express.recipientPhone}
                         disabled={isDisabled || isSubmitting}
                         onChange={setExpressSelection}
+                        onCost={setCarrierCost}
                       />
                     </>
                   ) : null}
 
-                  {renderFooter ? null : renderSellerDeliveryCost(false)}
+                  {loboOwnDelivery ? (
+                    <CheckoutShippingEstimateNotice
+                      estimate={shippingEstimate}
+                      blockMessage={shippingBlockMessage}
+                    />
+                  ) : null}
                 </>
               )}
+
+              {renderFooter ? null : renderSellerDeliveryCost(false)}
             </View>
           </View>
         )}

@@ -90,6 +90,30 @@ test("ЛОБО: подпись службы, примерная цена кур�
   );
 });
 
+test("цена службы входит в итог корзины вместо «К оплате»", () => {
+  const form = read("features/checkout/ui/CheckoutForm.tsx");
+  assert.match(form, /<CheckoutCarrierDeliveryCost cost=\{serviceCost\}/);
+  assert.equal(form.match(/onCost=\{setCarrierCost\}/g)?.length, 3);
+  assert.match(form, /cost: loboCost/);
+  assert.match(
+    read("app/(tabs)/cart.tsx"),
+    /goodsTotalRub=\{activeSellerEntry\.summary\.selectedTotal\}/,
+  );
+  for (const picker of [
+    "CdekPickupPointPicker",
+    "YandexPickupPointPicker",
+    "YandexExpressPanel",
+  ]) {
+    assert.match(
+      read(`features/checkout/ui/${picker}.tsx`),
+      /onCost\?\.\(|onCost\(/,
+      picker,
+    );
+  }
+  const cost = read("features/checkout/ui/CheckoutCarrierDeliveryCost.tsx");
+  assert.match(cost, /goods \+ feeRub/);
+});
+
 test("тексты совпадают с сайтом", () => {
   const web = read("../client/src/shared/config/copy/cart-checkout.js");
   const mobile = read("shared/config/appUiCopy.ts");

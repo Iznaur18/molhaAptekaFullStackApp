@@ -6,6 +6,7 @@ import {
   type YandexExpressQuote,
 } from "@/entities/yandex-delivery/api/yandexDeliveryCheckoutApi";
 import { CarrierRecipientFields } from "@/features/checkout/ui/CarrierPickerParts";
+import type { CarrierDeliveryCost } from "@/features/checkout/ui/CheckoutCarrierDeliveryCost";
 import type { YandexCheckoutItem } from "@/features/checkout/ui/YandexPickupPointPicker";
 import {
   buildYandexExpressOrderSelection,
@@ -26,6 +27,8 @@ type YandexExpressPanelProps = {
   initialRecipientPhone?: string;
   disabled?: boolean;
   onChange: (selection: YandexExpressOrderSelection | null) => void;
+  /** Цена службы для итога корзины; `null` — пока не посчитана. */
+  onCost?: (cost: CarrierDeliveryCost | null) => void;
 };
 
 /**
@@ -41,6 +44,7 @@ export const YandexExpressPanel = ({
   initialRecipientPhone = "",
   disabled = false,
   onChange,
+  onCost,
 }: YandexExpressPanelProps) => {
   const styles = useCdekPickupPointPickerStyles();
   const [recipientName, setRecipientName] = useState(initialRecipientName);
@@ -99,6 +103,22 @@ export const YandexExpressPanel = ({
       }),
     );
   }, [quote, recipientName, recipientPhone, onChange]);
+
+  // Цену курьера показывает и итог корзины (паритет web `onCost`).
+  useEffect(() => {
+    if (!onCost) return undefined;
+    const fee = quote?.available ? Number(quote.deliverySumRub) || 0 : 0;
+    onCost(
+      fee > 0
+        ? {
+            feeRub: fee,
+            label: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_YANDEX_EXPRESS,
+            approximate: false,
+          }
+        : null,
+    );
+    return () => onCost(null);
+  }, [quote, onCost]);
 
   const priceText =
     quote?.available && quote.deliverySumRub != null

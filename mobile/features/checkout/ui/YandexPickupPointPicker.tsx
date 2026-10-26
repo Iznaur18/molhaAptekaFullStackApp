@@ -9,6 +9,7 @@ import {
   fetchYandexDeliveryPoints,
   fetchYandexDeliveryQuote,
 } from "@/entities/yandex-delivery/api/yandexDeliveryCheckoutApi";
+import type { CarrierDeliveryCost } from "@/features/checkout/ui/CheckoutCarrierDeliveryCost";
 import {
   CarrierCitySearch,
   CarrierRecipientFields,
@@ -34,6 +35,8 @@ type YandexPickupPointPickerProps = {
   disabled?: boolean;
   /** Полный выбор для заказа или `null`, пока чего-то не хватает. */
   onChange: (selection: YandexDeliveryOrderSelection | null) => void;
+  /** Цена службы для итога корзины; `null` — пока не посчитана. */
+  onCost?: (cost: CarrierDeliveryCost | null) => void;
 };
 
 /**
@@ -51,6 +54,7 @@ export const YandexPickupPointPicker = ({
   initialRecipientPhone = "",
   disabled = false,
   onChange,
+  onCost,
 }: YandexPickupPointPickerProps) => {
   const styles = useCdekPickupPointPickerStyles();
   const [city, setCity] = useState("");
@@ -140,6 +144,22 @@ export const YandexPickupPointPicker = ({
       }),
     );
   }, [pointId, quote, recipientName, recipientPhone, onChange]);
+
+  // Цену пункта показывает и итог корзины (паритет web `onCost`).
+  useEffect(() => {
+    if (!onCost) return undefined;
+    const fee = quote?.available ? Number(quote.deliverySumRub) || 0 : 0;
+    onCost(
+      fee > 0
+        ? {
+            feeRub: fee,
+            label: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_YANDEX,
+            approximate: false,
+          }
+        : null,
+    );
+    return () => onCost(null);
+  }, [quote, onCost]);
 
   const pointOptions = useMemo<CarrierPickupPoint[]>(
     () =>

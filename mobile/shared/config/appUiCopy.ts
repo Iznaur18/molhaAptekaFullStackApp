@@ -1248,9 +1248,8 @@ export const CHECKOUT_FORM_UI = {
     minutes ? `${formatted} · курьер ~${minutes} мин в пути` : formatted,
   /** Примерная цена внешней службы (ЛОБО) — паритет web `CheckoutShippingEstimate`. */
   SHIPPING_PROVIDER_LOBO: "ЛОБО",
-  SHIPPING_ESTIMATE_LABEL: (carrier: string) => `Доставка ${carrier}`,
-  SHIPPING_ESTIMATE_APPROX: (formatted: string) => `≈ ${formatted}`,
-  SHIPPING_ESTIMATE_PAY_COURIER: "Оплата курьеру при получении",
+  /** Цена службы в итоге: у ЛОБО примерная (web `CARRIER_DELIVERY_APPROX`). */
+  CARRIER_DELIVERY_APPROX: (formatted: string) => `≈ ${formatted}`,
   SHIPPING_ESTIMATE_UNAVAILABLE:
     "Стоимость доставки посчитаем позже — её назовёт курьер.",
   SHIPPING_ESTIMATE_OUT_OF_ZONE:

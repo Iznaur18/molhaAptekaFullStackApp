@@ -754,6 +754,7 @@ export default function CartScreen() {
                     productCarrier={checkoutProductCarrier}
                     sellerDelivery={sellerDelivery}
                     deliveryProductIds={deliveryProductIds}
+                    goodsTotalRub={activeSellerEntry.summary.selectedTotal}
                     initialFulfillmentMethod={
                       fulfillmentBySellerId[activeSellerEntry.group.sellerId] ?? null
                     }
