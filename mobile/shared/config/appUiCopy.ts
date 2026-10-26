@@ -370,6 +370,7 @@ export const CART_PAGE_UI = {
   DELIVERY_HINT_FREE: "Доставка бесплатно",
   DELIVERY_HINT_FROM: (formatted: string) => `Доставка от ${formatted}`,
   DELIVERY_HINT_BY_TARIFF: "Доставка по тарифу продавца",
+  DELIVERY_HINT_LOBO: "Доставка ЛОБО, оплата курьеру",
   SELLER_ROW_OPEN: "Перейти",
   /** Подпись группы товаров за баллы: отдельный заказ у того же продавца. */
   POINTS_GROUP_SUFFIX: "за баллы",
@@ -1230,6 +1231,29 @@ export const CHECKOUT_FORM_UI = {
   YANDEX_PRICING: "Считаем доставку…",
   YANDEX_CARD_ONLY_HINT:
     "Товар и доставку вы оплатите картой в пункте выдачи Яндекса, когда заберёте заказ",
+  /** «Экспресс» — курьер Яндекса до двери (паритет web `YANDEX_EXPRESS_*`). */
+  SHIPPING_PROVIDER_YANDEX_EXPRESS: "Яндекс Экспресс",
+  YANDEX_EXPRESS_REQUIRED:
+    "Для курьера Яндекса укажите адрес с точкой на карте и получателя с телефоном",
+  YANDEX_EXPRESS_CARD_HINT:
+    "Курьер Яндекса привезёт заказ сегодня. Товар и доставку оплатите курьеру картой",
+  YANDEX_EXPRESS_CARD_ONLY: "С курьером Яндекса оплата только картой при получении",
+  YANDEX_EXPRESS_NEED_GEO:
+    "Выберите адрес из подсказок или отметьте точку на карте — курьер едет по координатам",
+  YANDEX_EXPRESS_PRICING: "Считаем курьера…",
+  YANDEX_EXPRESS_UNAVAILABLE:
+    "Курьер Яндекса по этому адресу не едет — выберите другую службу",
+  YANDEX_EXPRESS_PRICE: (formatted: string, minutes: number | null) =>
+    minutes ? `${formatted} · курьер ~${minutes} мин в пути` : formatted,
+  /** Примерная цена внешней службы (ЛОБО) — паритет web `CheckoutShippingEstimate`. */
+  SHIPPING_PROVIDER_LOBO: "ЛОБО",
+  SHIPPING_ESTIMATE_LABEL: (carrier: string) => `Доставка ${carrier}`,
+  SHIPPING_ESTIMATE_APPROX: (formatted: string) => `≈ ${formatted}`,
+  SHIPPING_ESTIMATE_PAY_COURIER: "Оплата курьеру при получении",
+  SHIPPING_ESTIMATE_UNAVAILABLE:
+    "Стоимость доставки посчитаем позже — её назовёт курьер.",
+  SHIPPING_ESTIMATE_OUT_OF_ZONE:
+    "Служба доставки не возит по этому адресу. Выберите самовывоз или другой адрес.",
   SHIPPING_PROVIDER_BADGE_CAPTION: "Доставку выполняет",
   SHIPPING_PROVIDER_BADGE_SELLER: "Продавец",
   CDEK_UNAVAILABLE: "СДЭК сейчас не отвечает",

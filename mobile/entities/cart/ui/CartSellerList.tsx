@@ -36,6 +36,7 @@ const formatDeliveryHint = (
   const hint = resolveCartGroupDeliveryHint(group, goodsTotalRub);
   if (!hint) return "";
   if (hint.kind === "free") return CART_PAGE_UI.DELIVERY_HINT_FREE;
+  if (hint.kind === "lobo") return CART_PAGE_UI.DELIVERY_HINT_LOBO;
   if (hint.kind === "from") {
     return CART_PAGE_UI.DELIVERY_HINT_FROM(formatPriceRub(hint.baseFeeRub));
   }

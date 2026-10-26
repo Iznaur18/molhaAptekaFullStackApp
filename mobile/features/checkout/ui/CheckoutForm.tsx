@@ -12,9 +12,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   ORDER_FULFILLMENT_DELIVERY,
   ORDER_FULFILLMENT_PICKUP,
+  PRODUCT_DELIVERY_CARRIER_LOBO,
   PRODUCT_DELIVERY_FULFILLMENT_ENABLED,
   SHIPPING_PROVIDER_CDEK,
   SHIPPING_PROVIDER_YANDEX_DELIVERY,
+  SHIPPING_PROVIDER_YANDEX_EXPRESS,
   SHIPPING_PROVIDERS_CHECKOUT_SOON_HINT,
 } from "@molha/api-contract";
 import {
@@ -64,6 +66,15 @@ import { userSavedAddressesFromUser } from "@/entities/address/lib/userSavedAddr
 import { AddressSuggestInput } from "@/entities/address/ui/AddressSuggestInput";
 import { CheckoutSavedAddressPicker } from "@/features/checkout/ui/CheckoutSavedAddressPicker";
 import { CheckoutSellerDeliveryCost } from "@/features/checkout/ui/CheckoutSellerDeliveryCost";
+import {
+  CheckoutShippingEstimateCost,
+  useShippingEstimate,
+} from "@/features/checkout/ui/CheckoutShippingEstimate";
+import { YandexExpressPanel } from "@/features/checkout/ui/YandexExpressPanel";
+import {
+  resolveOrderDeliveryGeo,
+  type YandexExpressOrderSelection,
+} from "@/features/checkout/lib/yandexExpressSelection";
 
 const EMPTY_PRODUCT_IDS: readonly string[] = [];
 
@@ -78,6 +89,13 @@ export type CheckoutCdekConfig = {
 /** Что нужно пикеру Яндекса: чей договор, какие товары и кто получатель. */
 export type CheckoutYandexConfig = {
   sellerId: string;
+  items: readonly YandexCheckoutItem[];
+  recipientName?: string;
+  recipientPhone?: string;
+};
+
+/** «Экспресс» Яндекса у продавца включён: какие товары и кто получатель. */
+export type CheckoutExpressConfig = {
   items: readonly YandexCheckoutItem[];
   recipientName?: string;
   recipientPhone?: string;
@@ -115,6 +133,13 @@ type CheckoutFormProps = {
   cdek?: CheckoutCdekConfig | null;
   /** Яндекс Доставка у этого продавца подключена; null — службы нет. */
   yandex?: CheckoutYandexConfig | null;
+  /** «Экспресс» Яндекса у продавца включён; null — нет. */
+  express?: CheckoutExpressConfig | null;
+  /**
+   * Служба, которую продавец задал на товаре (ЛОБО): это и есть «своя
+   * доставка» отправления — карточка подписана службой, цену называет она.
+   */
+  productCarrier?: string | null;
   /** Тариф собственной доставки продавца; `null` — считать нечего. */
   sellerDelivery?: CartSellerDelivery | null;
   /** Товары, которые везут: по ним считается расстояние. */
@@ -145,6 +170,10 @@ type CheckoutFormProps = {
     cdekShipment?: CdekOrderSelection;
     /** Выбор Яндекса: пункт и получатель. Цену считает сервер. */
     yandexDeliveryShipment?: YandexDeliveryOrderSelection;
+    /** «Экспресс»: только получатель — адрес и точка идут обычным путём. */
+    yandexExpressShipment?: YandexExpressOrderSelection;
+    /** Точка адреса (подсказка или карта) — по ней едет курьер, как на сайте. */
+    deliveryAddressGeo?: { lat: number; lon: number } | null;
   }) => void | Promise<void>;
 };
 
@@ -159,6 +188,8 @@ export const CheckoutForm = ({
   sellerDeliveryAvailable,
   cdek = null,
   yandex = null,
+  express = null,
+  productCarrier = null,
   sellerDelivery = null,
   deliveryProductIds = EMPTY_PRODUCT_IDS,
   initialFulfillmentMethod = null,
@@ -209,6 +240,8 @@ export const CheckoutForm = ({
   const [cdekSelection, setCdekSelection] = useState<CdekOrderSelection | null>(null);
   const [yandexSelection, setYandexSelection] =
     useState<YandexDeliveryOrderSelection | null>(null);
+  const [expressSelection, setExpressSelection] =
+    useState<YandexExpressOrderSelection | null>(null);
   const [localError, setLocalError] = useState("");
   const [selectedPickupByProductId, setSelectedPickupByProductId] = useState<
     Record<string, string>
@@ -285,8 +318,16 @@ export const CheckoutForm = ({
             },
           ]
         : []),
+      ...(express
+        ? [
+            {
+              id: SHIPPING_PROVIDER_YANDEX_EXPRESS,
+              label: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_YANDEX_EXPRESS,
+            },
+          ]
+        : []),
     ],
-    [cdek, yandex],
+    [cdek, yandex, express],
   );
   const chosenCarrier = resolveCheckoutChosenCarrier({
     needsDelivery: fulfillmentMethod === ORDER_FULFILLMENT_DELIVERY,
@@ -297,13 +338,19 @@ export const CheckoutForm = ({
   const cdekChosen = chosenCarrier === SHIPPING_PROVIDER_CDEK;
   // Яндекс берёт в пункте только карту — и за товар, и за доставку.
   const yandexChosen = chosenCarrier === SHIPPING_PROVIDER_YANDEX_DELIVERY;
+  // «Экспресс» — курьер Яндекса до двери: адрес покупателя, оплата картой курьеру.
+  const expressChosen = chosenCarrier === SHIPPING_PROVIDER_YANDEX_EXPRESS;
+  const cardOnlyCarrier = yandexChosen || expressChosen;
+  // Своя доставка отправления — служба товара (ЛОБО), а не тариф продавца.
+  const loboOwnDelivery =
+    productCarrier === PRODUCT_DELIVERY_CARRIER_LOBO && chosenCarrier == null;
   // Продавец сужает способы оплаты, служба «только карта» — ещё раз.
   const effectiveAllowedPaymentMethods = useMemo(
     () =>
-      yandexChosen
+      cardOnlyCarrier
         ? resolveCardOnlyAllowedPaymentMethods(allowedPaymentMethods)
         : allowedPaymentMethods,
-    [yandexChosen, allowedPaymentMethods],
+    [cardOnlyCarrier, allowedPaymentMethods],
   );
   const availablePaymentMethods = useMemo(
     () =>
@@ -352,21 +399,35 @@ export const CheckoutForm = ({
     if (yandexChosen) {
       return deliverySelectable && yandexSelection != null;
     }
-    return (
+    const addressOk =
       deliverySelectable &&
-      validateRuDeliveryAddressForm(deliveryAddress, { required: true }) === null
-    );
+      validateRuDeliveryAddressForm(deliveryAddress, { required: true }) === null;
+    if (expressChosen) {
+      return addressOk && expressSelection != null;
+    }
+    return addressOk;
   }, [
     cdekChosen,
     cdekSelection,
     yandexChosen,
     yandexSelection,
+    expressChosen,
+    expressSelection,
     deliveryAddress,
     deliverySelectable,
     isPickup,
     pickupReady,
     pickupSelectable,
   ]);
+
+  // ЛОБО: примерная цена по точке адреса и запрет, если адрес вне зоны службы.
+  const { estimate: shippingEstimate, blockMessage: shippingBlockMessage } =
+    useShippingEstimate({
+      productIds: deliveryProductIds,
+      geo: deliveryAddress.geo,
+      addressLine: deliveryAddress.line,
+      enabled: !isPickup && loboOwnDelivery,
+    });
 
   const deliveryOptionHint = !PRODUCT_DELIVERY_FULFILLMENT_ENABLED
     ? SHIPPING_PROVIDERS_CHECKOUT_SOON_HINT
@@ -447,25 +508,60 @@ export const CheckoutForm = ({
       setLocalError(validationError);
       return;
     }
+    const deliveryAddressGeo = resolveOrderDeliveryGeo(deliveryAddress);
+    if (expressChosen) {
+      // Курьер Яндекса едет по координатам: без точки адреса заказ не принять.
+      if (!expressSelection || !deliveryAddressGeo) {
+        setLocalError(CHECKOUT_FORM_UI.YANDEX_EXPRESS_REQUIRED);
+        return;
+      }
+      if (paymentMethod !== ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY) {
+        setLocalError(CHECKOUT_FORM_UI.YANDEX_EXPRESS_CARD_ONLY);
+        return;
+      }
+    }
+    if (shippingBlockMessage) {
+      setLocalError(shippingBlockMessage);
+      return;
+    }
     setLocalError("");
     void onSubmit({
       fulfillmentMethod: ORDER_FULFILLMENT_DELIVERY,
       deliveryAddress: deliveryAddress.line.trim(),
       deliveryAddressFlat: deliveryAddress.flat.trim(),
       paymentMethod,
+      // Точка с карты — это подъезд; сервер без неё возьмёт координаты улицы.
+      deliveryAddressGeo,
+      ...(expressChosen && expressSelection
+        ? { yandexExpressShipment: expressSelection }
+        : {}),
     });
   };
 
   // Ни одного общего способа у продавцов — заказ сервер всё равно отклонит.
   const hasPaymentMethod = availablePaymentMethods.includes(paymentMethod);
   const isFormDisabled =
-    isDisabled || isSubmitting || !isAddressValid || !hasPaymentMethod;
+    isDisabled ||
+    isSubmitting ||
+    !isAddressValid ||
+    !hasPaymentMethod ||
+    Boolean(shippingBlockMessage);
   const displayError = localError || submitError;
   // Своя доставка продавца — сумма зависит от адреса формы.
   const sellerDeliveryCostVisible =
-    !isPickup && !cdekChosen && !yandexChosen && sellerDelivery != null;
+    !isPickup &&
+    !cdekChosen &&
+    !yandexChosen &&
+    !expressChosen &&
+    !loboOwnDelivery &&
+    sellerDelivery != null;
   const renderSellerDeliveryCost = (inDock: boolean) =>
-    sellerDeliveryCostVisible && sellerDelivery ? (
+    !isPickup && loboOwnDelivery ? (
+      <CheckoutShippingEstimateCost
+        estimate={shippingEstimate}
+        blockMessage={shippingBlockMessage}
+      />
+    ) : sellerDeliveryCostVisible && sellerDelivery ? (
       <CheckoutSellerDeliveryCost
         sellerDelivery={sellerDelivery}
         productIds={deliveryProductIds}
@@ -679,6 +775,11 @@ export const CheckoutForm = ({
               <CheckoutShippingProviderPicker
                 disabled={isDisabled || isSubmitting}
                 sellerDeliveryAvailable={sellerDeliverySelectable}
+                sellerCardLabel={
+                  productCarrier === PRODUCT_DELIVERY_CARRIER_LOBO
+                    ? CHECKOUT_FORM_UI.SHIPPING_PROVIDER_LOBO
+                    : null
+                }
                 carriers={carrierCards}
                 selectedCarrier={chosenCarrier}
                 onSelectCarrier={(carrier) => {
@@ -745,6 +846,22 @@ export const CheckoutForm = ({
                     editable={!isDisabled && !isSubmitting}
                     keyboardType="default"
                   />
+
+                  {expressChosen && express ? (
+                    <>
+                      <Text style={checkoutStyles.pickupHint}>
+                        {CHECKOUT_FORM_UI.YANDEX_EXPRESS_CARD_HINT}
+                      </Text>
+                      <YandexExpressPanel
+                        items={express.items}
+                        geo={deliveryAddress.geo}
+                        initialRecipientName={express.recipientName}
+                        initialRecipientPhone={express.recipientPhone}
+                        disabled={isDisabled || isSubmitting}
+                        onChange={setExpressSelection}
+                      />
+                    </>
+                  ) : null}
 
                   {renderFooter ? null : renderSellerDeliveryCost(false)}
                 </>

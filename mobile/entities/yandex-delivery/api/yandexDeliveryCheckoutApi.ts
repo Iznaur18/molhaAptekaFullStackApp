@@ -61,3 +61,35 @@ export const fetchYandexDeliveryQuote = async ({
     throw new Error(formatApiErrorMessage(error, CHECKOUT_FORM_UI.YANDEX_UNAVAILABLE));
   }
 };
+
+export type YandexExpressQuote = {
+  available: boolean;
+  deliverySumRub?: number;
+  etaMinutes?: number | null;
+};
+
+/**
+ * `POST /order/yandex-express-quote` — цена курьера Яндекса до точки покупателя.
+ * Только для показа: при оформлении сервер пересчитает сам.
+ */
+export const fetchYandexExpressQuote = async ({
+  items,
+  toLat,
+  toLon,
+}: {
+  items: readonly { productId: string; quantity: number }[];
+  toLat: number;
+  toLon: number;
+}): Promise<YandexExpressQuote> => {
+  try {
+    const { data } = await apiClient.post("/order/yandex-express-quote", {
+      items,
+      toLat,
+      toLon,
+    });
+    const payload = (data as { data?: YandexExpressQuote } | null)?.data;
+    return payload ?? { available: false };
+  } catch (error) {
+    throw new Error(formatApiErrorMessage(error, CHECKOUT_FORM_UI.YANDEX_UNAVAILABLE));
+  }
+};

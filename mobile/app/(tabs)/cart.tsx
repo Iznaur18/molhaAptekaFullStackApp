@@ -413,6 +413,34 @@ export default function CartScreen() {
     ],
   );
 
+  // «Экспресс» — курьер Яндекса до двери. Тоже только картой при получении.
+  const expressAvailable =
+    yandexAvailabilityQuery.data?.expressAvailable === true &&
+    !auctionCheckoutBid &&
+    isCardOnDeliveryAccepted(allowedPaymentMethods);
+  const expressConfig = useMemo(
+    () =>
+      expressAvailable && cdekSellerId
+        ? {
+            items: activeSummary.selectedLines.map((line) => ({
+              productId: line.productId,
+              quantity: line.quantity,
+            })),
+            recipientName: String(sessionUser?.userFullName ?? ""),
+            recipientPhone: String(sessionUser?.userPhoneNumber ?? ""),
+          }
+        : null,
+    [
+      expressAvailable,
+      cdekSellerId,
+      activeSummary.selectedLines,
+      sessionUser?.userFullName,
+      sessionUser?.userPhoneNumber,
+    ],
+  );
+  // Служба, заданная продавцом на товаре (ЛОБО): ей подписана «своя доставка».
+  const checkoutProductCarrier = activeSellerEntry?.group.deliveryCarrier ?? null;
+
   // Тариф собственной доставки продавца. Считаем так, будто выбрана доставка:
   // блок с ценой форма показывает только в этом режиме. Сумму собирает функция
   // контракта, расстояние по дорогам приходит котировкой с сервера.
@@ -517,6 +545,8 @@ export default function CartScreen() {
     pickupSelections?: Array<{ productId: string; pickupLocationId: string }>;
     cdekShipment?: CdekOrderSelection;
     yandexDeliveryShipment?: YandexDeliveryOrderSelection;
+    yandexExpressShipment?: { recipient: { name: string; phone: string } };
+    deliveryAddressGeo?: { lat: number; lon: number } | null;
   }) => {
     setSubmitState({ isSubmitting: true, error: "", success: "" });
     const orderedProductIds = activeSummary.selectedLines.map((line) => line.productId);
@@ -544,6 +574,13 @@ export default function CartScreen() {
         ...(payload.cdekShipment ? { cdekShipment: payload.cdekShipment } : {}),
         ...(payload.yandexDeliveryShipment
           ? { yandexDeliveryShipment: payload.yandexDeliveryShipment }
+          : {}),
+        ...(payload.yandexExpressShipment
+          ? { yandexExpressShipment: payload.yandexExpressShipment }
+          : {}),
+        // Точка адреса — как сайт: курьер едет к подъезду, а не к середине улицы.
+        ...(payload.deliveryAddressGeo
+          ? { deliveryAddressGeo: payload.deliveryAddressGeo }
           : {}),
       });
       await removeItems(orderedProductIds);
@@ -701,7 +738,10 @@ export default function CartScreen() {
                     pickupGroups={pickupGroups}
                     // «Доставка» доступна и тогда, когда у продавца есть только СДЭК.
                     deliveryAvailable={
-                      deliveryAvailable || cdekAvailable || yandexAvailable
+                      deliveryAvailable ||
+                      cdekAvailable ||
+                      yandexAvailable ||
+                      expressAvailable
                     }
                     pickupAvailable={pickupAvailable}
                     allowedPaymentMethods={allowedPaymentMethods}
@@ -710,6 +750,8 @@ export default function CartScreen() {
                     sellerDeliveryAvailable={deliveryAvailable}
                     cdek={cdekConfig}
                     yandex={yandexConfig}
+                    express={expressConfig}
+                    productCarrier={checkoutProductCarrier}
                     sellerDelivery={sellerDelivery}
                     deliveryProductIds={deliveryProductIds}
                     initialFulfillmentMethod={
