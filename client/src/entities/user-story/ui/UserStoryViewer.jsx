@@ -1,3 +1,4 @@
+import { Eye } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { USER_STORY_UI } from "../../../shared/config/appUiCopy.js";
@@ -359,6 +360,7 @@ export function UserStoryViewer({
   const hasMultiple = stories.length > 1;
   const displayError = actionError || (phase === "error" ? error : "");
   const showLoadingOverlay = isMediaLoading && !isTransitioning && !incomingRevealed;
+  const viewsCount = isOwn ? activeStory?.viewsCount : undefined;
 
   const activeLayerClassName = [
     "user-story-viewer__media-layer",
@@ -444,7 +446,23 @@ export function UserStoryViewer({
                 ×
               </button>
 
-              <header className="user-story-viewer__header">
+              {typeof viewsCount === "number" ? (
+                <span
+                  className="user-story-viewer__views"
+                  aria-label={USER_STORY_UI.VIEWS_COUNT_LABEL(viewsCount)}
+                >
+                  <Eye size={18} aria-hidden />
+                  {viewsCount}
+                </span>
+              ) : null}
+
+              <header
+                className={
+                  typeof viewsCount === "number"
+                    ? "user-story-viewer__header user-story-viewer__header_with-views"
+                    : "user-story-viewer__header"
+                }
+              >
                 <button
                   type="button"
                   className="user-story-viewer__author"

@@ -913,6 +913,7 @@ export const USER_STORY_UI = {
   DELETING: "Удаляем…",
   REPORT: "Пожаловаться",
   CLOSE: "Закрыть",
+  VIEWS_COUNT_LABEL: (count: number) => `Просмотров: ${count}`,
   ERROR_GENERIC: "Не удалось выполнить действие",
   ERROR_IMAGE: "Не удалось обработать фото",
   ERROR_CAPTION: "Текст: не больше 150 символов",

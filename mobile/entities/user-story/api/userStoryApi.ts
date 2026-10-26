@@ -1,4 +1,6 @@
-import { apiClient } from "@/shared/api";
+import { userStoriesByAuthorDataSchema } from "@molha/api-contract";
+
+import { apiClient, parseApiContractData } from "@/shared/api";
 import { API_CLIENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { reportClientIssue } from "@/shared/lib/reportClientIssue";
@@ -22,6 +24,8 @@ export type UserStory = {
   mediaUrl: string;
   mediaType?: string;
   captionText?: string | null;
+  /** Только у автора своего сторис. */
+  viewsCount?: number;
 };
 
 export const fetchUserStoriesFeed = async (): Promise<UserStoriesFeed> => {
@@ -47,10 +51,7 @@ export const fetchUserStoriesByAuthor = async (
     const { data } = await apiClient.get(
       `/user/stories/author/${encodeURIComponent(authorUserId)}`,
     );
-    if (!data?.success || !Array.isArray(data.data?.stories)) {
-      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
-    }
-    return data.data.stories;
+    return parseApiContractData(data, userStoriesByAuthorDataSchema).stories;
   } catch (error) {
     throw new Error(
       formatApiErrorMessage(error, "Не удалось загрузить сторисы автора"),

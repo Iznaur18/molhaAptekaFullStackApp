@@ -18,6 +18,7 @@ export const USER_STORY_UI = {
   DELETING: "Удаляем…",
   REPORT: "Пожаловаться",
   CLOSE: "Закрыть",
+  VIEWS_COUNT_LABEL: (count) => `Просмотров: ${count}`,
   ERROR_GENERIC: "Не удалось выполнить действие",
   ERROR_VIDEO_TYPE: "Видео: только MP4 или WebM",
   ERROR_VIDEO_SIZE: "Видео: не больше 100 МБ",

@@ -47,6 +47,12 @@ const UserStorySchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    /** Уникальные зрители (без автора); растёт вместе с `UserStoryViewer`. */
+    viewsCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
   },
   { timestamps: true },
 );

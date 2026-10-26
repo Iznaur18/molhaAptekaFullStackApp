@@ -20,6 +20,7 @@ import {
   UserStoryModel,
   UserStoryReportModel,
   UserStoryViewModel,
+  UserStoryViewerModel,
 } from "../../models/index.js";
 import { normalizeStoredUploadUrl } from "../upload/buildPublicUploadUrl.js";
 import { canModerateProductsRole } from "../product/productModeration.js";
@@ -279,9 +280,12 @@ export async function getUserStoriesFeed(viewerUserId) {
 }
 
 /**
+ * Число просмотров видит только автор: остальным поле не отдаём.
+ *
  * @param {string} authorUserId
+ * @param {string | null} [viewerUserId]
  */
-export async function getActiveStoriesForAuthor(authorUserId) {
+export async function getActiveStoriesForAuthor(authorUserId, viewerUserId = null) {
   await expireStaleUserStories();
 
   const now = new Date();
@@ -293,7 +297,45 @@ export async function getActiveStoriesForAuthor(authorUserId) {
     .sort({ publishedAt: 1 })
     .lean();
 
-  return stories.map(mapUserStoryToPublic);
+  const isAuthor =
+    viewerUserId != null && String(viewerUserId) === String(authorUserId);
+  return stories.map((story) =>
+    isAuthor
+      ? { ...mapUserStoryToPublic(story), viewsCount: story.viewsCount ?? 0 }
+      : mapUserStoryToPublic(story),
+  );
+}
+
+/**
+ * Засчитывает зрителя один раз на сторис; автор себя не накручивает.
+ *
+ * @param {string} viewerUserId
+ * @param {string} authorUserId
+ * @param {string} storyId
+ */
+export async function countUserStoryViewer(viewerUserId, authorUserId, storyId) {
+  if (viewerUserId === authorUserId) {
+    return;
+  }
+
+  let upserted = false;
+  try {
+    const result = await UserStoryViewerModel.updateOne(
+      { storyId, viewerUserId },
+      { $setOnInsert: { storyId, viewerUserId } },
+      { upsert: true },
+    );
+    upserted = result.upsertedCount === 1;
+  } catch (upsertError) {
+    // Два параллельных запроса одного зрителя: второй упирается в unique — уже засчитан.
+    if (upsertError?.code !== 11000) {
+      throw upsertError;
+    }
+  }
+
+  if (upserted) {
+    await UserStoryModel.updateOne({ _id: storyId }, { $inc: { viewsCount: 1 } });
+  }
 }
 
 /**

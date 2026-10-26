@@ -1,5 +1,7 @@
+import { userStoriesByAuthorDataSchema } from "@molha/api-contract";
+
 import { apiClient } from "../../../shared/api/index.js";
-import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
+import { parseApiContractData } from "../../../shared/api/parseApiContract.js";
 
 /**
  * @param {string} authorUserId
@@ -11,11 +13,7 @@ export async function fetchUserStoriesByAuthor(authorUserId) {
       `/user/stories/author/${encodeURIComponent(authorUserId)}`,
     );
 
-    if (!data?.success || !Array.isArray(data.data?.stories)) {
-      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
-    }
-
-    return data.data.stories;
+    return parseApiContractData(data, userStoriesByAuthorDataSchema).stories;
   } catch (e) {
     const message =
       e?.response?.data?.message ?? e?.message ?? "Не удалось загрузить сторисы автора";

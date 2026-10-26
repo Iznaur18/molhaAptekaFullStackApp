@@ -252,6 +252,8 @@ export {
   submitUserStoryReportBodySchema,
   resolveUserStoryReportsBodySchema,
   USER_STORY_VIDEO_MAX_DURATION_SEC,
+  userStoriesByAuthorDataSchema,
+  userStoryPublicSchema,
 } from "./userStory.js";
 export {
   dataConfirmationRequestIdParamsSchema,

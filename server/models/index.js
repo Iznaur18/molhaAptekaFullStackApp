@@ -19,6 +19,7 @@ import ProductPromotionTariffModel from "./ProductPromotionTariffModel.js";
 import RaffleModel from "./RaffleModel.js";
 import UserStoryModel from "./UserStoryModel.js";
 import UserStoryViewModel from "./UserStoryViewModel.js";
+import UserStoryViewerModel from "./UserStoryViewerModel.js";
 import UserStoryReportModel from "./UserStoryReportModel.js";
 import ProductCategoryDisplayModel from "./ProductCategoryDisplayModel.js";
 import ProductCategoryModel from "./ProductCategoryModel.js";
@@ -84,6 +85,7 @@ export {
   RaffleModel,
   UserStoryModel,
   UserStoryViewModel,
+  UserStoryViewerModel,
   UserStoryReportModel,
   ProductCategoryDisplayModel,
   ProductCategoryModel,

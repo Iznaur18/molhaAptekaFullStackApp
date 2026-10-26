@@ -1,4 +1,5 @@
 import { Image } from "expo-image";
+import Eye from "lucide-react-native/icons/eye";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -79,6 +80,7 @@ export const UserStoryViewerModal = ({
   const isDeleting = deleteMutation.isPending;
   const hasMultiple = stories.length > 1;
   const showFooter = isOwn || canReport;
+  const viewsCount = isOwn ? activeStory?.viewsCount : undefined;
   const avatarUrl = authorAvatarUrl ? resolveUploadedMediaUrl(authorAvatarUrl) : null;
 
   useEffect(() => {
@@ -302,7 +304,23 @@ export const UserStoryViewerModal = ({
                   <Text style={styles.closeText}>×</Text>
                 </Pressable>
 
-                <View style={styles.header}>
+                {typeof viewsCount === "number" ? (
+                  <View
+                    accessible
+                    accessibilityLabel={USER_STORY_UI.VIEWS_COUNT_LABEL(viewsCount)}
+                    style={styles.viewsBadge}
+                  >
+                    <Eye size={18} color={styles.viewsText.color} />
+                    <Text style={styles.viewsText}>{viewsCount}</Text>
+                  </View>
+                ) : null}
+
+                <View
+                  style={[
+                    styles.header,
+                    typeof viewsCount === "number" ? styles.headerWithViews : null,
+                  ]}
+                >
                   <Pressable
                     accessibilityRole="button"
                     onPress={handleOpenProfile}
