@@ -30,6 +30,7 @@ import {
   markOrderLineLoyaltyReserveReleased,
   releaseUnawardedLoyaltyReservesForOrder,
 } from "./orderLoyaltyPoints.js";
+import { refundPointsPaymentForItem } from "./orderPointsPayment.js";
 import {
   getOrderItemOrThrow,
   loadOrderWithItems,
@@ -139,6 +140,7 @@ const applyCancelInTransaction = async ({ orderId, itemIndexes, buyerId, session
     });
     item.status = ORDER_STATUS_CANCELLED;
     markOrderLineLoyaltyReserveReleased(item);
+    await refundPointsPaymentForItem({ item, buyerId, session });
   }
 
   if (releaseLines.length === 0) return 0;
@@ -471,6 +473,7 @@ export async function cancelOrderItemsNotDeliveredByCarrier({ orderId, sellerId 
       item.carrierNotDeliveredAt = now;
       item.awaitingCarrierReturn = true;
       markOrderLineLoyaltyReserveReleased(item);
+      await refundPointsPaymentForItem({ item, buyerId, session });
       indexes.push(itemIndex);
 
       await applySoldQuantityDeltaForItemStatusChange({

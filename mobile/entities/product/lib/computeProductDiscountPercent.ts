@@ -1,3 +1,5 @@
+import { isProductPointsSaleActive } from "@molha/api-contract";
+
 type DiscountProduct = {
   productOldPrice?: number | null;
   productPrice?: number | null;
@@ -20,6 +22,10 @@ export const computeProductDiscountPercent = (
 export const resolveProductDiscountPercent = (
   product: DiscountProduct,
 ): number | null => {
+  // Скидка — от рублёвой цены, а товар за баллы рублями не продаётся.
+  if (isProductPointsSaleActive(product)) {
+    return null;
+  }
   if (product.discountPercent != null && Number.isFinite(product.discountPercent)) {
     const fromApi = Math.floor(Number(product.discountPercent));
     return fromApi > 0 ? fromApi : null;

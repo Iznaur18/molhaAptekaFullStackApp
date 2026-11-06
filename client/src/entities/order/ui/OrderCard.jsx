@@ -1,6 +1,6 @@
 import { resolveOrderShippingTrackingUrl } from "@molha/api-contract";
 import { useState } from "react";
-import { Bike, Phone } from "lucide-react";
+import { Bike, Phone, Store, Truck } from "lucide-react";
 
 import {
   ORDER_STATUS_DELIVERED,
@@ -15,10 +15,14 @@ import {
   orderNeedsSellerAttention,
   resolveSellerOrderCollapsedPreview,
 } from "../lib/orderNeedsSellerAttention.js";
-import { buildOrderStatusFromItems } from "@izibuy/shared-lib";
+import {
+  buildOrderStatusFromItems,
+  canCancelOrderItem,
+  canMarkOrderItemReturned,
+  isOrderShipmentTrackedByCarrier,
+} from "@izibuy/shared-lib";
 
 import {
-  ORDER_PRE_SHIPMENT_STATUSES,
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_READY_FOR_PICKUP,
   ORDER_STATUS_READY_TO_SHIP,
@@ -27,7 +31,6 @@ import {
 import { resolveShipmentAdvanceAction } from "../lib/resolveNextShipmentStatus.js";
 import { canCancelOrderShipment } from "../lib/canCancelOrderShipment.js";
 
-const PRE_SHIPMENT_STATUSES = new Set(ORDER_PRE_SHIPMENT_STATUSES);
 import { resolveOrderStatusLabelRu } from "../lib/resolveOrderStatusLabelRu.js";
 import { resolveOrderSellers } from "../lib/resolveOrderSellers.js";
 import {
@@ -43,9 +46,6 @@ import { resolveOrderLineSellerId, summarizeOrderItems } from "@izibuy/shared-li
 import {
   PRODUCT_DELIVERY_CARRIER_LOBO,
   PRODUCT_DELIVERY_CARRIER_SELLER,
-  SHIPPING_PROVIDER_CDEK,
-  SHIPPING_PROVIDER_YANDEX_DELIVERY,
-  SHIPPING_PROVIDER_YANDEX_EXPRESS,
   resolveOrderPrepaymentAmountRub,
   resolveProductDeliveryCarrier,
 } from "@molha/api-contract";
@@ -63,6 +63,7 @@ import { isAwaitingGitorgCourier } from "../lib/isAwaitingGitorgCourier.js";
 import { BuyerPassportSharePanel } from "../../installment/ui/BuyerPassportSharePanel.jsx";
 import { formatIsoDateTime } from "../../../shared/lib/formatIsoDateTime.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
+import { formatLoyaltyPointsAmount } from "@molha/api-contract";
 import {
   formatRuPhoneDisplayOrEmpty,
   toRuPhoneTelHref,
@@ -262,7 +263,16 @@ function OrderCardMeta({
       ) : null}
       <div className="order-card__meta-row">
         <dt>{ORDER_CARD_UI.PAYMENT_LABEL}</dt>
-        <dd>{formatPaymentMethod(order.paymentMethod)}</dd>
+        <dd>
+          {/* Заказ за баллы: товар оплачен баллами, рублями — только доставка. */}
+          {order.paidWithLoyaltyPoints === true
+            ? isPickupShipment
+              ? ORDER_CARD_UI.PAYMENT_POINTS
+              : ORDER_CARD_UI.PAYMENT_POINTS_WITH_DELIVERY(
+                  formatPaymentMethod(order.paymentMethod),
+                )
+            : formatPaymentMethod(order.paymentMethod)}
+        </dd>
       </div>
       {isInstallmentOrder && order.installmentContract ? (
         <div className="order-card__meta-row">
@@ -317,16 +327,17 @@ function OrderCardLineItem({
   // Отменить можно на любой ступени, пока товар не уехал: это отдельное право,
   // и с отгрузкой его связывать нельзя — иначе кнопка отмены пропадала вместе
   // с ярлыком отгрузки.
-  const canCancelItem = PRE_SHIPMENT_STATUSES.has(item.status);
+  const canCancelItem = canCancelOrderItem(item.status);
   // «Отгрузить» / «Доставлен» / «Выдал» / «Подтвердить» — в строке отправления.
   // Возврат оформляется, пока покупатель не подтвердил получение: товар уже
   // уехал, но сделка не состоялась — отказ у двери, неудачное вручение.
   // СДЭК и Яндекс сами отмечают возврат, когда посылка вернулась к продавцу.
   // Кнопка тут расходилась со службой: покупатель «отказался», а посылка
   // продолжала ехать в пункт, и заказ застревал в «Возвращён».
-  const canMarkReturned =
-    !carrierTracksShipment &&
-    (item.status === ORDER_STATUS_SHIPPED || item.status === ORDER_STATUS_DELIVERED);
+  const canMarkReturned = canMarkOrderItemReturned({
+    status: item.status,
+    carrierTracksShipment,
+  });
   // Для продавца «клиент отказался» и «я принял назад» — разные ситуации:
   // в первом случае товар ещё едет обратно.
   const returnedByLabel =
@@ -341,6 +352,15 @@ function OrderCardLineItem({
   const quantity = Math.max(0, Math.floor(Number(item.quantity) || 0));
   const unitPriceRub = Number(item.unitPriceAtOrder) || 0;
   const lineTotalRub = unitPriceRub * quantity;
+  // Позиция за баллы: рублёвая цена у неё 0, показываем цену в баллах.
+  const pointsUnitPrice = Math.max(0, Math.floor(Number(item.pointsPriceAtOrder) || 0));
+  const isPointsLine = pointsUnitPrice > 0;
+  const unitPriceText = isPointsLine
+    ? formatLoyaltyPointsAmount(pointsUnitPrice)
+    : formatPriceRub(unitPriceRub);
+  const lineTotalText = isPointsLine
+    ? formatLoyaltyPointsAmount(pointsUnitPrice * quantity)
+    : formatPriceRub(lineTotalRub);
   const productName = resolveOrderLineItemProductName(item);
   const affiliateSellerLine = resolveOrderLineAffiliateSellerLine({
     item,
@@ -445,24 +465,17 @@ function OrderCardLineItem({
               // Сумма позиции напротив названия; при нескольких штуках — ещё
               // «количество × цена за штуку», чтобы было видно, из чего она.
               <span className="order-card__item-price-block">
-                <span className="order-card__item-price">
-                  {formatPriceRub(lineTotalRub)}
-                </span>
+                <span className="order-card__item-price">{lineTotalText}</span>
                 {quantity > 1 ? (
                   <span className="order-card__item-price-unit">
-                    {ORDER_CARD_UI.ITEM_QUANTITY_UNIT_PRICE(
-                      quantity,
-                      formatPriceRub(unitPriceRub),
-                    )}
+                    {ORDER_CARD_UI.ITEM_QUANTITY_UNIT_PRICE(quantity, unitPriceText)}
                   </span>
                 ) : null}
               </span>
             ) : (
               <>
                 <span className="order-card__item-quantity">×{item.quantity}</span>
-                <span className="order-card__item-price">
-                  {formatPriceRub(item.unitPriceAtOrder)}
-                </span>
+                <span className="order-card__item-price">{unitPriceText}</span>
               </>
             )}
           </div>
@@ -672,11 +685,10 @@ export function OrderCard({
       : null;
 
   // СДЭК, Яндекс и «Экспресс»: «Отгружен» и «Доставлен» ставит опрос статусов службы, не продавец.
-  const cdekTracksThisShipment =
-    shipmentMethod === "delivery" &&
-    (shipmentOwn?.deliveryCarrier === SHIPPING_PROVIDER_CDEK ||
-      shipmentOwn?.deliveryCarrier === SHIPPING_PROVIDER_YANDEX_DELIVERY ||
-      shipmentOwn?.deliveryCarrier === SHIPPING_PROVIDER_YANDEX_EXPRESS);
+  const cdekTracksThisShipment = isOrderShipmentTrackedByCarrier({
+    fulfillment: shipmentMethod,
+    deliveryCarrier: shipmentOwn?.deliveryCarrier,
+  });
   const sellerDeliversThisShipment =
     shipmentMethod === "delivery" &&
     shipmentCarrier === PRODUCT_DELIVERY_CARRIER_SELLER &&
@@ -685,8 +697,12 @@ export function OrderCard({
   const shipmentStatusNow = buildOrderStatusFromItems(order.items);
   // Заказ оформлен с предоплатой, а деньги не пришли: продавцу не показываем
   // кнопки сборки, покупателю — кнопку оплаты, но только после подтверждения.
+  // Отменённый заказ платить не нужно: без этой проверки у него висели
+  // «Ожидает оплаты» и «Оплатить» — отметки об оплате у него так и нет.
   const awaitingPrepayment =
-    order.paymentMethod === "cardPrepaid" && !order.prepaidPaidAt;
+    order.paymentMethod === "cardPrepaid" &&
+    !order.prepaidPaidAt &&
+    shipmentStatusNow !== ORDER_STATUS_CANCELLED;
   // Оплата открывается после подтверждения продавцом: сначала он проверяет,
   // что товар есть, и только потом покупатель платит.
   const acceptedBySeller = shipmentStatusNow !== "pending";
@@ -885,9 +901,18 @@ export function OrderCard({
   // отменены — отправления нет, и доставку не показываем.
   const courierDeliveryFeeRub =
     shipmentOwn?.courierDelivery === true ? deliveryFeeRub : 0;
-  const orderDeliveryRub =
-    itemsSummary.totalAmount > 0 ? sellerDeliveryFeeRub + courierDeliveryFeeRub : 0;
+  const hasBillableItems = itemsSummary.totalAmount > 0 || itemsSummary.pointsTotal > 0;
+  const orderDeliveryRub = hasBillableItems
+    ? sellerDeliveryFeeRub + courierDeliveryFeeRub
+    : 0;
   const orderTotalWithDeliveryRub = itemsSummary.totalAmount + orderDeliveryRub;
+  // Заказ за баллы: товар — баллами, доставка (если есть) — рублями отдельно.
+  const orderTotalText =
+    itemsSummary.pointsTotal > 0
+      ? orderDeliveryRub > 0
+        ? `${formatLoyaltyPointsAmount(itemsSummary.pointsTotal)} + ${formatPriceRub(orderDeliveryRub)}`
+        : formatLoyaltyPointsAmount(itemsSummary.pointsTotal)
+      : formatPriceRub(orderTotalWithDeliveryRub);
   const awaitingGitorgCourier = isAwaitingGitorgCourier({
     status: shipmentStatusNow,
     shipment: shipmentOwn,
@@ -936,12 +961,25 @@ export function OrderCard({
           какую часть он забирает сам, а какую ему везут. Кнопка — только
           продавцу, и только пока есть куда двигать. */}
       <div className="order-card__shipment-row">
-        <span className="order-card__shipment-label">
-          {ORDER_CARD_UI.SHIPMENT_HEADING}:{" "}
-          {shipmentFulfillment === "delivery"
-            ? ORDER_CARD_UI.SHIPMENT_DELIVERY
-            : ORDER_CARD_UI.SHIPMENT_PICKUP}
-        </span>
+        <div className="order-card__shipment-method">
+          <span className="order-card__shipment-icon" aria-hidden="true">
+            {shipmentFulfillment === "delivery" ? (
+              <Truck size={18} strokeWidth={2} />
+            ) : (
+              <Store size={18} strokeWidth={2} />
+            )}
+          </span>
+          <span className="order-card__shipment-method-copy">
+            <span className="order-card__shipment-method-caption">
+              {ORDER_CARD_UI.SHIPMENT_HEADING}
+            </span>
+            <span className="order-card__shipment-method-value">
+              {shipmentFulfillment === "delivery"
+                ? ORDER_CARD_UI.SHIPMENT_DELIVERY
+                : ORDER_CARD_UI.SHIPMENT_PICKUP}
+            </span>
+          </span>
+        </div>
         <div className="order-card__shipment-actions">
           {canCancelOrder ? (
             <ConfirmButton
@@ -1188,10 +1226,17 @@ export function OrderCard({
 
       {canRaiseFee ? (
         <div className="order-card__fee">
-          <span>{ORDER_CARD_UI.SHIPMENT_FEE(formatPriceRub(deliveryFeeRub))}</span>
+          <div className="order-card__fee-copy">
+            <span className="order-card__fee-label">
+              {ORDER_CARD_UI.SHIPMENT_FEE_LABEL}
+            </span>
+            <span className="order-card__fee-value">
+              {formatPriceRub(deliveryFeeRub)}
+            </span>
+          </div>
           <button
             type="button"
-            className="order-card__item-action-button"
+            className="order-card__fee-raise"
             onClick={() =>
               onRaiseDeliveryFee({
                 orderId: order._id,
@@ -1416,9 +1461,7 @@ export function OrderCard({
             <span className="order-card__quantity">×{itemsSummary.quantity}</span>
           ) : null}
           <span className="order-card__total-block">
-            <span className="order-card__total">
-              {formatPriceRub(orderTotalWithDeliveryRub)}
-            </span>
+            <span className="order-card__total">{orderTotalText}</span>
             {orderDeliveryRub > 0 ? (
               <span className="order-card__total-note">
                 {ORDER_CARD_UI.TOTAL_WITH_DELIVERY_NOTE}

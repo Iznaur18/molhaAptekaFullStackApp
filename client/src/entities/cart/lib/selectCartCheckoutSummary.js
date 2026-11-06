@@ -17,6 +17,7 @@ const EMPTY_DESELECTION = new Set();
  *   selectedLines: import("./selectCartLines.js").CartLine[];
  *   checkoutBlockReason: string | null;
  *   selectedTotal: number;
+ *   selectedPointsTotal: number;
  *   selectedListTotal: number;
  *   selectedDiscount: number;
  *   selectedPromoDiscount: number;
@@ -100,6 +101,10 @@ export function selectCartCheckoutSummary(
       currentUserId,
     ),
     selectedTotal: sumLineTotals(selectedLines),
+    selectedPointsTotal: selectedLines.reduce(
+      (sum, line) => sum + (line.pointsLineTotal ?? 0),
+      0,
+    ),
     selectedListTotal: sumCartLinesCatalogListTotal(selectedLines),
     selectedDiscount: sumCartLinesCatalogDiscount(selectedLines),
     selectedPromoDiscount: sumCartLinesPromoDiscount(selectedLines),

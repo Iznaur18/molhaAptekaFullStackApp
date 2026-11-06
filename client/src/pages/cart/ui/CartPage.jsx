@@ -127,7 +127,11 @@ export function CartPage({
     return userSavedAddressesFromUser(user);
   }, [isAuthorized, user]);
 
-  /** Внутренняя корзина продавца; null — общий список продавцов. */
+  /**
+   * Внутренняя корзина продавца — ключ группы (`cartGroupId`): у продавца их
+   * две, если в корзине есть его товары и за рубли, и за баллы. null — общий
+   * список продавцов.
+   */
   const [activeSellerCartId, setActiveSellerCartId] = useState(
     /** @type {string | null} */ (null),
   );
@@ -159,7 +163,7 @@ export function CartPage({
   );
 
   /** Оформление обычной корзины — на странице продавца; sheet только у аукциона. */
-  const checkoutSellerId = auctionCheckoutBid ? null : activeSellerCartId;
+  const checkoutGroupId = auctionCheckoutBid ? null : activeSellerCartId;
 
   const handleProductClick = useCallback(
     (product) => {
@@ -234,6 +238,19 @@ export function CartPage({
     () => groupCartLinesBySeller(visibleLines),
     [visibleLines],
   );
+  const checkoutGroup = useMemo(
+    () =>
+      checkoutGroupId
+        ? (sellerGroups.find(
+            (group) => String(group.cartGroupId) === String(checkoutGroupId),
+          ) ?? null)
+        : null,
+    [checkoutGroupId, sellerGroups],
+  );
+  /** Продавец оформляемой группы — для всего, что на сервере ключуется продавцом. */
+  const checkoutSellerId = checkoutGroup?.sellerId ?? null;
+  /** Группа товаров за баллы: предоплаты нет, итог в баллах. */
+  const isPointsCheckout = checkoutGroup?.paidWithLoyaltyPoints === true;
 
   // Предоплата картой — только товары площадки; в sheet смотрим активного продавца.
   const prepaidSellerIds = useMemo(() => {
@@ -242,9 +259,12 @@ export function CartPage({
     }
     return sellerGroups.map((group) => String(group.sellerId));
   }, [checkoutSellerId, sellerGroups]);
-  const cardPrepaidAvailable = useCardPrepaidAvailable({
+  const cardPrepaidAvailableForSellers = useCardPrepaidAvailable({
     sellerIds: prepaidSellerIds,
   });
+  // Заказ за баллы предоплатой не оформляется: рублями там только доставка,
+  // и платят её при получении (сервер предоплату отклонит).
+  const cardPrepaidAvailable = cardPrepaidAvailableForSellers && !isPointsCheckout;
 
   const purchasableIds = useMemo(
     () => visibleLines.map((line) => line.productId),
@@ -291,7 +311,7 @@ export function CartPage({
       return;
     }
     const stillThere = sellerGroups.some(
-      (group) => String(group.sellerId) === String(activeSellerCartId),
+      (group) => String(group.cartGroupId) === String(activeSellerCartId),
     );
     if (!stillThere) {
       setActiveSellerCartId(null);
@@ -304,15 +324,15 @@ export function CartPage({
     }
     return (
       groupSummaries.find(
-        (entry) => String(entry.group.sellerId) === String(activeSellerCartId),
+        (entry) => String(entry.group.cartGroupId) === String(activeSellerCartId),
       ) ?? null
     );
   }, [activeSellerCartId, groupSummaries]);
 
   const activeSummary = useMemo(() => {
-    if (checkoutSellerId) {
+    if (checkoutGroupId) {
       const found = groupSummaries.find(
-        (entry) => String(entry.group.sellerId) === String(checkoutSellerId),
+        (entry) => String(entry.group.cartGroupId) === String(checkoutGroupId),
       );
       return (
         found?.summary ?? selectCartCheckoutSummary([], currentUserId, deselectedIds)
@@ -323,7 +343,7 @@ export function CartPage({
     }
     return cartSummary;
   }, [
-    checkoutSellerId,
+    checkoutGroupId,
     groupSummaries,
     activeSellerEntry,
     cartSummary,
@@ -334,7 +354,7 @@ export function CartPage({
   const isCartEmpty = lines.length === 0 && auctionBids.length === 0;
   const isAuctionCheckoutOpen = auctionCheckoutBid != null;
   useTrackCheckoutStarted(
-    Boolean(checkoutSellerId) || isAuctionCheckoutOpen,
+    Boolean(checkoutGroupId) || isAuctionCheckoutOpen,
     currentUserId,
   );
 
@@ -357,27 +377,27 @@ export function CartPage({
    * «Наличными» не пряталось бы, хотя сервер их отклонит.
    */
   const selectedCheckoutGroup = useMemo(() => {
-    if (!checkoutSellerId || activeSummary.selectedLines.length === 0) {
+    if (!checkoutGroupId || activeSummary.selectedLines.length === 0) {
       return null;
     }
     return (
       groupCartLinesBySeller(activeSummary.selectedLines).find(
-        (group) => String(group.sellerId) === String(checkoutSellerId),
+        (group) => String(group.cartGroupId) === String(checkoutGroupId),
       ) ?? null
     );
-  }, [checkoutSellerId, activeSummary.selectedLines]);
+  }, [checkoutGroupId, activeSummary.selectedLines]);
 
   const checkoutSellerGroups = useMemo(() => {
-    if (!checkoutSellerId) {
+    if (!checkoutGroupId) {
       return sellerGroups;
     }
     if (selectedCheckoutGroup) {
       return [selectedCheckoutGroup];
     }
     return sellerGroups.filter(
-      (group) => String(group.sellerId) === String(checkoutSellerId),
+      (group) => String(group.cartGroupId) === String(checkoutGroupId),
     );
-  }, [checkoutSellerId, selectedCheckoutGroup, sellerGroups]);
+  }, [checkoutGroupId, selectedCheckoutGroup, sellerGroups]);
 
   /** Отмеченные товары везут разные службы — одной доставкой не оформить. */
   const checkoutMixedCarriers = useMemo(
@@ -615,10 +635,10 @@ export function CartPage({
     setSubmitState({ isSubmitting: false, error: "", success: "" });
   };
 
-  /** @param {string} sellerId */
-  const openSellerCart = (sellerId) => {
+  /** @param {string} cartGroupId */
+  const openSellerCart = (cartGroupId) => {
     setAuctionCheckoutBid(null);
-    setActiveSellerCartId(sellerId);
+    setActiveSellerCartId(cartGroupId);
     setSubmitState({ isSubmitting: false, error: "", success: "" });
   };
 
@@ -815,10 +835,20 @@ export function CartPage({
             </div>
 
             <CartFulfillmentSection
-              key={activeSellerCart.group.sellerId || "unknown-seller"}
+              key={activeSellerCart.group.cartGroupId || "unknown-seller"}
               title={
-                activeSellerCart.group.sellerName ||
-                CART_PAGE_UI.SECTION_SELLER_FALLBACK
+                activeSellerCart.group.paidWithLoyaltyPoints
+                  ? `${
+                      activeSellerCart.group.sellerName ||
+                      CART_PAGE_UI.SECTION_SELLER_FALLBACK
+                    } · ${CART_PAGE_UI.POINTS_GROUP_SUFFIX}`
+                  : activeSellerCart.group.sellerName ||
+                    CART_PAGE_UI.SECTION_SELLER_FALLBACK
+              }
+              pointsTotal={
+                activeSellerCart.group.paidWithLoyaltyPoints
+                  ? activeSellerCart.summary.selectedPointsTotal
+                  : null
               }
               note={checkoutMixedCarriers ? CART_PAGE_UI.MIXED_CARRIERS_NOTE : null}
               lines={activeSellerCart.group.lines}
@@ -880,6 +910,9 @@ export function CartPage({
                       showSubmitButton={false}
                       fulfillmentMethodPortalTarget={fulfillmentMethodHostEl}
                       paymentMethodPortalTarget={paymentMethodHostEl}
+                      paidWithLoyaltyPoints={
+                        activeSellerCart.group.paidWithLoyaltyPoints === true
+                      }
                       onSubmit={handleCheckoutSubmit}
                       cdekAvailable={cdekAvailable}
                       cdekSelection={cdekSelection}

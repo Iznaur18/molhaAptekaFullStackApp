@@ -13,7 +13,7 @@ const line = (overrides) => ({
 test("свод считает штуки и сумму по живым позициям", () => {
   assert.deepEqual(
     summarizeOrderItems([line({ quantity: 2 }), line({ unitPriceAtOrder: 500 })]),
-    { quantity: 3, totalAmount: 2500 },
+    { quantity: 3, totalAmount: 2500, pointsTotal: 0 },
   );
 });
 
@@ -23,7 +23,7 @@ test("отменённая позиция уходит и из количест�
       line({ quantity: 2 }),
       line({ quantity: 3, status: "cancelled" }),
     ]),
-    { quantity: 2, totalAmount: 2000 },
+    { quantity: 2, totalAmount: 2000, pointsTotal: 0 },
   );
 });
 
@@ -31,6 +31,7 @@ test("возвращённая позиция тоже не оплачивает
   assert.deepEqual(summarizeOrderItems([line({ status: "returned" }), line({})]), {
     quantity: 1,
     totalAmount: 1000,
+    pointsTotal: 0,
   });
 });
 
@@ -38,20 +39,43 @@ test("полностью отменённый заказ сводится в н�
   assert.deepEqual(summarizeOrderItems([line({ status: "cancelled" })]), {
     quantity: 0,
     totalAmount: 0,
+    pointsTotal: 0,
   });
 });
 
 test("бесплатные штуки «Бесплатно от N» считаются в количестве, но не в сумме", () => {
   assert.deepEqual(
     summarizeOrderItems([line({ quantity: 3, buyNFreeUnitsAtOrder: 1 })]),
-    { quantity: 3, totalAmount: 2000 },
+    { quantity: 3, totalAmount: 2000, pointsTotal: 0 },
   );
 });
 
 test("пустой список и мусор не ломают свод", () => {
-  assert.deepEqual(summarizeOrderItems([]), { quantity: 0, totalAmount: 0 });
-  assert.deepEqual(summarizeOrderItems(null), { quantity: 0, totalAmount: 0 });
-  assert.deepEqual(summarizeOrderItems([{}]), { quantity: 0, totalAmount: 0 });
+  assert.deepEqual(summarizeOrderItems([]), {
+    quantity: 0,
+    totalAmount: 0,
+    pointsTotal: 0,
+  });
+  assert.deepEqual(summarizeOrderItems(null), {
+    quantity: 0,
+    totalAmount: 0,
+    pointsTotal: 0,
+  });
+  assert.deepEqual(summarizeOrderItems([{}]), {
+    quantity: 0,
+    totalAmount: 0,
+    pointsTotal: 0,
+  });
+});
+
+test("позиции за баллы складываются в pointsTotal, отменённая — нет", () => {
+  assert.deepEqual(
+    summarizeOrderItems([
+      line({ unitPriceAtOrder: 0, pointsPaidTotal: 300 }),
+      line({ unitPriceAtOrder: 0, pointsPaidTotal: 200, status: "cancelled" }),
+    ]),
+    { quantity: 1, totalAmount: 0, pointsTotal: 300 },
+  );
 });
 
 test("блок продавца показывает сумму без отменённой позиции", () => {

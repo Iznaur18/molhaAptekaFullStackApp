@@ -15,6 +15,10 @@ export const ORDER_CARD_UI = {
   PICKUP_ADDRESS_LABEL: "Забрать по адресу",
   TRACKING_LABEL: "Трек-номер",
   PAYMENT_LABEL: "Оплата",
+  PAYMENT_POINTS: "Баллами",
+  /** @param {string} deliveryMethodLabel «Наличными» */
+  PAYMENT_POINTS_WITH_DELIVERY: (deliveryMethodLabel) =>
+    `Баллами, доставка — ${deliveryMethodLabel.toLowerCase()}`,
   STATUS_LABEL: "Статус",
   ITEM_STATUS_LABEL: "Статус позиции",
   /**
@@ -52,7 +56,7 @@ export const ORDER_CARD_UI = {
     [make, color, plate].filter(Boolean).join(", "),
   /** @param {number} rating */
   SHIPMENT_COURIER_RATING: (rating) => `★ ${rating}`,
-  SHIPMENT_HEADING: "Отправление",
+  SHIPMENT_HEADING: "Получение",
   SHIPMENT_ISSUE_CODE: "Выдать код курьеру",
   SHIPMENT_REPLACE_COURIER: "Сменить курьера",
   SHIPMENT_PAYMENT_CONFIRM: "Оплата получена",
@@ -82,8 +86,7 @@ export const ORDER_CARD_UI = {
   SHIPMENT_PAY_TO_HINT: "Курьер отдаст заказ, когда продавец подтвердит перевод.",
   SHIPMENT_PAYMENT_RECEIVED_BY_SELLER: "Продавец подтвердил, что перевод дошёл",
   SHIPMENT_PAYMENT_RECEIVED_HINT: "Больше переводить ничего не нужно.",
-  /** @param {string} fee */
-  SHIPMENT_FEE: (fee) => `Курьеру за доставку: ${fee}`,
+  SHIPMENT_FEE_LABEL: "Курьеру за доставку",
   /** Доставка по тарифу продавца — платится продавцу, а не курьеру. */
   SELLER_DELIVERY_FEE_LABEL: "Доставка продавцом",
   /** Подпись под суммой в шапке, когда в неё вошла доставка. */

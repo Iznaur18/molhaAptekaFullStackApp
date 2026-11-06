@@ -7,6 +7,7 @@ import { CartLineItem } from "@/entities/cart/ui/CartLineItem";
 import { CartSelectAllRow } from "@/entities/cart/ui/CartSelectAllRow";
 import { CART_PAGE_UI, CHECKOUT_FORM_UI } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
+import { formatLoyaltyPointsAmount } from "@molha/api-contract";
 import { useCartFulfillmentSectionStyles } from "@/shared/theme/cartFulfillmentStyles";
 import { AppButton } from "@/shared/ui/AppButton";
 
@@ -99,6 +100,8 @@ type CartCheckoutDockProps = {
   isSubmitting?: boolean;
   submitDisabled?: boolean;
   onSubmit: () => void;
+  /** Товары за баллы: сумма в баллах, рублями — только доставка. */
+  pointsTotal?: number | null;
 };
 
 /** Итог корзины продавца и «Оформить» — паритет web `.cart-fulfillment__dock`. */
@@ -111,6 +114,7 @@ export const CartCheckoutDock = ({
   isSubmitting = false,
   submitDisabled = false,
   onSubmit,
+  pointsTotal = null,
 }: CartCheckoutDockProps) => {
   const styles = useCartFulfillmentSectionStyles();
   const router = useRouter();
@@ -170,17 +174,31 @@ export const CartCheckoutDock = ({
               </Text>
             </View>
           ) : null}
-          {deliveryCost ?? (
+          {pointsTotal != null ? (
             <View style={styles.totalRow}>
-              <Text style={styles.payableLabel}>{CART_PAGE_UI.PAYABLE_LABEL}</Text>
+              <Text style={styles.payableLabel}>
+                {CART_PAGE_UI.POINTS_PAYABLE_LABEL}
+              </Text>
               <Text style={styles.totalValue} numberOfLines={1}>
-                {formatPriceRub(summary.selectedTotal)}
+                {formatLoyaltyPointsAmount(pointsTotal)}
               </Text>
             </View>
-          )}
+          ) : null}
+          {deliveryCost ??
+            (pointsTotal != null ? null : (
+              <View style={styles.totalRow}>
+                <Text style={styles.payableLabel}>{CART_PAGE_UI.PAYABLE_LABEL}</Text>
+                <Text style={styles.totalValue} numberOfLines={1}>
+                  {formatPriceRub(summary.selectedTotal)}
+                </Text>
+              </View>
+            ))}
         </View>
       </View>
 
+      {pointsTotal != null ? (
+        <Text style={styles.checkoutHint}>{CART_PAGE_UI.POINTS_PAYMENT_NOTE}</Text>
+      ) : null}
       {!canCheckout && summary.checkoutBlockReason ? (
         <Text style={styles.checkoutHint}>{summary.checkoutBlockReason}</Text>
       ) : null}

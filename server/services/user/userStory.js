@@ -8,6 +8,7 @@ import { AppError } from "../../errors/AppError.js";
 import {
   assertPremiumCanCreateStory,
   canPublishUserStory,
+  countUserStoryViewer,
   createUserStoryRecord,
   deleteOwnUserStory,
   getActiveStoriesForAuthor,
@@ -41,10 +42,10 @@ export async function getUserStoriesFeedForViewer({ viewerUserId }) {
 }
 
 /**
- * @param {{ authorUserId: string }} input
+ * @param {{ authorUserId: string; viewerUserId: string | null }} input
  */
-export async function getUserStoriesByAuthor({ authorUserId }) {
-  const stories = await getActiveStoriesForAuthor(authorUserId);
+export async function getUserStoriesByAuthor({ authorUserId, viewerUserId }) {
+  const stories = await getActiveStoriesForAuthor(authorUserId, viewerUserId);
   return { stories };
 }
 
@@ -151,6 +152,7 @@ export async function markUserStoryViewed({ viewerUserId, storyId }) {
     String(story.authorUserId),
     story.publishedAt,
   );
+  await countUserStoryViewer(viewerUserId, String(story.authorUserId), storyId);
 
   return { message: "Просмотр сохранён" };
 }

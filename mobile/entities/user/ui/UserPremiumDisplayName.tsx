@@ -1,5 +1,7 @@
 import { type StyleProp, Text, type TextStyle, View } from "react-native";
 
+import { resolveSafeDealBadgeCopy } from "@/entities/seller-safe-deal/lib/safeDealBadgeCopy";
+import { SafeDealSellerBadge } from "@/entities/seller-safe-deal/ui/SafeDealSellerBadge";
 import { UserDataConfirmedBadge } from "@/entities/user/ui/UserDataConfirmedBadge";
 import { UserPremiumVerifiedBadge } from "@/entities/user/ui/UserPremiumVerifiedBadge";
 import { USER_DATA_CONFIRMED_UI, USER_PREMIUM_UI } from "@/shared/config";
@@ -9,6 +11,8 @@ type UserPremiumDisplayNameProps = {
   name: string;
   isPremium?: boolean;
   isUserDataConfirmed?: boolean;
+  /** Продавец подключил безопасную сделку — зелёный щит (web `hasSafeDeal`). */
+  hasSafeDeal?: boolean;
   badgeSize?: number;
   textStyle?: StyleProp<TextStyle>;
   /** Одна строка без переноса бейджей — seller-meta / списки. */
@@ -19,6 +23,7 @@ export const UserPremiumDisplayName = ({
   name,
   isPremium = false,
   isUserDataConfirmed = false,
+  hasSafeDeal = false,
   badgeSize = 18,
   textStyle,
   singleLine = false,
@@ -58,6 +63,15 @@ export const UserPremiumDisplayName = ({
           accessibilityHint={USER_DATA_CONFIRMED_UI.BADGE_TITLE}
         >
           <UserDataConfirmedBadge size={badgeSize} />
+        </View>
+      ) : null}
+      {hasSafeDeal ? (
+        <View
+          style={styles.badgeSlot}
+          accessibilityLabel={resolveSafeDealBadgeCopy().SHORT_ARIA}
+          accessibilityHint={resolveSafeDealBadgeCopy().TITLE}
+        >
+          <SafeDealSellerBadge size={badgeSize} />
         </View>
       ) : null}
     </View>

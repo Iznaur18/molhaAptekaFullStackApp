@@ -37,6 +37,23 @@ export const createUserStoryBodySchema = z.object({
     .optional(),
 });
 
+/** Один сторис в ответе. `viewsCount` приходит только автору. */
+export const userStoryPublicSchema = z.object({
+  _id: z.string(),
+  authorUserId: z.string(),
+  mediaType: z.enum(USER_STORY_MEDIA_TYPES),
+  mediaUrl: z.string(),
+  captionText: z.string().catch(""),
+  publishedAt: z.string(),
+  expiresAt: z.string(),
+  viewsCount: z.number().int().nonnegative().optional(),
+});
+
+/** `GET /user/stories/author/:userIdClient` */
+export const userStoriesByAuthorDataSchema = z.object({
+  stories: z.array(userStoryPublicSchema),
+});
+
 export const submitUserStoryReportBodySchema = z.object({
   reportText: z
     .string()

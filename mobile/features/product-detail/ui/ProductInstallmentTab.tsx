@@ -301,7 +301,25 @@ export const ProductInstallmentTab = ({
   );
 
   if (isOwnProduct) {
-    return <Text style={styles.message}>{INSTALLMENT_UI.SELLER_TAB_HINT}</Text>;
+    // Продавцу — статус его программы, как на сайте
+    // (`ProductDetailsModalInstallmentTab`): на модерации, отклонена, активна.
+    if (installmentEnabled && programQuery.isPending) {
+      return <ScreenLoadingState />;
+    }
+    const sellerProgramActive =
+      installmentEnabled &&
+      program?.isEnabled === true &&
+      program?.moderationStatus === "approved" &&
+      plans.length > 0;
+    const sellerMessage =
+      program?.moderationStatus === "pending"
+        ? INSTALLMENT_UI.MODERATION_PENDING
+        : program?.moderationStatus === "rejected"
+          ? INSTALLMENT_UI.MODERATION_REJECTED
+          : sellerProgramActive
+            ? INSTALLMENT_UI.MODERATION_APPROVED
+            : INSTALLMENT_UI.SELLER_TAB_HINT;
+    return <Text style={styles.message}>{sellerMessage}</Text>;
   }
 
   if (!installmentEnabled) {

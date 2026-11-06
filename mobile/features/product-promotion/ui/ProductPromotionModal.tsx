@@ -37,6 +37,11 @@ import { ProductPromoCodesModal } from "@/entities/product/ui/ProductPromoCodesM
 import { AffiliatePercentModal } from "@/entities/product/ui/AffiliatePercentModal";
 import { ProductLoyaltyPointsModal } from "@/entities/product/ui/ProductLoyaltyPointsModal";
 import { ProductBuyNFreeModal } from "@/entities/product/ui/ProductBuyNFreeModal";
+import { ProductPointsSaleModal } from "@/entities/product/ui/ProductPointsSaleModal";
+import {
+  PRODUCT_POINTS_SALE_PROMOTION_FORBIDDEN_MESSAGE,
+  isProductPointsSaleActive,
+} from "@molha/api-contract";
 import { ProductOutOfStockLabelModal } from "@/entities/product/ui/ProductOutOfStockLabelModal";
 import { ProductPromotionModalTabs } from "@/features/product-promotion/ui/ProductPromotionModalTabs";
 import { PRODUCT_CARD_UI, PRODUCT_PROMOTION_UI } from "@/shared/config";
@@ -215,6 +220,10 @@ export const ProductPromotionModal = ({
   const [isInstallmentProgramOpen, setIsInstallmentProgramOpen] = useState(false);
   const [isWholesaleOpen, setIsWholesaleOpen] = useState(false);
   const [isBuyNFreeOpen, setIsBuyNFreeOpen] = useState(false);
+  const [isPointsSaleOpen, setIsPointsSaleOpen] = useState(false);
+  // Товар за баллы не продвигается (решение 21.10.2026): вместо формы оплаты —
+  // объяснение, кнопки оплаты нет вовсе.
+  const isPointsSale = isProductPointsSaleActive(product);
   const [isOutOfStockLabelOpen, setIsOutOfStockLabelOpen] = useState(false);
   const [isRentalOpen, setIsRentalOpen] = useState(false);
   const [isFlashSaleOpen, setIsFlashSaleOpen] = useState(false);
@@ -228,6 +237,7 @@ export const ProductPromotionModal = ({
       setIsInstallmentProgramOpen(false);
       setIsWholesaleOpen(false);
       setIsBuyNFreeOpen(false);
+      setIsPointsSaleOpen(false);
       setIsOutOfStockLabelOpen(false);
       setIsRentalOpen(false);
       setIsFlashSaleOpen(false);
@@ -428,6 +438,13 @@ export const ProductPromotionModal = ({
   };
 
   const renderBody = () => {
+    if (isPromotionTab && isPointsSale) {
+      return (
+        <Text style={styles.tierDescription} accessibilityRole="text">
+          {PRODUCT_POINTS_SALE_PROMOTION_FORBIDDEN_MESSAGE}
+        </Text>
+      );
+    }
     if (isPromotionTab) {
       return renderPromotionBody();
     }
@@ -475,6 +492,7 @@ export const ProductPromotionModal = ({
         onOpenInstallmentProgram={() => setIsInstallmentProgramOpen(true)}
         onOpenWholesaleSettings={() => setIsWholesaleOpen(true)}
         onOpenBuyNFreeSettings={() => setIsBuyNFreeOpen(true)}
+        onOpenPointsSaleSettings={() => setIsPointsSaleOpen(true)}
         onOpenOutOfStockSettings={() => setIsOutOfStockLabelOpen(true)}
         onOpenRentalSettings={() => setIsRentalOpen(true)}
         onOpenFlashSaleSettings={() => setIsFlashSaleOpen(true)}
@@ -545,7 +563,7 @@ export const ProductPromotionModal = ({
               </ScrollView>
             )}
 
-            {isPromotionTab ? (
+            {isPromotionTab && !isPointsSale ? (
               <View style={styles.footer}>
                 <Pressable
                   style={({ pressed }) => [
@@ -596,6 +614,15 @@ export const ProductPromotionModal = ({
               visible
               product={product}
               onClose={() => setIsWholesaleOpen(false)}
+              onSaved={onWholesaleSaved}
+            />
+          ) : null}
+          {isPointsSaleOpen ? (
+            <ProductPointsSaleModal
+              embedded
+              visible
+              product={product}
+              onClose={() => setIsPointsSaleOpen(false)}
               onSaved={onWholesaleSaved}
             />
           ) : null}

@@ -9,6 +9,7 @@ import {
 } from "@molha/api-contract";
 
 import { ADDRESS_LINE_MAX_LENGTH } from "../constants/dadataConstants.js";
+import { POINTS_PAYMENT_STATES } from "../constants/loyaltyPointsConstants.js";
 
 import {
   ORDER_LINE_ITEM_QUANTITY_MIN,
@@ -156,6 +157,33 @@ const OrderLineItemSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    /**
+     * Оплата позиции баллами (товар за баллы). Баллы покупателя лежат в его
+     * резерве (`held`), продавцу уходят при подтверждении или по таймеру после
+     * вручения (`released`), при отмене возвращаются покупателю (`refunded`).
+     * У рублёвой позиции state = null, остальные поля нулевые.
+     */
+    pointsPriceAtOrder: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    pointsPaidTotal: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    pointsPaymentState: {
+      type: String,
+      enum: [...POINTS_PAYMENT_STATES, null],
+      default: null,
+    },
+    pointsCommissionTotal: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    pointsSettledAt: { type: Date, default: null },
     pickupLocationIdAtOrder: {
       type: String,
       default: null,
@@ -470,6 +498,19 @@ const OrderSchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
+    /**
+     * Заказ товаров за баллы: totalAmount у него 0 (рублей за товар нет),
+     * сумма в баллах — здесь. Доставка, если платная, идёт рублями как обычно.
+     */
+    paidWithLoyaltyPoints: {
+      type: Boolean,
+      default: false,
+    },
+    loyaltyPointsTotal: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
     deliveryAddress: {
       type: String,
       required: true,
@@ -624,6 +665,20 @@ OrderSchema.index(
 OrderSchema.index(
   { paymentMethod: 1, prepaidPaidAt: 1, status: 1, prepaymentDueAt: 1 },
   { name: "prepayment_deadline" },
+);
+
+/**
+ * Крон разморозки баллов: позиции за баллы, у которых вышел срок после
+ * вручения. Срок считается от deliveredAt, а не от своего поля: «Доставлен»
+ * ставят пять разных путей (продавец, курьер, СДЭК, Яндекс, ЛОБО), и
+ * забытый в одном из них таймер оставил бы баллы продавца висеть навсегда.
+ */
+OrderSchema.index(
+  { "items.pointsPaymentState": 1, "items.deliveredAt": 1 },
+  {
+    name: "points_payment_due_for_release",
+    partialFilterExpression: { paidWithLoyaltyPoints: true },
+  },
 );
 
 export default mongoose.model("Order", OrderSchema);

@@ -5,11 +5,16 @@ import {
   type ProductBadgeExplainKey,
 } from "@izibuy/shared-lib";
 
+import { resolveSafeDealBadgeCopy } from "@/entities/seller-safe-deal/lib/safeDealBadgeCopy";
 import { PRODUCT_BADGE_EXPLAIN_UI } from "@/shared/config";
 
 export const resolveProductBadgeExplainFallbackDescription = (
   badgeKey: string | null | undefined,
 ): string => {
+  // Текст зависит от того, работает ли заморозка денег, — из общего места.
+  if (badgeKey === "safe_deal") {
+    return resolveSafeDealBadgeCopy().EXPLAIN;
+  }
   const fallbacks = PRODUCT_BADGE_EXPLAIN_UI.FALLBACK;
   if (badgeKey && Object.prototype.hasOwnProperty.call(fallbacks, badgeKey)) {
     return fallbacks[badgeKey as keyof typeof fallbacks];
@@ -35,6 +40,9 @@ export const resolveProductDetailsBadgeExplainRequest = (item: {
 
   if (item.kind === "original") {
     return { title: item.label, badgeKey: "original", fallbackKey: "original" };
+  }
+  if (item.kind === "safeDeal") {
+    return { title: item.label, badgeKey: "safe_deal", fallbackKey: "safe_deal" };
   }
   if (item.kind === "raffle") {
     return { title: item.label, badgeKey: "raffle", fallbackKey: "raffle" };

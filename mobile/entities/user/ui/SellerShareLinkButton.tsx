@@ -18,7 +18,8 @@ type SellerShareLinkButtonProps = {
 
 const COPIED_ICON_MS = 1600;
 
-const useSellerShareStyles = createThemedStyles((theme) => ({
+/** Общий вид круглых кнопок витрины: «Поделиться», QR, соцсети. */
+export const useSellerShareStyles = createThemedStyles((theme) => ({
   root: {
     alignItems: "center",
     justifyContent: "center",

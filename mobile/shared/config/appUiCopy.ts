@@ -84,6 +84,7 @@ export const API_CLIENT_UI = {
   SUBMIT_PRICE_OFFER_FALLBACK: "Не удалось отправить предложение цены",
   FETCH_PRICE_OFFER_FALLBACK: "Не удалось загрузить предложение цены",
   FETCH_INCOMING_PRICE_OFFERS_FALLBACK: "Не удалось загрузить входящие ставки",
+  FETCH_SELLER_PRICE_OFFERS_FALLBACK: "Не удалось загрузить аукцион",
   FETCH_MY_PRICE_OFFER_BIDS_FALLBACK: "Не удалось загрузить ваши ставки",
   ACCEPT_PRICE_OFFER_FALLBACK: "Не удалось принять ставку",
   REJECT_PRICE_OFFER_FALLBACK: "Не удалось отклонить ставку",
@@ -315,6 +316,7 @@ export const ADD_TO_CART_UI = {
   SELLER_CLOSED_OVERLAY_FALLBACK: "Закрыто",
   GO_TO_CART: "Перейти в корзину",
   LOGIN_TO_ADD: "Войти, чтобы купить",
+  OWN_PRODUCT: "Свой товар",
   ADD_FAILED: "Не удалось добавить в корзину",
   DECREASE_ARIA: "Уменьшить количество",
   INCREASE_ARIA: "Увеличить количество",
@@ -368,7 +370,13 @@ export const CART_PAGE_UI = {
   DELIVERY_HINT_FREE: "Доставка бесплатно",
   DELIVERY_HINT_FROM: (formatted: string) => `Доставка от ${formatted}`,
   DELIVERY_HINT_BY_TARIFF: "Доставка по тарифу продавца",
+  DELIVERY_HINT_LOBO: "Доставка ЛОБО, оплата курьеру",
   SELLER_ROW_OPEN: "Перейти",
+  /** Подпись группы товаров за баллы: отдельный заказ у того же продавца. */
+  POINTS_GROUP_SUFFIX: "за баллы",
+  POINTS_PAYABLE_LABEL: "Баллами",
+  POINTS_PAYMENT_NOTE:
+    "Баллы спишутся со счёта при оформлении и перейдут продавцу после получения товара. Если заказ отменят — вернутся. Доставку, если она платная, оплачивают рублями при получении.",
   BACK_TO_SELLERS: "К продавцам",
   STOCK_REMAINING: (left: number) => `Осталось ${left} шт`,
   STOCK_QUANTITY_LIMITED: "Количество ограничено",
@@ -444,7 +452,13 @@ export const PRODUCT_DETAILS_MODAL_UI = {
   RETURNS_PLACEHOLDER: "Сведения о возврате появятся позже.",
   RETURNS_NONE: "Возврат не предусмотрен.",
   DELIVERY_TITLE: "Получение",
-  DELIVERY_SECTION_ARIA: "Доставка",
+  DELIVERY_SECTION_ARIA: "Самовывоз и доставка",
+  // У объявлений без корзины вкладка «Получение» говорит о месте встречи.
+  DEAL_TAB_TITLE: { viewing: "Осмотр", service: "Адрес" } as Record<string, string>,
+  DEAL_SECTION_ARIA: {
+    viewing: "Место осмотра",
+    service: "Адрес исполнителя",
+  } as Record<string, string>,
   DELIVERY_IN_DEVELOPMENT: "В разработке",
   PROTOTYPE_SLOTS_ARIA: "Дополнительный раздел",
   PROTOTYPE_SLOT_1: "Блок 1",
@@ -757,6 +771,8 @@ export const PRODUCT_REVIEW_UI = {
   LOADING: "Загрузка отзывов…",
   EMPTY: "Отзывов пока нет",
   NO_REVIEWS: "Отзывов пока нет",
+  /** Следующая страница отзывов — паритет web. */
+  LOAD_MORE: "Показать ещё",
   RATING_LINE: "★ {rating} · {count}",
   FETCH_FALLBACK: "Не удалось загрузить отзывы",
   SUMMARY_LINE: (rating: number, count: number) =>
@@ -843,6 +859,11 @@ export const PRODUCT_PRICE_OFFER_UI = {
   ACTION_PENDING: "Сохраняем…",
   ACCEPTED_BADGE: "Ожидает оплаты",
   GO_TO_CART: "Перейти в корзину",
+  /** Вкладка «Аукцион» своего товара — паритет web `ProductPriceOfferSellerTab`. */
+  SELLER_EMPTY: "Предложений пока нет",
+  SELLER_LOADING: "Загрузка…",
+  ARCHIVE_SECTION_TITLE: "История ставок",
+  ARCHIVE_EMPTY: "Архив пуст",
 } as const;
 
 export const AUCTION_PAGE_UI = {
@@ -892,6 +913,7 @@ export const USER_STORY_UI = {
   DELETING: "Удаляем…",
   REPORT: "Пожаловаться",
   CLOSE: "Закрыть",
+  VIEWS_COUNT_LABEL: (count: number) => `Просмотров: ${count}`,
   ERROR_GENERIC: "Не удалось выполнить действие",
   ERROR_IMAGE: "Не удалось обработать фото",
   ERROR_CAPTION: "Текст: не больше 150 символов",
@@ -1074,6 +1096,7 @@ export const INSTALLMENT_UI = {
   PASSPORT_SHARE_SELFIE_LOAD_ERROR: "Не удалось загрузить фото",
   MODERATION_PENDING: "Программа на модерации",
   MODERATION_REJECTED: "Программа отклонена",
+  MODERATION_APPROVED: "Рассрочка активна",
   SELLER_TAB_HINT: "Настройте планы в «Изменить товар» → «Продать в рассрочку».",
   SELLER_PROFILE_ARIA: (sellerName: string) => `Профиль продавца: ${sellerName}`,
   CONTRACT_PRODUCT: "Товар",
@@ -1209,6 +1232,28 @@ export const CHECKOUT_FORM_UI = {
   YANDEX_PRICING: "Считаем доставку…",
   YANDEX_CARD_ONLY_HINT:
     "Товар и доставку вы оплатите картой в пункте выдачи Яндекса, когда заберёте заказ",
+  /** «Экспресс» — курьер Яндекса до двери (паритет web `YANDEX_EXPRESS_*`). */
+  SHIPPING_PROVIDER_YANDEX_EXPRESS: "Яндекс Экспресс",
+  YANDEX_EXPRESS_REQUIRED:
+    "Для курьера Яндекса укажите адрес с точкой на карте и получателя с телефоном",
+  YANDEX_EXPRESS_CARD_HINT:
+    "Курьер Яндекса привезёт заказ сегодня. Товар и доставку оплатите курьеру картой",
+  YANDEX_EXPRESS_CARD_ONLY: "С курьером Яндекса оплата только картой при получении",
+  YANDEX_EXPRESS_NEED_GEO:
+    "Выберите адрес из подсказок или отметьте точку на карте — курьер едет по координатам",
+  YANDEX_EXPRESS_PRICING: "Считаем курьера…",
+  YANDEX_EXPRESS_UNAVAILABLE:
+    "Курьер Яндекса по этому адресу не едет — выберите другую службу",
+  YANDEX_EXPRESS_PRICE: (formatted: string, minutes: number | null) =>
+    minutes ? `${formatted} · курьер ~${minutes} мин в пути` : formatted,
+  /** Примерная цена внешней службы (ЛОБО) — паритет web `CheckoutShippingEstimate`. */
+  SHIPPING_PROVIDER_LOBO: "ЛОБО",
+  /** Цена службы в итоге: у ЛОБО примерная (web `CARRIER_DELIVERY_APPROX`). */
+  CARRIER_DELIVERY_APPROX: (formatted: string) => `≈ ${formatted}`,
+  SHIPPING_ESTIMATE_UNAVAILABLE:
+    "Стоимость доставки посчитаем позже — её назовёт курьер.",
+  SHIPPING_ESTIMATE_OUT_OF_ZONE:
+    "Служба доставки не возит по этому адресу. Выберите самовывоз или другой адрес.",
   SHIPPING_PROVIDER_BADGE_CAPTION: "Доставку выполняет",
   SHIPPING_PROVIDER_BADGE_SELLER: "Продавец",
   CDEK_UNAVAILABLE: "СДЭК сейчас не отвечает",
@@ -1262,6 +1307,7 @@ export const CHECKOUT_FORM_UI = {
   LABEL_FLAT: "Комментарий",
   PLACEHOLDER_FLAT: "подъезд, этаж, кв",
   LABEL_PAYMENT_METHOD: "Способ оплаты",
+  LABEL_PAYMENT_METHOD_DELIVERY: "Оплата доставки",
   PAYMENT_METHOD_CARD_SOON: "Скоро",
   PAYMENT_METHOD_NOT_ACCEPTED: "Продавец не принимает",
   LABEL_SHIPPING_PROVIDER: "Служба доставки",
@@ -1315,6 +1361,25 @@ export const PRODUCT_PICKUP_UI = {
   DETAILS_NO_ADDRESS: "Адрес самовывоза не указан",
   DETAILS_LOCATION_DEFAULT: "По умолчанию",
   DETAILS_DELIVERY_HINT: "Адрес укажете при оформлении заказа",
+  /** Перевозчик в панели «Получение» — паритет web `PRODUCT_PICKUP_UI`. */
+  FULFILLMENT_DELIVERY_ANY: "Доставка",
+  FULFILLMENT_COURIER: "Курьеры Gitorg",
+  DETAILS_LOBO_HINT:
+    "Курьер до двери по Чеченской Республике. Доставку оплатите курьеру наличными — цену покажем при оформлении",
+  // Объявления без корзины: адрес — место встречи, а не точка выдачи.
+  DEAL_DETAILS_TITLE: {
+    viewing: "Место осмотра",
+    service: "Адрес исполнителя",
+  } as Record<string, string>,
+  DEAL_DETAILS_NO_ADDRESS: {
+    viewing: "Место осмотра не указано",
+    service: "Адрес исполнителя не указан",
+  } as Record<string, string>,
+  DEAL_SERVICE_LOCATION_HINTS: {
+    at_client: "Исполнитель приедет к вам",
+    at_provider: "Приходите по адресу исполнителя",
+    online: "Удалённо, по видеосвязи или в переписке",
+  } as Record<string, string>,
 } as const;
 
 export const ADDRESS_DELIVERY_UI = {
@@ -1399,6 +1464,9 @@ export const ORDER_CARD_UI = {
   CDEK_STATUS_LABEL: "СДЭК",
   CDEK_PICK_UP_BY_LABEL: "Забрать до",
   PAYMENT_LABEL: "Оплата",
+  PAYMENT_POINTS: "Баллами",
+  PAYMENT_POINTS_WITH_DELIVERY: (deliveryMethodLabel: string) =>
+    `Баллами, доставка — ${deliveryMethodLabel.toLowerCase()}`,
   CREATED_LABEL: "Создан",
   BUYER_LABEL: "Покупатель",
   SELLER_LABEL: "Продавец",
@@ -1408,9 +1476,20 @@ export const ORDER_CARD_UI = {
   DETAILS_FOLD_SUMMARY: "Подробности заказа",
   ACTION_CONFIRM: "Подтвердить получение",
   ACTION_CANCEL: "Отменить",
+  ACTION_CANCEL_ORDER: "Отменить заказ",
   ACTION_SHIPPED: "Отгрузить",
   ACTION_DELIVERED: "Доставлен",
   ACTION_HANDED_TO_BUYER: "Выдал покупателю",
+  /** Возврат после отгрузки — паритет web `ORDER_CARD_UI`. */
+  ACTION_RETURN: "Вернулся",
+  ACTION_RETURN_CONFIRM:
+    "Оформить возврат? Товар вернётся в остаток, покупатель получит уведомление.",
+  ACTION_REFUSE: "Отказаться",
+  ACTION_REFUSE_CONFIRM:
+    "Отказаться от товара? Заказ закроется, продавец получит уведомление. Отменить это будет нельзя.",
+  ITEM_RETURNED_AT_LABEL: "Возвращён",
+  ITEM_RETURNED_BY_BUYER: "покупатель отказался",
+  ITEM_RETURNED_BY_SELLER: "оформил продавец",
   AWAITING_ACCEPT: "Ждём подтверждения продавца",
   AWAITING_ACCEPT_BUYER_HINT:
     "Продавец проверяет, что товар есть. Оплата откроется после подтверждения.",
@@ -1429,6 +1508,9 @@ export const ORDER_CARD_UI = {
   CANCEL_CONFIRM: "Отменить заказ покупателя?",
   BUYER_CANCEL_CONFIRM: "Отменить заказ?",
   SELLER_CANCEL_CONFIRM: "Отменить заказ покупателя?",
+  // Кнопка у строки убирает одну позицию, кнопка отправления — весь заказ.
+  // Один и тот же вопрос на обеих делал их неразличимыми.
+  ITEM_CANCEL_CONFIRM: "Убрать эту позицию из заказа?",
   ITEM_CANCELLED_BADGE: "Отмена",
   DELETED_PRODUCT_NAME: "Товар удалён",
   LOYALTY_POINTS_LINE: (points: number) =>
@@ -1650,6 +1732,8 @@ export const MY_PROFILE_PAGE_UI = {
   TAB_MY_PRODUCTS: "Мои товары",
   TAB_MY_SALES: "Мои продажи",
   TAB_MY_ORDERS: "Мои покупки",
+  TAB_DEAL_REQUESTS: "Заявки",
+  TAB_SAFE_DEAL: "Безопасная сделка",
   TAB_AUCTION: "Аукцион",
   TAB_ADMIN_ORDERS: "Все заказы",
   TAB_SEARCH_SYNONYMS_ADMIN: "Синонимы поиска",
@@ -1826,8 +1910,6 @@ export const SELLER_PRODUCTS_PAGE_UI = {
   TITLE: "Товары продавца",
   BACK_ARIA: "Назад",
   LOADING: "Загрузка…",
-  LOGIN_HINT: "Войдите, чтобы посмотреть товары продавца.",
-  LOGIN_BUTTON: "Войти",
   FETCH_PROFILE_FALLBACK: "Не удалось загрузить профиль продавца",
   EMPTY: "У продавца пока нет товаров в каталоге.",
   SHARE_LINK_ARIA: "Ссылка",
@@ -2128,6 +2210,14 @@ export const MY_SALES_PAGE_UI = {
   LOGIN_BUTTON: "Войти",
   STATUS_FILTER_LABEL: "Фильтр по статусу",
   STATUS_FILTER_ALL: "Все статусы",
+  /** Группы фильтра — вместо 14 кнопок-статусов (паритет web). */
+  STATUS_GROUP_ALL: "Все",
+  STATUS_GROUP_ATTENTION: "Нужно действие",
+  STATUS_GROUP_IN_PROGRESS: "В работе",
+  STATUS_GROUP_DONE: "Завершённые",
+  STATUS_GROUP_CLOSED: "Отменённые",
+  STATUS_MORE: "Ещё статусы",
+  STATUS_LESS: "Свернуть",
   SEARCH_LABEL: "Поиск покупателя",
   SEARCH_PLACEHOLDER: "Поиск покупателя…",
   SEARCH_DEBOUNCE_MS: 350,
@@ -2311,6 +2401,27 @@ export const CREATE_PRODUCT_UI = {
   LOYALTY_MODAL_CLOSE: "Закрыть",
   LOYALTY_MODAL_PENDING: "Сохраняем…",
   LOYALTY_MODAL_ERROR_REQUIRED: "Укажите целое число ≥ 0",
+  MANAGE_POINTS_SALE_TITLE: "Продажа за баллы",
+  MANAGE_POINTS_SALE_HINT:
+    "Покупатели оплатят товар баллами, баллы придут вам после получения товара",
+  MANAGE_POINTS_SALE_HINT_ON: (priceText: string, limit: number | null) =>
+    limit == null
+      ? `Цена ${priceText}, без ограничения в одни руки`
+      : `Цена ${priceText}, в одни руки до ${limit} шт.`,
+  MANAGE_POINTS_SALE_LOCKED_NOTE:
+    "Товар продаётся за баллы — акции, кешбэк, партнёрка и продвижение для него выключены",
+  POINTS_SALE_MODAL_TITLE: "Продажа за баллы",
+  POINTS_SALE_MODAL_PRICE_LABEL: "Цена в баллах",
+  POINTS_SALE_MODAL_LIMIT_LABEL: "В одни руки, шт.",
+  POINTS_SALE_MODAL_NO_LIMIT: "Без ограничения",
+  POINTS_SALE_MODAL_HINT:
+    "Пока продажа за баллы включена, товар покупают только баллами. Баллы держатся до получения и приходят вам за вычетом 2% комиссии — после подтверждения покупателем или через 7 дней после вручения. Акции, кешбэк и партнёрка для товара выключатся. Доставку покупатель оплачивает рублями при получении, как обычно.",
+  POINTS_SALE_MODAL_SAVE: "Включить продажу за баллы",
+  POINTS_SALE_MODAL_UPDATE: "Сохранить",
+  POINTS_SALE_MODAL_DISABLE: "Выключить продажу за баллы",
+  POINTS_SALE_MODAL_CLOSE: "Закрыть",
+  POINTS_SALE_MODAL_ERROR_PRICE: "Укажите цену в баллах — целое число от 1",
+  POINTS_SALE_MODAL_ERROR_LIMIT: "Лимит в одни руки — от 1 до 1000 шт.",
   MANAGE_BUY_N_FREE_TITLE: "Бесплатно от N",
   MANAGE_BUY_N_FREE_HINT:
     "После N завершённых заказов покупатель получит 1 шт. бесплатно",
@@ -3330,4 +3441,209 @@ export const CATALOG_LOAD_MORE_UI = {
   FAIL: "Не удалось подгрузить ещё товары",
   RETRY: "Повторить",
   LOADING: "Подгружаем…",
+} as const;
+
+/** Заявка на осмотр или услугу из объявления (паритет web `copy/deal-requests.js`). */
+export const PRODUCT_DEAL_ACTIONS_UI = {
+  REQUEST_BUTTON: {
+    viewing: "Записаться на осмотр",
+    service: "Оставить заявку",
+  } as Record<string, string>,
+  // Нижняя панель: длинные подписи не помещаются рядом с трубкой.
+  REQUEST_BUTTON_SHORT: {
+    viewing: "Записаться",
+    service: "Оставить заявку",
+  } as Record<string, string>,
+  SHOW_PHONE: "Показать телефон",
+  PHONE_LOADING: "Загружаем…",
+  PHONE_MISSING: "Продавец не указал телефон — оставьте заявку",
+  PHONE_CALL_ARIA: (phone: string) => `Позвонить продавцу: ${phone}`,
+  PHONE_FALLBACK_ERROR: "Не удалось показать телефон",
+  FORM_TITLE: {
+    viewing: "Когда вам удобно посмотреть?",
+    service: "Когда нужна услуга?",
+  } as Record<string, string>,
+  FIELD_DATE: "Дата",
+  FIELD_CLOCK: "Время",
+  FIELD_HOUR_ARIA: (hour: string) => `${hour} часов`,
+  FIELD_MINUTE_ARIA: (minute: string) => `${minute} минут`,
+  DAY_TODAY: "Сегодня",
+  DAY_TOMORROW: "Завтра",
+  FIELD_ADDRESS: "Адрес, если исполнитель приезжает к вам",
+  FIELD_ADDRESS_PLACEHOLDER: "Город, улица, дом",
+  FIELD_COMMENT: "Комментарий",
+  FIELD_COMMENT_PLACEHOLDER: {
+    viewing: "Например: приеду с мастером, нужен час",
+    service: "Опишите задачу: что нужно сделать",
+  } as Record<string, string>,
+  SUBMITTING: "Отправляем…",
+  CANCEL: "Отмена",
+  CLOSE: "Закрыть",
+  SUBMIT_BY_KIND: {
+    viewing: "Записаться",
+    service: "Отправить заявку",
+  } as Record<string, string>,
+  TIME_REQUIRED: "Укажите дату и время",
+  TIME_IN_PAST: "Выберите время в будущем",
+  SUBMIT_FALLBACK_ERROR: "Не удалось отправить заявку",
+  SENT_TITLE: "Заявка отправлена",
+  SENT_HINT: "Продавец ответит в течение суток — мы пришлём уведомление.",
+  OPEN_REQUESTS: "Мои заявки",
+} as const;
+
+/** Раздел «Заявки» в профиле (паритет web `DEAL_REQUESTS_PAGE_UI`). */
+export const DEAL_REQUESTS_PAGE_UI = {
+  TITLE: "Заявки",
+  LEAD: "Осмотры и услуги — сделки, которые не идут через корзину. Оплата — напрямую продавцу.",
+  TABS_ARIA: "Чьи заявки показать",
+  TAB_BUYER: "Мои заявки",
+  TAB_SELLER: "Мне прислали",
+  LOADING: "Загружаем заявки…",
+  LOAD_FALLBACK_ERROR: "Не удалось загрузить заявки",
+  RETRY: "Повторить",
+  EMPTY_BUYER:
+    "Вы ещё не оставляли заявок. Запишитесь на осмотр или закажите услугу прямо из объявления.",
+  EMPTY_SELLER:
+    "Заявок пока нет. Они появятся, когда покупатель запишется на осмотр или услугу.",
+  LOAD_MORE: "Показать ещё",
+  KIND: { viewing: "Осмотр", service: "Услуга" } as Record<string, string>,
+  ROLE_COUNTERPARTY: { buyer: "Продавец", seller: "Покупатель" } as Record<
+    string,
+    string
+  >,
+  LABEL_PREFERRED: "Удобное время",
+  LABEL_AGREED: "Договорились на",
+  LABEL_PRICE: "Цена исполнителя",
+  LABEL_ADDRESS: "Адрес",
+  LABEL_COMMENT: "Комментарий",
+  LABEL_DECLINE_REASON: "Причина",
+  LABEL_PHONE: "Телефон",
+  PHONE_LOCKED: "откроется после принятия заявки",
+  PHONE_MISSING: "не указан",
+  EXPIRES: (time: string) => `Ответьте до ${time}, иначе заявка закроется`,
+  EXPIRES_BUYER: (time: string) => `Продавец ответит до ${time}`,
+  OPEN_PRODUCT: "Открыть объявление",
+  LEAVE_REVIEW: "Оставить отзыв",
+  ACTION: {
+    accept: "Принять",
+    decline: "Отклонить",
+    cancel: "Отменить заявку",
+    confirm: "Подтвердить выполнение",
+    completed: { viewing: "Сделка состоялась", service: "Услуга выполнена" },
+    no_deal: "Не договорились",
+    no_show: "Встреча не состоялась",
+  } as Record<string, string | Record<string, string>>,
+  ACCEPT_TITLE: "Подтвердите время",
+  ACCEPT_TIME: "Время встречи",
+  ACCEPT_PRICE: "Итоговая цена, ₽",
+  ACCEPT_PRICE_REQUIRED: "Назовите итоговую цену услуги",
+  ACCEPT_TIME_IN_PAST: "Выберите время в будущем",
+  ACCEPT_SUBMIT: "Принять заявку",
+  DECLINE_TITLE: "Почему отклоняете?",
+  DECLINE_REASON_PLACEHOLDER: "Необязательно: например, уже продано",
+  DECLINE_SUBMIT: "Отклонить заявку",
+  FORM_CANCEL: "Назад",
+  COMPLETED_VIEWING_HINT:
+    "После «Сделка состоялась» объявление уйдёт с витрины, а остальные заявки на него закроются.",
+  ACTION_FALLBACK_ERROR: "Не удалось выполнить действие",
+} as const;
+
+/** QR-код витрины продавца (паритет web `copy/seller-qr.js`). */
+export const SELLER_QR_UI = {
+  BUTTON_ARIA: "QR-код витрины",
+  TITLE: "QR-код витрины",
+  CLOSE: "Закрыть",
+  // В приложении картинку не сохранить (нужен нативный модуль) — подсказка честная.
+  HINT: "Покупатель наводит камеру телефона на код и попадает на вашу витрину. Покажите код с экрана или отправьте ссылку.",
+  HINT_VISITOR:
+    "Наведите камеру телефона на код — откроется эта витрина. Код можно показать с экрана или отправить ссылкой.",
+  SHARE_MESSAGE: (sellerName: string, url: string) =>
+    sellerName ? `Витрина ${sellerName} в Gitorg: ${url}` : url,
+  CARD_CAPTION: "Наведите камеру — откроется витрина",
+  BRAND: "Gitorg",
+  QR_ALT: "QR-код со ссылкой на витрину",
+  SHARE: "Поделиться",
+  SHARE_ERROR: "Не удалось открыть «Поделиться». Попробуйте ещё раз.",
+  STATS_TITLE: "Переходы по коду",
+  STATS_LOADING: "Считаем переходы…",
+  STATS_FALLBACK: "Не удалось загрузить переходы по QR-коду",
+  STATS_EMPTY: "По коду пока никто не переходил.",
+  STATS_TOTAL: (total: number) =>
+    `${total} ${pluralizeRu(total, ["переход", "перехода", "переходов"])} за всё время`,
+  STATS_RECENT: (recent: number, days: number) => `${recent} за последние ${days} дней`,
+  STATS_NOTE: "Один человек считается не чаще раза в день. Ваши заходы не считаются.",
+} as const;
+
+/** Окно «Соцсети и сайт» на витрине (паритет web `copy/seller-social.js`). */
+export const SELLER_SOCIAL_LINKS_UI = {
+  BUTTON_ARIA: "Соцсети и сайт продавца",
+  TITLE: "Соцсети и сайт",
+  CLOSE: "Закрыть",
+  OPEN_ARIA: (label: string) => `Открыть ${label}`,
+  OPEN_ERROR: "Не удалось открыть ссылку",
+  ADD_TITLE: "Ещё не добавлено",
+  ADD_HINT:
+    "Нажмите — откроется редактирование профиля. Покупатели увидят ссылку на вашей витрине.",
+  ADD_ROW_HINT: "Добавить в профиле",
+  ADD_ARIA: (label: string) => `Добавить ${label} в редактировании профиля`,
+} as const;
+
+/** Раздел «Безопасная сделка» (паритет web `copy/safe-deal.js`). */
+export const SAFE_DEAL_UI = {
+  TITLE: "Безопасная сделка",
+  INTRO:
+    "Покупатель платит на площадке, деньги ждут, и продавец получает их после доставки. У подключённых продавцов на товарах появляется значок «Безопасная сделка».",
+  WHY_HEADING: "Зачем это продавцу",
+  WHY_ITEMS: [
+    "Покупатель не боится платить вперёд — заказов больше.",
+    "Деньги за заказ зарезервированы: покупатель не передумает по дороге.",
+    "Спор решает площадка, пока деньги ещё заморожены.",
+  ],
+  LEGAL_NOTE:
+    "Подключение доступно только ИП и ООО: выплаты обычным физлицам площадка не делает. Наличные и переводы напрямую остаются как раньше — без значка и без гарантии.",
+  STATUS_NONE: "Не подключена",
+  STATUS_PENDING: "На проверке",
+  STATUS_APPROVED: "Подключена",
+  STATUS_REJECTED: "Отклонена",
+  APPROVED_HINT:
+    "Безопасная сделка подключена. Чтобы сменить ИНН или форму, напишите в поддержку.",
+  PENDING_HINT: "Заявка на проверке — обычно это занимает один рабочий день.",
+  REJECTION_REASON: "Причина отказа",
+  FIELD_LEGAL_FORM: "Форма",
+  FIELD_INN: "ИНН",
+  LEGAL_FORM_ARIA: "Правовая форма продавца",
+  HINT_INN_IP: "12 цифр — ИНН физического лица, как в свидетельстве ИП.",
+  HINT_INN_OOO: "10 цифр — ИНН организации, как в выписке ЕГРЮЛ.",
+  HINT_INN_EMPTY: "Сначала выберите форму — от неё зависит длина ИНН.",
+  INN_PLACEHOLDER_IP: "500100732259",
+  INN_PLACEHOLDER_OOO: "2368017598",
+  SUBMIT: "Отправить заявку",
+  RESUBMIT: "Отправить заново",
+  SUBMITTING: "Отправляем…",
+  LOADING: "Загружаем…",
+  ERROR_GENERIC: "Не удалось выполнить действие",
+  LOGIN_HINT: "Войдите, чтобы подключить безопасную сделку.",
+  PRIVACY_NOTE:
+    "ИНН виден только вам и модератору — на витрине показывается лишь значок «Безопасная сделка».",
+} as const;
+
+/**
+ * Значок продавца на витрине (паритет web `SAFE_DEAL_BADGE_UI`). Пока заморозка
+ * денег не работает, обещать защиту нельзя — значок говорит «Продавец проверен».
+ */
+export const SAFE_DEAL_BADGE_UI = {
+  ESCROW: {
+    LABEL: "Безопасная сделка",
+    SHORT_ARIA: "Продавец работает по безопасной сделке",
+    TITLE: "Безопасная сделка: деньги уходят продавцу после доставки",
+    EXPLAIN:
+      "Покупатель платит на площадке, а не продавцу напрямую. Деньги ждут, пока заказ не будет доставлен, и только потом уходят продавцу. Если что-то пошло не так, спор решает площадка, пока деньги ещё заморожены.",
+  },
+  VERIFIED_ONLY: {
+    LABEL: "Продавец проверен",
+    SHORT_ARIA: "Продавец проверен площадкой",
+    TITLE: "Площадка проверила документы: это ИП или ООО",
+    EXPLAIN:
+      "Площадка проверила, что за продавцом стоит зарегистрированное ИП или ООО, а не аноним. Оплата пока проходит как обычно — напрямую продавцу, наличными или переводом.",
+  },
 } as const;

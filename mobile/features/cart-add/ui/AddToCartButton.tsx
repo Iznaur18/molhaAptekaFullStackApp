@@ -5,7 +5,7 @@ import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native";
 import { useCartActions } from "@/entities/cart/model/useCartActions";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useMyCartQuery } from "@/entities/cart/model/useMyCartQuery";
-import { getProductPurchaseLimit } from "@/entities/product/lib/getProductPurchaseLimit";
+import { getProductCartQuantityLimit } from "@/entities/product/lib/getProductPurchaseLimit";
 import { resolveProductPurchaseBlockState } from "@/entities/product/lib/resolveProductPurchaseBlockState";
 import { resolveProductSellerClosedPurchaseState } from "@/entities/product/lib/resolveProductSellerClosedPurchaseState";
 import { ADD_TO_CART_BUTTON_LAYOUT } from "@/entities/product/lib/addToCartButtonLayout";
@@ -17,12 +17,17 @@ import {
   PRODUCT_DETAIL_DOCK_CTA_BORDER_RADIUS,
   useAddToCartButtonStyles,
 } from "@/shared/theme/uploadFieldStyles";
+import { ShoppingCart } from "@/shared/ui/productDetailsLucideIcons";
 import { SquircleView } from "@/shared/ui/SquircleView";
 
 type AddToCartButtonProps = {
   productId: string;
   product?: unknown;
-  variant?: "default" | "detailDock";
+  /**
+   * `card` — карточка главного экрана: компактная кнопка, гость видит «В корзину».
+   * `banner` — баннер в ленте: кнопка по ширине надписи с тележкой.
+   */
+  variant?: "default" | "detailDock" | "card" | "banner";
 };
 
 const showCartError = (error: unknown) => {
@@ -43,10 +48,19 @@ export const AddToCartButton = ({
   const cartQuery = useMyCartQuery();
   const { addItem, setItemQuantity, removeItem, isUpdating } = useCartActions();
   const isDetailDock = variant === "detailDock";
+  const isCard = variant === "card";
+  const isBanner = variant === "banner";
+  const blockedVariant = isDetailDock
+    ? "detailDock"
+    : isCard
+      ? "card"
+      : isBanner
+        ? "banner"
+        : "default";
   const fixedFontProps = isDetailDock ? FIXED_FONT_PROPS : {};
 
   const quantity = cartQuery.data?.[productId] ?? 0;
-  const purchaseLimit = getProductPurchaseLimit(product);
+  const purchaseLimit = getProductCartQuantityLimit(product);
   const hasStockLimit = purchaseLimit > 0;
   const { isPurchaseBlocked, blockedLabel } = resolveProductPurchaseBlockState(
     product as Record<string, unknown> | null | undefined,
@@ -64,21 +78,11 @@ export const AddToCartButton = ({
   }, [hasStockLimit, productId, purchaseLimit, quantity, setItemQuantity]);
 
   if (isPurchaseBlocked) {
-    return (
-      <BlockedPurchaseButton
-        label={blockedLabel}
-        variant={isDetailDock ? "detailDock" : "default"}
-      />
-    );
+    return <BlockedPurchaseButton label={blockedLabel} variant={blockedVariant} />;
   }
 
   if (isSellerClosed) {
-    return (
-      <BlockedPurchaseButton
-        label={sellerClosedLabel}
-        variant={isDetailDock ? "detailDock" : "default"}
-      />
-    );
+    return <BlockedPurchaseButton label={sellerClosedLabel} variant={blockedVariant} />;
   }
 
   const handleLogin = () => {
@@ -102,7 +106,40 @@ export const AddToCartButton = ({
     void setItemQuantity(productId, quantity + 1).catch(showCartError);
   };
 
+  const renderBannerButton = (
+    onPress: () => void,
+    {
+      disabled = false,
+      accessibilityLabel = ADD_TO_CART_UI.ADD,
+    }: { disabled?: boolean; accessibilityLabel?: string } = {},
+  ) => (
+    <Pressable
+      style={styles.bannerPressable}
+      onPress={onPress}
+      disabled={disabled}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+    >
+      <View style={[styles.bannerButton, disabled && styles.buttonDisabled]}>
+        {isUpdating ? (
+          <ActivityIndicator color={theme.colors.onContrast} />
+        ) : (
+          <>
+            <ShoppingCart size={16} color={theme.colors.onContrast} strokeWidth={2} />
+            <Text style={styles.bannerButtonText}>{ADD_TO_CART_UI.ADD}</Text>
+          </>
+        )}
+      </View>
+    </Pressable>
+  );
+
   if (!isAuthorized) {
+    if (isBanner) {
+      return renderBannerButton(handleLogin, {
+        accessibilityLabel: ADD_TO_CART_UI.LOGIN_TO_ADD,
+      });
+    }
+
     if (isDetailDock) {
       return (
         <Pressable style={styles.detailDockPressable} onPress={handleLogin}>
@@ -112,6 +149,26 @@ export const AddToCartButton = ({
           >
             <Text style={styles.detailDockLoginButtonText} {...fixedFontProps}>
               {ADD_TO_CART_UI.LOGIN_TO_ADD}
+            </Text>
+          </SquircleView>
+        </Pressable>
+      );
+    }
+
+    if (isCard) {
+      return (
+        <Pressable
+          style={styles.addButtonPressable}
+          onPress={handleLogin}
+          accessibilityRole="button"
+          accessibilityLabel={ADD_TO_CART_UI.LOGIN_TO_ADD}
+        >
+          <SquircleView
+            radius={ADD_TO_CART_BUTTON_LAYOUT.borderRadius}
+            style={[styles.addButton, styles.cardButton]}
+          >
+            <Text style={[styles.addButtonText, styles.cardButtonText]}>
+              {ADD_TO_CART_UI.ADD}
             </Text>
           </SquircleView>
         </Pressable>
@@ -135,6 +192,10 @@ export const AddToCartButton = ({
   if (quantity === 0) {
     const outOfStock = hasStockLimit && purchaseLimit < 1;
     const disabled = outOfStock || isUpdating;
+
+    if (isBanner) {
+      return renderBannerButton(handleAdd, { disabled });
+    }
 
     if (isDetailDock) {
       return (
@@ -167,12 +228,19 @@ export const AddToCartButton = ({
       >
         <SquircleView
           radius={ADD_TO_CART_BUTTON_LAYOUT.borderRadius}
-          style={[styles.addButton, disabled && styles.buttonDisabled]}
+          style={[
+            styles.addButton,
+            isCard && styles.cardButton,
+            disabled && styles.buttonDisabled,
+          ]}
         >
           {isUpdating ? (
             <ActivityIndicator color={theme.colors.onContrast} />
           ) : (
-            <Text style={styles.addButtonText} {...fixedFontProps}>
+            <Text
+              style={[styles.addButtonText, isCard && styles.cardButtonText]}
+              {...fixedFontProps}
+            >
               {ADD_TO_CART_UI.ADD}
             </Text>
           )}
@@ -204,14 +272,22 @@ export const AddToCartButton = ({
   const increaseDisabled = isUpdating || (hasStockLimit && quantity >= purchaseLimit);
 
   return (
-    <View style={styles.stepper}>
+    <View
+      style={[
+        styles.stepper,
+        isCard && styles.cardStepper,
+        isBanner && styles.bannerStepper,
+      ]}
+    >
       <Pressable
         style={styles.stepButton}
         onPress={handleDecrease}
         disabled={isUpdating}
         accessibilityLabel={ADD_TO_CART_UI.DECREASE_ARIA}
       >
-        <Text style={styles.stepButtonText}>−</Text>
+        <Text style={[styles.stepButtonText, isBanner && styles.bannerStepButtonText]}>
+          −
+        </Text>
       </Pressable>
       <Text style={styles.quantity} accessibilityLabel={ADD_TO_CART_UI.QUANTITY_ARIA}>
         {quantity}
@@ -222,7 +298,9 @@ export const AddToCartButton = ({
         disabled={increaseDisabled}
         accessibilityLabel={ADD_TO_CART_UI.INCREASE_ARIA}
       >
-        <Text style={styles.stepButtonText}>+</Text>
+        <Text style={[styles.stepButtonText, isBanner && styles.bannerStepButtonText]}>
+          +
+        </Text>
       </Pressable>
     </View>
   );

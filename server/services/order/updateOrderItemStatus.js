@@ -33,6 +33,10 @@ import {
   releaseUnawardedLoyaltyReservesForOrder,
 } from "./orderLoyaltyPoints.js";
 import { settleLoyaltyPointsReservation } from "../loyalty/loyaltyPointsReserve.js";
+import {
+  refundPointsPaymentForItem,
+  settlePointsPaymentForItem,
+} from "./orderPointsPayment.js";
 import { settleAffiliatePayoutForOrderItem } from "../affiliate/settleAffiliatePayoutForOrderItem.js";
 import { notifyAffiliatePayoutCredited } from "../affiliate/notifyAffiliatePayoutCredited.js";
 import { finalizeOffersAfterOrderConfirmed } from "../product/productPriceOfferHelpers.js";
@@ -515,6 +519,15 @@ export async function confirmOrderItemByBuyer({
         markOrderLineLoyaltyReserveReleased(targetItem);
       }
 
+      // Товар за баллы: подтверждение получения отдаёт баллы продавцу.
+      await settlePointsPaymentForItem({
+        item: targetItem,
+        buyerId,
+        sellerId: itemSellerId,
+        session,
+        reason: "confirmed",
+      });
+
       const affiliateResult = await settleAffiliatePayoutForOrderItem({
         order,
         targetItem,
@@ -702,6 +715,9 @@ export async function markOrderItemReturned({
     txnItem.returnedAt = new Date();
     txnItem.returnedBy = requestUserId;
     markOrderLineLoyaltyReserveReleased(txnItem);
+    // Баллы за товар, которые ещё не ушли продавцу, возвращаются покупателю.
+    // Если таймер уже отдал их продавцу — это спор, автоматически не откатываем.
+    await refundPointsPaymentForItem({ item: txnItem, buyerId, session });
 
     txnOrder.status = buildOrderStatusFromItems(txnOrder.items);
     if (

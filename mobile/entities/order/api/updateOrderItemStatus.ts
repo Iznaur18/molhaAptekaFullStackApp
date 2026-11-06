@@ -35,6 +35,36 @@ export const markOrderItemCancelled = async (orderId: string, itemIndex: number)
   }
 };
 
+/**
+ * `PATCH /order/:orderId/items/:itemIndex/returned` — товар уехал и вернулся:
+ * отказ у двери, неудачное вручение.
+ */
+export const markOrderItemReturned = async (orderId: string, itemIndex: number) => {
+  try {
+    const { data } = await apiClient.patch(
+      `/order/${orderId}/items/${itemIndex}/returned`,
+    );
+    return parseUpdateOrderItemData(data);
+  } catch (error) {
+    throw new Error(formatApiErrorMessage(error, FALLBACK));
+  }
+};
+
+/**
+ * `PATCH /order/:orderId/shipment/:sellerId/cancelled` — снимает заказ
+ * продавца целиком, а не построчно (у покупателя и у продавца).
+ */
+export const cancelOrderShipment = async (orderId: string, sellerId: string) => {
+  try {
+    const { data } = await apiClient.patch(
+      `/order/${orderId}/shipment/${sellerId}/cancelled`,
+    );
+    return parseUpdateOrderItemData(data);
+  } catch (error) {
+    throw new Error(formatApiErrorMessage(error, FALLBACK));
+  }
+};
+
 export const markOrderItemShipped = async (orderId: string, itemIndex: number) => {
   try {
     const { data } = await apiClient.patch(

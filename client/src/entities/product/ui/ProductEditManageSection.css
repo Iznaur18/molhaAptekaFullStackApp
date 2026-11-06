@@ -15,6 +15,13 @@
   color: var(--iz-color-danger);
 }
 
+.product-edit-manage__note {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--iz-color-text-muted);
+}
+
 .product-edit-manage__warning {
   display: flex;
   align-items: flex-start;

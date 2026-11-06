@@ -10,6 +10,7 @@ import {
   fetchCdekDeliveryPoints,
   fetchCdekQuote,
 } from "@/entities/cdek/api/cdekCheckoutApi";
+import type { CarrierDeliveryCost } from "@/features/checkout/ui/CheckoutCarrierDeliveryCost";
 import {
   CarrierCitySearch,
   CarrierRecipientFields,
@@ -33,6 +34,8 @@ type CdekPickupPointPickerProps = {
   disabled?: boolean;
   /** Полный выбор для заказа или `null`, пока чего-то не хватает. */
   onChange: (selection: CdekOrderSelection | null) => void;
+  /** Цена службы для итога корзины; `null` — пока не посчитана. */
+  onCost?: (cost: CarrierDeliveryCost | null) => void;
 };
 
 /**
@@ -50,6 +53,7 @@ export const CdekPickupPointPicker = ({
   initialRecipientPhone = "",
   disabled = false,
   onChange,
+  onCost,
 }: CdekPickupPointPickerProps) => {
   const styles = useCdekPickupPointPickerStyles();
   const [city, setCity] = useState("");
@@ -123,6 +127,22 @@ export const CdekPickupPointPicker = ({
     () => quote?.options.find((option) => option.tariffCode === tariffCode) ?? null,
     [quote, tariffCode],
   );
+  // Цену тарифа показывает и итог корзины (паритет web `onCost`).
+  useEffect(() => {
+    if (!onCost) return undefined;
+    const fee = Number(selectedTariff?.deliverySumRub) || 0;
+    onCost(
+      fee > 0
+        ? {
+            feeRub: fee,
+            label: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_CDEK,
+            approximate: false,
+          }
+        : null,
+    );
+    return () => onCost(null);
+  }, [selectedTariff, onCost]);
+
   const selectedTariffPeriod = selectedTariff
     ? formatCarrierPeriodDays(
         selectedTariff.periodMinDays,

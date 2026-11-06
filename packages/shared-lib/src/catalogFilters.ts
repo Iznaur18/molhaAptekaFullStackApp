@@ -33,6 +33,7 @@ export const CATALOG_FILTERS_DRAFT_FLAG_KEYS = [
   "installmentOnly",
   "wholesaleOnly",
   "buyNFreeOnly",
+  "pointsSaleOnly",
   "sellerConfirmed",
   "sellerPremium",
   "followingOnly",
@@ -52,6 +53,7 @@ export const CATALOG_FILTERS_BENEFIT_FLAGS: readonly CatalogFiltersFlagKey[] = [
   "installmentOnly",
   "wholesaleOnly",
   "buyNFreeOnly",
+  "pointsSaleOnly",
 ];
 export const CATALOG_FILTERS_SELLER_FLAGS: readonly CatalogFiltersFlagKey[] = [
   "sellerConfirmed",
@@ -76,6 +78,7 @@ export type CatalogExtraFilters = {
   ratingMin: number | null;
   withReviews: boolean;
   returnOnly: boolean;
+  pointsSaleOnly: boolean;
   sellerConfirmed: boolean;
   sellerPremium: boolean;
 };
@@ -89,6 +92,7 @@ export const EMPTY_CATALOG_EXTRA_FILTERS: Readonly<CatalogExtraFilters> = Object
     ratingMin: null,
     withReviews: false,
     returnOnly: false,
+    pointsSaleOnly: false,
     sellerConfirmed: false,
     sellerPremium: false,
   },
@@ -130,6 +134,7 @@ type CatalogExtraFiltersSource = {
   ratingMin?: unknown;
   withReviews?: unknown;
   returnOnly?: unknown;
+  pointsSaleOnly?: unknown;
   sellerConfirmed?: unknown;
   sellerPremium?: unknown;
 };
@@ -155,6 +160,7 @@ export function pickCatalogExtraFilters(
         : null,
     withReviews: query?.withReviews === true,
     returnOnly: query?.returnOnly === true,
+    pointsSaleOnly: query?.pointsSaleOnly === true,
     sellerConfirmed: query?.sellerConfirmed === true,
     sellerPremium: query?.sellerPremium === true,
   };

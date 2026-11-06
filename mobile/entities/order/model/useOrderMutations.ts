@@ -2,9 +2,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import {
   advanceShipmentStatus,
+  cancelOrderShipment,
   confirmOrderItem,
   markOrderItemCancelled,
   markOrderItemDelivered,
+  markOrderItemReturned,
   markOrderItemShipped,
 } from "@/entities/order/api/updateOrderItemStatus";
 import { updateOrderStatus } from "@/entities/order/api/updateOrderStatus";
@@ -30,6 +32,25 @@ export const useOrderMutations = () => {
   const cancelItemMutation = useMutation({
     mutationFn: ({ orderId, itemIndex }: { orderId: string; itemIndex: number }) =>
       markOrderItemCancelled(orderId, itemIndex),
+    onSuccess: () => {
+      invalidateOrders();
+      invalidateSales();
+    },
+  });
+
+  const returnItemMutation = useMutation({
+    mutationFn: ({ orderId, itemIndex }: { orderId: string; itemIndex: number }) =>
+      markOrderItemReturned(orderId, itemIndex),
+    onSuccess: () => {
+      invalidateOrders();
+      invalidateSales();
+    },
+  });
+
+  /** Заказ продавца целиком — и у покупателя, и у продавца. */
+  const cancelShipmentMutation = useMutation({
+    mutationFn: ({ orderId, sellerId }: { orderId: string; sellerId: string }) =>
+      cancelOrderShipment(orderId, sellerId),
     onSuccess: () => {
       invalidateOrders();
       invalidateSales();
@@ -62,6 +83,8 @@ export const useOrderMutations = () => {
   return {
     confirmItemMutation,
     cancelItemMutation,
+    returnItemMutation,
+    cancelShipmentMutation,
     shipItemMutation,
     deliverItemMutation,
     advanceShipmentMutation,

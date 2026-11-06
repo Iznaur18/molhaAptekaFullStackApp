@@ -28,6 +28,7 @@ const PLACEHOLDER_SCOPE_KEYS: Array<keyof CatalogListQueryKeyParams> = [
   "ratingMin",
   "withReviews",
   "returnOnly",
+  "pointsSaleOnly",
   "sellerConfirmed",
   "sellerPremium",
   "regionCode",

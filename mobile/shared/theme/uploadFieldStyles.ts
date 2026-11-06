@@ -4,6 +4,7 @@ import {
   ADD_TO_CART_BUTTON_LAYOUT as CART_BTN,
   ADD_TO_CART_STEPPER_LAYOUT as CART_STEPPER,
 } from "@/entities/product/lib/addToCartButtonLayout";
+import { PRODUCT_CARD_MOBILE_CATALOG_LAYOUT } from "@/entities/product/lib/productCardMobileCatalogLayout";
 import { PRODUCT_DETAIL_OUT_OF_STOCK_BUTTON_LAYOUT as OOS_BTN } from "@/entities/product/lib/productDetailOutOfStockButtonLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { semanticColors } from "@/shared/theme/semanticColors";
@@ -394,6 +395,74 @@ export const useAddToCartButtonStyles = createThemedStyles((theme) => ({
     borderRadius: CART_STEPPER.borderRadius,
     backgroundColor: theme.colors.actionSoft,
     ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+  },
+  /**
+   * Карточка главного экрана — web `ProductCardMobileCatalog.css`: кнопка и
+   * степпер 2.15rem, padding 0.35rem 0.65rem, шрифт 0.78rem.
+   */
+  cardButton: {
+    height: PRODUCT_CARD_MOBILE_CATALOG_LAYOUT.actionHeight,
+    paddingVertical: 5.6,
+    paddingHorizontal: 10.4,
+  },
+  cardButtonText: {
+    fontSize: 12.48,
+  },
+  cardStepper: {
+    height: PRODUCT_CARD_MOBILE_CATALOG_LAYOUT.actionHeight,
+    paddingVertical: 0,
+  },
+  cardBlockedButton: {
+    minHeight: 0,
+    height: PRODUCT_CARD_MOBILE_CATALOG_LAYOUT.actionHeight,
+    paddingVertical: 5.6,
+    paddingHorizontal: 10.4,
+  },
+  /**
+   * Баннер в ленте — web `ProductCardBannerLayout.css` `.product-card__banner-actions`:
+   * кнопка по ширине надписи, слева, цвет акцента баннера, у «В корзину» тележка.
+   */
+  bannerPressable: {
+    alignSelf: "flex-start",
+    maxWidth: "100%",
+  },
+  bannerButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 7.2,
+    paddingVertical: 8.8,
+    paddingHorizontal: 13.6,
+    borderWidth: 1,
+    borderColor: theme.colors.danger,
+    borderRadius: 10.5,
+    backgroundColor: theme.colors.danger,
+  },
+  bannerButtonText: {
+    color: theme.colors.onContrast,
+    fontSize: 14.72,
+    fontWeight: "600",
+    lineHeight: 17.7,
+  },
+  bannerStepper: {
+    alignSelf: "flex-start",
+    width: "auto",
+    paddingVertical: 6.4,
+    paddingHorizontal: 8.8,
+    borderColor: theme.colors.danger,
+    borderRadius: 10.5,
+    backgroundColor: theme.colors.surface,
+  },
+  bannerStepButtonText: {
+    color: theme.colors.danger,
+  },
+  bannerBlockedButton: {
+    alignSelf: "flex-start",
+    width: "auto",
+    minHeight: 0,
+    paddingVertical: 8.8,
+    paddingHorizontal: 13.6,
+    borderRadius: 10.5,
   },
   buttonDisabled: {
     opacity: 0.5,

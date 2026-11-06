@@ -1,5 +1,6 @@
 import {
   PRODUCT_DELIVERY_CARRIER_LABEL_RU,
+  formatLoyaltyPointsAmount,
   resolveProductDeliveryCarrier,
 } from "@molha/api-contract";
 import { Link } from "react-router-dom";
@@ -74,6 +75,7 @@ function formatCartLineCarrierLabel(product) {
  *     value: number;
  *     onChange: (next: number) => void;
  *   } | null;
+ *   pointsTotal?: number | null;
  * }} props
  */
 export function CartFulfillmentSection({
@@ -98,6 +100,7 @@ export function CartFulfillmentSection({
   sellerDelivery = null,
   sellerDeliveryDistance = null,
   carrierDeliveryCost = null,
+  pointsTotal = null,
 }) {
   // У товаров продавца разные службы — подписываем службу у каждой строки,
   // иначе непонятно, с какого товара снять галочку.
@@ -289,6 +292,17 @@ export function CartFulfillmentSection({
               </div>
             ) : null}
 
+            {pointsTotal != null ? (
+              // Товары за баллы: сумма в баллах, рублями — только доставка.
+              <div className="cart-page__dock-total-row">
+                <span className="cart-page__payable-label">
+                  {CART_PAGE_UI.POINTS_PAYABLE_LABEL}
+                </span>
+                <span className="cart-page__total-value">
+                  {formatLoyaltyPointsAmount(pointsTotal)}
+                </span>
+              </div>
+            ) : null}
             {showCarrierDeliveryCost ? (
               <CheckoutCarrierDeliveryCost
                 cost={carrierDeliveryCost}
@@ -300,7 +314,7 @@ export function CartFulfillmentSection({
                 goodsTotalRub={sellerDelivery.goodsTotalRub ?? summary.selectedTotal}
                 distance={sellerDeliveryDistance}
               />
-            ) : (
+            ) : pointsTotal != null ? null : (
               <div className="cart-page__dock-total-row">
                 <span className="cart-page__payable-label">
                   {CART_PAGE_UI.PAYABLE_LABEL}
@@ -313,6 +327,9 @@ export function CartFulfillmentSection({
           </div>
         </div>
 
+        {pointsTotal != null ? (
+          <p className="cart-page__checkout-hint">{CART_PAGE_UI.POINTS_PAYMENT_NOTE}</p>
+        ) : null}
         {showCheckoutActions ? (
           <>
             {!canCheckout && summary.checkoutBlockReason ? (

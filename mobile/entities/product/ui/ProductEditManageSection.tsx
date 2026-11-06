@@ -5,6 +5,11 @@ import {
   isProductRentalConfigured,
 } from "@izibuy/shared-lib";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import {
+  formatLoyaltyPointsAmount,
+  isProductPointsSaleActive,
+  normalizeProductPointsPerBuyerLimit,
+} from "@molha/api-contract";
 import { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
@@ -92,6 +97,7 @@ type ProductEditManageSectionProps = {
   canOpenInstallmentProgram?: boolean;
   onOpenWholesaleSettings?: () => void;
   onOpenBuyNFreeSettings?: () => void;
+  onOpenPointsSaleSettings?: () => void;
   onOpenRentalSettings?: () => void;
   onOpenFlashSaleSettings?: () => void;
   onOpenPromoCodesSettings?: () => void;
@@ -150,6 +156,7 @@ export const ProductEditManageSection = ({
   canOpenInstallmentProgram = true,
   onOpenWholesaleSettings,
   onOpenBuyNFreeSettings,
+  onOpenPointsSaleSettings,
   onOpenRentalSettings,
   onOpenFlashSaleSettings,
   onOpenPromoCodesSettings,
@@ -163,10 +170,18 @@ export const ProductEditManageSection = ({
   const styles = useProductEditManageSectionStyles();
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
+  // Товар за баллы: никаких акций и доп. режимов (решение 21.10.2026).
+  // Сервер их всё равно не включит — здесь просто не предлагаем.
+  const isPointsSale = isProductPointsSaleActive(product);
+  const showPointsSale = typeof onOpenPointsSaleSettings === "function" && canEdit;
+  const pointsSaleLimit = normalizeProductPointsPerBuyerLimit(
+    product.productPointsPerBuyerLimit,
+  );
   const isListedForOthers = product.productIsAvailable !== false;
   const hasOpenSalesLocked = product.hasOpenSales === true;
   const showVisibility = typeof onSetAvailability === "function" && canToggleVisibility;
-  const showAuctionToggle = typeof onSetAuction === "function" && canEdit;
+  const showAuctionToggle =
+    !isPointsSale && typeof onSetAuction === "function" && canEdit;
   const isAuctionEnabled = product.productAuctionEnabled === true;
   const showOriginality = typeof onSetOriginality === "function" && canEdit;
   const isOriginal = product.productIsOriginal === true;
@@ -192,33 +207,44 @@ export const ProductEditManageSection = ({
   );
   const affiliateConfigured = isProductAffiliateConfigured(product);
   const showWholesale =
-    typeof onOpenWholesaleSettings === "function" ||
-    typeof onSetWholesale === "function";
+    !isPointsSale &&
+    (typeof onOpenWholesaleSettings === "function" ||
+      typeof onSetWholesale === "function");
   const showBuyNFree =
-    typeof onOpenBuyNFreeSettings === "function" || typeof onSetBuyNFree === "function";
+    !isPointsSale &&
+    (typeof onOpenBuyNFreeSettings === "function" ||
+      typeof onSetBuyNFree === "function");
   const showRental =
-    typeof onOpenRentalSettings === "function" || typeof onSetRental === "function";
+    !isPointsSale &&
+    (typeof onOpenRentalSettings === "function" || typeof onSetRental === "function");
   const showFlashSale =
-    typeof onOpenFlashSaleSettings === "function" ||
-    typeof onSetFlashSale === "function";
+    !isPointsSale &&
+    (typeof onOpenFlashSaleSettings === "function" ||
+      typeof onSetFlashSale === "function");
   const isFlashSaleEnabled = product.productFlashSaleEnabled === true;
   /** Сервер запрещает совмещать горящую скидку с аукционом и ручной скидкой. */
   const flashSaleBlockedByAuction = product.productAuctionEnabled === true;
   const flashSaleBlockedByManualDiscount = hasProductManualCatalogDiscount(product);
   const showAffiliate =
-    typeof onOpenAffiliateSettings === "function" ||
-    typeof onSetAffiliate === "function";
+    !isPointsSale &&
+    (typeof onOpenAffiliateSettings === "function" ||
+      typeof onSetAffiliate === "function");
   const showLoyalty =
-    typeof onOpenLoyaltySettings === "function" ||
-    typeof onSetLoyaltyPoints === "function";
-  const showPromoCodes = typeof onOpenPromoCodesSettings === "function" && canEdit;
+    !isPointsSale &&
+    (typeof onOpenLoyaltySettings === "function" ||
+      typeof onSetLoyaltyPoints === "function");
+  const showPromoCodes =
+    !isPointsSale && typeof onOpenPromoCodesSettings === "function" && canEdit;
   const showQaToggle = typeof onSetQa === "function" && canEdit;
   const isQaEnabled = product.productQaEnabled === true;
   const showRaffleToggle =
-    sellerRaffleActive && typeof onToggleRaffleParticipation === "function";
+    !isPointsSale &&
+    sellerRaffleActive &&
+    typeof onToggleRaffleParticipation === "function";
   const showInstallmentButton =
-    typeof onOpenInstallmentProgram === "function" ||
-    typeof onSetInstallment === "function";
+    !isPointsSale &&
+    (typeof onOpenInstallmentProgram === "function" ||
+      typeof onSetInstallment === "function");
   const showDelete = canDelete && typeof onDelete === "function";
   const isRaffleParticipant = isProductRaffleParticipant(product);
   const canOpenInstallment =
@@ -276,7 +302,35 @@ export const ProductEditManageSection = ({
           </Text>
         </View>
       ) : null}
+      {isPointsSale ? (
+        <Text style={styles.note}>
+          {CREATE_PRODUCT_UI.MANAGE_POINTS_SALE_LOCKED_NOTE}
+        </Text>
+      ) : null}
       <View style={styles.toggles}>
+        {showPointsSale ? (
+          <ProductManageToggleRow
+            title={CREATE_PRODUCT_UI.MANAGE_POINTS_SALE_TITLE}
+            description={
+              isPointsSale
+                ? CREATE_PRODUCT_UI.MANAGE_POINTS_SALE_HINT_ON(
+                    formatLoyaltyPointsAmount(product.productPointsPrice),
+                    pointsSaleLimit,
+                  )
+                : CREATE_PRODUCT_UI.MANAGE_POINTS_SALE_HINT
+            }
+            checked={isPointsSale}
+            disabled={actionsLocked}
+            pending={false}
+            pendingLabel={CREATE_PRODUCT_UI.BUY_N_FREE_MODAL_PENDING}
+            onPress={() => onOpenPointsSaleSettings?.()}
+            onCheckedChange={() => {
+              // И включение, и выключение — через окно: там видно, что гаснет.
+              onOpenPointsSaleSettings?.();
+              return { revert: true };
+            }}
+          />
+        ) : null}
         {showOriginality ? (
           <ProductManageToggleRow
             title={CREATE_PRODUCT_UI.LABEL_ORIGINALITY}

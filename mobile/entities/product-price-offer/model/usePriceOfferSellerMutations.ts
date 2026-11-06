@@ -13,6 +13,12 @@ export const usePriceOfferSellerMutations = (productId: string) => {
     void queryClient.invalidateQueries({
       queryKey: priceOfferQueryKeys.top(productId),
     });
+    void queryClient.invalidateQueries({
+      queryKey: priceOfferQueryKeys.seller(productId),
+    });
+    void queryClient.invalidateQueries({
+      queryKey: priceOfferQueryKeys.sellerArchive(productId),
+    });
   };
 
   const acceptMutation = useMutation({

@@ -65,6 +65,7 @@ import { applyWholesaleFields } from "./applyWholesaleFields.js";
 import { applyBuyNFreeFields } from "./applyBuyNFreeFields.js";
 import { applyFlashSaleFields } from "./applyFlashSaleFields.js";
 import { applyRentalFields } from "./applyRentalFields.js";
+import { applyPointsSaleFields } from "./applyPointsSaleFields.js";
 import { resolveProductDealTermsWrite } from "./productDealTermsFields.js";
 import { PRODUCT_FLASH_SALE_ACTIVE_PRICE_LOCKED_MESSAGE } from "@molha/api-contract";
 import {
@@ -849,6 +850,7 @@ export async function buildProductPatchSet({
   applyRentalFields(body, $set, existing);
   Object.assign($set, resolveProductDealTermsWrite(body));
   const flashSaleState = applyFlashSaleFields(body, $set, $unset, existing);
+  applyPointsSaleFields(body, $set, existing);
 
   const availabilityBecameHidden =
     hasSetField($set, "productIsAvailable") &&

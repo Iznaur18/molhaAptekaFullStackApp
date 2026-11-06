@@ -12,6 +12,7 @@ import {
   MY_ORDERS_LIST_FILTER_DONE,
   MY_ORDERS_LIST_FILTER_IN_PROGRESS,
 } from "@/entities/order/model/myOrdersListFilters";
+import { OrderStatusChipRow } from "@/entities/order/ui/OrderStatusChipRow";
 import { MY_ORDERS_PAGE_UI } from "@/shared/config";
 import { useMyOrdersPageStyles } from "@/shared/theme/myOrdersPageStyles";
 
@@ -94,11 +95,7 @@ export const MyOrdersPageToolbar = ({
       </View>
 
       <>
-        <View
-          style={styles.statusChips}
-          accessibilityRole="toolbar"
-          accessibilityLabel={MY_ORDERS_PAGE_UI.STATUS_FILTER_LABEL}
-        >
+        <OrderStatusChipRow accessibilityLabel={MY_ORDERS_PAGE_UI.STATUS_FILTER_LABEL}>
           <StatusChip
             label={MY_ORDERS_PAGE_UI.STATUS_GROUP_ALL}
             active={!statusFilter && !attentionOnly}
@@ -129,12 +126,11 @@ export const MyOrdersPageToolbar = ({
                 : MY_ORDERS_PAGE_UI.STATUS_MORE}
             </Text>
           </Pressable>
-        </View>
+        </OrderStatusChipRow>
 
         {showAllStatuses ? (
-          <View
-            style={[styles.statusChips, styles.statusChipsAll]}
-            accessibilityRole="toolbar"
+          <OrderStatusChipRow
+            style={styles.statusChipsAll}
             accessibilityLabel={MY_ORDERS_PAGE_UI.STATUS_FILTER_LABEL}
           >
             {STATUS_FILTER_OPTIONS.map((option) => (
@@ -146,7 +142,7 @@ export const MyOrdersPageToolbar = ({
                 onPress={() => onStatusFilterChange(option.value)}
               />
             ))}
-          </View>
+          </OrderStatusChipRow>
         ) : null}
       </>
     </View>

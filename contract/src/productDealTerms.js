@@ -5,6 +5,10 @@ import {
   CATEGORY_DEAL_TYPE_VIEWING,
   normalizeCategoryDealType,
 } from "./categoryDealType.js";
+import {
+  formatLoyaltyPointsAmount,
+  isProductPointsSaleActive,
+} from "./productPointsSale.js";
 
 /**
  * Условия сделки в объявлении без корзины.
@@ -137,16 +141,22 @@ export const normalizeProductServiceLocations = (raw) => {
  * Как показать цену объявления-услуги: «от 1 500 ₽ / час» или «Договорная».
  *
  * Для всего, что не услуга, возвращает цену как есть — вызывать можно для
- * любого товара, не проверяя тип заранее.
+ * любого товара, не проверяя тип заранее. Товар за баллы показывает цену в
+ * баллах: рублёвая цена у него лежит, но купить за неё нельзя.
  *
  * @param {{
  *   productDealType?: unknown;
  *   productServicePriceMode?: unknown;
  *   productServicePriceUnit?: unknown;
+ *   productPointsSaleEnabled?: unknown;
+ *   productPointsPrice?: unknown;
  * } | null | undefined} product
  * @param {string} formattedPrice цена, уже отформатированная клиентом («1 500 ₽»)
  */
 export const formatProductDealPrice = (product, formattedPrice) => {
+  if (isProductPointsSaleActive(product)) {
+    return formatLoyaltyPointsAmount(product?.productPointsPrice);
+  }
   if (
     normalizeCategoryDealType(product?.productDealType) !== CATEGORY_DEAL_TYPE_SERVICE
   ) {

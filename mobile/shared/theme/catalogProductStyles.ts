@@ -500,6 +500,13 @@ export const useProductCardStyles = createThemedStyles((theme) => {
       fontWeight: "500",
       color: BC.ratingPlaceholder,
     },
+    /** web `.product-card__footer-actions` до 1023 px: над кнопкой 0.5rem, по бокам inset. */
+    purchaseSlot: {
+      height: MCL.actionTopGap + MCL.actionHeight,
+      paddingTop: MCL.actionTopGap,
+      paddingHorizontal: MCL.contentInsetX,
+      justifyContent: "flex-end",
+    },
     footerActions: {
       marginTop: "auto",
       paddingTop: 5.6,
@@ -673,6 +680,13 @@ export const useProductCardBannerStyles = createThemedStyles((theme) => {
       flexWrap: "wrap",
       alignItems: "center",
       gap: 6,
+    },
+    /** web `.product-card__banner-actions`: слева, по ширине кнопки, отступ 0.35rem. */
+    actions: {
+      alignItems: "flex-start",
+      gap: 7.2,
+      paddingTop: 5.6,
+      width: "100%",
     },
     metaText: {
       fontSize: 13.1,

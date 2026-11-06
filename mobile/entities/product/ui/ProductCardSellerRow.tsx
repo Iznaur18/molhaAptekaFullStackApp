@@ -25,7 +25,8 @@ export const ProductCardSellerRow = ({
     return null;
   }
 
-  const { sellerId, displayName, isPremiumUser, isUserDataConfirmed } = sellerProfile;
+  const { sellerId, displayName, isPremiumUser, isUserDataConfirmed, hasSafeDeal } =
+    sellerProfile;
 
   if (!sellerId) {
     return (
@@ -34,6 +35,7 @@ export const ProductCardSellerRow = ({
           name={displayName}
           isPremium={isPremiumUser}
           isUserDataConfirmed={isUserDataConfirmed}
+          hasSafeDeal={hasSafeDeal}
           badgeSize={PRODUCT_CARD_BADGE_LAYOUT.sellerBadgeSize}
           textStyle={[
             styles.nameTextPlain,
@@ -49,6 +51,7 @@ export const ProductCardSellerRow = ({
       name={displayName}
       isPremium={isPremiumUser}
       isUserDataConfirmed={isUserDataConfirmed}
+      hasSafeDeal={hasSafeDeal}
       badgeSize={PRODUCT_CARD_BADGE_LAYOUT.sellerBadgeSize}
       textStyle={[styles.nameText, isCatalogGrid && styles.nameTextCatalogGrid]}
     />

@@ -238,7 +238,7 @@ export default function CartScreen() {
   useEffect(() => {
     if (
       activeSellerCartId != null &&
-      !sellerGroups.some((group) => group.sellerId === activeSellerCartId)
+      !sellerGroups.some((group) => group.cartGroupId === activeSellerCartId)
     ) {
       setActiveSellerCartId(null);
     }
@@ -248,8 +248,9 @@ export default function CartScreen() {
     () =>
       activeSellerCartId == null
         ? null
-        : (sellerEntries.find((entry) => entry.group.sellerId === activeSellerCartId) ??
-          null),
+        : (sellerEntries.find(
+            (entry) => entry.group.cartGroupId === activeSellerCartId,
+          ) ?? null),
     [activeSellerCartId, sellerEntries],
   );
 
@@ -258,6 +259,10 @@ export default function CartScreen() {
     [currentUserId, deselectedIds],
   );
   const activeSummary = activeSellerEntry?.summary ?? emptySummary;
+  /** Группа товаров за баллы: итог в баллах, без предоплаты. */
+  const isPointsCheckout =
+    auctionCheckoutBid == null &&
+    activeSellerEntry?.group.paidWithLoyaltyPoints === true;
 
   /** Отмеченные товары везут разные службы — одной доставкой не оформить. */
   const checkoutMixedCarriers = useMemo(
@@ -333,10 +338,13 @@ export default function CartScreen() {
     () => checkoutSellers.map((seller) => seller.sellerId),
     [checkoutSellers],
   );
-  const cardPrepaidAvailable = useCardPrepaidAvailable({
+  const cardPrepaidAvailableForSellers = useCardPrepaidAvailable({
     sellerIds: checkoutSellerIds,
     enabled: isAuthorized,
   });
+  // Заказ за баллы предоплатой не оформляется: рублями там только доставка,
+  // и платят её при получении (сервер предоплату отклонит).
+  const cardPrepaidAvailable = cardPrepaidAvailableForSellers && !isPointsCheckout;
 
   const handleRefresh = useCallback(async () => {
     await Promise.all([
@@ -405,6 +413,34 @@ export default function CartScreen() {
     ],
   );
 
+  // «Экспресс» — курьер Яндекса до двери. Тоже только картой при получении.
+  const expressAvailable =
+    yandexAvailabilityQuery.data?.expressAvailable === true &&
+    !auctionCheckoutBid &&
+    isCardOnDeliveryAccepted(allowedPaymentMethods);
+  const expressConfig = useMemo(
+    () =>
+      expressAvailable && cdekSellerId
+        ? {
+            items: activeSummary.selectedLines.map((line) => ({
+              productId: line.productId,
+              quantity: line.quantity,
+            })),
+            recipientName: String(sessionUser?.userFullName ?? ""),
+            recipientPhone: String(sessionUser?.userPhoneNumber ?? ""),
+          }
+        : null,
+    [
+      expressAvailable,
+      cdekSellerId,
+      activeSummary.selectedLines,
+      sessionUser?.userFullName,
+      sessionUser?.userPhoneNumber,
+    ],
+  );
+  // Служба, заданная продавцом на товаре (ЛОБО): ей подписана «своя доставка».
+  const checkoutProductCarrier = activeSellerEntry?.group.deliveryCarrier ?? null;
+
   // Тариф собственной доставки продавца. Считаем так, будто выбрана доставка:
   // блок с ценой форма показывает только в этом режиме. Сумму собирает функция
   // контракта, расстояние по дорогам приходит котировкой с сервера.
@@ -435,10 +471,11 @@ export default function CartScreen() {
     setAuctionCheckoutBid(bid);
   };
 
-  const openSellerCart = (sellerId: string) => {
+  /** Ключ группы: у продавца их две, если в корзине есть его товары за баллы. */
+  const openSellerCart = (cartGroupId: string) => {
     setAuctionCheckoutBid(null);
     setSubmitState({ isSubmitting: false, error: "", success: "" });
-    setActiveSellerCartId(sellerId);
+    setActiveSellerCartId(cartGroupId);
   };
 
   const closeSellerCart = () => {
@@ -508,6 +545,8 @@ export default function CartScreen() {
     pickupSelections?: Array<{ productId: string; pickupLocationId: string }>;
     cdekShipment?: CdekOrderSelection;
     yandexDeliveryShipment?: YandexDeliveryOrderSelection;
+    yandexExpressShipment?: { recipient: { name: string; phone: string } };
+    deliveryAddressGeo?: { lat: number; lon: number } | null;
   }) => {
     setSubmitState({ isSubmitting: true, error: "", success: "" });
     const orderedProductIds = activeSummary.selectedLines.map((line) => line.productId);
@@ -535,6 +574,13 @@ export default function CartScreen() {
         ...(payload.cdekShipment ? { cdekShipment: payload.cdekShipment } : {}),
         ...(payload.yandexDeliveryShipment
           ? { yandexDeliveryShipment: payload.yandexDeliveryShipment }
+          : {}),
+        ...(payload.yandexExpressShipment
+          ? { yandexExpressShipment: payload.yandexExpressShipment }
+          : {}),
+        // Точка адреса — как сайт: курьер едет к подъезду, а не к середине улицы.
+        ...(payload.deliveryAddressGeo
+          ? { deliveryAddressGeo: payload.deliveryAddressGeo }
           : {}),
       });
       await removeItems(orderedProductIds);
@@ -665,10 +711,15 @@ export default function CartScreen() {
               </Pressable>
 
               <CartFulfillmentSection
-                key={activeSellerEntry.group.sellerId || "unknown-seller"}
+                key={activeSellerEntry.group.cartGroupId || "unknown-seller"}
                 title={
-                  activeSellerEntry.group.sellerName.trim() ||
-                  CART_PAGE_UI.SECTION_SELLER_FALLBACK
+                  activeSellerEntry.group.paidWithLoyaltyPoints
+                    ? `${
+                        activeSellerEntry.group.sellerName.trim() ||
+                        CART_PAGE_UI.SECTION_SELLER_FALLBACK
+                      } · ${CART_PAGE_UI.POINTS_GROUP_SUFFIX}`
+                    : activeSellerEntry.group.sellerName.trim() ||
+                      CART_PAGE_UI.SECTION_SELLER_FALLBACK
                 }
                 note={checkoutMixedCarriers ? CART_PAGE_UI.MIXED_CARRIERS_NOTE : null}
                 lines={activeSellerEntry.group.lines}
@@ -687,16 +738,23 @@ export default function CartScreen() {
                     pickupGroups={pickupGroups}
                     // «Доставка» доступна и тогда, когда у продавца есть только СДЭК.
                     deliveryAvailable={
-                      deliveryAvailable || cdekAvailable || yandexAvailable
+                      deliveryAvailable ||
+                      cdekAvailable ||
+                      yandexAvailable ||
+                      expressAvailable
                     }
                     pickupAvailable={pickupAvailable}
                     allowedPaymentMethods={allowedPaymentMethods}
                     cardPrepaidAvailable={cardPrepaidAvailable}
+                    paidWithLoyaltyPoints={isPointsCheckout}
                     sellerDeliveryAvailable={deliveryAvailable}
                     cdek={cdekConfig}
                     yandex={yandexConfig}
+                    express={expressConfig}
+                    productCarrier={checkoutProductCarrier}
                     sellerDelivery={sellerDelivery}
                     deliveryProductIds={deliveryProductIds}
+                    goodsTotalRub={activeSellerEntry.summary.selectedTotal}
                     initialFulfillmentMethod={
                       fulfillmentBySellerId[activeSellerEntry.group.sellerId] ?? null
                     }
@@ -711,6 +769,11 @@ export default function CartScreen() {
                     renderFooter={(footer) => (
                       <CartCheckoutDock
                         summary={activeSellerEntry.summary}
+                        pointsTotal={
+                          isPointsCheckout
+                            ? activeSellerEntry.summary.selectedPointsTotal
+                            : null
+                        }
                         canCheckout={canCheckoutActive}
                         deliveryCost={footer.deliveryCost}
                         error={footer.error}

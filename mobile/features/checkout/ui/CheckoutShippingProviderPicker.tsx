@@ -16,6 +16,11 @@ type CheckoutShippingProviderPickerProps = {
   disabled?: boolean;
   /** Продавец везёт сам. */
   sellerDeliveryAvailable?: boolean;
+  /**
+   * Подпись «своей доставки», когда службу задал продавец на товаре (ЛОБО):
+   * везёт она, а не продавец (паритет web — карточка службы выбрана).
+   */
+  sellerCardLabel?: string | null;
   /** Службы, по которым продавец подключил договор и включил доставку. */
   carriers?: readonly CheckoutCarrierOption[];
   /** Выбранная служба; `null` — своя доставка продавца. */
@@ -34,6 +39,7 @@ type CheckoutShippingProviderPickerProps = {
 export const CheckoutShippingProviderPicker = ({
   disabled = false,
   sellerDeliveryAvailable = true,
+  sellerCardLabel = null,
   carriers = [],
   selectedCarrier = null,
   onSelectCarrier,
@@ -41,7 +47,12 @@ export const CheckoutShippingProviderPicker = ({
   const theme = useAppTheme();
   const cards = [
     ...(sellerDeliveryAvailable
-      ? [{ id: SELLER_CARD_ID, label: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SELLER }]
+      ? [
+          {
+            id: SELLER_CARD_ID,
+            label: sellerCardLabel ?? CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SELLER,
+          },
+        ]
       : []),
     ...carriers,
   ];
@@ -56,7 +67,7 @@ export const CheckoutShippingProviderPicker = ({
     // подпись карточки «Продавцом».
     const singleName =
       cards[0].id === SELLER_CARD_ID
-        ? CHECKOUT_FORM_UI.SHIPPING_PROVIDER_BADGE_SELLER
+        ? (sellerCardLabel ?? CHECKOUT_FORM_UI.SHIPPING_PROVIDER_BADGE_SELLER)
         : cards[0].label;
     return (
       <View style={styles.root}>

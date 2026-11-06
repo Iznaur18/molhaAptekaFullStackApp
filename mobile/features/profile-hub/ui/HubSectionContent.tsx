@@ -10,6 +10,8 @@ import { LoyaltyPointsPage } from "@/features/loyalty-points-page/ui/LoyaltyPoin
 import { DataConfirmationPage } from "@/features/data-confirmation-page/ui/DataConfirmationPage";
 import { CreateRafflePage } from "@/features/create-raffle-page/ui/CreateRafflePage";
 import { AuctionPage } from "@/features/auction-page/ui/AuctionPage";
+import { DealRequestsPage } from "@/features/deal-requests-page/ui/DealRequestsPage";
+import { SafeDealPage } from "@/features/safe-deal-page/ui/SafeDealPage";
 import { InstallmentPaymentsPage } from "@/features/installment-payments-page/ui/InstallmentPaymentsPage";
 import { InstallmentSalesPage } from "@/features/installment-sales-page/ui/InstallmentSalesPage";
 import { ProductModerationPage } from "@/features/product-moderation-page/ui/ProductModerationPage";
@@ -62,6 +64,10 @@ export const HubSectionContent = ({
       return <PartnerProgramPage />;
     case "data-confirmation":
       return <DataConfirmationPage />;
+    case "deal-requests":
+      return <DealRequestsPage />;
+    case "safe-deal":
+      return <SafeDealPage />;
     case "auction":
       return <AuctionPage />;
     case "installment-payments":

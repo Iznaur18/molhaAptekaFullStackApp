@@ -22,6 +22,7 @@ import {
   PRODUCT_DETAILS_BADGE_SOFT_COLORS,
   PRODUCT_DETAILS_SOFT_BADGE_LAYOUT,
 } from "@/entities/product/lib/productDetailsBadgeSoftPalette";
+import { SafeDealSellerBadge } from "@/entities/seller-safe-deal/ui/SafeDealSellerBadge";
 import { PRODUCT_DETAIL_TAB_BAR_LAYOUT } from "@/shared/lib/productDetailTabBarLayout";
 import { PRODUCT_DETAILS_MODAL_UI } from "@/shared/config";
 import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
@@ -177,6 +178,33 @@ const renderBadge = ({
                 style={[softBadgeText, styles.metaInfoChipOriginalText]}
                 numberOfLines={1}
               >
+                {item.label}
+              </Text>
+            </>
+          ),
+        })}
+      </View>
+    );
+  }
+
+  if (item.kind === "safeDeal") {
+    const tone = PRODUCT_DETAILS_BADGE_SOFT_COLORS.safeDeal;
+    return (
+      <View key={item.key}>
+        {renderBadgeShell({
+          interactive,
+          style: [
+            styles.metaInfoChip,
+            styles.metaInfoChipRow,
+            softBadgeChrome,
+            { backgroundColor: tone.backgroundColor },
+          ],
+          accessibilityLabel: item.label,
+          onPress: () => onBadgePress?.(item),
+          children: (
+            <>
+              <SafeDealSellerBadge size={14} />
+              <Text style={[softBadgeText, { color: tone.color }]} numberOfLines={1}>
                 {item.label}
               </Text>
             </>

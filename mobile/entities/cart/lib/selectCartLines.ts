@@ -1,4 +1,8 @@
 import {
+  isProductPointsSaleActive,
+  normalizeProductPointsPrice,
+} from "@molha/api-contract";
+import {
   resolveBuyNFreeFreeUnitsForCart,
   resolveBuyNFreeLineTotal,
   resolveProductUnitPriceWithPromo,
@@ -24,6 +28,9 @@ type CatalogProduct = {
   productWholesalePrice?: number | null;
   productBuyNFreeEnabled?: boolean | null;
   productBuyNFreeThreshold?: number | null;
+  productPointsSaleEnabled?: boolean | null;
+  productPointsPrice?: number | null;
+  productPointsPerBuyerLimit?: number | null;
 };
 
 export type AppliedPromo = {
@@ -50,6 +57,10 @@ export type CartLine = {
   promoCode: string | null;
   isPromoApplied: boolean;
   buyNFreeUnits: number;
+  /** Товар продаётся за баллы: рублёвые суммы строки — 0. */
+  isPointsSale: boolean;
+  pointsUnitPrice: number;
+  pointsLineTotal: number;
 };
 
 export const selectCartLines = (
@@ -88,6 +99,29 @@ export const selectCartLines = (
     const product =
       rawProduct != null ? normalizeStaleFlashSaleProduct(rawProduct, nowMs) : null;
     const qty = Math.floor(Number(quantity)) || 0;
+    // Товар за баллы: ни рублёвой цены, ни промокода, ни опта, ни «N+1» —
+    // в заказе их тоже не будет (см. createOrder на сервере).
+    if (product != null && isProductPointsSaleActive(product)) {
+      const pointsUnitPrice =
+        normalizeProductPointsPrice(product.productPointsPrice) ?? 0;
+      return {
+        productId,
+        quantity: qty,
+        product,
+        unitPrice: 0,
+        lineTotal: 0,
+        isMissing: false,
+        isWholesaleApplied: false,
+        wholesaleSavings: 0,
+        promoDiscountPercent: null,
+        promoCode: null,
+        isPromoApplied: false,
+        buyNFreeUnits: 0,
+        isPointsSale: true,
+        pointsUnitPrice,
+        pointsLineTotal: pointsUnitPrice * qty,
+      };
+    }
     const promo = promoByProductId.get(productId) ?? null;
     const promoDiscountPercent =
       promo != null ? Math.floor(Number(promo.discountPercent)) || null : null;
@@ -132,6 +166,9 @@ export const selectCartLines = (
       promoCode: isPromoApplied ? String(promo?.code ?? "") : null,
       isPromoApplied,
       buyNFreeUnits,
+      isPointsSale: false,
+      pointsUnitPrice: 0,
+      pointsLineTotal: 0,
     };
   });
 

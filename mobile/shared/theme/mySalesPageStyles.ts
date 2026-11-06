@@ -76,9 +76,25 @@ export const useMySalesPageStyles = createThemedStyles((theme) => ({
     fontSize: 13.6,
     color: theme.colors.textMuted,
   },
-  statusChips: {
-    gap: 6,
-    paddingVertical: 2.4,
+  /** web `.my-sales-page__status-chips_all { margin-top: 0.375rem }` поверх gap тулбара. */
+  statusChipsAll: {
+    marginTop: 6,
+  },
+  /** web `.my-sales-page__status-more`: пунктирная, без заливки. */
+  statusMore: {
+    borderWidth: 1,
+    borderStyle: "dashed",
+    borderRadius: 999,
+    paddingVertical: CHIP_PADDING_VERTICAL,
+    paddingHorizontal: CHIP_PADDING_HORIZONTAL,
+    borderColor: theme.colors.border,
+    backgroundColor: "transparent",
+  },
+  statusMoreText: {
+    fontSize: 14.4,
+    fontWeight: "600",
+    lineHeight: 18.7,
+    color: theme.colors.textSecondary,
   },
   statusChip: {
     borderWidth: StyleSheet.hairlineWidth,

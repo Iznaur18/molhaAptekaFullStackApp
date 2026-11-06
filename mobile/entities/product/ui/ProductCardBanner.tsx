@@ -1,4 +1,5 @@
 import { useRouter } from "expo-router";
+import type { ReactNode } from "react";
 import { Pressable, Text, View } from "react-native";
 
 import { formatProductReviewRatingLine } from "@/entities/product-review/lib/formatProductReviewRatingLine";
@@ -34,9 +35,17 @@ type ProductCardBannerProps = {
     averageRating?: number;
     reviewCount?: number;
   };
+  /** Главный экран: «В корзину» / «Записаться» под текстом баннера, как на сайте. */
+  renderPurchaseAction?: (
+    product: ProductCardBannerProps["product"],
+    placement: "banner",
+  ) => ReactNode;
 };
 
-export const ProductCardBanner = ({ product }: ProductCardBannerProps) => {
+export const ProductCardBanner = ({
+  product,
+  renderPurchaseAction,
+}: ProductCardBannerProps) => {
   const router = useRouter();
   const theme = useAppTheme();
   const styles = useProductCardBannerStyles();
@@ -133,6 +142,15 @@ export const ProductCardBanner = ({ product }: ProductCardBannerProps) => {
               </>
             ) : null}
           </View>
+
+          {renderPurchaseAction && !showSellerClosedOverlay ? (
+            <View
+              style={styles.actions}
+              accessibilityLabel={PRODUCT_CARD_UI.FOOTER_ACTIONS_ARIA}
+            >
+              {renderPurchaseAction(product, "banner")}
+            </View>
+          ) : null}
         </View>
       </Pressable>
 

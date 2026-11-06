@@ -36,6 +36,13 @@ export type CreateOrderPayload = {
   cdekShipment?: CdekOrderSelection;
   /** Яндекс Доставка до пункта выдачи — так же, как СДЭК: только выбор. */
   yandexDeliveryShipment?: YandexDeliveryOrderSelection;
+  /** «Экспресс» Яндекса до двери: только получатель, адрес идёт обычным путём. */
+  yandexExpressShipment?: { recipient: { name: string; phone: string } };
+  /**
+   * Точка адреса, выбранная покупателем (подсказка или карта). По ней едет
+   * курьер; деньги от неё не зависят — тариф сервер считает по своим.
+   */
+  deliveryAddressGeo?: { lat: number; lon: number } | null;
   idempotencyKey: string;
 };
 

@@ -50,6 +50,7 @@ export const HOME_PAGE_UI = {
     followingOnly: "Мои подписки",
     originalOnly: "Оригинал",
     returnOnly: "С возвратом",
+    pointsSaleOnly: "За баллы",
     auctionOnly: "Аукцион",
     rentalOnly: "Аренда",
     affiliateOnly: "Партнёрская программа",

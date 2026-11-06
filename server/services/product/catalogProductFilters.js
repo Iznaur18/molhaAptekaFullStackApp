@@ -54,6 +54,7 @@ export const CATALOG_TOGGLE_FILTER_KEYS = [
   "flashSaleOnly",
   "pickupOnly",
   "returnOnly",
+  "pointsSaleOnly",
 ];
 
 /** Службы доставки — всё, что не продавец и не курьеры Gitorg. */
@@ -199,6 +200,9 @@ export function buildCatalogToggleClause(key) {
       return { productPickupEnabled: { $ne: false } };
     case "returnOnly":
       return { productReturnEnabled: true };
+    case "pointsSaleOnly":
+      // Как isProductPointsSaleActive: флаг без цены за баллы не продаётся.
+      return { productPointsSaleEnabled: true, productPointsPrice: { $gte: 1 } };
     default:
       throw new Error(`Unknown catalog toggle filter: ${key}`);
   }

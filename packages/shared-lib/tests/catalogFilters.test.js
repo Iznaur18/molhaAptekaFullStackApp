@@ -32,6 +32,7 @@ describe("catalogFilters", () => {
         ratingMin: null,
         withReviews: false,
         returnOnly: false,
+        pointsSaleOnly: false,
         sellerConfirmed: false,
         sellerPremium: false,
       },

@@ -156,6 +156,30 @@ test("stories smoke: feed → create (премиум/сотрудник) → aut
   );
   assert.match(viewData.message, /просмотр/i);
 
+  // Автор свой сторис не накручивает; чужой зритель — один раз, сколько бы ни открыл.
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    await parseSuccessData(
+      await request(`/user/stories/${storyId}/view`, {
+        method: "POST",
+        headers: { Cookie: modCookie },
+      }),
+    );
+  }
+  const ownAuthorData = await parseSuccessData(
+    await request(`/user/stories/author/${user._id}`, {
+      headers: { Cookie: userCookie },
+    }),
+  );
+  assert.equal(ownAuthorData.stories[0].viewsCount, 1);
+
+  const foreignAuthorData = await parseSuccessData(
+    await request(`/user/stories/author/${user._id}`, {
+      headers: { Cookie: modCookie },
+    }),
+  );
+  assert.equal(foreignAuthorData.stories[0].viewsCount, undefined);
+  assert.equal(authorData.stories[0].viewsCount, undefined);
+
   const pendingCount = await parseSuccessData(
     await request("/user/stories/reports/pending/count", {
       headers: { Cookie: modCookie },

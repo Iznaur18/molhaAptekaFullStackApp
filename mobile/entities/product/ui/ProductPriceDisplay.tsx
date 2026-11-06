@@ -1,6 +1,11 @@
 import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 
+import {
+  formatLoyaltyPointsAmount,
+  isProductPointsSaleActive,
+} from "@molha/api-contract";
+
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { PRODUCT_CARD_UI } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
@@ -44,7 +49,11 @@ export const ProductPriceDisplay = ({
   const styles = useProductPriceStyles();
   const isAuthorized = useIsAuthorized();
   const hasDiscount = hasProductCatalogDiscount(product);
-  const currentPriceText = formatPriceRub(Math.floor(Number(product.productPrice)));
+  // Товар за баллы: цена одна — в баллах, без скидок и кешбэка.
+  const isPointsSale = isProductPointsSaleActive(product);
+  const currentPriceText = isPointsSale
+    ? formatLoyaltyPointsAmount(product.productPointsPrice)
+    : formatPriceRub(Math.floor(Number(product.productPrice)));
   const isDetail = variant === "detail";
   const isBanner = variant === "banner";
   const isCart = variant === "cart";
@@ -97,7 +106,7 @@ export const ProductPriceDisplay = ({
           onPress={onDiscountBadgePress}
         />
       ) : null}
-      {isDetail ? (
+      {isDetail && !isPointsSale ? (
         <ProductLoyaltyPointsBadge
           product={product}
           variant="detail"

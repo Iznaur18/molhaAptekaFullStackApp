@@ -1,4 +1,5 @@
 import {
+  PRODUCT_DELIVERY_CARRIER_LOBO,
   PRODUCT_DELIVERY_CARRIER_SELLER,
   resolveSellerDeliveryTariff,
 } from "@molha/api-contract";
@@ -7,7 +8,9 @@ import type { CartSellerGroup } from "@izibuy/shared-lib";
 export type CartGroupDeliveryHint =
   | { kind: "free" }
   | { kind: "from"; baseFeeRub: number }
-  | { kind: "byTariff" };
+  | { kind: "byTariff" }
+  /** ЛОБО: цену назовёт курьер, платят ему при получении. */
+  | { kind: "lobo" };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
@@ -17,14 +20,15 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
  *
  * Возвращает вид подсказки, а не текст: текст собирает экран из своих
  * подписей, а эту функцию можно проверить тестом без UI. `null` — подсказать
- * нечего: доставки нет или везёт не продавец (такие службы в приложении
- * пока не оформляются).
+ * нечего: доставки нет или цену заранее не узнать (СДЭК и Яндекс — без
+ * пункта выдачи). Паритет web `formatCartGroupDeliveryHint`.
  */
 export function resolveCartGroupDeliveryHint(
   group: Pick<CartSellerGroup, "deliveryAvailable" | "deliveryCarrier" | "lines">,
   goodsTotalRub: number,
 ): CartGroupDeliveryHint | null {
   if (!group?.deliveryAvailable) return null;
+  if (group.deliveryCarrier === PRODUCT_DELIVERY_CARRIER_LOBO) return { kind: "lobo" };
   if (group.deliveryCarrier !== PRODUCT_DELIVERY_CARRIER_SELLER) return null;
 
   const seller = (group.lines ?? [])

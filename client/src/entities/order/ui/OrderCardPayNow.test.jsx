@@ -62,4 +62,22 @@ describe("кнопка «Оплатить» у покупателя", () => {
       screen.getByText("Оплатите до 4 октября, 15:30 — иначе заказ отменится"),
     ).toBeTruthy();
   });
+
+  it("у отменённого заказа не просит оплатить", () => {
+    const order = makeOrder();
+    renderWithProviders(
+      <OrderCard
+        order={{
+          ...order,
+          status: "cancelled",
+          items: order.items.map((item) => ({ ...item, status: "cancelled" })),
+        }}
+        attentionRole="buyer"
+        onPayOrder={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByRole("button", { name: /Оплатить/ })).toBeNull();
+    expect(screen.queryByText("Ожидает оплаты")).toBeNull();
+  });
 });

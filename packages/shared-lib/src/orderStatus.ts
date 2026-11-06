@@ -207,6 +207,8 @@ export type OrderItemsSummary = {
   quantity: number;
   /** Сумма к оплате. */
   totalAmount: number;
+  /** Сумма в баллах — у позиций товаров за баллы (рублей за них нет). */
+  pointsTotal: number;
 };
 
 /**
@@ -223,6 +225,7 @@ export function summarizeOrderItems(
         quantity?: number;
         unitPriceAtOrder?: number;
         buyNFreeUnitsAtOrder?: number;
+        pointsPaidTotal?: number;
       }>
     | null
     | undefined,
@@ -237,6 +240,10 @@ export function summarizeOrderItems(
       0,
     ),
     totalAmount: calculateOrderItemsTotalAmount(billable),
+    pointsTotal: billable.reduce(
+      (sum, item) => sum + Math.max(0, Math.floor(Number(item?.pointsPaidTotal) || 0)),
+      0,
+    ),
   };
 }
 

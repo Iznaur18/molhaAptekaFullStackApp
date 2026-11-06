@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import type { z } from "zod";
-import { Alert, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
@@ -14,9 +14,13 @@ import { summarizeMySales } from "@/entities/order/lib/summarizeMySales";
 import {
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_DELIVERED,
+  ORDER_STATUS_RETURNED,
   ORDER_STATUS_SHIPPED,
 } from "@/entities/order/model/constants";
-import { MY_ORDERS_LIST_FILTER_IN_PROGRESS } from "@/entities/order/model/myOrdersListFilters";
+import {
+  isMyOrdersListGroupFilter,
+  MY_ORDERS_LIST_FILTER_IN_PROGRESS,
+} from "@/entities/order/model/myOrdersListFilters";
 import { useMySalesQuery } from "@/entities/order/model/useMySalesQuery";
 import { useOrderMutations } from "@/entities/order/model/useOrderMutations";
 import { OrderCard, orderShipmentActionKey } from "@/entities/order/ui/OrderCard";
@@ -38,6 +42,7 @@ import {
   PRODUCT_REPORT_UI,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { confirmDestructiveAction } from "@/shared/lib/confirmDestructiveAction";
 import { useDebouncedValue } from "@/shared/lib/useDebouncedValue";
 import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
@@ -68,8 +73,10 @@ export const MySalesPage = () => {
   const isSearchPending = searchTerm !== debouncedSearchTerm;
   const hasSearchQuery = debouncedSearchTerm.trim() !== "";
 
-  const serverStatusFilter =
-    statusFilter === MY_ORDERS_LIST_FILTER_IN_PROGRESS ? "" : statusFilter;
+  // Группу статусов считает приложение, серверу уходит только точный статус
+  // (он групп не знает и отклонил бы «done» как незнакомый статус).
+  const isGroupFilter = isMyOrdersListGroupFilter(statusFilter);
+  const serverStatusFilter = isGroupFilter ? "" : statusFilter;
 
   const salesParams = useMemo(
     () => ({
@@ -90,6 +97,8 @@ export const MySalesPage = () => {
     shipItemMutation,
     deliverItemMutation,
     advanceShipmentMutation,
+    returnItemMutation,
+    cancelShipmentMutation,
   } = useOrderMutations();
   const [pendingActionKey, setPendingActionKey] = useState<string | null>(null);
   const [itemActionErrors, setItemActionErrors] = useState<Record<string, string>>({});
@@ -109,8 +118,7 @@ export const MySalesPage = () => {
 
   const totalServer = serverOrders.length;
   const totalVisible = filteredOrders.length;
-  const hasClientFilters =
-    statusFilter === MY_ORDERS_LIST_FILTER_IN_PROGRESS || attentionOnly;
+  const hasClientFilters = isGroupFilter || attentionOnly;
   const hasFilters = Boolean(serverStatusFilter) || hasSearchQuery || hasClientFilters;
   const summaryCountLabel = hasFilters
     ? MY_SALES_PAGE_UI.COUNT_FILTERED(totalVisible, totalServer)
@@ -136,9 +144,22 @@ export const MySalesPage = () => {
     await invalidateSalesQueues();
   }, [salesQuery, overviewQuery, invalidateSalesQueues]);
 
+  // Повторное нажатие на плитку снимает фильтр (паритет web).
   const handleInProgressFilterClick = useCallback(() => {
-    setStatusFilter(MY_ORDERS_LIST_FILTER_IN_PROGRESS);
+    setStatusFilter((current) =>
+      current === MY_ORDERS_LIST_FILTER_IN_PROGRESS
+        ? ""
+        : MY_ORDERS_LIST_FILTER_IN_PROGRESS,
+    );
     setAttentionOnly(false);
+  }, []);
+
+  /** «Нужно действие» — отдельно от статуса: включая его, статус сбрасываем. */
+  const handleAttentionOnlyChange = useCallback((value: boolean) => {
+    setAttentionOnly(value);
+    if (value) {
+      setStatusFilter("");
+    }
   }, []);
 
   const patchSalesCaches = useCallback(
@@ -279,21 +300,87 @@ export const MySalesPage = () => {
     orderId: string;
     itemIndex: number;
   }) => {
-    Alert.alert(ORDER_CARD_UI.ACTION_CANCEL, ORDER_CARD_UI.CANCEL_CONFIRM, [
-      { text: PRODUCT_REPORT_UI.CANCEL, style: "cancel" },
-      {
-        text: ORDER_CARD_UI.ACTION_CANCEL,
-        style: "destructive",
-        onPress: () => {
-          void runSellerAction({
-            orderId,
-            itemIndex,
-            optimisticStatus: ORDER_STATUS_CANCELLED,
-            mutate: () => cancelItemMutation.mutateAsync({ orderId, itemIndex }),
-          });
-        },
+    confirmDestructiveAction({
+      title: ORDER_CARD_UI.ACTION_CANCEL,
+      message: ORDER_CARD_UI.ITEM_CANCEL_CONFIRM,
+      confirmLabel: ORDER_CARD_UI.ACTION_CANCEL,
+      cancelLabel: PRODUCT_REPORT_UI.CANCEL,
+      onConfirm: () => {
+        void runSellerAction({
+          orderId,
+          itemIndex,
+          optimisticStatus: ORDER_STATUS_CANCELLED,
+          mutate: () => cancelItemMutation.mutateAsync({ orderId, itemIndex }),
+        });
       },
-    ]);
+    });
+  };
+
+  /** «Вернулся»: товар уехал и вернулся к продавцу — снова в остатке. */
+  const handleMarkReturned = ({
+    orderId,
+    itemIndex,
+  }: {
+    orderId: string;
+    itemIndex: number;
+  }) => {
+    confirmDestructiveAction({
+      title: ORDER_CARD_UI.ACTION_RETURN,
+      message: ORDER_CARD_UI.ACTION_RETURN_CONFIRM,
+      confirmLabel: ORDER_CARD_UI.ACTION_RETURN,
+      cancelLabel: PRODUCT_REPORT_UI.CANCEL,
+      onConfirm: () => {
+        void runSellerAction({
+          orderId,
+          itemIndex,
+          optimisticStatus: ORDER_STATUS_RETURNED,
+          mutate: () => returnItemMutation.mutateAsync({ orderId, itemIndex }),
+        });
+      },
+    });
+  };
+
+  /** «Отменить заказ»: заказ покупателя целиком, пока весь он у продавца. */
+  const handleCancelOrder = ({
+    orderId,
+    sellerId,
+  }: {
+    orderId: string;
+    sellerId: string;
+  }) => {
+    confirmDestructiveAction({
+      title: ORDER_CARD_UI.ACTION_CANCEL_ORDER,
+      message: ORDER_CARD_UI.CANCEL_CONFIRM,
+      confirmLabel: ORDER_CARD_UI.ACTION_CANCEL_ORDER,
+      cancelLabel: PRODUCT_REPORT_UI.CANCEL,
+      onConfirm: () => {
+        void (async () => {
+          const actionKey = orderShipmentActionKey(orderId, "cancel");
+          setPendingActionKey(actionKey);
+          setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
+          try {
+            const updatedOrder = await cancelShipmentMutation.mutateAsync({
+              orderId,
+              sellerId,
+            });
+            patchSalesCaches((prev) =>
+              prev.map((order) => (order._id === orderId ? updatedOrder : order)),
+            );
+            await invalidateSalesQueues();
+            void handleRefresh();
+          } catch (error) {
+            const message = formatApiErrorMessage(
+              error,
+              API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK,
+            );
+            setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
+            void handleRefresh();
+          } finally {
+            setPendingActionKey(null);
+          }
+        })();
+      },
+    });
   };
 
   const handleProductClick = useCallback(
@@ -330,12 +417,12 @@ export const MySalesPage = () => {
         summaryCountLabel={summaryCountLabel}
         totalSalesCount={sellerTotalSalesCount}
         statusFilter={statusFilter}
+        attentionOnly={attentionOnly}
         onStatusFilterChange={(value) => {
           setStatusFilter(value);
-          if (value) {
-            setAttentionOnly(false);
-          }
+          setAttentionOnly(false);
         }}
+        onAttentionOnlyChange={handleAttentionOnlyChange}
         searchTerm={searchTerm}
         onSearchTermChange={setSearchTerm}
         isSearchPending={isSearchPending}
@@ -346,7 +433,7 @@ export const MySalesPage = () => {
         totalAmountRub={summary.totalAmountRub}
         attentionOnly={attentionOnly}
         onInProgressFilterClick={handleInProgressFilterClick}
-        onAttentionFilterChange={setAttentionOnly}
+        onAttentionFilterChange={handleAttentionOnlyChange}
       />
       {totalVisible > 0 && attentionOnly ? (
         <Text style={styles.filterHint}>{MY_SALES_PAGE_UI.ATTENTION_FILTER_HINT}</Text>
@@ -424,6 +511,8 @@ export const MySalesPage = () => {
               onMarkDelivered={handleMarkDelivered}
               onAdvanceShipment={handleAdvanceShipment}
               onCancelItem={handleCancelItem}
+              onMarkReturned={handleMarkReturned}
+              onCancelOrder={handleCancelOrder}
               pendingActionKey={pendingActionKey}
               itemActionErrors={itemActionErrors}
             />

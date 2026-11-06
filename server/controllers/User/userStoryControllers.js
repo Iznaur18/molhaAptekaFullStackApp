@@ -24,6 +24,7 @@ export const getUserStoriesFeedController = async (req, res) => {
 export const getUserStoriesByAuthorController = async (req, res) => {
   const result = await getUserStoriesByAuthor({
     authorUserId: String(req.params.userIdClient),
+    viewerUserId: req.userId ? String(req.userId) : null,
   });
 
   return successRes(res, result);

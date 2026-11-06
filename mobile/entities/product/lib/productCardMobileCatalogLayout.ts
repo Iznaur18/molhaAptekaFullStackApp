@@ -19,6 +19,10 @@ export const PRODUCT_CARD_MOBILE_CATALOG_LAYOUT = {
   ratingLineHeight: 20,
   priceColumnGap: 5.6,
   priceRowGap: 3.2,
+  /** `--product-card-mobile-cart-height` 2.15rem — «В корзину» / «Записаться» на главной. */
+  actionHeight: 34.4,
+  /** До 1023 px над кнопкой 0.5rem — «В корзину» не липнет к строке продавца. */
+  actionTopGap: 8,
 } as const;
 
 export type ProductCardMobileCatalogLayout = typeof PRODUCT_CARD_MOBILE_CATALOG_LAYOUT;
@@ -42,11 +46,21 @@ export const resolveProductCardCatalogGridImageHeight = (
   layout: ProductCardMobileCatalogLayout = PRODUCT_CARD_MOBILE_CATALOG_LAYOUT,
 ): number => Math.max(0, tileWidth) + 2 * layout.contentInsetX;
 
-/** Квадратное фото + текстовый стек + нижний padding — паритет web `.app-shell__cell`. */
+/** Место под кнопку покупки или заявки на карточке главного экрана. */
+export const resolveProductCardCatalogGridActionSlotHeight = (
+  layout: ProductCardMobileCatalogLayout = PRODUCT_CARD_MOBILE_CATALOG_LAYOUT,
+): number => layout.actionTopGap + layout.actionHeight;
+
+/**
+ * Квадратное фото + текстовый стек + нижний padding — паритет web `.app-shell__cell`.
+ * `withAction` — главный экран: под текстом кнопка, все карточки ряда одной высоты.
+ */
 export const resolveProductCardCatalogGridTotalHeight = (
   tileWidth: number,
   layout: ProductCardMobileCatalogLayout = PRODUCT_CARD_MOBILE_CATALOG_LAYOUT,
+  { withAction = false }: { withAction?: boolean } = {},
 ): number =>
   resolveProductCardCatalogGridImageHeight(tileWidth, layout) +
   resolveProductCardCatalogGridContentBelowImageHeight(layout) +
+  (withAction ? resolveProductCardCatalogGridActionSlotHeight(layout) : 0) +
   layout.bottomPadding;

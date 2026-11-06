@@ -51,6 +51,7 @@ import { up as reassignDetachedAutoProductsUp } from "./20261006-reassign-detach
 import { up as productCategoryBreadcrumbDedupeUp } from "./20261007-product-category-breadcrumb-dedupe.js";
 import { up as categoryDefaultCharacteristicsUp } from "./20261009-category-default-characteristics.js";
 import { up as categoryDefaultCharacteristicsAdminRootsUp } from "./20261010-category-default-characteristics-admin-roots.js";
+import { up as servicesRepairSubcategoriesUp } from "./20261020-services-repair-subcategories.js";
 
 export const MIGRATIONS = [
   {
@@ -335,5 +336,11 @@ export const MIGRATIONS = [
     description:
       "Fill empty default characteristics of leaf categories in electronics, food, cafes and donat roots",
     up: categoryDefaultCharacteristicsAdminRootsUp,
+  },
+  {
+    id: "20261020-services-repair-subcategories",
+    description:
+      "Add 8 subcategories under services → repair and construction without touching existing categories",
+    up: servicesRepairSubcategoriesUp,
   },
 ];

@@ -30,6 +30,7 @@ import { formatApiErrorMessage } from "@izibuy/shared-lib";
  *   ratingMin?: number | null;
  *   withReviews?: boolean | null;
  *   returnOnly?: boolean | null;
+ *   pointsSaleOnly?: boolean | null;
  *   sellerConfirmed?: boolean | null;
  *   sellerPremium?: boolean | null;
  *   regionCode?: string | null;
@@ -67,6 +68,7 @@ export function buildCatalogProductsRequestParams({
   ratingMin,
   withReviews,
   returnOnly,
+  pointsSaleOnly,
   sellerConfirmed,
   sellerPremium,
   regionCode,
@@ -97,6 +99,7 @@ export function buildCatalogProductsRequestParams({
     ...(ratingMin != null ? { ratingMin } : {}),
     ...(withReviews ? { withReviews: "true" } : {}),
     ...(returnOnly ? { returnOnly: "true" } : {}),
+    ...(pointsSaleOnly ? { pointsSaleOnly: "true" } : {}),
     ...(sellerConfirmed ? { sellerConfirmed: "true" } : {}),
     ...(sellerPremium ? { sellerPremium: "true" } : {}),
     ...(regionCode ? { regionCode } : {}),

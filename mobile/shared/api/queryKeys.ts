@@ -89,6 +89,20 @@ export const priceOfferQueryKeys = {
   my: (productId: string) => [...priceOfferQueryKeys.all, "me", productId] as const,
   incoming: () => [...priceOfferQueryKeys.all, "incoming"] as const,
   myBids: () => [...priceOfferQueryKeys.all, "my-bids"] as const,
+  seller: (productId: string) =>
+    [...priceOfferQueryKeys.all, "seller", productId] as const,
+  sellerArchive: (productId: string) =>
+    [...priceOfferQueryKeys.all, "seller-archive", productId] as const,
+};
+
+export const dealRequestQueryKeys = {
+  all: ["deal-request"] as const,
+  mine: (role: string) => [...dealRequestQueryKeys.all, "me", role] as const,
+};
+
+export const sellerSafeDealQueryKeys = {
+  all: ["seller-safe-deal"] as const,
+  me: () => [...sellerSafeDealQueryKeys.all, "me"] as const,
 };
 
 export const curatedProductListQueryKeys = {

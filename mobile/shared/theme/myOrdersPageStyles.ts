@@ -65,14 +65,6 @@ export const useMyOrdersPageStyles = createThemedStyles((theme) => ({
     fontSize: 13.6,
     color: theme.colors.textMuted,
   },
-  /** web `.my-orders-page__status-chips { flex-wrap: wrap; gap: 0.375rem }`. */
-  statusChips: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-    gap: 6,
-    paddingVertical: 2.4,
-  },
   /** web `.my-orders-page__status-chips_all { margin-top: 0.375rem }` поверх gap тулбара. */
   statusChipsAll: {
     marginTop: 6,
@@ -89,6 +81,7 @@ export const useMyOrdersPageStyles = createThemedStyles((theme) => ({
   },
   statusMoreText: {
     fontSize: 14.4,
+    fontWeight: "600",
     lineHeight: 18.7,
     color: theme.colors.textSecondary,
   },

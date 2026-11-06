@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useState, type ReactNode } from "react";
 import { Pressable, Text, View } from "react-native";
 
 import { ProductCardRatingRow } from "@/entities/product/ui/ProductCardRatingRow";
@@ -87,6 +87,15 @@ type ProductCardProps = {
   isAvailabilityTogglePending?: boolean;
   isAuctionTogglePending?: boolean;
   isLoyaltyPointsOvercommitted?: boolean;
+  /**
+   * Главный экран: кнопка под текстом карточки («В корзину», «Записаться»…).
+   * Передаётся снаружи, чтобы карточка-сущность не тянула фичу корзины.
+   * Место под кнопку резервируется всегда — карточки ряда одной высоты.
+   */
+  renderPurchaseAction?: (
+    product: ProductCardProps["product"],
+    placement?: "card" | "banner",
+  ) => ReactNode;
 };
 
 export const ProductCard = memo(
@@ -107,6 +116,7 @@ export const ProductCard = memo(
     isAvailabilityTogglePending = false,
     isAuctionTogglePending = false,
     isLoyaltyPointsOvercommitted = false,
+    renderPurchaseAction,
   }: ProductCardProps) => {
     const router = useRouter();
     const theme = useAppTheme();
@@ -164,7 +174,14 @@ export const ProductCard = memo(
     const cardMediaStyles = useProductCardMediaStyles();
 
     if (flags.showBannerLayout) {
-      return <ProductCardBanner product={product} />;
+      return (
+        <ProductCardBanner
+          product={product}
+          renderPurchaseAction={
+            isMineMode || isModerationQueue ? undefined : renderPurchaseAction
+          }
+        />
+      );
     }
 
     const name = product.productName?.trim() || "Без названия";
@@ -225,9 +242,13 @@ export const ProductCard = memo(
         typeof onDeleteProduct === "function");
     const isWishlisted = isInWishlist(product._id);
 
+    const showPurchaseSlot =
+      typeof renderPurchaseAction === "function" && !isMineMode && !isModerationQueue;
     const catalogGridMinHeight =
       isCatalogGrid && catalogGridTileWidth != null && catalogGridTileWidth > 0
-        ? resolveProductCardCatalogGridTotalHeight(catalogGridTileWidth)
+        ? resolveProductCardCatalogGridTotalHeight(catalogGridTileWidth, undefined, {
+            withAction: showPurchaseSlot,
+          })
         : undefined;
 
     return (
@@ -467,6 +488,10 @@ export const ProductCard = memo(
             </>
           ) : null}
         </View>
+
+        {showPurchaseSlot ? (
+          <View style={styles.purchaseSlot}>{renderPurchaseAction(product)}</View>
+        ) : null}
 
         {showSellerFooter ? (
           <View style={styles.footerActions}>

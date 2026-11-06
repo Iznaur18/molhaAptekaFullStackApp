@@ -127,6 +127,7 @@ export function useCatalogProductsInfiniteQuery({
         ratingMin: listParams.ratingMin,
         withReviews: Boolean(listParams.withReviews),
         returnOnly: Boolean(listParams.returnOnly),
+        pointsSaleOnly: Boolean(listParams.pointsSaleOnly),
         sellerConfirmed: Boolean(listParams.sellerConfirmed),
         sellerPremium: Boolean(listParams.sellerPremium),
         regionCode: listParams.regionCode || undefined,

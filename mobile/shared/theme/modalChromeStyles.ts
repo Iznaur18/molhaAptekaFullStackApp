@@ -362,6 +362,28 @@ export const useStoryViewerModalStyles = createThemedStyles((theme) => ({
     right: 60,
     zIndex: 4,
   },
+  headerWithViews: {
+    right: 140,
+  },
+  viewsBadge: {
+    position: "absolute",
+    top: 12,
+    right: 60,
+    zIndex: 5,
+    height: 40,
+    paddingHorizontal: 12,
+    borderRadius: theme.radius.pill,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: STORY_VIEWER_OVERLAY_SCRIM,
+  },
+  viewsText: {
+    color: theme.colors.onContrast,
+    fontSize: 15,
+    fontWeight: "600",
+    fontVariant: ["tabular-nums"],
+  },
   authorButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -732,6 +754,12 @@ export const useProductManageToggleRowStyles = createThemedStyles((theme) => ({
 export const useProductEditManageSectionStyles = createThemedStyles((theme) => ({
   root: {
     gap: 12,
+  },
+  /** Паритет web `.product-edit-manage__note`. */
+  note: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: theme.colors.textMuted,
   },
   warningBanner: {
     flexDirection: "row",

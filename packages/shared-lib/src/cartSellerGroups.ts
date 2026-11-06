@@ -2,6 +2,7 @@ import {
   ORDER_FULFILLMENT_DELIVERY,
   PRODUCT_DELIVERY_CARRIER_SELLER,
   calculateSellerDeliveryFee,
+  isProductPointsSaleActive,
   normalizeSellerDeliveryTariff,
   productShipsToBuyer,
   resolveProductDeliveryCarrier,
@@ -19,7 +20,14 @@ export type CartSellerGroupLine = {
 };
 
 export type CartSellerGroup<TLine extends CartSellerGroupLine = CartSellerGroupLine> = {
+  /**
+   * Ключ группы в корзине. У продавца их бывает две: товары за рубли и
+   * товары за баллы — это разные заказы (смешанный сервер не примет).
+   */
+  cartGroupId: string;
   sellerId: string;
+  /** Группа товаров за баллы: итог в баллах, без предоплаты. */
+  paidWithLoyaltyPoints: boolean;
   sellerName: string;
   sellerAvatarUrl: string;
   sellerAvatarFocus: { x?: number; y?: number } | null;
@@ -77,6 +85,12 @@ const resolveSellerProfile = (line: CartSellerGroupLine | null | undefined) => {
 };
 
 /**
+ * Ключ группы корзины: продавец, а для товаров за баллы — продавец с пометкой.
+ */
+export const buildCartGroupId = (sellerId: string, paidWithLoyaltyPoints: boolean) =>
+  paidWithLoyaltyPoints ? `${sellerId}:points` : sellerId;
+
+/**
  * Корзина по отправлениям: одно на продавца.
  *
  * Раньше корзина делилась на две секции по возможностям товара, и правило
@@ -98,8 +112,12 @@ export function groupCartLinesBySeller<TLine extends CartSellerGroupLine>(
     const sellerId = resolveSellerId(line);
     const product = readProduct(line) ?? {};
     const profile = resolveSellerProfile(line);
-    const group: CartSellerGroup<TLine> = bySeller.get(sellerId) ?? {
+    const paidWithLoyaltyPoints = isProductPointsSaleActive(product);
+    const cartGroupId = buildCartGroupId(sellerId, paidWithLoyaltyPoints);
+    const group: CartSellerGroup<TLine> = bySeller.get(cartGroupId) ?? {
+      cartGroupId,
       sellerId,
+      paidWithLoyaltyPoints,
       sellerName: profile.sellerName,
       sellerAvatarUrl: profile.sellerAvatarUrl,
       sellerAvatarFocus: profile.sellerAvatarFocus,
@@ -126,8 +144,8 @@ export function groupCartLinesBySeller<TLine extends CartSellerGroupLine>(
       group.deliveryAvailable = false;
     }
     const carrier = resolveProductDeliveryCarrier(product);
-    if (!carrierSeen.has(sellerId)) {
-      carrierSeen.add(sellerId);
+    if (!carrierSeen.has(cartGroupId)) {
+      carrierSeen.add(cartGroupId);
       group.deliveryCarrier = carrier;
     } else if (group.deliveryCarrier !== carrier) {
       group.deliveryCarrier = "mixed";
@@ -155,7 +173,7 @@ export function groupCartLinesBySeller<TLine extends CartSellerGroupLine>(
       group.sellerPaymentMethods = profile.sellerPaymentMethods;
     }
 
-    bySeller.set(sellerId, group);
+    bySeller.set(cartGroupId, group);
   }
 
   for (const group of bySeller.values()) {

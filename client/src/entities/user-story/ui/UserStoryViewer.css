@@ -73,6 +73,31 @@
   z-index: 4;
 }
 
+.user-story-viewer__header_with-views {
+  right: 140px;
+}
+
+/* Слева от ✕: та же высота и подложка, что у кнопки закрытия. */
+.user-story-viewer__views {
+  position: absolute;
+  top: 12px;
+  right: 60px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--iz-color-overlay-strong);
+  color: #ffffff;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
 .user-story-viewer__author {
   display: inline-flex;
   align-items: center;

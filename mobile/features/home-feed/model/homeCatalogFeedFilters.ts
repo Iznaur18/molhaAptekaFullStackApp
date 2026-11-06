@@ -37,6 +37,7 @@ export type HomeCatalogFeedFiltersState = Pick<
   | "ratingMin"
   | "withReviews"
   | "returnOnly"
+  | "pointsSaleOnly"
   | "sellerConfirmed"
   | "sellerPremium"
 >;
@@ -61,6 +62,7 @@ export const EMPTY_HOME_CATALOG_FEED_FILTERS: HomeCatalogFeedFiltersState = {
   ratingMin: undefined,
   withReviews: false,
   returnOnly: false,
+  pointsSaleOnly: false,
   sellerConfirmed: false,
   sellerPremium: false,
 };
@@ -94,6 +96,7 @@ export const pickHomeCatalogFeedFilters = (
     ratingMin: extra.ratingMin ?? undefined,
     withReviews: extra.withReviews,
     returnOnly: extra.returnOnly,
+    pointsSaleOnly: extra.pointsSaleOnly,
     sellerConfirmed: extra.sellerConfirmed,
     sellerPremium: extra.sellerPremium,
   };
@@ -112,6 +115,7 @@ export const hasHomeCatalogFeedExtraFilters = (
     extra.ratingMin !== EMPTY_CATALOG_EXTRA_FILTERS.ratingMin ||
     extra.withReviews ||
     extra.returnOnly ||
+    extra.pointsSaleOnly ||
     extra.sellerConfirmed ||
     extra.sellerPremium
   );

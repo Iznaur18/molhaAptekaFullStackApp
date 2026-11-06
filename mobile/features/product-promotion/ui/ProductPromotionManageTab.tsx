@@ -112,6 +112,8 @@ type ProductPromotionManageTabProps = {
 
   onOpenBuyNFreeSettings?: () => void;
 
+  onOpenPointsSaleSettings?: () => void;
+
   onOpenOutOfStockSettings?: () => void;
 
   onOpenRentalSettings?: () => void;

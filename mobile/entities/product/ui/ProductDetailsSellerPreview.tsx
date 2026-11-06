@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { buildMarketplaceNotSellerNotice } from "@izibuy/shared-lib";
+import { isSellerSafeDealApproved } from "@molha/api-contract";
 import { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
@@ -76,6 +77,7 @@ export const ProductDetailsSellerPreview = ({
   const displayName = sellerObj.userName?.trim() || USER_LIST_ROW_UI.MISSING_NAME;
   const isPremium = sellerObj.isPremiumUser === true;
   const isConfirmed = sellerObj.isUserDataConfirmed === true;
+  const hasSafeDeal = isSellerSafeDealApproved(sellerObj);
   const listedRaw =
     sellerObj.sellerListedProductCount ?? sellerObj.sellerListedProductsCount;
   const listedCount = Number(listedRaw);
@@ -145,6 +147,7 @@ export const ProductDetailsSellerPreview = ({
             name={displayName}
             isPremium={isPremium}
             isUserDataConfirmed={isConfirmed}
+            hasSafeDeal={hasSafeDeal}
             textStyle={styles.nameText}
             badgeSize={16}
           />

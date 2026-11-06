@@ -114,6 +114,7 @@ export {
   PROFILE_SECTION_ADVERTISING,
   PROFILE_SECTION_ONEC_INTEGRATION,
   PROFILE_SECTION_DELIVERY_PAYMENT,
+  PROFILE_SECTION_DEAL_REQUESTS,
   PROFILE_SECTION_SAFE_DEAL,
   PROFILE_SECTION_SAFE_DEAL_MODERATION,
   PROFILE_SECTION_ADMIN_ORDERS,
@@ -361,6 +362,7 @@ export type {
   MarketingTouchSummary,
 } from "./marketingAttribution.js";
 export {
+  buildCartGroupId,
   groupCartLinesBySeller,
   hasMixedDeliveryCarriers,
   quoteCartSellerDelivery,
@@ -418,6 +420,12 @@ export {
   orderMatchesStatusFilter,
 } from "./orderListFilters.js";
 export type { MyOrdersListGroupFilter } from "./orderListFilters.js";
+export {
+  canCancelOrderItem,
+  canCancelOrderShipment,
+  canMarkOrderItemReturned,
+  isOrderShipmentTrackedByCarrier,
+} from "./orderCancellation.js";
 export type {
   CatalogExtraFilters,
   CatalogFacetsPrice,

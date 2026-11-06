@@ -19,6 +19,8 @@ type CheckoutPaymentMethodPickerProps = {
   /** Что принимают продавцы корзины; `null` — ограничений нет. */
   allowedMethods?: readonly string[] | null;
   hiddenMethods?: readonly string[];
+  /** Подпись блока; по умолчанию «Способ оплаты». */
+  legend?: string;
 };
 
 export const CheckoutPaymentMethodPicker = ({
@@ -28,6 +30,7 @@ export const CheckoutPaymentMethodPicker = ({
   cardPrepaidAvailable = false,
   allowedMethods = null,
   hiddenMethods = [],
+  legend = CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD,
 }: CheckoutPaymentMethodPickerProps) => {
   const theme = useAppTheme();
   const styles = useCheckoutPaymentMethodPickerStyles();
@@ -45,7 +48,7 @@ export const CheckoutPaymentMethodPicker = ({
   if (availableMethods.length === 1) {
     return (
       <View style={styles.root}>
-        <Text style={styles.legend}>{CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD}</Text>
+        <Text style={styles.legend}>{legend}</Text>
         <Text style={styles.single} accessibilityRole="text">
           {ORDER_PAYMENT_METHOD_LABEL_RU[availableMethods[0]]}
         </Text>
@@ -55,7 +58,7 @@ export const CheckoutPaymentMethodPicker = ({
 
   return (
     <View style={styles.root}>
-      <Text style={styles.legend}>{CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD}</Text>
+      <Text style={styles.legend}>{legend}</Text>
       <View style={styles.row} accessibilityRole="radiogroup">
         {orderedMethods.map((method) => {
           const isSelectable = availableMethods.includes(method);

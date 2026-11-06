@@ -7,7 +7,7 @@ export const USER_STORY_CAPTION_MAX_CHARS = 150;
 export const USER_STORY_VIDEO_MAX_DURATION_SEC = 30;
 
 /** Длительность показа сториса с картинкой перед авто-закрытием / следующим. */
-export const USER_STORY_IMAGE_VIEW_DURATION_MS = 5000;
+export const USER_STORY_IMAGE_VIEW_DURATION_MS = 20000;
 
 export const USER_STORY_ASPECT_RATIO = 9 / 16;
 

@@ -67,6 +67,11 @@ export const CART_PAGE_UI = {
   CHECKOUT_OPEN: "Оформить заказ",
   CHECKOUT_SELLER: "Оформить",
   SELLER_ROW_OPEN: "Перейти",
+  /** Подпись группы товаров за баллы: отдельный заказ у того же продавца. */
+  POINTS_GROUP_SUFFIX: "за баллы",
+  POINTS_PAYABLE_LABEL: "Баллами",
+  POINTS_PAYMENT_NOTE:
+    "Баллы спишутся со счёта при оформлении и перейдут продавцу после получения товара. Если заказ отменят — вернутся. Доставку, если она платная, оплачивают рублями при получении.",
   CHECKOUT_SHEET_CLOSE: "Закрыть",
   CHECKOUT_SELLER_HINT:
     "Каждый продавец оформляется отдельно — свой заказ и своя оплата.",
@@ -255,6 +260,7 @@ export const CHECKOUT_FORM_UI = {
   LABEL_FLAT: "Комментарий",
   PLACEHOLDER_FLAT: "подъезд, этаж, кв",
   LABEL_PAYMENT_METHOD: "Способ оплаты",
+  LABEL_PAYMENT_METHOD_DELIVERY: "Оплата доставки",
   PAYMENT_METHOD_CARD_SOON: "Скоро",
   /** Способ есть у площадки, но конкретный продавец его не принимает. */
   PAYMENT_METHOD_NOT_ACCEPTED: "Продавец не принимает",

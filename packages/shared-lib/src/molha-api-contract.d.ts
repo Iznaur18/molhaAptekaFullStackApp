@@ -1,4 +1,8 @@
 declare module "@molha/api-contract" {
+  export const SHIPPING_PROVIDER_CDEK: string;
+  export const SHIPPING_PROVIDER_YANDEX_DELIVERY: string;
+  export const SHIPPING_PROVIDER_YANDEX_EXPRESS: string;
+
   export const PRODUCT_CATALOG_DELIVERY_FILTER_VALUES: readonly string[];
   export const PRODUCT_CATALOG_RATING_MIN_VALUES: readonly number[];
   export const PRODUCT_PRICE_RUB_MAX: number;
@@ -27,6 +31,11 @@ declare module "@molha/api-contract" {
   ): string | null;
   /** Едет ли товар до покупателя вообще — любым перевозчиком. */
   export function productShipsToBuyer(product: ProductDeliveryCarrierSource): boolean;
+
+  /** Продаётся ли товар сейчас за баллы (флаг и цена в баллах). */
+  export function isProductPointsSaleActive(
+    product: Record<string, any> | null | undefined,
+  ): boolean;
 
   export type SellerDeliveryTariff = {
     paid: boolean;

@@ -11,6 +11,7 @@
  *   captionText: string;
  *   publishedAt: string;
  *   expiresAt: string;
+ *   viewsCount?: number;
  * }} UserStoryFromApi
  */
 

@@ -1,4 +1,5 @@
 import { hasProductCharacteristicsContent } from "@izibuy/shared-lib";
+import { isCartDealType, normalizeCategoryDealType } from "@molha/api-contract";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 import { Platform, Pressable, ScrollView, Text, View } from "react-native";
@@ -8,6 +9,7 @@ import {
   type ProductBadgeExplainRequest,
 } from "@/entities/product-badge-explain/lib/resolveProductBadgeExplainSheet";
 import { useProductBadgeExplainsQuery } from "@/entities/product-badge-explain/model/useProductBadgeExplainsQuery";
+import { ProductDealActions } from "@/entities/deal-request/ui/ProductDealActions";
 import { ProductBadgeExplainSheet } from "@/entities/product-badge-explain/ui/ProductBadgeExplainSheet";
 import {
   getProductFieldReadLayout,
@@ -69,6 +71,7 @@ type ProductDetailsDetailsTabProps = {
   showBlockedPurchaseButton?: boolean;
   blockedPurchaseLabel?: string;
   showSellerClosedPurchaseButton?: boolean;
+  showOwnProductPurchaseButton?: boolean;
   sellerClosedPurchaseLabel?: string;
   showInlinePurchaseActions?: boolean;
   presentation?: ProductDetailsDetailsPresentation;
@@ -92,6 +95,7 @@ export const ProductDetailsDetailsTab = ({
   showBlockedPurchaseButton = false,
   blockedPurchaseLabel = "",
   showSellerClosedPurchaseButton = false,
+  showOwnProductPurchaseButton = false,
   sellerClosedPurchaseLabel = "",
   showInlinePurchaseActions = false,
   presentation = "default",
@@ -147,9 +151,16 @@ export const ProductDetailsDetailsTab = ({
     ...(hasCharacteristics ? (["characteristics"] as const) : []),
     "returns",
   ];
+  // По умолчанию — как на сайте (`resolveProductDetailsContentPanels`):
+  // описание, иначе характеристики, иначе возврат; «Получение» — только по нажатию.
+  const defaultContentTab: ContentTabId = hasDescription
+    ? "description"
+    : hasCharacteristics
+      ? "characteristics"
+      : "returns";
   const resolvedContentTab = availableContentTabs.includes(contentTab)
     ? contentTab
-    : (availableContentTabs[0] ?? "returns");
+    : defaultContentTab;
   const showContentTabs = true;
 
   const charItems = Array.isArray(characteristics)
@@ -161,9 +172,19 @@ export const ProductDetailsDetailsTab = ({
     hasCharacteristics && resolvedContentTab === "characteristics";
   const showReturns = resolvedContentTab === "returns";
   const showDelivery = resolvedContentTab === "delivery";
+  // Осмотр (авто, недвижимость) и услуга: вкладка про место встречи, а не
+  // про доставку — паритет web `ProductDetailsContentSwitcher`.
+  const dealType = normalizeCategoryDealType(product.productDealType);
+  const deliveryTabLabel = isCartDealType(dealType)
+    ? PRODUCT_DETAILS_MODAL_UI.DELIVERY_TITLE
+    : (PRODUCT_DETAILS_MODAL_UI.DEAL_TAB_TITLE[dealType] ??
+      PRODUCT_DETAILS_MODAL_UI.DELIVERY_TITLE);
 
   const panelAriaLabel = showDelivery
-    ? PRODUCT_DETAILS_MODAL_UI.DELIVERY_SECTION_ARIA
+    ? isCartDealType(dealType)
+      ? PRODUCT_DETAILS_MODAL_UI.DELIVERY_SECTION_ARIA
+      : (PRODUCT_DETAILS_MODAL_UI.DEAL_SECTION_ARIA[dealType] ??
+        PRODUCT_DETAILS_MODAL_UI.DELIVERY_SECTION_ARIA)
     : showReturns
       ? PRODUCT_DETAILS_MODAL_UI.RETURNS_SECTION_ARIA
       : showCharacteristics
@@ -258,6 +279,11 @@ export const ProductDetailsDetailsTab = ({
         onLoyaltyBadgePress={openBadgeExplain}
       />
       <ProductFlashSaleCountdown product={product} onExpired={handleFlashSaleExpired} />
+      {/* Объявление без корзины: вместо «В корзину» — заявка и телефон. В узкой
+          раскладке кнопки в нижней панели, как «В корзину». */}
+      {showInlinePurchaseActions ? (
+        <ProductDealActions product={product} isOwnProduct={isOwnProduct} />
+      ) : null}
       {showInlinePurchaseActions ? (
         <ProductDetailPurchaseActions
           productId={productId}
@@ -268,6 +294,7 @@ export const ProductDetailsDetailsTab = ({
           blockedPurchaseLabel={blockedPurchaseLabel}
           showSellerClosedPurchaseButton={showSellerClosedPurchaseButton}
           sellerClosedPurchaseLabel={sellerClosedPurchaseLabel}
+          showOwnProductPurchaseButton={showOwnProductPurchaseButton}
           variant="inline"
         />
       ) : null}
@@ -390,7 +417,7 @@ export const ProductDetailsDetailsTab = ({
                       styles.contentSwitcherTabTextActive,
                   ]}
                 >
-                  {PRODUCT_DETAILS_MODAL_UI.DELIVERY_TITLE}
+                  {deliveryTabLabel}
                 </Text>
               </Pressable>
               {hasCharacteristics ? (

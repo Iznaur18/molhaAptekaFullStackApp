@@ -28,6 +28,7 @@ export type CatalogListFilters = {
   ratingMin?: number;
   withReviews?: boolean;
   returnOnly?: boolean;
+  pointsSaleOnly?: boolean;
   sellerConfirmed?: boolean;
   sellerPremium?: boolean;
   regionCode?: string;
@@ -59,6 +60,7 @@ export const buildCatalogListQueryKey = (filters: CatalogListFilters) => ({
   ratingMin: filters.ratingMin ?? undefined,
   withReviews: filters.withReviews === true ? true : undefined,
   returnOnly: filters.returnOnly === true ? true : undefined,
+  pointsSaleOnly: filters.pointsSaleOnly === true ? true : undefined,
   sellerConfirmed: filters.sellerConfirmed === true ? true : undefined,
   sellerPremium: filters.sellerPremium === true ? true : undefined,
   regionCode: filters.regionCode?.trim() || undefined,

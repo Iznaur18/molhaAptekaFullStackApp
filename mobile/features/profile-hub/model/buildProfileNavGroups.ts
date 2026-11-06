@@ -158,6 +158,15 @@ export const buildProfileNavGroups = (
           },
         ];
       }
+      if (sectionId === "deal-requests") {
+        return [
+          {
+            sectionId,
+            label: MY_PROFILE_PAGE_UI.TAB_DEAL_REQUESTS,
+            disabled: !access.isProfileReady,
+          },
+        ];
+      }
       if (sectionId === "auction" && access.canUseAuction) {
         return [
           {
@@ -301,8 +310,10 @@ export const buildProfileNavGroups = (
 
   const servicesItems: ProfileNavItem[] = PROFILE_SERVICES_SECTION_ORDER.flatMap(
     (sectionId): ProfileNavItem[] => {
-      // Пункты сервисов на mobile появятся по мере экранов; порядок уже общий.
-      void sectionId;
+      // Пункты сервисов появляются по мере экранов; порядок уже общий с web.
+      if (sectionId === "safe-deal" && access.isProfileReady) {
+        return [{ sectionId, label: MY_PROFILE_PAGE_UI.TAB_SAFE_DEAL }];
+      }
       return [];
     },
   );

@@ -26,6 +26,7 @@ export type CatalogProductsRequestOptions = {
   ratingMin?: number;
   withReviews?: boolean;
   returnOnly?: boolean;
+  pointsSaleOnly?: boolean;
   sellerConfirmed?: boolean;
   sellerPremium?: boolean;
   regionCode?: string;
@@ -61,6 +62,7 @@ export const buildCatalogProductsRequestParams = ({
   ratingMin,
   withReviews,
   returnOnly,
+  pointsSaleOnly,
   sellerConfirmed,
   sellerPremium,
   regionCode,
@@ -90,6 +92,7 @@ export const buildCatalogProductsRequestParams = ({
   ...(ratingMin != null ? { ratingMin } : {}),
   ...(withReviews ? { withReviews: "true" } : {}),
   ...(returnOnly ? { returnOnly: "true" } : {}),
+  ...(pointsSaleOnly ? { pointsSaleOnly: "true" } : {}),
   ...(sellerConfirmed ? { sellerConfirmed: "true" } : {}),
   ...(sellerPremium ? { sellerPremium: "true" } : {}),
   ...(regionCode?.trim() ? { regionCode: regionCode.trim() } : {}),

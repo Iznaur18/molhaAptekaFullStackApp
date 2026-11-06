@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useQueryClient } from "@tanstack/react-query";
+import { isProductPurchasableViaCart } from "@molha/api-contract";
 
 import { resolveProductImageUrls } from "@/entities/product/lib/resolveProductImageUrls";
 import { resolveProductPreviewVideoUrl } from "@/entities/product/lib/resolveProductPreviewVideoUrl";
@@ -40,6 +41,7 @@ import { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyalt
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
+import { ProductDealActions } from "@/entities/deal-request/ui/ProductDealActions";
 import { ProductDetailPurchaseActions } from "@/features/product-detail/ui/ProductDetailPurchaseActions";
 import { ProductDetailMediaSection } from "@/features/product-detail/ui/ProductDetailMediaSection";
 import { ProductDetailTabBar } from "@/features/product-detail/ui/ProductDetailTabBar";
@@ -330,17 +332,28 @@ export default function ProductDetailScreen() {
     resolveProductPurchaseBlockState(productRecord);
   const { isSellerClosed, closedLabel: sellerClosedLabel } =
     resolveProductSellerClosedPurchaseState(productRecord);
+  // Авто, недвижимость и услуги в корзину не кладут: кнопки покупки у них нет
+  // вовсе, в том числе «Нет в наличии» и «У нас закрыто» — они про заказ
+  // (паритет web `resolveProductPurchaseButtonState.js`).
+  const viaCart = isProductPurchasableViaCart(productRecord);
   const canShowAddToCart =
+    viaCart &&
     !isOwnProduct &&
     isAvailable &&
     purchaseLimit > 0 &&
     !isProductOutOfStock &&
     !isPurchaseBlocked &&
     !isSellerClosed;
-  const showOutOfStockPurchaseButton = !isOwnProduct && isProductOutOfStock;
+  const showOutOfStockPurchaseButton = viaCart && !isOwnProduct && isProductOutOfStock;
   const showBlockedPurchaseButton = !isOwnProduct && isPurchaseBlocked;
   const showSellerClosedPurchaseButton =
-    !isOwnProduct && isSellerClosed && !isPurchaseBlocked && !isProductOutOfStock;
+    viaCart &&
+    !isOwnProduct &&
+    isSellerClosed &&
+    !isPurchaseBlocked &&
+    !isProductOutOfStock;
+  // Своё объявление: на месте «В корзину» неактивная «Свой товар», как на сайте.
+  const showOwnProductPurchaseButton = isOwnProduct;
   const showManageActions = (isOwnProduct || isAdmin) && activeTab === "details";
   const hasOpenSalesLocked = productRecord.hasOpenSales === true;
   const showMobilePurchaseDock =
@@ -350,11 +363,20 @@ export default function ProductDetailScreen() {
       showOutOfStockPurchaseButton ||
       showBlockedPurchaseButton ||
       showSellerClosedPurchaseButton ||
+      showOwnProductPurchaseButton ||
       auctionUi.auctionActive ||
       installmentActive);
+  // Авто, недвижимость, услуги: в панели вместо «В корзину» — заявка и телефон
+  // (паритет web `showMobileDealDock`).
+  const showMobileDealDock =
+    !pageLayout.isPageSplit &&
+    activeTab === "details" &&
+    !showMobilePurchaseDock &&
+    !viaCart &&
+    !isOwnProduct;
   const scrollPaddingBottom = pageLayout.resolveScrollPaddingBottom(
     insets.bottom,
-    showMobilePurchaseDock,
+    showMobilePurchaseDock || showMobileDealDock,
   );
   const showInstallmentDock =
     !pageLayout.isPageSplit && activeTab === "installment" && installmentDock != null;
@@ -693,6 +715,7 @@ export default function ProductDetailScreen() {
     blockedPurchaseLabel: blockedLabel,
     showSellerClosedPurchaseButton,
     sellerClosedPurchaseLabel: sellerClosedLabel,
+    showOwnProductPurchaseButton,
     showInlinePurchaseActions: pageLayout.isPageSplit,
     isAuthorized,
     onRequestLogin: () => {
@@ -811,6 +834,7 @@ export default function ProductDetailScreen() {
               styles.container,
               pageLayout.isPageSplit && styles.containerSplit,
               !showMobilePurchaseDock &&
+                !showMobileDealDock &&
                 !showInstallmentDock &&
                 !showAuctionDock &&
                 styles.containerNoDock,
@@ -963,7 +987,25 @@ export default function ProductDetailScreen() {
               showBlockedPurchaseButton={showBlockedPurchaseButton}
               blockedPurchaseLabel={blockedLabel}
               showSellerClosedPurchaseButton={showSellerClosedPurchaseButton}
+              showOwnProductPurchaseButton={showOwnProductPurchaseButton}
               sellerClosedPurchaseLabel={sellerClosedLabel}
+              variant="dock"
+            />
+          </SquircleView>
+        ) : null}
+
+        {showMobileDealDock && keyboardBottomInset === 0 ? (
+          <SquircleView
+            radius={PRODUCT_DETAIL_PURCHASE_DOCK_TOP_RADIUS}
+            outerStyle={styles.purchaseDock}
+            style={[
+              styles.purchaseDockInner,
+              { paddingBottom: Math.max(insets.bottom, 10.4) },
+            ]}
+          >
+            <ProductDealActions
+              product={productRecord}
+              isOwnProduct={false}
               variant="dock"
             />
           </SquircleView>
