@@ -30,6 +30,7 @@ import {
 import {
   createOneCExchangeSession,
   destroyOneCExchangeSession,
+  extendOneCExchangeSession,
   resolveOneCExchangeSession,
   setOneCExchangeCookie,
   touchOneCExchangeSession,
@@ -140,6 +141,8 @@ function handleInit(res) {
  * @param {import('mongoose').HydratedDocument<any>} session
  */
 async function handleFile(req, res, session) {
+  // Сохранится вместе с учётом куска внутри receiveOneCFileChunk.
+  extendOneCExchangeSession(session);
   const received = await receiveOneCFileChunk({
     req,
     session,
@@ -184,6 +187,8 @@ async function handleImport(req, res, session) {
 
   const known = session.files.find((row) => row.filename === filename);
   if (known) known.imported = true;
+  // Разбору нужны файлы сессии — даём ему полный TTL от постановки в очередь.
+  extendOneCExchangeSession(session);
   await session.save();
 
   await enqueueOneCImportJob(String(job._id));

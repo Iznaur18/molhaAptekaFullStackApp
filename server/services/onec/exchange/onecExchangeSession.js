@@ -108,8 +108,19 @@ export async function resolveOneCExchangeSession(req, expectedType) {
  * @param {import('mongoose').HydratedDocument<any>} session
  */
 export async function touchOneCExchangeSession(session) {
-  session.expiresAt = buildOneCExchangeSessionExpiry();
+  extendOneCExchangeSession(session);
   await session.save();
+}
+
+/**
+ * Сдвинуть срок жизни сессии без отдельного save — для обработчиков, которые
+ * и так сохраняют сессию (приём куска файла, `mode=import`). Так TTL
+ * отсчитывается от последнего действия 1С, а не от начала обмена.
+ *
+ * @param {{ expiresAt: Date }} session
+ */
+export function extendOneCExchangeSession(session) {
+  session.expiresAt = buildOneCExchangeSessionExpiry();
 }
 
 /**
