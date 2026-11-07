@@ -43,4 +43,14 @@ export const AUCTION_PAGE_UI = {
   TAB_BADGE: (count) => (count > 99 ? "99+" : String(count)),
   PAY_DEADLINE_LABEL: "Оплатить до",
   EDIT_PRICE_LABEL: "Новая цена, ₽",
+  /** Подпись под ценой в карточке своей ставки */
+  PRICE_CAPTION_MINE: "ваша ставка",
+  /** Подпись под ценой в карточке входящей ставки */
+  PRICE_CAPTION_INCOMING: "ставка",
+  STATUS_BUYER_PENDING: "Ждём ответа продавца",
+  STATUS_SELLER_PENDING: "Ждёт вашего решения",
+  EDIT_BID: "Изменить ставку",
+  CANCEL_BID: "Отменить",
+  SAVE_BID: "Сохранить",
+  CLOSE_EDITOR: "Не менять",
 };

@@ -10,7 +10,6 @@ import {
   PRICE_OFFER_STATUS_PENDING,
 } from "../model/constants.js";
 import { formatIsoDateTime } from "../../../shared/lib/formatIsoDateTime.js";
-import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import {
   AUCTION_PAGE_UI,
   PRODUCT_PRICE_OFFER_UI,
@@ -19,6 +18,7 @@ import {
 import { UserPremiumDisplayName } from "../../user/ui/UserPremiumDisplayName.jsx";
 
 import { AuctionDashboardProductThumb } from "./AuctionDashboardProductThumb.jsx";
+import { AuctionDashboardRowPrice } from "./AuctionDashboardRowPrice.jsx";
 import { AuctionDashboardRowStatus } from "./AuctionDashboardRowStatus.jsx";
 import { AuctionDashboardSellerActions } from "./AuctionDashboardSellerActions.jsx";
 
@@ -158,9 +158,11 @@ export function AuctionSellerOfferRow({
                 {" · "}
                 {formatIsoDateTime(offer.createdAt)}
               </p>
-              <AuctionDashboardRowStatus isPending={isPending} isAccepted={isAccepted}>
+              <AuctionDashboardRowStatus
+                tone={isPending ? "attention" : isAccepted ? "success" : "neutral"}
+              >
                 {isPending
-                  ? PRODUCT_PRICE_OFFER_UI.STATUS_PENDING
+                  ? AUCTION_PAGE_UI.STATUS_SELLER_PENDING
                   : isAccepted
                     ? PRODUCT_PRICE_OFFER_UI.ACCEPTED_BADGE
                     : null}
@@ -168,15 +170,10 @@ export function AuctionSellerOfferRow({
             </>
           ) : null}
         </div>
-      </div>
-
-      <div className="auction-dashboard-row__price-strip">
-        <span className="auction-dashboard-row__price-label">
-          {AUCTION_PAGE_UI.BID_PRICE_LABEL}
-        </span>
-        <span className="auction-dashboard-row__price">
-          {formatPriceRub(offer.offerPrice)}
-        </span>
+        <AuctionDashboardRowPrice
+          price={offer.offerPrice}
+          caption={AUCTION_PAGE_UI.PRICE_CAPTION_INCOMING}
+        />
       </div>
 
       {collapsedPreview ? (

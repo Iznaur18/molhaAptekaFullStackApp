@@ -58,21 +58,28 @@
   color: var(--iz-color-danger);
 }
 
+/* ── Карточка ставки ─────────────────────────────────────────────── */
+
 .auction-dashboard-row {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.5rem;
+  gap: 0.65rem;
+  padding: 0.75rem;
   border: 1px solid var(--iz-color-border);
-  border-left: 3px solid var(--iz-color-border);
-  border-radius: 20px;
+  border-radius: 18px;
   background: var(--iz-color-surface);
   box-shadow: none;
 }
 
+/* Нужно ваше действие — тонкая цветная рамка вместо полосы слева */
 .auction-dashboard-row_attention {
-  border-left-color: var(--iz-color-warning);
-  box-shadow: none;
+  border-color: color-mix(in srgb, var(--iz-color-warning) 60%, var(--iz-color-border));
+}
+
+.auction-dashboard-row__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
 }
 
 .auction-dashboard-row__head-line {
@@ -83,6 +90,118 @@
   min-width: 0;
 }
 
+.auction-dashboard-row__thumb {
+  flex: 0 0 auto;
+  width: 3.25rem;
+  height: 3.25rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 12px;
+  object-fit: cover;
+  background: var(--iz-color-surface-muted);
+}
+
+.auction-dashboard-row__thumb_placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--iz-color-text-placeholder);
+  font-size: 0.7rem;
+}
+
+.auction-dashboard-row__main {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.auction-dashboard-row__title,
+.auction-dashboard-row__title_static {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--iz-color-text);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: left;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.auction-dashboard-row__title {
+  cursor: pointer;
+}
+
+.auction-dashboard-row__title:hover {
+  text-decoration: underline;
+}
+
+.auction-dashboard-row__meta {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--iz-color-text-muted);
+}
+
+/* Цена справа */
+.auction-dashboard-row__price-box {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.05rem;
+  padding-left: 0.25rem;
+}
+
+.auction-dashboard-row__price {
+  font-size: 1.15rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+  color: var(--iz-color-text);
+  white-space: nowrap;
+}
+
+.auction-dashboard-row__price-caption {
+  font-size: 0.72rem;
+  color: var(--iz-color-text-muted);
+  white-space: nowrap;
+}
+
+/* Статус */
+.auction-dashboard-row__status-pill {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.15rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 8px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.auction-dashboard-row__status-pill_neutral {
+  background: var(--iz-color-surface-muted);
+  color: var(--iz-color-text-secondary);
+}
+
+.auction-dashboard-row__status-pill_attention {
+  background: var(--iz-color-warning-surface);
+  color: var(--iz-color-warning-text);
+}
+
+.auction-dashboard-row__status-pill_success {
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success-text);
+}
+
+/* Свернутая карточка (сворачивание используется не везде) */
 .auction-dashboard-row__chevron-btn {
   flex-shrink: 0;
   margin: 0;
@@ -116,157 +235,118 @@
   color: var(--iz-color-text-secondary);
 }
 
-.auction-dashboard-row__head {
+/* ── Кнопки ──────────────────────────────────────────────────────── */
+
+.auction-dashboard-row__actions {
   display: flex;
-  align-items: flex-start;
-  gap: 0.65rem;
+  align-items: stretch;
+  gap: 0.5rem;
 }
 
-.auction-dashboard-row__thumb {
-  flex: 0 0 auto;
-  width: 3.25rem;
-  height: 3.25rem;
-  border: 1px solid var(--iz-color-border);
-  border-radius: 14px;
-  object-fit: cover;
+.auction-dashboard-row__btn {
+  flex: 1 1 0;
+  min-height: 2.5rem;
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    filter 0.15s ease;
+}
+
+.auction-dashboard-row__btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.auction-dashboard-row__btn_secondary {
+  border-color: var(--iz-color-border-strong);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text-secondary);
+}
+
+.auction-dashboard-row__btn_secondary:hover:not(:disabled) {
   background: var(--iz-color-surface-muted);
 }
 
-.auction-dashboard-row__thumb_placeholder {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--iz-color-text-placeholder);
-  font-size: 0.7rem;
+.auction-dashboard-row__btn_accept {
+  background: var(--iz-color-success);
+  color: var(--iz-color-on-contrast);
 }
 
-.auction-dashboard-row__main {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  gap: 0.25rem;
-  min-width: 0;
+.auction-dashboard-row__btn_accept:hover:not(:disabled) {
+  filter: brightness(0.96);
 }
 
-.auction-dashboard-row__title {
+/* Тихая текстовая кнопка: «Отменить», «Не менять» */
+.auction-dashboard-row__text-btn {
+  flex: 0 0 auto;
+  align-self: center;
   margin: 0;
-  padding: 0;
+  padding: 0.4rem 0.5rem;
   border: 0;
+  border-radius: 10px;
   background: transparent;
-  color: var(--iz-color-text);
+  color: var(--iz-color-text-secondary);
   font: inherit;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  text-align: left;
   cursor: pointer;
 }
 
-.auction-dashboard-row__title:hover {
-  text-decoration: underline;
-}
-
-.auction-dashboard-row__title_static {
-  margin: 0;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--iz-color-text);
-}
-
-.auction-dashboard-row__meta {
-  margin: 0;
-  font-size: 0.85rem;
-  color: var(--iz-color-text-muted);
-}
-
-.auction-dashboard-row__price {
-  font-size: 1.02rem;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  color: var(--iz-color-text);
-  white-space: nowrap;
-}
-
-.auction-dashboard-row__price-strip {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.45rem 0.55rem;
-  border-radius: 14px;
+.auction-dashboard-row__text-btn:hover:not(:disabled) {
   background: var(--iz-color-surface-muted);
 }
 
-.auction-dashboard-row__price-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: var(--iz-color-text);
+.auction-dashboard-row__text-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
-.auction-dashboard-row__status-pill {
-  display: inline-flex;
-  align-items: center;
-  align-self: flex-start;
-  padding: 0.12rem 0.45rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  line-height: 1.2;
+.auction-dashboard-row__text-btn_danger {
+  color: var(--iz-color-danger);
 }
 
-.auction-dashboard-row__status-pill_pending {
-  background: var(--iz-color-warning-surface);
-  color: var(--iz-color-warning-text);
+.auction-dashboard-row__text-btn_danger:hover:not(:disabled) {
+  background: var(--iz-color-danger-surface);
 }
 
-.auction-dashboard-row__status-pill_accepted {
-  background: var(--iz-color-success-surface);
-  color: var(--iz-color-success-text);
-}
-
-.auction-dashboard-row__status {
-  margin: 0;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.auction-dashboard-row__status_pending {
-  color: var(--iz-color-warning-text);
-}
-
-.auction-dashboard-row__status_accepted {
-  color: var(--iz-color-success);
-}
+/* ── Поле новой цены ─────────────────────────────────────────────── */
 
 .auction-dashboard-row__editor {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 0.4rem;
-}
-
-.auction-dashboard-row__editor-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: var(--iz-color-text);
+  margin: 0;
 }
 
 .auction-dashboard-row__composer {
   display: grid;
+  flex: 1 1 auto;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: stretch;
+  min-width: 0;
   overflow: hidden;
   border: 1px solid var(--iz-color-border-strong);
-  border-radius: 14px;
-  background: var(--iz-color-surface-muted);
+  border-radius: 12px;
+  background: var(--iz-color-surface);
+}
+
+.auction-dashboard-row__composer:focus-within {
+  border-color: var(--iz-color-action);
 }
 
 .auction-dashboard-row__composer-prefix {
   display: flex;
   align-items: center;
-  padding: 0 0.55rem 0 0.65rem;
+  padding: 0 0.4rem 0 0.65rem;
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--iz-color-text-muted);
@@ -275,7 +355,7 @@
 .auction-dashboard-row__composer-input {
   width: 100%;
   min-width: 0;
-  padding: 0.55rem 0.35rem;
+  padding: 0.5rem 0.35rem;
   border: 0;
   background: transparent;
   font: inherit;
@@ -296,13 +376,12 @@
 
 .auction-dashboard-row__composer-submit {
   margin: 0;
-  padding: 0.55rem 0.85rem;
+  padding: 0.5rem 0.85rem;
   border: 0;
-  border-left: 1px solid var(--iz-color-border-strong);
   background: var(--iz-color-action);
   color: var(--iz-color-on-contrast);
   font: inherit;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
@@ -317,71 +396,7 @@
   cursor: not-allowed;
 }
 
-.auction-dashboard-row__editor-cancel {
-  align-self: flex-start;
-  margin: 0;
-  padding: 0.3rem 0.625rem;
-  border: 0;
-  border-radius: 14px;
-  background: var(--iz-color-danger);
-  color: var(--iz-color-on-contrast);
-  font: inherit;
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.auction-dashboard-row__editor-cancel:hover:not(:disabled) {
-  filter: brightness(0.96);
-}
-
-.auction-dashboard-row__editor-cancel:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.auction-dashboard-row__decision {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.45rem;
-}
-
-.auction-dashboard-row__decision-btn {
-  margin: 0;
-  min-height: 2.55rem;
-  padding: 0.55rem 0.65rem;
-  border: 1px solid transparent;
-  border-radius: 14px;
-  font: inherit;
-  font-size: 0.88rem;
-  font-weight: 700;
-  line-height: 1.2;
-  cursor: pointer;
-}
-
-.auction-dashboard-row__decision-btn:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
-
-.auction-dashboard-row__decision-btn_accept {
-  background: var(--iz-color-success);
-  color: var(--iz-color-on-contrast);
-}
-
-.auction-dashboard-row__decision-btn_accept:hover:not(:disabled) {
-  filter: brightness(0.96);
-}
-
-.auction-dashboard-row__decision-btn_reject {
-  border-color: color-mix(in srgb, var(--iz-color-danger-border) 70%, transparent);
-  background: var(--iz-color-surface);
-  color: var(--iz-color-danger);
-}
-
-.auction-dashboard-row__decision-btn_reject:hover:not(:disabled) {
-  background: var(--iz-color-danger-surface);
-}
+/* ── Прочее ──────────────────────────────────────────────────────── */
 
 .auction-dashboard-row__cta {
   width: 100%;
@@ -389,7 +404,7 @@
   min-height: 2.75rem;
   padding: 0.65rem 0.85rem;
   border: 0;
-  border-radius: 14px;
+  border-radius: 12px;
   background: var(--iz-color-action);
   color: var(--iz-color-on-contrast);
   font: inherit;
