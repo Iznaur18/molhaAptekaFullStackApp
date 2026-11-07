@@ -9,7 +9,6 @@ import { useNavigate } from "react-router-dom";
 import { usePriceOfferMutations } from "../model/usePriceOfferMutations.js";
 import { getProductPriceRubMaxError } from "../../product/lib/productPriceRubValidation.js";
 import { formatIsoDateTime } from "../../../shared/lib/formatIsoDateTime.js";
-import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import { HOME_MAIN_VIEW_PATH } from "../../../shared/lib/homeMainViewPaths.js";
 import {
   formatIntegerGroupRu,
@@ -27,6 +26,7 @@ import {
 
 import { AuctionDashboardBuyerPriceEditor } from "./AuctionDashboardBuyerPriceEditor.jsx";
 import { AuctionDashboardProductThumb } from "./AuctionDashboardProductThumb.jsx";
+import { AuctionDashboardRowPrice } from "./AuctionDashboardRowPrice.jsx";
 import { AuctionDashboardRowStatus } from "./AuctionDashboardRowStatus.jsx";
 
 import "./AuctionDashboard.css";
@@ -56,6 +56,7 @@ export function AuctionBuyerBidRow({
     formatIntegerGroupRu(bid.offerPrice ?? ""),
   );
   const [error, setError] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
   const { patchMutation, cancelMutation } = usePriceOfferMutations(bid.productId);
   const isBusy = patchMutation.isPending || cancelMutation.isPending;
 
@@ -89,6 +90,7 @@ export function AuctionBuyerBidRow({
     setError("");
     try {
       await patchMutation.mutateAsync(price);
+      setIsEditing(false);
       onChanged?.();
     } catch (e) {
       setError(e instanceof Error ? e.message : AUCTION_PAGE_UI.ERROR_GENERIC);
@@ -107,6 +109,12 @@ export function AuctionBuyerBidRow({
 
   const handleGoToCart = () => {
     navigate(HOME_MAIN_VIEW_PATH.cart);
+  };
+
+  const handleCloseEditor = () => {
+    setIsEditing(false);
+    setError("");
+    setPriceInput(formatIntegerGroupRu(bid.offerPrice ?? ""));
   };
 
   return (
@@ -160,9 +168,9 @@ export function AuctionBuyerBidRow({
               <p className="auction-dashboard-row__meta">
                 {formatIsoDateTime(bid.createdAt)}
               </p>
-              <AuctionDashboardRowStatus isPending={isPending} isAccepted={isAccepted}>
+              <AuctionDashboardRowStatus tone={isAccepted ? "success" : "neutral"}>
                 {isPending
-                  ? PRODUCT_PRICE_OFFER_UI.STATUS_PENDING
+                  ? AUCTION_PAGE_UI.STATUS_BUYER_PENDING
                   : isAccepted
                     ? PRODUCT_PRICE_OFFER_UI.STATUS_ACCEPTED
                     : null}
@@ -176,15 +184,10 @@ export function AuctionBuyerBidRow({
             </>
           ) : null}
         </div>
-      </div>
-
-      <div className="auction-dashboard-row__price-strip">
-        <span className="auction-dashboard-row__price-label">
-          {AUCTION_PAGE_UI.BID_PRICE_LABEL}
-        </span>
-        <span className="auction-dashboard-row__price">
-          {formatPriceRub(bid.offerPrice)}
-        </span>
+        <AuctionDashboardRowPrice
+          price={bid.offerPrice}
+          caption={AUCTION_PAGE_UI.PRICE_CAPTION_MINE}
+        />
       </div>
 
       {collapsedPreview ? (
@@ -193,18 +196,41 @@ export function AuctionBuyerBidRow({
 
       {isExpanded ? (
         <>
-          {isPending && isUserDataConfirmed ? (
+          {isPending && isUserDataConfirmed && isEditing ? (
             <AuctionDashboardBuyerPriceEditor
               label={AUCTION_PAGE_UI.EDIT_PRICE_LABEL}
               value={priceInput}
               onChange={(next) => setPriceInput(formatRubPriceInput(next))}
               onSubmit={() => void handleUpdate()}
-              onCancel={() => void handleCancel()}
+              onClose={handleCloseEditor}
               disabled={isBusy}
-              submitLabel={PRODUCT_PRICE_OFFER_UI.UPDATE}
-              cancelLabel={PRODUCT_PRICE_OFFER_UI.CANCEL}
+              submitLabel={AUCTION_PAGE_UI.SAVE_BID}
+              closeLabel={AUCTION_PAGE_UI.CLOSE_EDITOR}
               pendingLabel={PRODUCT_PRICE_OFFER_UI.ACTION_PENDING}
             />
+          ) : null}
+
+          {isPending && isUserDataConfirmed && !isEditing ? (
+            <div className="auction-dashboard-row__actions" role="group">
+              <button
+                type="button"
+                className="auction-dashboard-row__btn auction-dashboard-row__btn_secondary"
+                disabled={isBusy}
+                onClick={() => setIsEditing(true)}
+              >
+                <span aria-hidden="true">✎</span> {AUCTION_PAGE_UI.EDIT_BID}
+              </button>
+              <button
+                type="button"
+                className="auction-dashboard-row__text-btn auction-dashboard-row__text-btn_danger"
+                disabled={isBusy}
+                onClick={() => void handleCancel()}
+              >
+                {cancelMutation.isPending
+                  ? PRODUCT_PRICE_OFFER_UI.ACTION_PENDING
+                  : AUCTION_PAGE_UI.CANCEL_BID}
+              </button>
+            </div>
           ) : null}
 
           {isAccepted ? (

@@ -17,10 +17,10 @@ export function AuctionDashboardSellerActions({
   pendingLabel,
 }) {
   return (
-    <div className="auction-dashboard-row__decision" role="group">
+    <div className="auction-dashboard-row__actions" role="group">
       <button
         type="button"
-        className="auction-dashboard-row__decision-btn auction-dashboard-row__decision-btn_reject"
+        className="auction-dashboard-row__btn auction-dashboard-row__btn_secondary"
         disabled={disabled}
         onClick={onReject}
       >
@@ -28,7 +28,7 @@ export function AuctionDashboardSellerActions({
       </button>
       <button
         type="button"
-        className="auction-dashboard-row__decision-btn auction-dashboard-row__decision-btn_accept"
+        className="auction-dashboard-row__btn auction-dashboard-row__btn_accept"
         disabled={disabled}
         onClick={onAccept}
       >

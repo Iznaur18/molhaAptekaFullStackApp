@@ -1,15 +1,17 @@
 import { INTEGER_INPUT_FIELD_PROPS } from "../../../shared/lib/numericInput.js";
 
 /**
+ * Поле новой цены своей ставки. Открывается по «Изменить ставку».
+ *
  * @param {{
  *   label: string;
  *   value: string;
  *   onChange: (value: string) => void;
  *   onSubmit: () => void;
- *   onCancel: () => void;
+ *   onClose: () => void;
  *   disabled?: boolean;
  *   submitLabel: string;
- *   cancelLabel: string;
+ *   closeLabel: string;
  *   pendingLabel: string;
  * }} props
  */
@@ -18,15 +20,20 @@ export function AuctionDashboardBuyerPriceEditor({
   value,
   onChange,
   onSubmit,
-  onCancel,
+  onClose,
   disabled = false,
   submitLabel,
-  cancelLabel,
+  closeLabel,
   pendingLabel,
 }) {
   return (
-    <div className="auction-dashboard-row__editor">
-      <span className="auction-dashboard-row__editor-label">{label}</span>
+    <form
+      className="auction-dashboard-row__editor"
+      onSubmit={(event) => {
+        event.preventDefault();
+        onSubmit();
+      }}
+    >
       <div className="auction-dashboard-row__composer">
         <span className="auction-dashboard-row__composer-prefix" aria-hidden="true">
           ₽
@@ -38,24 +45,24 @@ export function AuctionDashboardBuyerPriceEditor({
           onChange={(event) => onChange(event.target.value)}
           disabled={disabled}
           aria-label={label}
+          autoFocus
         />
         <button
-          type="button"
+          type="submit"
           className="auction-dashboard-row__composer-submit"
           disabled={disabled}
-          onClick={onSubmit}
         >
           {disabled ? pendingLabel : submitLabel}
         </button>
       </div>
       <button
         type="button"
-        className="auction-dashboard-row__editor-cancel"
+        className="auction-dashboard-row__text-btn"
         disabled={disabled}
-        onClick={onCancel}
+        onClick={onClose}
       >
-        {cancelLabel}
+        {closeLabel}
       </button>
-    </div>
+    </form>
   );
 }

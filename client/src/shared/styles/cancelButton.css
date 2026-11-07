@@ -13,7 +13,6 @@
 .product-reviews-section__cancel-edit,
 .admin-delete-user__btn_secondary,
 .product-price-offer__btn--cancel,
-.auction-dashboard-row__editor-cancel,
 .installment-queue-card__btn_cancel {
   border: var(--iz-border) solid var(--iz-color-danger);
   background: var(--iz-color-danger);
@@ -35,7 +34,6 @@
 :root[data-theme="dark"] .product-reviews-section__cancel-edit,
 :root[data-theme="dark"] .admin-delete-user__btn_secondary,
 :root[data-theme="dark"] .product-price-offer__btn--cancel,
-:root[data-theme="dark"] .auction-dashboard-row__editor-cancel,
 :root[data-theme="dark"] .installment-queue-card__btn_cancel {
   color: #ffffff;
 }
@@ -50,7 +48,6 @@
 .product-reviews-section__cancel-edit:hover:not(:disabled),
 .admin-delete-user__btn_secondary:hover:not(:disabled),
 .product-price-offer__btn--cancel:hover:not(:disabled),
-.auction-dashboard-row__editor-cancel:hover:not(:disabled),
 .installment-queue-card__btn_cancel:hover:not(:disabled) {
   border-color: color-mix(in srgb, var(--iz-color-danger) 85%, var(--iz-color-ink));
   background: color-mix(in srgb, var(--iz-color-danger) 85%, var(--iz-color-ink));
@@ -65,7 +62,6 @@
 .product-reviews-section__cancel-edit:active:not(:disabled),
 .admin-delete-user__btn_secondary:active:not(:disabled),
 .product-price-offer__btn--cancel:active:not(:disabled),
-.auction-dashboard-row__editor-cancel:active:not(:disabled),
 .installment-queue-card__btn_cancel:active:not(:disabled) {
   transform: scale(var(--iz-state-pressed-scale));
 }
@@ -80,22 +76,9 @@
 .product-reviews-section__cancel-edit:disabled,
 .admin-delete-user__btn_secondary:disabled,
 .product-price-offer__btn--cancel:disabled,
-.auction-dashboard-row__editor-cancel:disabled,
 .installment-queue-card__btn_cancel:disabled {
   opacity: var(--iz-state-disabled-opacity);
   cursor: not-allowed;
-}
-
-.auction-dashboard-row__editor-cancel {
-  align-self: flex-start;
-  margin: 0;
-  padding: var(--iz-control-btn-padding-y) var(--iz-control-btn-padding-x);
-  border-radius: 14px;
-  font: inherit;
-  font-size: var(--iz-control-btn-font);
-  font-weight: var(--iz-control-btn-weight);
-  text-decoration: none;
-  cursor: pointer;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -108,7 +91,6 @@
   .product-reviews-section__cancel-edit:active:not(:disabled),
   .admin-delete-user__btn_secondary:active:not(:disabled),
   .product-price-offer__btn--cancel:active:not(:disabled),
-  .auction-dashboard-row__editor-cancel:active:not(:disabled),
   .installment-queue-card__btn_cancel:active:not(:disabled) {
     transform: none;
     opacity: var(--iz-state-pressed-opacity);
