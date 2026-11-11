@@ -1,18 +1,12 @@
 .user-stories-strip {
-  /* Паритет mobile HOME_FEED_SECTION_GAP = 8 */
+  /* Паритет mobile HOME_FEED_SECTION_GAP = 8. Кружки лежат прямо на фоне
+     страницы, без карточки-подложки (макет главной, ноябрь 2026). */
   margin: 0 0 var(--iz-space-2);
-  padding: 8px 12px;
-  border: 1px solid var(--iz-color-border);
-  border-radius: 20px;
-  background-color: var(--iz-color-surface);
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background-color: transparent;
   overflow: hidden;
-}
-
-@supports (corner-shape: squircle) {
-  .user-stories-strip {
-    border-radius: 20px;
-    corner-shape: squircle;
-  }
 }
 
 .user-stories-strip__scroll {
@@ -20,7 +14,7 @@
   gap: 14px;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 4px 4px 8px;
+  padding: 4px 2px 6px;
   border: none;
   border-radius: 0;
   background-color: transparent;
@@ -71,15 +65,18 @@
   background: var(--iz-color-text-muted);
 }
 
+/* «Ваша история»: мягкий круг цвета акцента с оранжевым плюсом. */
 .user-stories-strip__ring_add {
-  background: var(--iz-color-action);
-  border: none;
+  background: var(--iz-color-action-soft);
+  border: 1px solid var(--iz-color-action-border);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--iz-color-action) 14%, transparent);
 }
 
 .user-stories-strip__plus {
-  font-size: 1.75rem;
+  font-size: 2rem;
+  font-weight: 300;
   line-height: 1;
-  color: var(--iz-color-on-contrast);
+  color: var(--iz-color-action);
 }
 
 .user-stories-strip__avatar,
@@ -120,10 +117,15 @@
 }
 
 .user-stories-strip__label {
+  display: -webkit-box;
   width: 100%;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   font-size: 0.75rem;
+  line-height: 1.2;
+  text-align: center;
+  overflow-wrap: break-word;
   color: var(--iz-color-text);
 }

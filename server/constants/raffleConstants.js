@@ -15,6 +15,10 @@ export const RAFFLE_STATUSES = [
 export const RAFFLE_TARGET_SALES_MIN = 1;
 export const RAFFLE_TARGET_SALES_MAX = 100_000;
 
+/** Сколько победителей выбирается при завершении розыгрыша. */
+export const RAFFLE_WINNERS_COUNT_MIN = 1;
+export const RAFFLE_WINNERS_COUNT_MAX = 100;
+
 export const RAFFLE_TITLE_MAX_LENGTH = 100;
 export const RAFFLE_DESCRIPTION_MAX_LENGTH = 200;
 export const RAFFLE_INSTAGRAM_URL_MAX_LENGTH = 500;

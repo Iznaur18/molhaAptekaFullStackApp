@@ -5,6 +5,8 @@ import {
   RAFFLE_STATUS_PENDING_STAFF,
   RAFFLE_TARGET_SALES_MAX,
   RAFFLE_TARGET_SALES_MIN,
+  RAFFLE_WINNERS_COUNT_MIN,
+  RAFFLE_WINNERS_COUNT_MAX,
   RAFFLE_DESCRIPTION_MAX_LENGTH,
   RAFFLE_TITLE_MAX_LENGTH,
   RAFFLE_PRIZE_MEDIA_TYPES,
@@ -147,6 +149,34 @@ const RaffleSchema = new Schema(
     winnerSelectedAt: {
       type: Date,
       default: null,
+    },
+    /**
+     * Сколько победителей выбирается при завершении (взвешенный рандом без
+     * повторов). Если участников меньше — победителей столько, сколько есть.
+     */
+    winnersCount: {
+      type: Number,
+      default: RAFFLE_WINNERS_COUNT_MIN,
+      min: RAFFLE_WINNERS_COUNT_MIN,
+      max: RAFFLE_WINNERS_COUNT_MAX,
+    },
+    /**
+     * Снимок победителей на момент завершения (первый дублируется в
+     * legacy-полях winnerUserId/winnerUserName/winnerUserAvatarUrl).
+     */
+    winners: {
+      type: [
+        new Schema(
+          {
+            userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+            userName: { type: String, default: "", trim: true, maxlength: 64 },
+            userAvatarUrl: { type: String, default: "", trim: true },
+            selectedAt: { type: Date, default: null },
+          },
+          { _id: false },
+        ),
+      ],
+      default: [],
     },
     moderationComment: {
       type: String,

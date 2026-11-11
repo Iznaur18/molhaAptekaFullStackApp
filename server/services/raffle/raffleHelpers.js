@@ -4,6 +4,8 @@ import { ORDER_STATUS_CONFIRMED } from "../../constants/orderConstants.js";
 import {
   RAFFLE_STATUS_ACTIVE,
   RAFFLE_STATUS_COMPLETED,
+  RAFFLE_WINNERS_COUNT_MAX,
+  RAFFLE_WINNERS_COUNT_MIN,
   SITE_RAFFLES_ACTIVE_VITRINE_MAX,
   SITE_RAFFLES_COMPLETED_VITRINE_MAX,
 } from "../../constants/raffleConstants.js";
@@ -21,7 +23,7 @@ import {
   applyRafflePrizeMediaFields,
   normalizePrizeMediaType,
 } from "./rafflePrizeMedia.js";
-import { pickWeightedRaffleWinnerUserId } from "./pickWeightedRaffleWinner.js";
+import { pickWeightedRaffleWinnersUserIds } from "./pickWeightedRaffleWinner.js";
 import { getCompletedRaffleExpiryCutoff } from "./getCompletedRaffleExpiryCutoff.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 
@@ -112,33 +114,33 @@ export const listRaffleBuyerTicketCounts = async (productWindows) => {
 };
 
 /**
- * @param {string | null} winnerUserId
- * @returns {Promise<{ winnerUserId: string | null; winnerUserName: string; winnerUserAvatarUrl: string; winnerSelectedAt: Date | null }>}
+ * @param {Array<string>} winnerUserIds
+ * @returns {Promise<Array<{ userId: string; userName: string; userAvatarUrl: string; selectedAt: Date }>>}
  */
-const resolveRaffleWinnerSnapshot = async (winnerUserId) => {
-  if (!winnerUserId) {
-    return {
-      winnerUserId: null,
-      winnerUserName: "",
-      winnerUserAvatarUrl: "",
-      winnerSelectedAt: null,
-    };
+const resolveRaffleWinnersSnapshots = async (winnerUserIds) => {
+  if (!Array.isArray(winnerUserIds) || winnerUserIds.length === 0) {
+    return [];
   }
 
-  const user = await UserModel.findById(winnerUserId)
+  const users = await UserModel.find({ _id: { $in: winnerUserIds } })
     .select("userName userAvatarUrl")
     .lean();
+  const userById = new Map(users.map((user) => [String(user._id), user]));
+  const selectedAt = new Date();
 
-  return {
-    winnerUserId: String(winnerUserId),
-    winnerUserName:
-      typeof user?.userName === "string" && user.userName.trim()
-        ? user.userName.trim()
-        : WINNER_FALLBACK_USER_NAME,
-    winnerUserAvatarUrl:
-      typeof user?.userAvatarUrl === "string" ? user.userAvatarUrl.trim() : "",
-    winnerSelectedAt: new Date(),
-  };
+  return winnerUserIds.map((winnerUserId) => {
+    const user = userById.get(String(winnerUserId));
+    return {
+      userId: String(winnerUserId),
+      userName:
+        typeof user?.userName === "string" && user.userName.trim()
+          ? user.userName.trim()
+          : WINNER_FALLBACK_USER_NAME,
+      userAvatarUrl:
+        typeof user?.userAvatarUrl === "string" ? user.userAvatarUrl.trim() : "",
+      selectedAt,
+    };
+  });
 };
 
 /**
@@ -221,8 +223,16 @@ export const completeRaffleById = async (
 
   const productWindows = await buildRaffleProductSaleWindows(raffle);
   const ticketEntries = await listRaffleBuyerTicketCounts(productWindows);
-  const winnerUserId = pickWeightedRaffleWinnerUserId(ticketEntries);
-  const winnerSnapshot = await resolveRaffleWinnerSnapshot(winnerUserId);
+  const winnersCount = Math.min(
+    RAFFLE_WINNERS_COUNT_MAX,
+    Math.max(
+      RAFFLE_WINNERS_COUNT_MIN,
+      Math.floor(Number(raffle.winnersCount) || RAFFLE_WINNERS_COUNT_MIN),
+    ),
+  );
+  const winnerUserIds = pickWeightedRaffleWinnersUserIds(ticketEntries, winnersCount);
+  const winnersSnapshot = await resolveRaffleWinnersSnapshots(winnerUserIds);
+  const firstWinner = winnersSnapshot[0] ?? null;
 
   const completed = await RaffleModel.findOneAndUpdate(
     {
@@ -239,10 +249,18 @@ export const completeRaffleById = async (
           ticketCount: entry.ticketCount,
         })),
         completedAt: new Date(),
-        winnerUserId: winnerSnapshot.winnerUserId,
-        winnerUserName: winnerSnapshot.winnerUserName,
-        winnerUserAvatarUrl: winnerSnapshot.winnerUserAvatarUrl,
-        winnerSelectedAt: winnerSnapshot.winnerSelectedAt,
+        winners: winnersSnapshot.map((winner) => ({
+          userId: new mongoose.Types.ObjectId(winner.userId),
+          userName: winner.userName,
+          userAvatarUrl: winner.userAvatarUrl,
+          selectedAt: winner.selectedAt,
+        })),
+        winnerUserId: firstWinner
+          ? new mongoose.Types.ObjectId(firstWinner.userId)
+          : null,
+        winnerUserName: firstWinner?.userName ?? "",
+        winnerUserAvatarUrl: firstWinner?.userAvatarUrl ?? "",
+        winnerSelectedAt: firstWinner?.selectedAt ?? null,
       },
     },
     { new: true },
@@ -255,10 +273,12 @@ export const completeRaffleById = async (
   await clearRaffleParticipationFromProducts(raffleId);
 
   try {
-    const winnerLabel = winnerSnapshot.winnerUserName || WINNER_FALLBACK_USER_NAME;
-    const sellerMessage = winnerSnapshot.winnerUserId
-      ? `Розыгрыш «${raffle.title}» завершён. Победитель: ${winnerLabel}`
-      : `Розыгрыш «${raffle.title}» завершён`;
+    const sellerMessage =
+      winnersSnapshot.length === 0
+        ? `Розыгрыш «${raffle.title}» завершён`
+        : winnersSnapshot.length === 1
+          ? `Розыгрыш «${raffle.title}» завершён. Победитель: ${winnersSnapshot[0].userName || WINNER_FALLBACK_USER_NAME}`
+          : `Розыгрыш «${raffle.title}» завершён. Победителей: ${winnersSnapshot.length}`;
 
     await createUserInAppNotification({
       userId: raffle.sellerId,
@@ -266,9 +286,9 @@ export const completeRaffleById = async (
       message: sellerMessage,
     });
 
-    if (winnerSnapshot.winnerUserId) {
+    for (const winner of winnersSnapshot) {
       await createUserInAppNotification({
-        userId: winnerSnapshot.winnerUserId,
+        userId: winner.userId,
         kind: RAFFLE_NOTIFICATION_KIND_WINNER,
         message: `Вы победили в розыгрыше «${raffle.title}»`,
       });
@@ -362,6 +382,26 @@ export const toPublicRafflePayload = (raffle, options = {}) => {
         }
       : null,
     winnerSelectedAt: raffle.winnerSelectedAt ?? null,
+    winnersCount: Math.min(
+      RAFFLE_WINNERS_COUNT_MAX,
+      Math.max(
+        RAFFLE_WINNERS_COUNT_MIN,
+        Math.floor(Number(raffle.winnersCount) || RAFFLE_WINNERS_COUNT_MIN),
+      ),
+    ),
+    winners: Array.isArray(raffle.winners)
+      ? raffle.winners
+          .filter((entry) => entry && entry.userId)
+          .map((entry) => ({
+            _id: String(entry.userId),
+            userName:
+              typeof entry.userName === "string" && entry.userName.trim()
+                ? entry.userName.trim()
+                : WINNER_FALLBACK_USER_NAME,
+            userAvatarUrl:
+              typeof entry.userAvatarUrl === "string" ? entry.userAvatarUrl.trim() : "",
+          }))
+      : [],
     createdAt: raffle.createdAt,
     updatedAt: raffle.updatedAt,
     seller: seller

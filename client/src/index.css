@@ -101,6 +101,17 @@ body {
   overflow-x: clip;
 }
 
+/* Схема «Пользовательский»: фон страницы #fafafc. Только веб: токен --iz-color-bg
+   общий с приложением и не меняется, перекрываем сам фон страницы. */
+:root[data-theme="custom"] {
+  --iz-page-bg-custom: #fafafc;
+  background-color: var(--iz-page-bg-custom);
+}
+
+:root[data-theme="custom"] body {
+  background-color: var(--iz-page-bg-custom);
+}
+
 #root {
   box-sizing: border-box;
   width: 100%;

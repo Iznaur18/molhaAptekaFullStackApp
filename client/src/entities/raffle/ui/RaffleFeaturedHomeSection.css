@@ -8,15 +8,14 @@
 }
 
 /**
- * Паритет с mobile/shared/theme/raffleFeaturedStyles.ts → revealButton:
- *   backgroundColor action (сплошная заливка, без радуги)
- *   paddingVertical 14 / paddingHorizontal 16
- *   borderWidth hairline, borderColor border
- *   radius 16 (RAFFLE_REVEAL_BUTTON_BORDER_RADIUS)
- *   текст 15/20, 700, onContrast · pressed opacity .92
+ * Web-макет главной (ноябрь 2026): градиентная «таблетка» с подарком слева
+ * и шевроном справа. На mobile — сплошная заливка
+ * (mobile/shared/theme/raffleFeaturedStyles.ts → revealButton), паритет
+ * намеренно разведён: макет относится к web-главной.
  */
 .raffle-featured-home-section__reveal {
   box-sizing: border-box;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -24,28 +23,44 @@
   margin: 0;
   padding: 14px var(--iz-space-4);
   overflow: hidden;
-  border: var(--iz-border-hairline) solid var(--iz-color-border);
-  border-radius: var(--iz-radius-card-lg);
-  background: var(--iz-color-action);
+  border: 0;
+  border-radius: var(--iz-radius-pill);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--iz-color-action) 82%, #ffb37a) 0%,
+    var(--iz-color-action) 55%,
+    color-mix(in srgb, var(--iz-color-action) 88%, #d63c00) 100%
+  );
   color: var(--iz-color-on-contrast);
   font-size: var(--iz-font-md);
   font-weight: var(--iz-weight-bold);
   line-height: var(--iz-leading-base);
   cursor: pointer;
   transition:
-    background var(--iz-transition-base),
+    filter var(--iz-transition-base),
     opacity var(--iz-transition-base);
 }
 
 @supports (corner-shape: squircle) {
   .raffle-featured-home-section__reveal {
-    border-radius: var(--iz-radius-card-lg);
-    corner-shape: squircle;
+    border-radius: var(--iz-radius-pill);
+    corner-shape: round;
   }
 }
 
+.raffle-featured-home-section__reveal-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.raffle-featured-home-section__reveal-chevron {
+  position: absolute;
+  right: var(--iz-space-4);
+}
+
 .raffle-featured-home-section__reveal:hover {
-  background: var(--iz-color-action-hover);
+  filter: brightness(1.04);
 }
 
 /* revealButtonPressed: opacity .92 */

@@ -3,7 +3,11 @@ import {
   RAFFLE_PRIZE_MEDIA_TYPE_VIDEO,
 } from "../lib/isRafflePrizeVideo.js";
 import { CREATE_RAFFLE_MODAL_UI } from "../../../shared/config/appUiCopy.js";
-import { isRuRegionCode } from "@molha/api-contract";
+import {
+  RAFFLE_WINNERS_COUNT_MAX,
+  RAFFLE_WINNERS_COUNT_MIN,
+  isRuRegionCode,
+} from "@molha/api-contract";
 
 /** @typedef {'basic' | 'prize' | 'conditions'} CreateRaffleWizardStepId */
 
@@ -53,6 +57,7 @@ export function resolveCreateRaffleWizardStepCopy(stepId) {
  *   prizeImageUrl: string;
  *   prizeVideoUrl: string;
  *   targetSales: string;
+ *   winnersCount?: string;
  *   instagramUrl: string;
  *   regionCode?: string;
  * }} form
@@ -89,6 +94,14 @@ export function validateCreateRaffleFormStep(stepId, form) {
   if (!Number.isFinite(targetSales) || targetSales < 1) {
     return CREATE_RAFFLE_MODAL_UI.ERROR_TARGET;
   }
+  const winnersCount = Number(form.winnersCount);
+  if (
+    !Number.isInteger(winnersCount) ||
+    winnersCount < RAFFLE_WINNERS_COUNT_MIN ||
+    winnersCount > RAFFLE_WINNERS_COUNT_MAX
+  ) {
+    return CREATE_RAFFLE_MODAL_UI.ERROR_WINNERS_COUNT;
+  }
   return null;
 }
 
@@ -100,6 +113,7 @@ export function validateCreateRaffleFormStep(stepId, form) {
  *   prizeImageUrl: string;
  *   prizeVideoUrl: string;
  *   targetSales: string;
+ *   winnersCount?: string;
  *   instagramUrl: string;
  *   regionCode?: string;
  * }} form
@@ -111,6 +125,7 @@ export function isCreateRaffleFormDirty(form) {
     String(form.prizeImageUrl ?? "").trim() !== "" ||
     String(form.prizeVideoUrl ?? "").trim() !== "" ||
     String(form.targetSales ?? "").trim() !== "" ||
+    String(form.winnersCount ?? "1").trim() !== "1" ||
     String(form.instagramUrl ?? "").trim() !== "" ||
     form.prizeMediaType !== RAFFLE_PRIZE_MEDIA_TYPE_IMAGE ||
     (Boolean(form.regionCode) && form.regionCode !== "RU-MOW")

@@ -3,6 +3,8 @@ import {
   DEFAULT_VIEWER_REGION_CODE,
   RAFFLE_DESCRIPTION_MAX_LENGTH,
   RAFFLE_TITLE_MAX_LENGTH,
+  RAFFLE_WINNERS_COUNT_MAX,
+  RAFFLE_WINNERS_COUNT_MIN,
   isRuRegionCode,
 } from "@molha/api-contract";
 
@@ -59,6 +61,7 @@ const INITIAL_FORM = {
   prizeVideoUrl: "",
   prizeImageFocus: { ...DEFAULT_RAFFLE_PRIZE_IMAGE_FOCUS },
   targetSales: "",
+  winnersCount: "1",
   instagramUrl: "",
   regionCode: DEFAULT_VIEWER_REGION_CODE,
 };
@@ -79,6 +82,7 @@ function formFromRaffle(raffle) {
     prizeVideoUrl: raffle.prizeVideoUrl ?? "",
     prizeImageFocus: getRafflePrizeImageFocus(raffle),
     targetSales: String(raffle.targetSales ?? ""),
+    winnersCount: String(raffle.winnersCount ?? "1"),
     instagramUrl: raffle.instagramUrl ?? "",
     regionCode: isRuRegionCode(regionRaw) ? regionRaw : DEFAULT_VIEWER_REGION_CODE,
   };
@@ -328,6 +332,19 @@ export function CreateRaffleModal({
       return;
     }
 
+    const winnersCount = Number(form.winnersCount);
+    if (
+      !Number.isInteger(winnersCount) ||
+      winnersCount < RAFFLE_WINNERS_COUNT_MIN ||
+      winnersCount > RAFFLE_WINNERS_COUNT_MAX
+    ) {
+      setStatus({
+        kind: "error",
+        message: CREATE_RAFFLE_MODAL_UI.ERROR_WINNERS_COUNT,
+      });
+      return;
+    }
+
     const body = {
       title: form.title.trim(),
       description: form.description.trim(),
@@ -336,6 +353,7 @@ export function CreateRaffleModal({
       prizeVideoUrl: resolveUploadedImageUrl(form.prizeVideoUrl.trim()),
       prizeImageFocus: form.prizeImageFocus,
       targetSales,
+      winnersCount,
       instagramUrl: form.instagramUrl.trim(),
       regionCode: form.regionCode,
     };
@@ -628,6 +646,27 @@ export function CreateRaffleModal({
                   </FormFieldLabel>
                   <p className="create-raffle-modal__field-hint">
                     {CREATE_RAFFLE_MODAL_UI.HINT_TARGET}
+                  </p>
+                </div>
+                <div className="create-raffle-modal__field">
+                  <FormFieldLabel
+                    label={CREATE_RAFFLE_MODAL_UI.LABEL_WINNERS_COUNT}
+                    required
+                  >
+                    <input
+                      {...INTEGER_INPUT_FIELD_PROPS}
+                      value={form.winnersCount}
+                      required
+                      onChange={(e) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          winnersCount: keepDigitsOnly(e.target.value),
+                        }))
+                      }
+                    />
+                  </FormFieldLabel>
+                  <p className="create-raffle-modal__field-hint">
+                    {CREATE_RAFFLE_MODAL_UI.HINT_WINNERS_COUNT}
                   </p>
                 </div>
                 <div className="create-raffle-modal__field">

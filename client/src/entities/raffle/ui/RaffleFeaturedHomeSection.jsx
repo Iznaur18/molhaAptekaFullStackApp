@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { ChevronRight, Gift } from "lucide-react";
 
 import { RAFFLE_FEATURED_CAROUSEL_UI } from "../../../shared/config/appUiCopy.js";
 
@@ -36,8 +37,14 @@ export function RaffleFeaturedHomeSection({ raffles, onOpenProducts, getManage }
         onClick={openFirstRaffleProducts}
       >
         <span className="raffle-featured-home-section__reveal-label">
+          <Gift size={18} aria-hidden />
           {RAFFLE_FEATURED_CAROUSEL_UI.SHOW}
         </span>
+        <ChevronRight
+          className="raffle-featured-home-section__reveal-chevron"
+          size={18}
+          aria-hidden
+        />
       </button>
     </section>
   );
