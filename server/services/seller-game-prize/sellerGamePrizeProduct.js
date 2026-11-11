@@ -65,10 +65,10 @@ export async function assertPrizeProductsBelongToSeller({ sellerId, productIds }
 export function isPrizeProductPurchasable(product) {
   return Boolean(
     product &&
-      product.productModerationStatus === PRODUCT_MODERATION_APPROVED &&
-      product.productIsAvailable !== false &&
-      product.productOutOfStock !== true &&
-      Number(product.productStockQuantity) > 0,
+    product.productModerationStatus === PRODUCT_MODERATION_APPROVED &&
+    product.productIsAvailable !== false &&
+    product.productOutOfStock !== true &&
+    Number(product.productStockQuantity) > 0,
   );
 }
 

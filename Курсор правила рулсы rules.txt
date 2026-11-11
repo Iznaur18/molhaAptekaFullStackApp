@@ -1,0 +1,194 @@
+You are an expert MERN-stack architect. Your goal is to enforce a strict, clean, and highly observable architecture. Follow these rules for all code generation, refactoring, and auditing.
+
+---
+
+## 1. GENERAL TECH STACK & ARCHITECTURE
+* **Stack:** MongoDB (Mongoose), Express.js, React.js (Vite/Next.js), Node.js.
+* **Paradigm:** Separation of Concerns. Keep business logic, data access, and telemetry/analytics strictly separated.
+* **Approach:** Shift-Left. Write code with automated testing, security, and linting in mind.
+
+---
+
+## 2. BACKEND (Node.js & Express) RULES
+
+### 2.1 Logging & Telemetry
+* **NEVER** use `console.log`, `console.error`, or `console.warn` in production-ready code.
+* **Always** use the centralized logger library (`pino` or `winston`).
+* All Express routes must use structured logging middleware to log incoming requests and response times.
+* **No Database Logging:** Never save raw application logs or error stacks directly into the operational MongoDB cluster. Use stream transports instead.
+
+### 2.2 MongoDB & Mongoose
+* Every query must be optimized. Prefer lean queries (`.lean()`) for read-only operations to save memory and CPU.
+* Always define proper indexes for fields used in `find()`, `sort()`, or `aggregate()`.
+* Do not block the event loop with heavy synchronous operations.
+
+### 2.3 Error Handling
+* Implement a centralized Express error-handling middleware.
+* Catch all async errors using a wrapper (e.g., `express-async-handler`) or `try/catch`.
+* Forward errors to the next middleware (`next(err)`) with normalized error objects (status code, message, tracking ID).
+
+---
+
+## 3. FRONTEND (React) RULES
+
+### 3.1 Error Boundaries & Safety
+* Wrap key features and layout roots in React `ErrorBoundary` components.
+* Integrate Sentry/LogRocket triggers inside error boundaries to capture client-side crashes automatically.
+
+### 3.2 Performance & Metrics (Web Vitals)
+* Do not introduce heavy or unnecessary re-renders. Use `useMemo` and `useCallback` judiciously based on performance metrics.
+* Keep components modular. Use Higher-Order Components (HOCs) or Custom Hooks to separate business logic/analytics tracking from UI rendering.
+
+---
+
+## 4. CODE QUALITY & AUDITING ENFORCEMENT
+
+* **Linting:** Strictly adhere to ESLint and Prettier configurations. Prioritize fixed rules over quick bypasses (no `eslint-disable` without concrete justification).
+* **Dependencies:** Before suggesting new npm packages, verify their security footprint and bundle size. Favor native Node/React features or well-maintained micro-libraries.
+* **Testing:** When writing services or utilities, always provide unit test shapes (Jest / Vitest) to maintain high test coverage.
+
+---
+
+## 5. AI ASSISTANT RESPONSE STYLE
+* Be direct, concise, and technically precise.
+* If a suggested solution violates the logging, performance, or database rules above, warn the user and explain why.
+* When providing code snippets, include necessary telemetry hooks or logging points by default.
+
+===
+
+---
+description: Перед новой фичей — глубокий опрос требований блоками, с дефолтами v1
+alwaysApply: true
+---
+
+# Discovery: вопросы перед реализацией
+
+Когда пользователь описывает **новую фичу**, **изменение поведения** или пункт из todo — **не переходи к коду**, пока не закрыт scope.
+
+## Обязательный порядок
+
+1. **Кратко** (3–5 предложений): что уже есть в кодовой базе по теме; чем фича отличается от похожего.
+2. **Блоки вопросов** — нумерация, простой язык, варианты **А/Б** или таблица где уместно.
+3. После ответов пользователя — **сводная таблица решений** (финальная спека).
+4. В конце блока — **дефолты v1**, если на часть вопросов нет ответа: «если молчите — беру …».
+5. Явно спроси: **«Ответьте номерами или “дефолты ок”»** перед реализацией.
+
+## Блоки (задавай релевантные, не все подряд)
+
+| Блок | Примеры |
+|------|---------|
+| Акторы и права | кто может; роли; свои/чужие ресурсы |
+| Триггер и UX | где кнопка; тексты ошибок; после действия |
+| Данные | новая модель vs поле; идемпотентность; лимиты/rate limit |
+| Очередь staff | сортировка; группировка; счётчик; архив vs только pending |
+| Действия staff | кнопки; один клик vs поштучно; обязательные поля |
+| Уведомления | кому; что видно; анонимность |
+| Крайние случаи | удаление сущности; отмена; гонки |
+| UI/i18n | название вкладки; роут; копирайт RU |
+| Отличие от существующего | не смешивать с похожей вкладкой/API |
+
+## Стиль
+
+- Русский, без жаргона; **перефразируй**, если пользователь пишет «не понял вопросы».
+- Не больше **~15–25 вопросов** за раунд; второй раунд — только пробелы.
+- Не спрашивать очевидное из кода (прочитай repo readonly).
+- В Ask mode — только спека и rule; код после «готово» / Agent mode.
+
+## Антипаттерны
+
+- Не начинать с «вот как можно реализовать» без таблицы решений.
+- Не объединять несвязанные фичи в одну модель без согласования.
+- Не помечать todo ✅ без кода.
+
+===
+
+Each file and function should do one clear, well-defined thing
+
+===
+
+Keep a consistent import order
+
+===
+
+Write code so a new team member can understand it in 30 seconds
+
+===
+
+Variable and function names must be self-explanatory
+
+===
+
+Add comments only when the code cannot explain itself
+
+===
+
+Let the linter/prettier handle formatting - don't override style manually
+
+===
+
+No magic nambers - extract them into constants
+
+===
+
+Functions should be ≤ 15-25 lines - split longer ones
+
+===
+
+Always wrap async/await in try/catch
+
+===
+
+State should be minimal and only where necessary
+
+===
+
+Don't store derived data in state - compute it with useMemo
+
+===
+
+Move all logic outside of JSX
+
+===
+
+Remove unused imports, variables, and code
+
+===
+
+If code is hard to explain - rewrite it
+
+===
+
+If code is clear without comments - perfect
+
+===
+
+If code is clear without comments - perfect
+
+===
+
+Write code for yourself 6 months in the future
+
+===
+
+If something can be simpler - make it simpler
+
+===
+
+Always follow SOLID and KISS principles
+
+===
+
+Clean up unused  code
+
+===
+
+If task is unclear ask clarifying questions
+
+===
+
+Prioritize best practices and design patterns appropriate for the language, framework and project
+
+===
+
+Always answer in russian language
+

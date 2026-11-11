@@ -199,14 +199,9 @@ describe("prizeProductId в секции", () => {
 
     const parsedWith = putFortuneWheelConfigBodySchema.parse({
       enabled: true,
-      sectors: buildSectors(2, [
-        { prizeProductId: "6af0c4bcb5658b01e9a19c8a" },
-      ]),
+      sectors: buildSectors(2, [{ prizeProductId: "6af0c4bcb5658b01e9a19c8a" }]),
     });
-    assert.equal(
-      parsedWith.sectors[0].prizeProductId,
-      "6af0c4bcb5658b01e9a19c8a",
-    );
+    assert.equal(parsedWith.sectors[0].prizeProductId, "6af0c4bcb5658b01e9a19c8a");
 
     assert.throws(() =>
       putFortuneWheelConfigBodySchema.parse({

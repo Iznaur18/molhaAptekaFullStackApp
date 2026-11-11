@@ -180,7 +180,8 @@ export async function spinSellerFortuneWheel({ sellerId, buyerId }) {
     const isWin = sector?.enabled !== false;
 
     // Товар-приз: подтягиваем название для снимков спина и выигрыша.
-    const prizeProductId = isWin && sector.prizeProductId ? String(sector.prizeProductId) : null;
+    const prizeProductId =
+      isWin && sector.prizeProductId ? String(sector.prizeProductId) : null;
     const prizeProductName = prizeProductId
       ? ((await resolvePrizeProductNames([prizeProductId])).get(prizeProductId) ?? null)
       : null;

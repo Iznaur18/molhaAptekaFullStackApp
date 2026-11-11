@@ -1,0 +1,158 @@
+1) # Discovery: вопросы перед реализацией
+
+Когда пользователь описывает **новую фичу**, **изменение поведения** или пункт из todo — **не переходи к коду**, пока не закрыт scope.
+
+## Обязательный порядок
+
+1. **Кратко** (3–5 предложений): что уже есть в кодовой базе по теме; чем фича отличается от похожего.
+2. **Блоки вопросов** — нумерация, простой язык, варианты **А/Б** или таблица где уместно.
+3. После ответов пользователя — **сводная таблица решений** (финальная спека).
+4. В конце блока — **дефолты v1**, если на часть вопросов нет ответа: «если молчите — беру …».
+5. Явно спроси: **«Ответьте номерами или “дефолты ок”»** перед реализацией.
+
+## Блоки (задавай релевантные, не все подряд)
+
+| Блок | Примеры |
+|---|---|
+| Акторы и права | кто может; роли; свои/чужие ресурсы |
+| Триггер и UX | где кнопка; тексты ошибок; после действия |
+| Данные | новая модель vs поле; идемпотентность; лимиты/rate limit |
+| Очередь staff | сортировка; группировка; счётчик; архив vs только pending |
+| Действия staff | кнопки; один клик vs поштучно; обязательные поля |
+| Уведомления | кому; что видно; анонимность |
+| Крайние случаи | удаление сущности; отмена; гонки |
+| UI/i18n | название вкладки; роут; копирайт RU |
+| Отличие от существующего | не смешивать с похожей вкладкой/API |
+
+## Стиль
+
+- Русский, без жаргона; **перефразируй**, если пользователь пишет «не понял вопросы».
+- Не больше **~15–25 вопросов** за раунд; второй раунд — только пробелы.
+- Не спрашивать очевидное из кода (прочитай repo readonly).
+- В Ask mode — только спека и rule; код после «готово» / Agent mode.
+
+## Антипаттерны
+
+- Не начинать с «вот как можно реализовать» без таблицы решений.
+- Не объединять несвязанные фичи в одну модель без согласования.
+- Не помечать todo ✅ без кода.
+
+2) # Post-ship gate (adversarial)
+
+Когда пользователь говорит **«перепроверь» / «на 100%» / «готово?» / «проверь по шпаргалкам»** — **не отвечай «ок»**. Сначала пройди gate и выдай отчёт. Без green gate — статус **не ready**.
+
+## Обязательный отчёт (коротко)
+
+```
+GATE:
+- env matrix: …
+- money/auth path: …
+- silent catch: …
+- deps/resolve: …
+- tests run: …
+VERDICT: ready | blocked (что чинить)
+```
+
+## Чеклист (все релевантные пункты)
+
+### 1. Env matrix (не только localhost)
+- Web: `localhost` **и** LAN `http://192.168.x.x` (не secure context).
+- Не полагайся на `crypto.randomUUID`, `navigator.clipboard`, `navigator.share` без fallback.
+- Env-списки через запятую (`FRONTEND_URL=a,b,c`) — для URL/redirect бери **первый origin**, не всю строку.
+
+### 2. Money / auth / ledger
+- Convert / credit / refund / reverse: идемпотентность, txn или явный fallback без replica.
+- После успеха UI **обновляет баланс** (invalidate query / callback).
+- Ошибки **видимы** пользователю (не пустой `catch {}`).
+
+### 3. Silent failure ban
+```js
+// ❌
+try { await doThing(); } catch {}
+
+// ✅
+try { await doThing(); } catch (e) { showError(e); throw/log; }
+```
+
+### 4. Deps & bundle
+- Новый import → пакет есть в `package.json` целевого app (mobile/client).
+- Не тяни native-only пакет, если в проекте уже есть SecureStore/localStorage паттерн.
+
+### 5. Client ↔ mobile parity
+- Одинаковый UX-критпуть (copy/share/convert) на обеих платформах, shared constants где надо.
+
+### 6. Runtime proof
+- Хотя бы один реальный вызов API/unit/integration по критичному пути **или** явный ручной smoke-скрипт в отчёте.
+- «Прочитал код» ≠ proof.
+
+## Анти-паттерны ревью
+
+- «Выглядит правильно» без прогона пути.
+- Чинить только то, что пользователь уже нашёл, игноря соседний тот же класс бага.
+- Считать localhost-поведение достаточным для LAN/prod.
+
+3) ---
+DO NOT GIVE ME HIGH LEVEL SHIT, IF I ASK FOR FIX OR EXPLANATION, I WANT ACTUAL CODE OR EXPLANATION!!! I DON'T WANT "Here's how you can blablabla"
+
+- Be terse. No explanations. Output code immediately.
+- Treat me as an expert. Anticipate my refactoring needs.
+- Suggest contrarian solutions using new tech.
+- No moralizing or obvious safety warnings.
+- Use Prettier formatting.
+- When editing multiple files, use separate code blocks.
+- If constrained by policy, give closest legal code and state reason after.
+
+4) # Expo HAS CHANGED
+
+Read the exact versioned docs at https://docs.expo.dev/versions/v54.0.0/ before writing any code.
+
+5) @AGENTS.md
+
+6) # Client ↔ mobile: границы shared (A.4)
+
+Полный аудит: `docs/client-mobile-consolidation-audit.md` §2, §4.
+
+## Шарить (единый источник)
+
+| Что | Куда |
+| --- | ---- |
+| Zod-схемы, upload-лимиты, API shapes | `contract/` → `@molha/api-contract` |
+| Pure: цены, даты, URL media, роли, staff paths | `packages/shared-lib` |
+| `parseApiContract`, multipart, refresh queue | `packages/shared-api` + thin wrapper в client/mobile |
+| Design tokens | `packages/design-tokens` (+ verify CI) |
+| Profile sections / staff web paths | `shared-lib` (`profileSections`, `profileStaffWebPaths`) |
+
+**Правило:** третья копия одной функции в `client/` и `mobile/` — почти всегда баг процесса → вынести в пакет.
+
+## Не шарить
+
+- JSX / CSS / `StyleSheet` / DOM-хуки
+- `react-router` vs `expo-router` навигация
+- Vite proxy / cookies vs `EXPO_PUBLIC_*` / SecureStore
+- Web-only (DnD, scroll lock, dialog trap) и mobile-only (push, image-picker, deep links)
+- **Импорт `client/src/...` в `mobile/`** (и обратно UI) — запрещено
+
+## Auth
+
+- Один API (`server/`), разные **адаптеры** хранения токенов (cookie/sessionStorage vs SecureStore).
+- Не дублировать refresh/retry без синхронизации с `shared-api`.
+
+## Staff на mobile
+
+- Новые staff-фичи → **web only** (G.1). См. `mobile-staff-freeze.mdc`.
+
+## PR checklist
+
+См. `.github/pull_request_template.md` § Shared-слой.
+
+7) # Mobile staff freeze (G.1)
+
+- **Не добавлять** новые staff/moderation/admin экраны в `mobile/` (RN).
+- Новые staff-фичи — **только web** (`client/`).
+- В hub-меню staff-пункты открывают web: `openProfileStaffWebSection` + `PROFILE_SECTION_WEB_PATH` из `@izibuy/shared-lib`.
+- Пути web: `EXPO_PUBLIC_WEB_APP_URL` (dev: `http://127.0.0.1:5173` или staging).
+- Deep link buyer: `izibuy://` / `https://izibuy.ru/...` — in-app. Staff profile sections — browser/web SPA.
+- Существующие in-app staff экраны — **maintenance** (G.2), не расширять. Список: `mobile/README.md` § Staff inventory.
+- Buyer-critical path — **активная разработка** (G.3): `mobile/docs/BUYER-CRITICAL-PATH.md`.
+
+См. `mobile/docs/STAFF-WEB-ONLY.md`, `docs/client-mobile-consolidation-audit.md` §5–§6.

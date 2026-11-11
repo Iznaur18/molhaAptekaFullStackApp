@@ -1160,7 +1160,9 @@ export async function createOrder({
   const fortuneWheelPrizeWinIdsToExpire = [];
   if (productPrizeWins.length > 0) {
     const orderSellerIds = new Set(
-      uniqueProductIds.map((productId) => String(productById[productId]?.sellerId ?? "")),
+      uniqueProductIds.map((productId) =>
+        String(productById[productId]?.sellerId ?? ""),
+      ),
     );
     const itemProductIds = new Set(uniqueProductIds.map(String));
     const prizeProductIds = [
