@@ -1,0 +1,159 @@
+/* Блок «Буст продвижение» на главной — белая карточка по макету:
+   шапка с молнией и «Все товары →», ряд мини-карточек без бейджа. */
+.boost-home-section {
+  margin: 0;
+  padding: 14px;
+  border-radius: var(--iz-radius-card-lg);
+  background: var(--iz-color-surface);
+  box-shadow: var(--iz-shadow-card-subtle);
+  box-sizing: border-box;
+}
+
+.boost-home-section__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+}
+
+.boost-home-section__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--iz-radius-md);
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-action);
+}
+
+.boost-home-section__headings {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.boost-home-section__title {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--iz-color-text);
+}
+
+.boost-home-section__subtitle {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.25;
+  color: var(--iz-color-text-secondary);
+}
+
+.boost-home-section__view-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: var(--iz-radius-pill);
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-action);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.15s ease;
+}
+
+.boost-home-section__view-all:hover {
+  background: var(--iz-color-action-bg-hover);
+}
+
+.boost-home-section__view-all:focus-visible {
+  outline: 2px solid var(--iz-color-action);
+  outline-offset: 2px;
+}
+
+.boost-home-section__scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.boost-home-section__scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.boost-home-section__track {
+  display: flex;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.boost-home-section__item {
+  flex: 0 0 clamp(8.5rem, 23%, 11rem);
+  min-width: 0;
+}
+
+/* Мини-карточка: фото на приглушённой подложке, цена — белая таблетка
+   поверх фото слева внизу (по макету). */
+.boost-mini-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+}
+
+.boost-mini-card__media {
+  position: relative;
+  border-radius: var(--iz-radius-card);
+  background: var(--iz-color-surface-muted);
+  overflow: hidden;
+}
+
+.boost-mini-card__image-wrap {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.boost-mini-card__image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  user-select: none;
+}
+
+.boost-mini-card__price-wrap {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  z-index: 2;
+  margin: 0;
+  padding: 3px 8px;
+  border: 0;
+  border-radius: var(--iz-radius-pill);
+  background: var(--iz-color-surface);
+  box-shadow: var(--iz-shadow-sm);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.boost-mini-card__price {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--iz-color-text);
+}

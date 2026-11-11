@@ -101,10 +101,7 @@
   width: 100%;
   min-width: 0;
   margin: 0;
-  padding: 12px;
-  border: 1px solid var(--iz-color-border);
-  border-radius: 1rem;
-  background: var(--iz-color-surface-muted);
+  padding: 0;
   box-sizing: border-box;
 }
 

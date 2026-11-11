@@ -1,0 +1,14 @@
+---
+description: Логи, lean-запросы, индексы, ошибки API — как в этом сервере
+globs: server/**/*.js
+alwaysApply: false
+---
+
+# Сервер: логи, Mongo, ошибки
+
+- Новый серверный код пишет в `logServerEvent` / `logServerHttpError` (`server/utils/logServerEvent.js`), не в голый `console.log`. `pino` и `winston` не добавлять.
+- Стек и сырой лог приложения в операционную MongoDB не класть. Аудит и денежные события — только существующие модели и `emit*Event`.
+- Read-only выдача — `.lean()`, если дальше документ не сохраняют. Поле в `find` / `sort` / `aggregate` без индекса — индекс в модели в том же изменении.
+- Тяжёлое и синхронное — в BullMQ (`queues/`, `worker.js`), не в запросе.
+- Успех: `successRes(res, data)`. Ошибка: `throw new AppError(status, "Текст по-русски")`. Ответ руками через `res.status().json()` не писать.
+- Сервис и утилита — рядом тест `node --test`. Новый endpoint — схема в `contract/`, иначе zod срежет поле.

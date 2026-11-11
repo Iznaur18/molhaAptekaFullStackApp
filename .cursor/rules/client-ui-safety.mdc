@@ -1,0 +1,12 @@
+---
+description: Error boundary, тексты ошибок, без лишних ререндеров на web
+globs: client/**/*.{js,jsx}
+alwaysApply: false
+---
+
+# Web UI
+
+- Корень и смена маршрута уже в `AppErrorBoundary`. Новый изолированный виджет с падением не должен ронять всё приложение — граница рядом с виджетом, тот же компонент.
+- Sentry и LogRocket не подключать, пока их нет в `client/package.json`.
+- Ошибка API видна пользователю: `new Error(message ?? fallback)` с русским fallback. Пустой `catch` запрещён.
+- Бизнес-правило и аналитика — в `model`/`lib` или хук, не в разметке. Тяжёлый экран — `React.lazy`, entry-чанк не раздувать.

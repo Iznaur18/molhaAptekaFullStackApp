@@ -27,6 +27,7 @@ import {
   createOrderBodySchema,
   createProductBodySchema,
   createRaffleBodySchema,
+  patchRaffleBodySchema,
   createUserStoryBodySchema,
   getAllOrdersQuerySchema,
   getMySalesQuerySchema,
@@ -429,6 +430,48 @@ test("createRaffleBodySchema rejects invalid non-empty instagramUrl", () => {
       regionCode: "RU-MOW",
     }),
   );
+});
+
+test("createRaffleBodySchema defaults winnersCount to 1", () => {
+  const parsed = createRaffleBodySchema.parse({
+    title: "Single winner",
+    targetSales: 10,
+    prizeImageUrl: "/uploads/prize.png",
+    regionCode: "RU-MOW",
+  });
+  assert.equal(parsed.winnersCount, 1);
+});
+
+test("createRaffleBodySchema accepts winnersCount within 1..100", () => {
+  const parsed = createRaffleBodySchema.parse({
+    title: "Many winners",
+    targetSales: 10,
+    winnersCount: "25",
+    prizeImageUrl: "/uploads/prize.png",
+    regionCode: "RU-MOW",
+  });
+  assert.equal(parsed.winnersCount, 25);
+});
+
+test("createRaffleBodySchema rejects winnersCount out of range", () => {
+  for (const winnersCount of [0, 101, 1.5]) {
+    assert.throws(() =>
+      createRaffleBodySchema.parse({
+        title: "Bad winners",
+        targetSales: 10,
+        winnersCount,
+        prizeImageUrl: "/uploads/prize.png",
+        regionCode: "RU-MOW",
+      }),
+    );
+  }
+});
+
+test("patchRaffleBodySchema accepts optional winnersCount", () => {
+  assert.equal(patchRaffleBodySchema.parse({}).winnersCount, undefined);
+  assert.equal(patchRaffleBodySchema.parse({ winnersCount: 5 }).winnersCount, 5);
+  assert.throws(() => patchRaffleBodySchema.parse({ winnersCount: 0 }));
+  assert.throws(() => patchRaffleBodySchema.parse({ winnersCount: 101 }));
 });
 
 test("createUserStoryBodySchema validates media payload", () => {

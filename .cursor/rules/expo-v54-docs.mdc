@@ -1,0 +1,13 @@
+---
+description: Перед кодом mobile читать доки Expo SDK 54, не expo install
+globs: mobile/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Expo SDK 54
+
+Перед правкой `mobile/` свериться с докой версии: https://docs.expo.dev/versions/v54.0.0/
+
+- `expo install` не запускать — ломает lock. Зависимости ставить из корня репозитория (`npm install`, `--workspace`).
+- Новые staff/admin-экраны в RN не добавлять (`mobile-staff-freeze.mdc`).
+- Импорт `client/src/...` в `mobile/` запрещён.

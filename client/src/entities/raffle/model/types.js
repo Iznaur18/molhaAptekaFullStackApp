@@ -28,6 +28,8 @@
  * @property {string | null} [completedAt]
  * @property {{ _id: string; userName?: string | null; userAvatarUrl?: string | null } | null} [winner]
  * @property {string | null} [winnerSelectedAt]
+ * @property {number} [winnersCount]
+ * @property {Array<{ _id: string; userName?: string | null; userAvatarUrl?: string | null }>} [winners]
  * @property {string} [createdAt]
  * @property {string} [updatedAt]
  * @property {{ _id: string; userName?: string | null } | null} [seller]

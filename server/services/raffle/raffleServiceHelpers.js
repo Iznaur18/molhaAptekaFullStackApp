@@ -104,6 +104,9 @@ export const applyRaffleBodyPatch = (raffle, body) => {
   if (body.targetSales !== undefined) {
     raffle.targetSales = Number(body.targetSales);
   }
+  if (body.winnersCount !== undefined) {
+    raffle.winnersCount = Math.floor(Number(body.winnersCount) || 1);
+  }
   if (body.instagramUrl !== undefined) {
     raffle.instagramUrl = String(body.instagramUrl).trim();
   }

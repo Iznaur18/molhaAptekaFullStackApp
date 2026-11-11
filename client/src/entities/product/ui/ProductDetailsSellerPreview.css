@@ -116,8 +116,9 @@
   gap: 0.625rem;
   min-width: 0;
   padding: 0.625rem 0.7rem;
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.75rem;
-  background: var(--iz-color-bg);
+  background: var(--iz-color-surface-muted);
 }
 
 .product-details-seller-preview__metric-icon {
@@ -127,7 +128,7 @@
   width: 1.875rem;
   height: 1.875rem;
   border-radius: 0.5rem;
-  background: var(--iz-color-surface-muted);
+  background: var(--iz-color-surface);
   color: var(--iz-color-action);
 }
 

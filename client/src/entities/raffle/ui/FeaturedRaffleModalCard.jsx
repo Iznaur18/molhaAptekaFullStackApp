@@ -126,8 +126,8 @@ export function FeaturedRaffleModalCard({
           />
         </div>
 
-        {isCompleted && raffle.winner?._id ? (
-          <FeaturedRaffleWinnerCard winner={raffle.winner} />
+        {isCompleted && (raffle.winner?._id || raffle.winners?.length) ? (
+          <FeaturedRaffleWinnerCard winner={raffle.winner} winners={raffle.winners} />
         ) : null}
 
         <div className="featured-raffle-modal-card__stats" aria-label={label}>

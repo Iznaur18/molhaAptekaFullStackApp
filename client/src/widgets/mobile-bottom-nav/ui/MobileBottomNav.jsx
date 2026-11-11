@@ -1,4 +1,4 @@
-import { Home, Menu, Plus, ShoppingCart, User } from "lucide-react";
+import { Home, LayoutGrid, Plus, ShoppingCart, User } from "lucide-react";
 
 import { useCart } from "../../../entities/cart/model/useCart.js";
 import {
@@ -69,13 +69,15 @@ export function MobileBottomNav({
     <nav className="mobile-bottom-nav" aria-label={HOME_PAGE_UI.NAV_MOBILE_BOTTOM_ARIA}>
       <MobileBottomNavItem
         ariaLabel={HOME_PAGE_UI.NAV_MOBILE_HOME_ARIA}
+        label={HOME_PAGE_UI.NAV_MOBILE_HOME}
         icon={Home}
         isActive={isHomeActive}
         onClick={onHomeClick}
       />
       <MobileBottomNavItem
         ariaLabel={HOME_PAGE_UI.CATALOG_MENU_BUTTON_ARIA}
-        icon={Menu}
+        label={HOME_PAGE_UI.NAV_MOBILE_CATALOG}
+        icon={LayoutGrid}
         isActive={isCatalogActive}
         onClick={onCatalogClick}
       />
@@ -86,10 +88,12 @@ export function MobileBottomNav({
             : HEADER_PLACE_PRODUCT_BUTTON_UI.ARIA_LOGIN_REQUIRED
         }
         icon={Plus}
+        isPrimary
         onClick={handlePlaceProductClick}
       />
       <MobileBottomNavItem
         ariaLabel={HEADER_CART_BUTTON_UI.ARIA}
+        label={HOME_PAGE_UI.NAV_MOBILE_CART}
         icon={ShoppingCart}
         isActive={isCartActive}
         badgeContent={cartBadge}
@@ -100,6 +104,7 @@ export function MobileBottomNav({
       />
       <MobileBottomNavItem
         ariaLabel={HEADER_PROFILE_BUTTON_UI.ARIA}
+        label={HOME_PAGE_UI.NAV_MOBILE_PROFILE}
         icon={User}
         isActive={isProfileActive}
         badgeContent={profileBadge}
@@ -115,8 +120,10 @@ export function MobileBottomNav({
 /**
  * @param {{
  *   ariaLabel: string;
+ *   label?: string;
  *   icon: import("lucide-react").LucideIcon;
  *   isActive?: boolean;
+ *   isPrimary?: boolean;
  *   badgeContent?: number | null;
  *   badgeAriaLabel?: string;
  *   onClick: () => void;
@@ -124,8 +131,10 @@ export function MobileBottomNav({
  */
 function MobileBottomNavItem({
   ariaLabel,
+  label,
   icon,
   isActive = false,
+  isPrimary = false,
   badgeContent = null,
   badgeAriaLabel,
   onClick,
@@ -133,6 +142,7 @@ function MobileBottomNavItem({
   const itemClassName = [
     "mobile-bottom-nav__item",
     isActive && "mobile-bottom-nav__item--active",
+    isPrimary && "mobile-bottom-nav__item--primary",
   ]
     .filter(Boolean)
     .join(" ");
@@ -161,6 +171,11 @@ function MobileBottomNavItem({
           </span>
         ) : null}
       </span>
+      {label ? (
+        <span className="mobile-bottom-nav__label" aria-hidden>
+          {label}
+        </span>
+      ) : null}
     </button>
   );
 }

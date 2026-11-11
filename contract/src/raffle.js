@@ -13,6 +13,8 @@ import {
 /** Синхрон с `server/constants/raffleConstants.js`. */
 export const RAFFLE_TARGET_SALES_MIN = 1;
 export const RAFFLE_TARGET_SALES_MAX = 100_000;
+export const RAFFLE_WINNERS_COUNT_MIN = 1;
+export const RAFFLE_WINNERS_COUNT_MAX = 100;
 export const RAFFLE_TITLE_MAX_LENGTH = 100;
 export const RAFFLE_DESCRIPTION_MAX_LENGTH = 200;
 export const RAFFLE_INSTAGRAM_URL_MAX_LENGTH = 500;
@@ -169,6 +171,18 @@ export const createRaffleBodySchema = rafflePrizeFieldsSchema
         RAFFLE_TARGET_SALES_MAX,
         `Цель: от ${RAFFLE_TARGET_SALES_MIN} до ${RAFFLE_TARGET_SALES_MAX}`,
       ),
+    winnersCount: z.coerce
+      .number()
+      .int(`Победителей: от ${RAFFLE_WINNERS_COUNT_MIN} до ${RAFFLE_WINNERS_COUNT_MAX}`)
+      .min(
+        RAFFLE_WINNERS_COUNT_MIN,
+        `Победителей: от ${RAFFLE_WINNERS_COUNT_MIN} до ${RAFFLE_WINNERS_COUNT_MAX}`,
+      )
+      .max(
+        RAFFLE_WINNERS_COUNT_MAX,
+        `Победителей: от ${RAFFLE_WINNERS_COUNT_MIN} до ${RAFFLE_WINNERS_COUNT_MAX}`,
+      )
+      .default(RAFFLE_WINNERS_COUNT_MIN),
     instagramUrl: z
       .string()
       .trim()
@@ -199,6 +213,12 @@ export const patchRaffleBodySchema = rafflePrizeFieldsSchema.extend({
     .int()
     .min(RAFFLE_TARGET_SALES_MIN)
     .max(RAFFLE_TARGET_SALES_MAX)
+    .optional(),
+  winnersCount: z.coerce
+    .number()
+    .int()
+    .min(RAFFLE_WINNERS_COUNT_MIN)
+    .max(RAFFLE_WINNERS_COUNT_MAX)
     .optional(),
   instagramUrl: z
     .string()

@@ -500,6 +500,7 @@ export const CREATE_RAFFLE_MODAL_UI = {
   LABEL_REGION: "Регион показа",
   HINT_REGION: "Розыгрыш увидят покупатели только этого региона.",
   ERROR_TARGET: "Укажите цель продаж (число ≥ 1)",
+  ERROR_WINNERS_COUNT: "Укажите количество победителей (от 1 до 100)",
   ERROR_INSTAGRAM: "Укажите ссылку Instagram",
   ERROR_PRIZE_IMAGE: "Загрузите фото приза",
   ERROR_PRIZE_VIDEO: "Загрузите видео приза",
@@ -512,6 +513,7 @@ export const CREATE_RAFFLE_MODAL_UI = {
   LABEL_PRIZE_VIDEO: "Видео приза (ссылка или файл)",
   PREVIEW_LABEL: "Превью",
   LABEL_TARGET: "Цель продаж",
+  LABEL_WINNERS_COUNT: "Количество победителей",
   LABEL_INSTAGRAM: "Ссылка Instagram",
   SUBMIT: "Создать",
   SUBMIT_EDIT: "Сохранить",
@@ -529,6 +531,8 @@ export const CREATE_RAFFLE_MODAL_UI = {
   HINT_PRIZE_VIDEO: "Прямая ссылка на MP4/WebM или видеофайл, загруженный на сервер.",
   HINT_TARGET:
     "Сколько подтверждённых продаж нужно для завершения розыгрыша. Целое число от 1 до 100 000.",
+  HINT_WINNERS_COUNT:
+    "Сколько участников получат приз. Победители выбираются случайно без повторов — один участник получает один приз.",
   HINT_INSTAGRAM:
     "Необязательно. Ссылка на Instagram — покупатели увидят её после завершения розыгрыша.",
 };

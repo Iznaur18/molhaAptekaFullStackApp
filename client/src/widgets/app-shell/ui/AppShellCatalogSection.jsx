@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { HomeCuratedProductListsSection } from "../../../entities/curated-product-list/ui/HomeCuratedProductListsSection.jsx";
 import { CuratedProductListCarouselSkeleton } from "../../../entities/curated-product-list/ui/CuratedProductListCarouselSkeleton.jsx";
-import { CuratedProductListCarousel } from "../../../entities/curated-product-list/ui/CuratedProductListCarousel.jsx";
+import { BoostProductsHomeSection } from "../../../entities/product/ui/BoostProductsHomeSection.jsx";
 import { buildSellerStoreCuratedCategories } from "../../../entities/curated-category-list/lib/buildSellerStoreCuratedCategories.js";
 import { CuratedCategoryListCarousel } from "../../../entities/curated-category-list/ui/CuratedCategoryListCarousel.jsx";
 import { HomeCuratedCategoryListsSection } from "../../../entities/curated-category-list/ui/HomeCuratedCategoryListsSection.jsx";
@@ -277,10 +277,12 @@ export function AppShellCatalogGridSection({
       ) : null}
       {/* Платное место — первым, над подборками админа. */}
       {showBoostProductsRow ? (
-        <CuratedProductListCarousel
-          title={HOME_PAGE_UI.CATALOG_HOME_SECTION_BOOST_PRODUCTS}
+        <BoostProductsHomeSection
           products={boostProducts}
           onOpenProduct={onOpenProductDetails}
+          isAuthorized={isAuthorized}
+          onRequestLogin={onRequestLoginAddToCart}
+          currentUserId={currentUserId}
         />
       ) : null}
       {showCuratedProductLists && homeCuratedProductLists.length > 0 ? (

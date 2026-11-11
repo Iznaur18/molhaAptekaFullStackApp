@@ -365,8 +365,12 @@ export function RaffleProductsPage({
                 />
               </div>
 
-              {progressUi.isCompleted && raffle?.winner?._id ? (
-                <FeaturedRaffleWinnerCard winner={raffle.winner} />
+              {progressUi.isCompleted &&
+              (raffle?.winner?._id || raffle?.winners?.length) ? (
+                <FeaturedRaffleWinnerCard
+                  winner={raffle.winner}
+                  winners={raffle.winners}
+                />
               ) : null}
 
               <div className="raffle-products-page__stats">

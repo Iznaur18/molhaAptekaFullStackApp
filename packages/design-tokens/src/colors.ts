@@ -169,7 +169,7 @@ const izColorsCustomCanonical = {
   textPlaceholder: "#8a8a8a",
   ink: CUSTOM_BLACK,
   bg: CUSTOM_LIGHT_GRAY,
-  surfaceMuted: "#e8e8e8",
+  surfaceMuted: "#f2f2f2",
   surfaceElevated: "#f4f4f4",
   surface: "#ffffff",
   onContrast: "#ffffff",
