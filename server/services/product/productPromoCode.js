@@ -4,6 +4,8 @@ import {
 } from "@molha/api-contract";
 
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
+import { LUCKY_BOX_ORDER_PROMO_CODE } from "../../constants/sellerLuckyBoxConstants.js";
+import { FORTUNE_WHEEL_ORDER_PROMO_CODE } from "../../constants/sellerFortuneWheelConstants.js";
 import { AppError } from "../../errors/AppError.js";
 import { ProductModel, ProductPromoActivationModel } from "../../models/index.js";
 import OrderModel from "../../models/OrderModel.js";
@@ -295,6 +297,8 @@ export async function activateProductPromoCode({ userId, productId, code }) {
 
 /**
  * Product IDs from order lines that used a promo (snapshot present).
+ * Выигрыши «Коробок удачи» (код LUCKYBOX) сюда не входят: это не активация
+ * промокода, списывать её нельзя — выигрыш помечается used отдельно.
  * @param {Array<{ productId?: unknown; promoCodeAtOrder?: unknown }>} items
  * @returns {string[]}
  */
@@ -302,7 +306,11 @@ export const collectOrderedProductIdsWithPromo = (items) => {
   const ids = new Set();
   for (const item of items ?? []) {
     const code = String(item?.promoCodeAtOrder ?? "").trim();
-    if (!code) {
+    if (
+      !code ||
+      code === LUCKY_BOX_ORDER_PROMO_CODE ||
+      code === FORTUNE_WHEEL_ORDER_PROMO_CODE
+    ) {
       continue;
     }
     const productId = item?.productId;

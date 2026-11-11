@@ -1,0 +1,243 @@
+.fortune-wheel-admin__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+/* --- Переключатель «Игра включена» --- */
+
+.fortune-wheel-admin__toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  user-select: none;
+  width: fit-content;
+}
+
+.fortune-wheel-admin__toggle-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.fortune-wheel-admin__toggle-track {
+  position: relative;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid var(--iz-color-border);
+  background: var(--iz-color-surface);
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.fortune-wheel-admin__toggle-thumb {
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--iz-color-text-muted);
+  transform: translateY(-50%);
+  transition:
+    left 0.18s ease,
+    background 0.18s ease;
+}
+
+.fortune-wheel-admin__toggle-input:checked + .fortune-wheel-admin__toggle-track {
+  background: var(--iz-color-action);
+  border-color: var(--iz-color-action);
+}
+
+.fortune-wheel-admin__toggle-input:checked
+  + .fortune-wheel-admin__toggle-track
+  .fortune-wheel-admin__toggle-thumb {
+  left: 19px;
+  background: var(--iz-color-on-contrast);
+}
+
+.fortune-wheel-admin__toggle-input:focus-visible + .fortune-wheel-admin__toggle-track {
+  outline: 2px solid var(--iz-color-action);
+  outline-offset: 2px;
+}
+
+.fortune-wheel-admin__toggle-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+/* Маленький вариант свитча — для выключателя отдельной секции. */
+.fortune-wheel-admin__toggle_small .fortune-wheel-admin__toggle-track {
+  width: 32px;
+  height: 19px;
+}
+
+.fortune-wheel-admin__toggle_small .fortune-wheel-admin__toggle-thumb {
+  width: 13px;
+  height: 13px;
+}
+
+.fortune-wheel-admin__toggle_small
+  .fortune-wheel-admin__toggle-input:checked
+  + .fortune-wheel-admin__toggle-track
+  .fortune-wheel-admin__toggle-thumb {
+  left: 15px;
+}
+
+/* --- Количество секций --- */
+
+.fortune-wheel-admin__count {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.fortune-wheel-admin__count-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--iz-color-text-secondary);
+}
+
+.fortune-wheel-admin__count-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
+.fortune-wheel-admin__count-chip {
+  min-width: 34px;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 999px;
+  background: var(--iz-color-surface);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--iz-color-text-secondary);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.fortune-wheel-admin__count-chip:hover {
+  border-color: var(--iz-color-action);
+}
+
+.fortune-wheel-admin__count-chip_active {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
+}
+
+/* --- Секции --- */
+
+.fortune-wheel-admin__sectors {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.9rem;
+}
+
+.fortune-wheel-admin__sector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 16px;
+  background: var(--iz-color-surface);
+}
+
+.fortune-wheel-admin__sector-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.fortune-wheel-admin__sector-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--iz-color-action);
+}
+
+.fortune-wheel-admin__sector_disabled .fortune-wheel-admin__sector-title {
+  color: var(--iz-color-text-muted);
+}
+
+.fortune-wheel-admin__sector_disabled
+  .fortune-wheel-admin__field:has(.fortune-wheel-admin__input:disabled) {
+  opacity: 0.55;
+}
+
+.fortune-wheel-admin__sector-fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.8rem;
+}
+
+.fortune-wheel-admin__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.fortune-wheel-admin__field-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--iz-color-text-secondary);
+}
+
+.fortune-wheel-admin__input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 12px;
+  background: var(--iz-color-surface);
+  font: inherit;
+  font-weight: 600;
+}
+
+.fortune-wheel-admin__input:focus-visible {
+  outline: 2px solid var(--iz-color-action);
+  outline-offset: 1px;
+}
+
+.fortune-wheel-admin__field-hint {
+  font-size: 0.7rem;
+  color: var(--iz-color-text-muted);
+}
+
+/* --- Сумма шансов и статистика --- */
+
+.fortune-wheel-admin__chance-total {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--iz-color-danger, #d92d20);
+}
+
+.fortune-wheel-admin__chance-total_ok {
+  color: var(--iz-color-success, #16a34a);
+}
+
+.fortune-wheel-admin__stats {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--iz-color-text-muted);
+}

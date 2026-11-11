@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import {
   areCatalogSearchParamsEqual,
@@ -302,18 +302,7 @@ function CatalogFiltersSheetContent({
         </div>
       </header>
       <div className="catalog-filters-sheet__body">
-        <CatalogFiltersSection
-          title={HOME_PAGE_UI.CATALOG_FILTERS_SHEET_SORT}
-          after={
-            <Link
-              to="/legal/ranking"
-              className="catalog-filters-sheet__rules-link"
-              onClick={onClose}
-            >
-              {HOME_PAGE_UI.CATALOG_FILTERS_SHEET_RANKING_RULES}
-            </Link>
-          }
-        >
+        <CatalogFiltersSection title={HOME_PAGE_UI.CATALOG_FILTERS_SHEET_SORT}>
           {CATALOG_FILTERS_SHEET_SORTS.map((sort) => (
             <CatalogFilterChip
               key={sort}

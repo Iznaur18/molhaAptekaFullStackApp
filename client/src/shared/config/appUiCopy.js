@@ -174,6 +174,11 @@ export {
   RAFFLE_PARTICIPANTS_SHEET_UI,
   RAFFLE_ADVERTISING_PAGE_UI,
 } from "./copy/raffle.js";
+export { LUCKY_BOX_SECTION_UI, LUCKY_BOX_ADVERTISING_UI } from "./copy/lucky-box.js";
+export {
+  FORTUNE_WHEEL_SECTION_UI,
+  FORTUNE_WHEEL_ADVERTISING_UI,
+} from "./copy/fortune-wheel.js";
 export { INSTALLMENT_UI } from "./copy/installment.js";
 export {
   DATA_CONFIRMATION_PAGE_UI,

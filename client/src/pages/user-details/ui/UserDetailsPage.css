@@ -128,7 +128,7 @@
   margin: 0;
   padding: 0 var(--iz-space-3);
   border: 1px solid var(--color-accent, var(--iz-color-link));
-  border-radius: var(--iz-radius-button, 10px);
+  border-radius: var(--iz-radius-pill);
   background: var(--color-accent, var(--iz-color-link));
   color: var(--iz-color-on-contrast);
   font: inherit;

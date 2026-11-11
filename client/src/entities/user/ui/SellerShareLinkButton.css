@@ -56,12 +56,6 @@
   color: var(--color-accent, var(--iz-color-link));
 }
 
-/* Залитая — как «Подписаться» рядом с ней. */
-.seller-share-link--filled {
-  background: var(--color-accent, var(--iz-color-link));
-  color: var(--iz-color-on-contrast);
-}
-
 .seller-share-link--meta:hover {
   filter: brightness(1.05);
 }

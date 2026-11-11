@@ -1,0 +1,229 @@
+.lucky-box-admin__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+/* --- Переключатель «Игра включена» --- */
+
+.lucky-box-admin__toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  user-select: none;
+  width: fit-content;
+}
+
+.lucky-box-admin__toggle-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.lucky-box-admin__toggle-track {
+  position: relative;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid var(--iz-color-border);
+  background: var(--iz-color-surface);
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.lucky-box-admin__toggle-thumb {
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--iz-color-text-muted);
+  transform: translateY(-50%);
+  transition:
+    left 0.18s ease,
+    background 0.18s ease;
+}
+
+.lucky-box-admin__toggle-input:checked + .lucky-box-admin__toggle-track {
+  background: var(--iz-color-action);
+  border-color: var(--iz-color-action);
+}
+
+.lucky-box-admin__toggle-input:checked
+  + .lucky-box-admin__toggle-track
+  .lucky-box-admin__toggle-thumb {
+  left: 19px;
+  background: var(--iz-color-on-contrast);
+}
+
+.lucky-box-admin__toggle-input:focus-visible + .lucky-box-admin__toggle-track {
+  outline: 2px solid var(--iz-color-action);
+  outline-offset: 2px;
+}
+
+.lucky-box-admin__toggle-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+/* Маленький вариант свитча — для выключателя отдельного приза. */
+.lucky-box-admin__toggle_small .lucky-box-admin__toggle-track {
+  width: 32px;
+  height: 19px;
+}
+
+.lucky-box-admin__toggle_small .lucky-box-admin__toggle-thumb {
+  width: 13px;
+  height: 13px;
+}
+
+.lucky-box-admin__toggle_small
+  .lucky-box-admin__toggle-input:checked
+  + .lucky-box-admin__toggle-track
+  .lucky-box-admin__toggle-thumb {
+  left: 15px;
+}
+
+/* --- Количество призов --- */
+
+.lucky-box-admin__count {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.lucky-box-admin__count-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--iz-color-text-secondary);
+}
+
+.lucky-box-admin__count-chips {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.lucky-box-admin__count-chip {
+  min-width: 34px;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 999px;
+  background: var(--iz-color-surface);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--iz-color-text-secondary);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.lucky-box-admin__count-chip:hover {
+  border-color: var(--iz-color-action);
+}
+
+.lucky-box-admin__count-chip_active {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
+}
+
+/* --- Призы --- */
+
+.lucky-box-admin__prizes {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.9rem;
+}
+
+.lucky-box-admin__prize {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 16px;
+  background: var(--iz-color-surface);
+}
+
+.lucky-box-admin__prize-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.lucky-box-admin__prize-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--iz-color-action);
+}
+
+.lucky-box-admin__prize_disabled .lucky-box-admin__prize-title {
+  color: var(--iz-color-text-muted);
+}
+
+.lucky-box-admin__prize_disabled .lucky-box-admin__prize-fields {
+  opacity: 0.55;
+}
+
+.lucky-box-admin__prize-fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.8rem;
+}
+
+.lucky-box-admin__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.lucky-box-admin__field-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--iz-color-text-secondary);
+}
+
+.lucky-box-admin__input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 12px;
+  background: var(--iz-color-surface);
+  font: inherit;
+  font-weight: 600;
+}
+
+.lucky-box-admin__input:focus-visible {
+  outline: 2px solid var(--iz-color-action);
+  outline-offset: 1px;
+}
+
+.lucky-box-admin__field-hint {
+  font-size: 0.7rem;
+  color: var(--iz-color-text-muted);
+}
+
+/* --- Статистика --- */
+
+.lucky-box-admin__stats {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--iz-color-text-muted);
+}

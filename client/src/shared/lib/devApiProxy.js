@@ -31,6 +31,10 @@ export const DEV_API_PROXY_PREFIXES = [
   "/intro-ad",
   "/seller-personal-category",
   "/seller-shelf",
+  // Строго до "/seller": иначе `/seller-lucky-box/...` попадёт в
+  // crawler-only ветку и вместо API вернётся index.html.
+  "/seller-lucky-box",
+  "/seller-fortune-wheel",
   "/deal-requests",
   "/seller",
   "/audit",

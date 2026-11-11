@@ -107,7 +107,7 @@
   padding: 12px 14px;
   border-radius: 1.25rem;
   border: 1px solid var(--iz-color-border);
-  background: var(--iz-color-action-soft);
+  background: var(--iz-color-surface);
 }
 
 .seller-products-page__seller-name {
@@ -248,4 +248,15 @@
   font-size: 14px;
   font-weight: 600;
   color: var(--iz-color-text);
+}
+
+/* Игры продавца («Коробки удачи», «Колесо фортуны») — в один ряд. */
+.seller-products-page__games {
+  display: flex;
+  gap: var(--iz-space-2, 0.5rem);
+}
+
+.seller-products-page__games > * {
+  flex: 1 1 0;
+  min-width: 0;
 }

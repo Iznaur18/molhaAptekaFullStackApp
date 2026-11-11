@@ -1,6 +1,10 @@
 import { useState } from "react";
 
-import { formatLoyaltyPointsAmount } from "@molha/api-contract";
+import {
+  formatLoyaltyPointsAmount,
+  FORTUNE_WHEEL_ORDER_PROMO_CODE,
+  LUCKY_BOX_ORDER_PROMO_CODE,
+} from "@molha/api-contract";
 
 import { useCart } from "../../../entities/cart/model/useCart.js";
 import { getCartLineStockHint } from "../../../entities/cart/lib/getCartLineStockHint.js";
@@ -10,6 +14,8 @@ import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../../entities/product/model/p
 import {
   CART_PAGE_UI,
   COMMON_UI,
+  FORTUNE_WHEEL_SECTION_UI,
+  LUCKY_BOX_SECTION_UI,
   PRODUCT_BUY_N_FREE_UI,
   PRODUCT_FLASH_SALE_UI,
   PRODUCT_PROMO_CODE_UI,
@@ -61,11 +67,14 @@ export function CartLineItem({
     ? formatLoyaltyPointsAmount(line.pointsLineTotal)
     : formatPriceRub(line.lineTotal);
   const buyNFreeUnits = Math.floor(Number(line.buyNFreeUnits) || 0);
+  const prizeFreeUnits = Math.floor(Number(line.prizeFreeUnits) || 0);
   const paidQty = Math.max(0, line.quantity - buyNFreeUnits);
   const buyNFreeHint =
     buyNFreeUnits > 0
       ? PRODUCT_BUY_N_FREE_UI.CART_LINE_HINT(paidQty, unitPriceText)
       : null;
+  const prizeHint =
+    prizeFreeUnits > 0 ? CART_PAGE_UI.PRIZE_LINE_HINT(prizeFreeUnits) : null;
   const purchaseLimit = getProductCartQuantityLimit(product);
   const stockHint = getCartLineStockHint(purchaseLimit, line.quantity);
   const resolvedImage = resolveProductImageUrl(product);
@@ -151,9 +160,18 @@ export function CartLineItem({
                 {CART_PAGE_UI.WHOLESALE_LINE_BADGE}
               </p>
             ) : null}
+            {prizeFreeUnits > 0 ? (
+              <p className="cart-line__wholesale-badge" role="status">
+                {CART_PAGE_UI.PRIZE_LINE_BADGE}
+              </p>
+            ) : null}
             {line.isPromoApplied ? (
               <p className="cart-line__wholesale-badge" role="status">
-                {PRODUCT_PROMO_CODE_UI.CART_PROMO_LABEL}
+                {line.promoCode === LUCKY_BOX_ORDER_PROMO_CODE
+                  ? LUCKY_BOX_SECTION_UI.CART_LINE_LABEL
+                  : line.promoCode === FORTUNE_WHEEL_ORDER_PROMO_CODE
+                    ? FORTUNE_WHEEL_SECTION_UI.CART_LINE_LABEL
+                    : PRODUCT_PROMO_CODE_UI.CART_PROMO_LABEL}
                 {line.promoDiscountPercent != null
                   ? ` ${PRODUCT_PROMO_CODE_UI.CART_PROMO_PERCENT(line.promoDiscountPercent)}`
                   : ""}
@@ -218,6 +236,7 @@ export function CartLineItem({
         {buyNFreeHint ? (
           <p className="cart-line__buy-n-free-hint">{buyNFreeHint}</p>
         ) : null}
+        {prizeHint ? <p className="cart-line__buy-n-free-hint">{prizeHint}</p> : null}
       </div>
 
       <button

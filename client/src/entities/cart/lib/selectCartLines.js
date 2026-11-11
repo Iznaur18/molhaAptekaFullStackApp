@@ -27,6 +27,7 @@ import { normalizeStaleFlashSaleProduct } from "../../product/lib/isProductFlash
  * @property {number | null} unitPriceSnapshot
  * @property {boolean} priceIncreasedSinceAdd
  * @property {number} buyNFreeUnits
+ * @property {number} prizeFreeUnits бесплатные единицы-приз из игр продавца
  * @property {boolean} isPointsSale товар продаётся за баллы: рублёвые суммы строки — 0
  * @property {number} pointsUnitPrice
  * @property {number} pointsLineTotal
@@ -39,6 +40,7 @@ import { normalizeStaleFlashSaleProduct } from "../../product/lib/isProductFlash
  * @param {Record<string, number>} [priceSnapshots]
  * @param {number} [nowMs]
  * @param {Record<string, { completedPaidOrderCount?: number; freeClaimPending?: boolean }> | Map<string, { completedPaidOrderCount?: number; freeClaimPending?: boolean }>} [buyNFreeProgressByProductId]
+ * @param {Record<string, number> | Map<string, number>} [prizeFreeUnitsByProductId] бесплатные единицы-приз (игры продавца) по товару
  */
 export const selectCartLines = (
   cartItems,
@@ -47,6 +49,7 @@ export const selectCartLines = (
   priceSnapshots = {},
   nowMs = Date.now(),
   buyNFreeProgressByProductId = {},
+  prizeFreeUnitsByProductId = {},
 ) => {
   const productById = new Map(products.map((p) => [String(p._id), p]));
   /** @type {Map<string, { code?: string; discountPercent?: number }>} */
@@ -80,6 +83,21 @@ export const selectCartLines = (
     }
   }
 
+  /** Призовые бесплатные единицы по товару (снимок выигрышей игр). */
+  const prizeUnitsByProductId = new Map();
+  if (prizeFreeUnitsByProductId instanceof Map) {
+    for (const [productId, units] of prizeFreeUnitsByProductId.entries()) {
+      prizeUnitsByProductId.set(String(productId), units);
+    }
+  } else if (
+    prizeFreeUnitsByProductId &&
+    typeof prizeFreeUnitsByProductId === "object"
+  ) {
+    for (const [productId, units] of Object.entries(prizeFreeUnitsByProductId)) {
+      prizeUnitsByProductId.set(String(productId), units);
+    }
+  }
+
   const lines = Object.entries(cartItems).map(([productId, quantity]) => {
     const rawProduct = productById.get(productId) ?? null;
     const product =
@@ -105,6 +123,7 @@ export const selectCartLines = (
         unitPriceSnapshot: null,
         priceIncreasedSinceAdd: false,
         buyNFreeUnits: 0,
+        prizeFreeUnits: 0,
         isPointsSale: true,
         pointsUnitPrice,
         pointsLineTotal: pointsUnitPrice * qty,
@@ -144,6 +163,12 @@ export const selectCartLines = (
         : Math.floor(Number(unitPriceSnapshotRaw)) || null;
     const priceIncreasedSinceAdd =
       unitPriceSnapshot != null && unitPrice > unitPriceSnapshot;
+    // Приз из игр продавца: бесплатные единицы складываются с «N+1», но не
+    // больше количества в строке (зеркало createOrder на сервере).
+    const prizeFreeUnits = Math.min(
+      Math.max(0, Math.floor(Number(prizeUnitsByProductId.get(productId)) || 0)),
+      qty,
+    );
     return {
       productId,
       quantity: qty,
@@ -152,7 +177,7 @@ export const selectCartLines = (
       lineTotal: resolveBuyNFreeLineTotal({
         unitPrice,
         quantity: qty,
-        freeUnits: buyNFreeUnits,
+        freeUnits: Math.min(buyNFreeUnits + prizeFreeUnits, qty),
       }),
       isMissing: product == null,
       isWholesaleApplied,
@@ -163,6 +188,7 @@ export const selectCartLines = (
       unitPriceSnapshot,
       priceIncreasedSinceAdd,
       buyNFreeUnits,
+      prizeFreeUnits,
       isPointsSale: false,
       pointsUnitPrice: 0,
       pointsLineTotal: 0,
