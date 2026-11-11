@@ -1,0 +1,196 @@
+.fortune-wheel {
+  display: flex;
+  flex-direction: column;
+}
+
+.fortune-wheel__toggle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 4.5rem;
+  padding: 0.7rem 0.9rem;
+  border: none;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #242c3f 0%, #171d2b 100%);
+  color: #ffffff;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    filter 0.2s ease;
+}
+
+.fortune-wheel__toggle:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.12);
+}
+
+.fortune-wheel__toggle:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.fortune-wheel__toggle-svg {
+  flex-shrink: 0;
+  width: 2.1rem;
+  height: 2.1rem;
+  color: #ff7a1a;
+}
+
+.fortune-wheel__toggle-icon {
+  flex-shrink: 0;
+  margin-left: auto;
+  font-size: 1.3rem;
+  line-height: 1;
+  opacity: 0.85;
+}
+
+.fortune-wheel__head {
+  flex: 0 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+}
+
+.fortune-wheel__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: inherit;
+}
+
+.fortune-wheel__subtitle {
+  margin: 0;
+  font-size: 0.78rem;
+  color: color-mix(in srgb, currentColor 82%, transparent);
+}
+
+/*
+ * Зона результата/подсказки фиксированной высоты: смена «подсказка →
+ * результат» не двигает колесо и не растягивает шторку.
+ */
+.fortune-wheel__feedback {
+  min-height: 6.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--iz-space-2, 0.5rem);
+}
+
+.fortune-wheel__hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--iz-color-text-muted);
+  text-align: center;
+}
+
+.fortune-wheel__hint_error {
+  color: var(--iz-color-danger, #d92d20);
+}
+
+.fortune-wheel__result {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.75rem 0.875rem;
+  border-radius: 14px;
+  border: 1px solid var(--iz-color-border);
+  background: var(--iz-color-surface);
+}
+
+.fortune-wheel__result_win {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action-soft);
+}
+
+.fortune-wheel__result-title {
+  margin: 0;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.fortune-wheel__result-text {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--iz-color-text-muted);
+}
+
+/* Срок действия выигрыша — яркий акцент, чтобы не пропустили. */
+.fortune-wheel__timer {
+  margin: 0.2rem 0 0;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.32rem 0.65rem;
+  border-radius: 999px;
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* Список возможных призов — заполняет зону под колесом до спина. */
+.fortune-wheel__prizes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.fortune-wheel__prizes-title {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--iz-color-text-muted);
+}
+
+.fortune-wheel__prizes-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fortune-wheel__prize-chip {
+  padding: 0.32rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--iz-color-action) 45%, transparent);
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-action);
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.fortune-wheel__teaser {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--iz-space-2, 0.5rem);
+}
+
+.fortune-wheel__teaser-text {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--iz-color-text-muted);
+}
+
+.fortune-wheel__login-button {
+  padding: 0.55rem 1rem;
+  border: none;
+  border-radius: 12px;
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+}

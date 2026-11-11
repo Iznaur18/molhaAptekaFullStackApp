@@ -113,6 +113,19 @@ import {
   listAppliedProductPromosForUser,
 } from "../product/productPromoCode.js";
 import { claimBuyNFreeRedemption } from "../product/productBuyNFreeProgress.js";
+import { LUCKY_BOX_ORDER_PROMO_CODE } from "../../constants/sellerLuckyBoxConstants.js";
+import { FORTUNE_WHEEL_ORDER_PROMO_CODE } from "../../constants/sellerFortuneWheelConstants.js";
+import {
+  listActiveLuckyBoxWinsForUser,
+  markLuckyBoxWinsExpired,
+  markLuckyBoxWinsUsed,
+} from "../seller-lucky-box/sellerLuckyBox.js";
+import {
+  listActiveFortuneWheelWinsForUser,
+  markFortuneWheelWinsExpired,
+  markFortuneWheelWinsUsed,
+} from "../seller-fortune-wheel/sellerFortuneWheel.js";
+import { isPrizeProductPurchasable } from "../seller-game-prize/sellerGamePrizeProduct.js";
 import { getSellerIdsBlockingBuyer } from "../user/userBlockHelpers.js";
 import { isUserSellerClosedNow } from "@molha/api-contract";
 import { USER_SELLER_CLOSED_ORDER_MESSAGE } from "../../constants/userBusinessHoursConstants.js";
@@ -182,7 +195,10 @@ const buildItemsWithPriceSnapshot = (
       0,
       Math.floor(Number(freeUnitsBudget[productKey] ?? 0) || 0),
     );
-    const freeUnits = Math.min(availableFreeUnits, 1, item.quantity);
+    // Бюджет сам ограничивает итог («N+1» кладёт 1, приз из игры ещё 1) —
+    // дополнительный потолок на строку не нужен, иначе приз сгорит впустую
+    // при заказе нескольких штук того же товара.
+    const freeUnits = Math.min(availableFreeUnits, item.quantity);
     freeUnitsBudget[productKey] = availableFreeUnits - freeUnits;
     const paidQuantity = Math.max(0, item.quantity - freeUnits);
     const loyalty = buildOrderLineLoyaltySnapshot({
@@ -1062,6 +1078,131 @@ export async function createOrder({
     };
   }
 
+  // Выигрыши игр («Коробки удачи», «Колесо фортуны»): скидка применяется
+  // автоматически, без промокода. Берём лучший активный выигрыш на продавца
+  // из обеих игр и перебиваем им обычный промо только там, где процент выше.
+  /** @type {import("mongoose").Types.ObjectId[]} */
+  const luckyBoxWinIdsToMark = [];
+  /** @type {import("mongoose").Types.ObjectId[]} */
+  const fortuneWheelWinIdsToMark = [];
+  /**
+   * Товары-призы из игр: 1 шт за 0 ₽ (бесплатная единица на строку товара).
+   * @type {Array<{ win: any; source: "luckyBox" | "fortuneWheel" }>}
+   */
+  const productPrizeWins = [];
+  if (!isPointsOrder) {
+    const [luckyBoxWins, fortuneWheelWins] = await Promise.all([
+      listActiveLuckyBoxWinsForUser({ userId: String(userId) }),
+      listActiveFortuneWheelWinsForUser({ userId: String(userId) }),
+    ]);
+    /** @type {Record<string, { win: any; source: "luckyBox" | "fortuneWheel" }>} */
+    const bestWinBySellerId = {};
+    for (const [wins, source] of [
+      [luckyBoxWins, "luckyBox"],
+      [fortuneWheelWins, "fortuneWheel"],
+    ]) {
+      for (const win of wins) {
+        // Выигрыш-товар — не скидка: уходит в свою механику бесплатной единицы.
+        if (win.prizeProductId) {
+          productPrizeWins.push({ win, source });
+          continue;
+        }
+        const winSellerId = String(win.sellerId);
+        const currentBest = bestWinBySellerId[winSellerId];
+        if (!currentBest || win.discountPercent > currentBest.win.discountPercent) {
+          bestWinBySellerId[winSellerId] = { win, source };
+        }
+      }
+    }
+    const winAppliedSellerIds = new Set();
+    for (const productId of uniqueProductIds) {
+      const winSellerId = String(productById[productId]?.sellerId ?? "");
+      const best = winSellerId ? bestWinBySellerId[winSellerId] : null;
+      if (!best) {
+        continue;
+      }
+      const currentPromo = promoByProductId[productId];
+      if (!currentPromo || best.win.discountPercent > currentPromo.discountPercent) {
+        promoByProductId[productId] = {
+          code:
+            best.source === "fortuneWheel"
+              ? FORTUNE_WHEEL_ORDER_PROMO_CODE
+              : LUCKY_BOX_ORDER_PROMO_CODE,
+          discountPercent: best.win.discountPercent,
+        };
+        winAppliedSellerIds.add(winSellerId);
+      }
+    }
+    // Выигрыш расходуем только если он реально применился хотя бы к одной
+    // позиции заказа (обычный промо оказался слабее или отсутствовал).
+    for (const winSellerId of winAppliedSellerIds) {
+      const best = bestWinBySellerId[winSellerId];
+      if (best.source === "fortuneWheel") {
+        fortuneWheelWinIdsToMark.push(best.win._id);
+      } else {
+        luckyBoxWinIdsToMark.push(best.win._id);
+      }
+    }
+  }
+
+  // Товары-призы: бесплатная единица на строку товара этого продавца.
+  // Товар вне заказа — приз ждёт следующего заказа; товар недоступен
+  // (удалён/нет в наличии) — приз сгорает (expired) в транзакции заказа.
+  /** @type {Record<string, number>} */
+  const productPrizeFreeUnitsById = {};
+  /** @type {import("mongoose").Types.ObjectId[]} */
+  const luckyBoxPrizeWinIdsToMark = [];
+  /** @type {import("mongoose").Types.ObjectId[]} */
+  const fortuneWheelPrizeWinIdsToMark = [];
+  /** @type {import("mongoose").Types.ObjectId[]} */
+  const luckyBoxPrizeWinIdsToExpire = [];
+  /** @type {import("mongoose").Types.ObjectId[]} */
+  const fortuneWheelPrizeWinIdsToExpire = [];
+  if (productPrizeWins.length > 0) {
+    const orderSellerIds = new Set(
+      uniqueProductIds.map((productId) =>
+        String(productById[productId]?.sellerId ?? ""),
+      ),
+    );
+    const itemProductIds = new Set(uniqueProductIds.map(String));
+    const prizeProductIds = [
+      ...new Set(productPrizeWins.map(({ win }) => String(win.prizeProductId))),
+    ];
+    const prizeProductDocs = await ProductModel.find({
+      _id: { $in: prizeProductIds.map((id) => new mongoose.Types.ObjectId(id)) },
+    })
+      .select(
+        "_id productModerationStatus productIsAvailable productOutOfStock productStockQuantity",
+      )
+      .lean();
+    const prizeProductById = new Map(
+      prizeProductDocs.map((doc) => [String(doc._id), doc]),
+    );
+    for (const { win, source } of productPrizeWins) {
+      if (!orderSellerIds.has(String(win.sellerId))) {
+        continue;
+      }
+      const productId = String(win.prizeProductId);
+      const markList =
+        source === "fortuneWheel"
+          ? fortuneWheelPrizeWinIdsToMark
+          : luckyBoxPrizeWinIdsToMark;
+      const expireList =
+        source === "fortuneWheel"
+          ? fortuneWheelPrizeWinIdsToExpire
+          : luckyBoxPrizeWinIdsToExpire;
+      if (!isPrizeProductPurchasable(prizeProductById.get(productId))) {
+        expireList.push(win._id);
+        continue;
+      }
+      if (!itemProductIds.has(productId)) {
+        continue; // покупатель не взял приз в этот заказ — остаётся активным
+      }
+      productPrizeFreeUnitsById[productId] = 1;
+      markList.push(win._id);
+    }
+  }
+
   try {
     const created = await runInTransaction(async (session) => {
       await guardOrderItemsStockInTransaction(items, userId, session);
@@ -1109,6 +1250,11 @@ export async function createOrder({
         if (claimed) {
           freeUnitsByProductId[productId] = 1;
         }
+      }
+      // Бесплатные единицы товаров-призов из игр — поверх «N+1».
+      for (const [productId, units] of Object.entries(productPrizeFreeUnitsById)) {
+        freeUnitsByProductId[productId] =
+          (freeUnitsByProductId[productId] ?? 0) + units;
       }
 
       const pricedItems = buildItemsWithPriceSnapshot(
@@ -1251,6 +1397,46 @@ export async function createOrder({
           session,
         });
       }
+
+      // Применённые выигрыши игр помечаем использованными в той же
+      // транзакции: откат заказа вернёт выигрыши покупателю.
+      if (luckyBoxWinIdsToMark.length > 0) {
+        await markLuckyBoxWinsUsed({
+          winIds: luckyBoxWinIdsToMark,
+          orderId,
+          session,
+        });
+      }
+      if (fortuneWheelWinIdsToMark.length > 0) {
+        await markFortuneWheelWinsUsed({
+          winIds: fortuneWheelWinIdsToMark,
+          orderId,
+          session,
+        });
+      }
+      // Товары-призы: применённые — used, недоступные — сгорают (expired).
+      if (luckyBoxPrizeWinIdsToMark.length > 0) {
+        await markLuckyBoxWinsUsed({
+          winIds: luckyBoxPrizeWinIdsToMark,
+          orderId,
+          session,
+        });
+      }
+      if (fortuneWheelPrizeWinIdsToMark.length > 0) {
+        await markFortuneWheelWinsUsed({
+          winIds: fortuneWheelPrizeWinIdsToMark,
+          orderId,
+          session,
+        });
+      }
+      await markLuckyBoxWinsExpired({
+        winIds: luckyBoxPrizeWinIdsToExpire,
+        session,
+      });
+      await markFortuneWheelWinsExpired({
+        winIds: fortuneWheelPrizeWinIdsToExpire,
+        session,
+      });
 
       return createdOrder;
     });

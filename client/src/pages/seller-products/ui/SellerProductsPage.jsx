@@ -25,6 +25,8 @@ import { getSellerSocialLinks } from "../../../entities/user/lib/getSellerSocial
 import { useTrackSellerQrScan } from "../../../entities/analytics/model/useSellerQrAnalytics.js";
 import { usePublicSellerShelvesQuery } from "../../../entities/seller-shelf/model/usePublicSellerShelvesQuery.js";
 import { usePublicSellerOneCShelvesQuery } from "../../../entities/seller-shelf/model/usePublicSellerOneCShelvesQuery.js";
+import { SellerLuckyBoxSection } from "../../../entities/lucky-box/ui/SellerLuckyBoxSection.jsx";
+import { SellerFortuneWheelSection } from "../../../entities/fortune-wheel/ui/SellerFortuneWheelSection.jsx";
 import { HomeCatalogGrid } from "../../../widgets/catalog-product-grid/ui/HomeCatalogGrid.jsx";
 import { useSellerProductsCatalog } from "../model/useSellerProductsCatalog.js";
 import {
@@ -386,29 +388,6 @@ export function SellerProductsPage({
                     />
                   </>
                 ) : null}
-                <button
-                  type="button"
-                  className="seller-share-link seller-share-link--meta seller-share-link--filled"
-                  aria-label={PRODUCT_CARD_UI.SELLER_PROFILE_ARIA(displayName)}
-                  onClick={handleSellerProfileClick}
-                >
-                  {/* Восклицательный знак без круга: в lucide такого значка нет. */}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.6"
-                    strokeLinecap="round"
-                    className="seller-share-link__icon"
-                    aria-hidden="true"
-                  >
-                    <path d="M12 5v9" />
-                    <path d="M12 19h.01" />
-                  </svg>
-                </button>
                 <UserFollowButton
                   targetUserId={String(seller._id)}
                   isFollowing={seller.isFollowing === true}
@@ -426,6 +405,26 @@ export function SellerProductsPage({
               {SELLER_STORE_PAUSE_UI.SELLER_PAGE_NOTICE}
             </p>
           ) : null}
+
+          <div className="seller-products-page__games">
+            <SellerLuckyBoxSection
+              sellerId={String(seller._id)}
+              isAuthorized={isAuthorized}
+              isSelf={
+                currentUserId != null && String(currentUserId) === String(seller._id)
+              }
+              onRequestLogin={onRequestLogin}
+            />
+
+            <SellerFortuneWheelSection
+              sellerId={String(seller._id)}
+              isAuthorized={isAuthorized}
+              isSelf={
+                currentUserId != null && String(currentUserId) === String(seller._id)
+              }
+              onRequestLogin={onRequestLogin}
+            />
+          </div>
 
           {(shelvesQuery.data?.shelves?.length ?? 0) > 0 || onecShelves.length > 0 ? (
             <div

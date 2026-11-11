@@ -72,6 +72,9 @@ export const ADVERTISING_PAGE_UI = {
   /** @param {number} balance */
   BALANCE: (balance) => `${balance} баллов`,
   BALANCE_LABEL: "Баланс",
+  TABS_ARIA: "Разделы рекламы",
+  TAB_ADS: "Продвижение",
+  TAB_GAMES: "Игры",
 };
 
 export const INTRO_AD_PAGE_UI = {

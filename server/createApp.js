@@ -25,6 +25,8 @@ import {
   introAdRouter,
   sellerPersonalCategoryRouter,
   sellerShelfRouter,
+  sellerLuckyBoxRouter,
+  sellerFortuneWheelRouter,
   dealRequestRouter,
   auditRouter,
   analyticsRouter,
@@ -143,6 +145,8 @@ export const createApp = () => {
   app.use("/intro-ad", introAdRouter);
   app.use("/seller-personal-category", sellerPersonalCategoryRouter);
   app.use("/seller-shelf", sellerShelfRouter);
+  app.use("/seller-lucky-box", sellerLuckyBoxRouter);
+  app.use("/seller-fortune-wheel", sellerFortuneWheelRouter);
   app.use("/deal-requests", dealRequestRouter);
   app.use("/audit", auditRouter);
   app.use("/analytics", analyticsRouter);

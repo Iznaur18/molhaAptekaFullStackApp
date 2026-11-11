@@ -828,8 +828,10 @@
 }
 
 .app-shell--header-v2 .app-shell__auth-actions--mobile-top .header-circle-button--cta,
-.app-shell--header-v2 .header-users-stretch__shell--cta:not(.header-users-stretch__shell--open) {
-  box-shadow: 0 6px 14px -4px color-mix(in srgb, var(--iz-color-action) 55%, transparent);
+.app-shell--header-v2
+  .header-users-stretch__shell--cta:not(.header-users-stretch__shell--open) {
+  box-shadow: 0 6px 14px -4px
+    color-mix(in srgb, var(--iz-color-action) 55%, transparent);
 }
 
 .app-shell--header-v2 .app-shell__header-filter .header-circle-button {

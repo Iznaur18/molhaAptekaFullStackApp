@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -39,6 +39,10 @@ import { fetchMyAppliedProductPromos } from "../../../entities/product-promo-cod
 import { productPromoCodeQueryKeys } from "../../../entities/product-promo-code/model/productPromoCodeQueryKeys.js";
 import { invalidatePriceOfferQueries } from "../../../entities/product-price-offer/lib/priceOfferQueryCache.js";
 import { useMyAcceptedBidsQuery } from "../../../entities/product-price-offer/model/useMyAcceptedBidsQuery.js";
+import { useMyLuckyBoxWinsQuery } from "../../../entities/lucky-box/model/useMyLuckyBoxWinsQuery.js";
+import { mergeLuckyBoxWinsIntoAppliedPromos } from "../../../entities/lucky-box/lib/mergeLuckyBoxWinsIntoAppliedPromos.js";
+import { useMyFortuneWheelWinsQuery } from "../../../entities/fortune-wheel/model/useMyFortuneWheelWinsQuery.js";
+import { mergeFortuneWheelWinsIntoAppliedPromos } from "../../../entities/fortune-wheel/lib/mergeFortuneWheelWinsIntoAppliedPromos.js";
 import { useAuthSession } from "../../../entities/user/model/useAuthSession.js";
 import { userSavedAddressesFromUser } from "../../../entities/address/lib/userSavedAddressesFromUser.js";
 import { CheckoutForm } from "../../../shared/ui/CheckoutForm/CheckoutForm.jsx";
@@ -78,7 +82,7 @@ export function CartPage({
   onGoToCatalog,
   onCheckoutSuccess,
 }) {
-  const { items, clearCart, removeItems, priceSnapshots } = useCart();
+  const { items, clearCart, removeItems, priceSnapshots, addItem } = useCart();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const createOrderMutation = useCreateOrderMutation();
@@ -205,23 +209,85 @@ export function CartPage({
     return map;
   }, [buyNFreeProductIds, buyNFreeProgressQueries]);
 
+  const luckyBoxWinsQuery = useMyLuckyBoxWinsQuery({ enabled: isAuthorized });
+  const fortuneWheelWinsQuery = useMyFortuneWheelWinsQuery({ enabled: isAuthorized });
+
+  // Товар-приз из игр: автоматически кладём в корзину по 1 шт (сервер при
+  // оформлении сделает её бесплатной). После ручного удаления в этой сессии
+  // повторно не добавляем — не спорим с покупателем.
+  const prizeAutoAddedRef = useRef(new Set());
+  useEffect(() => {
+    const productWins = [
+      ...(luckyBoxWinsQuery.data ?? []),
+      ...(fortuneWheelWinsQuery.data ?? []),
+    ].filter((win) => win?.prizeProductId);
+    for (const win of productWins) {
+      const productId = String(win.prizeProductId);
+      if (prizeAutoAddedRef.current.has(productId) || items[productId]) {
+        continue;
+      }
+      prizeAutoAddedRef.current.add(productId);
+      addItem(productId, 1);
+    }
+  }, [luckyBoxWinsQuery.data, fortuneWheelWinsQuery.data, items, addItem]);
+
+  // Бесплатные единицы-приз по товару — для цен строк корзины (зеркало
+  // createOrder: 1 шт товара-приза за 0 ₽).
+  const prizeFreeUnitsByProductId = useMemo(() => {
+    const map = {};
+    for (const win of [
+      ...(luckyBoxWinsQuery.data ?? []),
+      ...(fortuneWheelWinsQuery.data ?? []),
+    ]) {
+      if (!win?.prizeProductId) {
+        continue;
+      }
+      const productId = String(win.prizeProductId);
+      map[productId] = (map[productId] ?? 0) + 1;
+    }
+    return map;
+  }, [luckyBoxWinsQuery.data, fortuneWheelWinsQuery.data]);
+
+  // Выигрыши игр показываем в корзине как обычные промо-строки: скидка
+  // применится автоматически при оформлении (зеркало createOrder).
+  const appliedPromosWithGameWins = useMemo(
+    () =>
+      mergeFortuneWheelWinsIntoAppliedPromos(
+        mergeLuckyBoxWinsIntoAppliedPromos(
+          appliedPromosQuery.data?.appliedPromos ?? [],
+          luckyBoxWinsQuery.data ?? [],
+          productsQuery.data ?? [],
+        ),
+        fortuneWheelWinsQuery.data ?? [],
+        productsQuery.data ?? [],
+      ),
+    [
+      appliedPromosQuery.data,
+      luckyBoxWinsQuery.data,
+      fortuneWheelWinsQuery.data,
+      productsQuery.data,
+    ],
+  );
+
   const { lines } = useMemo(
     () =>
       selectCartLines(
         items,
         productsQuery.data ?? [],
-        appliedPromosQuery.data?.appliedPromos ?? [],
+        appliedPromosWithGameWins,
         priceSnapshots,
         cartPriceNowMs,
         buyNFreeProgressByProductId,
+        prizeFreeUnitsByProductId,
       ),
     [
       items,
       productsQuery.data,
-      appliedPromosQuery.data,
+      appliedPromosWithGameWins,
       priceSnapshots,
       cartPriceNowMs,
       buyNFreeProgressByProductId,
+      prizeFreeUnitsByProductId,
     ],
   );
 

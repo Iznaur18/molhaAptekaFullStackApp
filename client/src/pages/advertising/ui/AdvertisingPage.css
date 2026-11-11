@@ -107,9 +107,17 @@
   height: 1.5rem;
 }
 
+.advertising-page__tabs {
+  margin: 0;
+}
+
 .advertising-page__cards {
   display: grid;
   gap: 1rem;
+}
+
+.advertising-page__cards[hidden] {
+  display: none;
 }
 
 .advertising-page__card {

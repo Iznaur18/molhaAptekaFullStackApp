@@ -31,6 +31,8 @@
 /payments
 /price-offers
 /product
+/seller-fortune-wheel
+/seller-lucky-box
 /seller-personal-category
 /seller-shelf
 /sellers

@@ -1,0 +1,299 @@
+.lucky-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.lucky-box__toggle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 4.5rem;
+  padding: 0.7rem 0.9rem;
+  border: none;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #6d5bf6 0%, #8b5cf6 100%);
+  color: #ffffff;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    filter 0.2s ease;
+}
+
+.lucky-box__toggle:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+
+.lucky-box__toggle:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.lucky-box__toggle-svg {
+  flex-shrink: 0;
+  width: 2.1rem;
+  height: 2.1rem;
+  color: #ffffff;
+}
+
+.lucky-box__toggle-icon {
+  flex-shrink: 0;
+  margin-left: auto;
+  font-size: 1.3rem;
+  line-height: 1;
+  opacity: 0.85;
+}
+
+.lucky-box__head {
+  flex: 0 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+}
+
+.lucky-box__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: inherit;
+}
+
+.lucky-box__subtitle {
+  margin: 0;
+  font-size: 0.78rem;
+  color: color-mix(in srgb, currentColor 82%, transparent);
+}
+
+.lucky-box__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--iz-space-2, 0.5rem);
+}
+
+.lucky-box__box {
+  position: relative;
+  aspect-ratio: 1.4;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 14px;
+  background: var(--iz-color-action-soft);
+  cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    background 0.3s ease,
+    opacity 0.3s ease;
+}
+
+.lucky-box__box:disabled {
+  cursor: default;
+}
+
+.lucky-box__box:not(:disabled):hover {
+  transform: translateY(-2px);
+  border-color: var(--iz-color-action);
+}
+
+.lucky-box__box:not(:disabled):active {
+  transform: translateY(0) scale(0.97);
+}
+
+.lucky-box__box-face {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--iz-color-action);
+}
+
+.lucky-box__gift {
+  width: 2.5rem;
+  height: 2.5rem;
+  transition: transform 0.16s ease;
+}
+
+.lucky-box__box:not(:disabled):hover .lucky-box__gift {
+  transform: scale(1.08) rotate(-3deg);
+}
+
+.lucky-box__box_picked-win {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action);
+  animation: lucky-box-pop 0.35s ease;
+}
+
+.lucky-box__box_picked-win .lucky-box__box-face,
+.lucky-box__box_revealed-prize .lucky-box__box-face {
+  flex-direction: column;
+  gap: 0.05rem;
+}
+
+.lucky-box__box-face-label {
+  font-size: 0.62rem;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.lucky-box__box-face-value {
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.lucky-box__box_picked-win .lucky-box__box-face {
+  color: var(--iz-color-on-contrast);
+}
+
+.lucky-box__box_picked-empty {
+  border-color: var(--iz-color-border);
+  background: var(--iz-color-surface);
+  animation: lucky-box-pop 0.35s ease;
+}
+
+.lucky-box__box_picked-empty .lucky-box__box-face {
+  color: var(--iz-color-text-muted);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.lucky-box__box_revealed-prize {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action-soft);
+}
+
+.lucky-box__box_dimmed {
+  opacity: 0.45;
+}
+
+@keyframes lucky-box-pop {
+  0% {
+    transform: scale(0.9);
+  }
+  60% {
+    transform: scale(1.04);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/*
+ * Зона подсказок/результата фиксированной высоты — под самый высокий
+ * вариант (блок выигрыша с таймером ~107px). Смена «подсказка → результат»
+ * не двигает сетку и не растягивает шторку.
+ */
+.lucky-box__feedback {
+  min-height: 6.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--iz-space-2, 0.5rem);
+}
+
+/* Индикатор попыток: подарки гаснут по мере использования. */
+.lucky-box__attempts {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.lucky-box__attempt {
+  width: 1.6rem;
+  height: 1.6rem;
+  color: var(--iz-color-action);
+  transition:
+    opacity 0.25s ease,
+    filter 0.25s ease,
+    transform 0.25s ease;
+}
+
+.lucky-box__attempt_used {
+  opacity: 0.25;
+  filter: grayscale(1);
+  transform: scale(0.85);
+}
+
+.lucky-box__hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--iz-color-text-muted);
+  text-align: center;
+}
+
+.lucky-box__hint_error {
+  color: var(--iz-color-danger, #d92d20);
+}
+
+.lucky-box__result {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.75rem 0.875rem;
+  border-radius: 14px;
+  border: 1px solid var(--iz-color-border);
+  background: var(--iz-color-surface);
+}
+
+.lucky-box__result_win {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action-soft);
+}
+
+.lucky-box__result-title {
+  margin: 0;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.lucky-box__result-text {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--iz-color-text-muted);
+}
+
+/* Срок действия выигрыша — яркий акцент, чтобы не пропустили. */
+.lucky-box__timer {
+  margin: 0.2rem 0 0;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.32rem 0.65rem;
+  border-radius: 999px;
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.lucky-box__teaser {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--iz-space-2, 0.5rem);
+}
+
+.lucky-box__teaser-text {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--iz-color-text-muted);
+}
+
+.lucky-box__login-button {
+  padding: 0.55rem 1rem;
+  border: none;
+  border-radius: 12px;
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+}

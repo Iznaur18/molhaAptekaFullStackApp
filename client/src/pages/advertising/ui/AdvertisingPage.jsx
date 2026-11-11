@@ -22,6 +22,7 @@ import {
 import { pluralizeRuBall } from "../../../shared/lib/pluralizeRuBall.js";
 import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
 import { IntroVideoUploadField } from "../../../shared/ui/IntroVideoUploadField/IntroVideoUploadField.jsx";
+import { ModalSectionTabs } from "../../../shared/ui/ModalSectionTabs/ModalSectionTabs.jsx";
 import {
   buildSubmitIntroAdCampaignBody,
   formToIntroAdPreviewSettings,
@@ -32,6 +33,8 @@ import { IS_INTRO_AD_ADVERTISING_ENABLED } from "../model/isIntroAdAdvertisingEn
 import { SellerPersonalCategoryAdvertisingSection } from "./SellerPersonalCategoryAdvertisingSection.jsx";
 import { SiteHeaderBannerAdvertisingSection } from "./SiteHeaderBannerAdvertisingSection.jsx";
 import { RaffleAdvertisingSection } from "./RaffleAdvertisingSection.jsx";
+import { LuckyBoxAdvertisingSection } from "./LuckyBoxAdvertisingSection.jsx";
+import { FortuneWheelAdvertisingSection } from "./FortuneWheelAdvertisingSection.jsx";
 
 import "./AdvertisingPage.css";
 
@@ -102,6 +105,7 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin, onOpenCreateRaff
   const [showForm, setShowForm] = useState(false);
   const [actionError, setActionError] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [activeTab, setActiveTab] = useState("ads");
 
   const submitMutation = useMutation({
     mutationFn: submitIntroAdCampaign,
@@ -276,7 +280,18 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin, onOpenCreateRaff
         </div>
       </div>
 
-      <div className="advertising-page__cards">
+      <ModalSectionTabs
+        tabs={[
+          { id: "ads", label: ADVERTISING_PAGE_UI.TAB_ADS },
+          { id: "games", label: ADVERTISING_PAGE_UI.TAB_GAMES },
+        ]}
+        activeTabId={activeTab}
+        onTabChange={setActiveTab}
+        ariaLabel={ADVERTISING_PAGE_UI.TABS_ARIA}
+        className="advertising-page__tabs"
+      />
+
+      <div className="advertising-page__cards" hidden={activeTab !== "ads"}>
         {!IS_INTRO_AD_ADVERTISING_ENABLED ? (
           <article
             className="advertising-page__card advertising-page__card_intro advertising-page__card_disabled"
@@ -490,6 +505,12 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin, onOpenCreateRaff
           loyaltyBalance={loyaltyBalance}
           onOpenCreateRaffle={onOpenCreateRaffle}
         />
+      </div>
+
+      <div className="advertising-page__cards" hidden={activeTab !== "games"}>
+        <LuckyBoxAdvertisingSection isAuthorized={isAuthorized} />
+
+        <FortuneWheelAdvertisingSection isAuthorized={isAuthorized} />
       </div>
     </section>
   );

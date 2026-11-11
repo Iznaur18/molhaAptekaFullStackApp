@@ -17,6 +17,10 @@ export const CART_PAGE_UI = {
   DELIVERY_FEE_LABEL: "Доставка",
   DELIVERY_FEE_VALUE: "Индивидуальная плата при получении",
   WHOLESALE_LINE_BADGE: "Опт",
+  /** Бейдж строки корзины с товаром-призом из игр продавца. */
+  PRIZE_LINE_BADGE: "🎁 Приз",
+  /** Подсказка под строкой: часть единиц бесплатна как приз. */
+  PRIZE_LINE_HINT: (freeUnits) => `${freeUnits} шт бесплатно — приз из игры продавца`,
   /** @param {string} formatted */
   DISCOUNT_AMOUNT: (formatted) => `−${formatted}`,
   PURCHASABLE_TOTAL_LABEL: "К оформлению",

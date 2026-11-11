@@ -61,6 +61,12 @@ import OneCImportJobModel from "./OneCImportJobModel.js";
 import OneCPendingProductModel from "./OneCPendingProductModel.js";
 import ProductPromoActivationModel from "./ProductPromoActivationModel.js";
 import ProductBulkImportJobModel from "./ProductBulkImportJobModel.js";
+import { SellerLuckyBoxConfigModel } from "./SellerLuckyBoxConfigModel.js";
+import { SellerLuckyBoxPlayModel } from "./SellerLuckyBoxPlayModel.js";
+import { SellerLuckyBoxWinModel } from "./SellerLuckyBoxWinModel.js";
+import { SellerFortuneWheelConfigModel } from "./SellerFortuneWheelConfigModel.js";
+import { SellerFortuneWheelSpinModel } from "./SellerFortuneWheelSpinModel.js";
+import { SellerFortuneWheelWinModel } from "./SellerFortuneWheelWinModel.js";
 import { GeoCacheModel } from "./GeoCacheModel.js";
 
 export {
@@ -127,5 +133,11 @@ export {
   OneCPendingProductModel,
   ProductPromoActivationModel,
   ProductBulkImportJobModel,
+  SellerLuckyBoxConfigModel,
+  SellerLuckyBoxPlayModel,
+  SellerLuckyBoxWinModel,
+  SellerFortuneWheelConfigModel,
+  SellerFortuneWheelSpinModel,
+  SellerFortuneWheelWinModel,
   GeoCacheModel,
 };
