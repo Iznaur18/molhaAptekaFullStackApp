@@ -85,4 +85,25 @@ export const FORTUNE_WHEEL_ADVERTISING_UI = {
   SAVING: "Сохраняем…",
   /** @param {number} spins @param {number} wins */
   STATS: (spins, wins) => `Крутили колесо: ${spins}, призов выиграно: ${wins}`,
+  /* --- Конструктор (простой режим) --- */
+  BUILDER_HINT:
+    "Нажмите на секцию колеса и выберите её приз — шансы пересчитаются сами.",
+  /** @param {number} index */
+  BUILDER_PALETTE_LABEL: (index) => `Секция ${index + 1} — приз:`,
+  BUILDER_SELECT_SECTOR: "Сначала выберите секцию на колесе",
+  BUILDER_EMPTY_CHIP: "пусто",
+  BUILDER_ADD_SECTOR: "+ Добавить секцию",
+  BUILDER_REMOVE_SECTOR: "Удалить секцию",
+  /** @param {number} percent */
+  BUILDER_CHANCE_INFO: (percent) =>
+    `Каждая секция выпадает с шансом ~${percent}% — сумма всегда 100%`,
+  BUILDER_NOTE:
+    "Скидка действует 24 часа. Свои шансы, сроки и товар-приз — в расширенной настройке.",
+  MODE_ADVANCED: "Расширенная настройка",
+  MODE_BUILDER: "Вернуться к конструктору",
+  /** @param {number} index @param {number | null} discount */
+  BUILDER_SECTOR_ARIA: (index, discount) =>
+    discount === null
+      ? `Секция ${index + 1}: пусто`
+      : `Секция ${index + 1}: скидка ${discount}%`,
 };

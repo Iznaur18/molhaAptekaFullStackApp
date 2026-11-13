@@ -241,3 +241,203 @@
   font-size: 0.78rem;
   color: var(--iz-color-text-muted);
 }
+
+/* --- Конструктор (простой режим) --- */
+
+.fortune-wheel-admin__builder-hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--iz-color-text-secondary);
+}
+
+.fortune-wheel-admin__wheel-stage {
+  position: relative;
+  width: min(60vw, 13rem);
+  margin: 0 auto;
+}
+
+/* Стрелка сверху — как на колесе, которое видит покупатель. */
+.fortune-wheel-admin__wheel-pointer {
+  position: absolute;
+  top: -0.35rem;
+  left: 50%;
+  z-index: 2;
+  width: 0;
+  height: 0;
+  transform: translateX(-50%);
+  border-left: 0.65rem solid transparent;
+  border-right: 0.65rem solid transparent;
+  border-top: 1.05rem solid var(--iz-color-ink);
+  filter: drop-shadow(
+    0 2px 2px color-mix(in srgb, var(--iz-color-ink) 30%, transparent)
+  );
+}
+
+.fortune-wheel-admin__wheel {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 50%;
+  border: 1px solid var(--iz-color-border);
+  background: var(--iz-color-surface);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--iz-color-ink) 10%, transparent);
+}
+
+.fortune-wheel-admin__wheel-sector {
+  stroke: var(--iz-color-surface);
+  stroke-width: 1.5;
+  cursor: pointer;
+}
+
+.fortune-wheel-admin__wheel-sector_even {
+  fill: var(--iz-color-action);
+}
+
+.fortune-wheel-admin__wheel-sector_odd {
+  fill: color-mix(in srgb, var(--iz-color-action) 42%, #ffffff);
+}
+
+.fortune-wheel-admin__wheel-sector_empty {
+  fill: var(--iz-color-surface-muted);
+}
+
+.fortune-wheel-admin__wheel-sector_selected,
+.fortune-wheel-admin__wheel-sector:focus-visible {
+  stroke: var(--iz-color-ink);
+  stroke-width: 2.5;
+  outline: none;
+}
+
+.fortune-wheel-admin__wheel-label {
+  font-size: 10px;
+  font-weight: 800;
+  fill: var(--iz-color-on-contrast);
+  pointer-events: none;
+  user-select: none;
+}
+
+.fortune-wheel-admin__wheel-label_light {
+  fill: var(--iz-color-ink);
+}
+
+.fortune-wheel-admin__wheel-label_empty {
+  fill: var(--iz-color-text-muted);
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.fortune-wheel-admin__wheel-hub {
+  fill: var(--iz-color-surface);
+  stroke: var(--iz-color-border);
+  stroke-width: 1;
+  pointer-events: none;
+}
+
+.fortune-wheel-admin__chance-info {
+  margin: 0;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--iz-color-text-muted);
+}
+
+.fortune-wheel-admin__palette-label {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--iz-color-text-muted);
+}
+
+.fortune-wheel-admin__palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.fortune-wheel-admin__chip {
+  padding: 0.45rem 0.8rem;
+  border: 1.5px solid var(--iz-color-border);
+  border-radius: 999px;
+  background: var(--iz-color-surface);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--iz-color-text-secondary);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.fortune-wheel-admin__chip:hover {
+  border-color: var(--iz-color-action);
+}
+
+.fortune-wheel-admin__chip_active {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
+}
+
+.fortune-wheel-admin__chip_empty:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.fortune-wheel-admin__remove-sector {
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 0.8rem;
+  color: var(--iz-color-text-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.fortune-wheel-admin__remove-sector:hover {
+  color: var(--iz-color-danger, #d92d20);
+}
+
+.fortune-wheel-admin__remove-sector:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.fortune-wheel-admin__add-sector {
+  width: 100%;
+  padding: 0.7rem;
+  border: 2px dashed var(--iz-color-border);
+  border-radius: 14px;
+  background: none;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--iz-color-action);
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.fortune-wheel-admin__add-sector:hover {
+  border-color: var(--iz-color-action);
+}
+
+.fortune-wheel-admin__builder-note {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--iz-color-text-muted);
+}
+
+.fortune-wheel-admin__mode-switch {
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 0.82rem;
+  color: var(--iz-color-action);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
