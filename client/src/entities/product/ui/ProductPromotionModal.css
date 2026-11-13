@@ -45,13 +45,13 @@
   padding-inline: var(--iz-space-4);
 }
 
-/* Телефон: модалка во весь экран — gutter 0 (safe-area остаётся).
+/* Телефон: модалка во весь экран — gutter 8px (safe-area остаётся).
    Держать ПОСЛЕ базовых правил тела/табов: специфичность та же,
    побеждает порядок. */
 @media (max-width: 40rem) {
   .product-promotion-modal .product-modal-shell__body.product-promotion-modal__body {
     padding-inline: max(
-      0rem,
+      0.5rem,
       env(safe-area-inset-left, 0px),
       env(safe-area-inset-right, 0px)
     );

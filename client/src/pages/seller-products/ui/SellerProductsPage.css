@@ -33,11 +33,11 @@
   overflow-x: clip;
 }
 
-/* Телефон: gutter 0 — контент от края до края (как app-shell). */
+/* Телефон: gutter 8px (как app-shell). */
 @media (max-width: 640px) {
   .seller-products-page {
     --seller-products-screen-padding-x: max(
-      0rem,
+      0.5rem,
       env(safe-area-inset-left, 0px),
       env(safe-area-inset-right, 0px)
     );

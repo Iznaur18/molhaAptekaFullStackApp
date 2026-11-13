@@ -2,7 +2,7 @@ import { resolveMobileBottomNavOverlayContentInset } from "@/shared/lib/mobileBo
 import { resolveIsTabletScreen } from "@/shared/lib/screenBreakpoints";
 
 /** Базовый горизонтальный inset контента. */
-export const SCREEN_CONTENT_PADDING_HORIZONTAL = 0;
+export const SCREEN_CONTENT_PADDING_HORIZONTAL = 8;
 
 /** Отступ между секциями на главной / в каталоге. */
 export const SCREEN_CONTENT_SECTION_GAP = 8;

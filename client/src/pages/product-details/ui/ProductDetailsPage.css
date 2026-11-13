@@ -64,11 +64,11 @@
   }
 }
 
-/* Телефон: контент от края до края — gutter 0 (safe-area остаётся). */
+/* Телефон: gutter 8px, как app-shell (safe-area остаётся). */
 @media (max-width: 640px) {
   .product-details-page {
     --product-details-page-inline-padding: max(
-      0rem,
+      0.5rem,
       env(safe-area-inset-left, 0px),
       env(safe-area-inset-right, 0px)
     );

@@ -1,9 +1,9 @@
 @media (max-width: 40rem) {
   .product-details-modal {
-    /* Gutter 0 — паритет странице товара (--product-details-page-inline-padding)
+    /* Gutter 8px — паритет странице товара (--product-details-page-inline-padding)
        и app-shell. Safe-area остаётся. */
     --product-details-modal-inline-pad: max(
-      0rem,
+      0.5rem,
       env(safe-area-inset-left, 0px),
       env(safe-area-inset-right, 0px)
     );
