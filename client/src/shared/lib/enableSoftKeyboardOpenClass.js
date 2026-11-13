@@ -76,6 +76,16 @@ export function enableSoftKeyboardOpenClass() {
       ? window.matchMedia("(hover: none) and (pointer: coarse)").matches
       : false;
 
+  /**
+   * Высота layout-viewport без клавиатуры. На Android Chrome при открытии
+   * клавиатуры ужимаются И window.innerHeight, И visualViewport.height —
+   * inset против «живой» высоты ≈ 0, и клавиатура не определяется (навбар
+   * возвращался над клавиатурой). Поэтому inset меряем против базовой
+   * высоты, которую обновляем только пока фокус вне текстового поля
+   * (клавиатуры в этот момент заведомо нет).
+   */
+  let baselineHeight = window.innerHeight;
+
   /** @type {ReturnType<typeof setTimeout> | null} */
   let settleTimer = null;
   let isSettled = true;
@@ -85,10 +95,17 @@ export function enableSoftKeyboardOpenClass() {
       isTextFieldFocused: isPageScrollLockTextField(document.activeElement),
       isCoarsePointer,
       hasVisualViewport: Boolean(viewport),
-      inset: resolveSoftKeyboardInset(viewport, window.innerHeight),
+      inset: resolveSoftKeyboardInset(viewport, baselineHeight),
       isSettled,
     });
     document.documentElement.classList.toggle(SOFT_KEYBOARD_OPEN_CLASS, open);
+  };
+
+  const onWindowResize = () => {
+    if (!isPageScrollLockTextField(document.activeElement)) {
+      baselineHeight = window.innerHeight;
+    }
+    sync();
   };
 
   /** @param {FocusEvent} event */
@@ -115,6 +132,7 @@ export function enableSoftKeyboardOpenClass() {
   document.addEventListener("focusin", onFocusIn);
   document.addEventListener("focusout", onFocusOut);
   viewport?.addEventListener("resize", sync);
+  window.addEventListener("resize", onWindowResize);
 
   return () => {
     if (settleTimer != null) {
@@ -124,6 +142,7 @@ export function enableSoftKeyboardOpenClass() {
     document.removeEventListener("focusin", onFocusIn);
     document.removeEventListener("focusout", onFocusOut);
     viewport?.removeEventListener("resize", sync);
+    window.removeEventListener("resize", onWindowResize);
     document.documentElement.classList.remove(SOFT_KEYBOARD_OPEN_CLASS);
   };
 }
