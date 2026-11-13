@@ -45,6 +45,25 @@
   padding-inline: var(--iz-space-4);
 }
 
+/* Телефон: модалка во весь экран — gutter 0 (safe-area остаётся).
+   Держать ПОСЛЕ базовых правил тела/табов: специфичность та же,
+   побеждает порядок. */
+@media (max-width: 40rem) {
+  .product-promotion-modal .product-modal-shell__body.product-promotion-modal__body {
+    padding-inline: max(
+      0rem,
+      env(safe-area-inset-left, 0px),
+      env(safe-area-inset-right, 0px)
+    );
+  }
+
+  /* Табы больше не компенсируют inline-padding тела. */
+  .product-promotion-modal .product-modal-shell__header .modal-section-tabs_in-header {
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+}
+
 .product-promotion-modal__footer {
   flex-shrink: 0;
   padding-top: 0.75rem;

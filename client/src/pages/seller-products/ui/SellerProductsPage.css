@@ -33,6 +33,17 @@
   overflow-x: clip;
 }
 
+/* Телефон: gutter 0 — контент от края до края (как app-shell). */
+@media (max-width: 640px) {
+  .seller-products-page {
+    --seller-products-screen-padding-x: max(
+      0rem,
+      env(safe-area-inset-left, 0px),
+      env(safe-area-inset-right, 0px)
+    );
+  }
+}
+
 /* Без home edge-bleed (AppShell.css ≤667): сетка в границах shell. */
 .seller-products-page .app-shell__grid,
 .seller-products-page .app-shell__grid-blocks {

@@ -40,10 +40,10 @@ test("лесенка ширин совпадает с web --app-shell-max-width"
   assert.equal(resolveContentMaxWidth(375), undefined);
 });
 
-test("поля по краям — 1rem, как web --app-shell-content-inline-padding", () => {
+test("поля по краям — 0 (осознанное отличие от web --app-shell-content-inline-padding)", () => {
   // Модуль тянет алиас `@/`, поэтому читаем значение из исходника.
   const layout = readMobileFile("shared/theme/screenContentLayout.ts");
-  assert.match(layout, /SCREEN_CONTENT_PADDING_HORIZONTAL = 16;/);
+  assert.match(layout, /SCREEN_CONTENT_PADDING_HORIZONTAL = 0;/);
   const tokens = readRepoFile("client/src/shared/styles/designTokens.css");
   assert.match(tokens, /--iz-space-4: 1rem;/);
   const shell = readRepoFile("client/src/app/ui/AppShell.css");
