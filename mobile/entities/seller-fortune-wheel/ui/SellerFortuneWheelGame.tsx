@@ -2,7 +2,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import ChevronRight from "lucide-react-native/icons/chevron-right";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Animated, Easing, Pressable, Text, View } from "react-native";
+import { Platform, Pressable, Text, View } from "react-native";
+import { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import Svg, { Circle, Line } from "react-native-svg";
 
 import { SellerStorefrontSheet } from "@/entities/user/ui/SellerStorefrontSheet";
@@ -108,7 +109,15 @@ export const SellerFortuneWheelGame = ({
   const spinMutation = useSpinFortuneWheelMutation({ sellerId });
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const rotationRef = useRef(new Animated.Value(0));
+  /**
+   * Вращение: на web — обычный state + CSS-transition (как web-версия игры;
+   * RN Animated на react-native-web ротор не крутит — см. паттерн
+   * useHomeCatalogUsersStretchMenuAnimation), на native — reanimated.
+   */
+  const isWeb = Platform.OS === "web";
+  const rotationShared = useSharedValue(0);
+  const [webRotation, setWebRotation] = useState(0);
+  /** Последний целевой угол — стартовая точка следующего спина. */
   const rotationValueRef = useRef(0);
   const settleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [spinning, setSpinning] = useState(false);
@@ -118,13 +127,18 @@ export const SellerFortuneWheelGame = ({
   const [revealedResult, setRevealedResult] = useState<FortuneWheelSpin | null>(null);
   const [localError, setLocalError] = useState("");
 
+  const rotorAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotationShared.value}deg` }],
+  }));
+  // Native — reanimated; web — угол и transition ставятся императивно
+  // на DOM-ноду ротора в FortuneWheelView (RNW вырезает их из style).
+  const rotorStyle = rotorAnimatedStyle;
+  const rotorTransition = isWeb
+    ? `transform ${SPIN_DURATION_MS}ms cubic-bezier(0.12, 0.75, 0.08, 1)`
+    : undefined;
+
   useEffect(() => {
-    const rotation = rotationRef.current;
-    const id = rotation.addListener(({ value }) => {
-      rotationValueRef.current = value;
-    });
     return () => {
-      rotation.removeListener(id);
       if (settleTimerRef.current) {
         clearTimeout(settleTimerRef.current);
       }
@@ -187,18 +201,18 @@ export const SellerFortuneWheelGame = ({
         result.sectorIndex,
         sectors,
       );
-      Animated.timing(rotationRef.current, {
-        toValue: target,
-        duration: SPIN_DURATION_MS,
-        easing: Easing.bezier(0.12, 0.75, 0.08, 1),
-        useNativeDriver: true,
-      }).start(({ finished }) => {
-        if (finished && pendingResultRef.current) {
-          settleSpin();
-        }
-      });
-      // Страховка, если колбэк анимации не дошёл.
-      settleTimerRef.current = setTimeout(settleSpin, SPIN_DURATION_MS + 600);
+      rotationValueRef.current = target;
+      if (isWeb) {
+        // Web: CSS-transition из rotorStyle доезжает до target сама.
+        setWebRotation(target);
+      } else {
+        rotationShared.value = withTiming(target, {
+          duration: SPIN_DURATION_MS,
+          easing: Easing.bezier(0.12, 0.75, 0.08, 1),
+        });
+      }
+      // Результат раскрываем строго по таймеру — колбэки анимаций не нужны.
+      settleTimerRef.current = setTimeout(settleSpin, SPIN_DURATION_MS + 100);
     } catch (error) {
       pendingResultRef.current = null;
       setSpinning(false);
@@ -263,7 +277,9 @@ export const SellerFortuneWheelGame = ({
           <>
             <FortuneWheelView
               sectors={sectors}
-              rotation={rotationRef.current}
+              rotorStyle={rotorStyle}
+              rotationDeg={isWeb ? webRotation : undefined}
+              rotorTransition={rotorTransition}
               spinning={spinning}
               landedIndex={spinning ? null : landedIndex}
               hubLabel={spinning ? UI.SPINNING : UI.SPIN}

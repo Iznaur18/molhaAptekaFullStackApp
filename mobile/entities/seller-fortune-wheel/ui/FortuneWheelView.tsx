@@ -1,4 +1,6 @@
-import { Animated, Pressable, Text, View } from "react-native";
+import { useEffect, useRef } from "react";
+import { Platform, Pressable, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import Animated from "react-native-reanimated";
 import Svg, { G, Path, Text as SvgText } from "react-native-svg";
 
 import { FORTUNE_WHEEL_SECTION_UI as UI } from "@/shared/config";
@@ -38,8 +40,20 @@ function sectorPath(startDeg: number, endDeg: number) {
 
 type FortuneWheelViewProps = {
   sectors: FortuneWheelSector[];
-  /** Угол ротора — Animated.Value в градусах (может превышать 360). */
-  rotation: Animated.Value;
+  /**
+   * Стиль ротора с текущим углом (native): useAnimatedStyle от reanimated.
+   * На web не используется — там угол ставится через rotationDeg.
+   */
+  rotorStyle: StyleProp<ViewStyle>;
+  /**
+   * Web only: текущий угол ротора в градусах. Вместе с rotorTransition
+   * ставится напрямую на DOM-ноду: react-native-web вырезает transition
+   * из style-объекта и перетирает inline-style при ре-рендере, поэтому
+   * вращение на web полностью императивное.
+   */
+  rotationDeg?: number;
+  /** Web only: CSS-transition ротора, например "transform 4200ms ease". */
+  rotorTransition?: string;
   spinning: boolean;
   landedIndex: number | null;
   hubLabel: string;
@@ -53,7 +67,9 @@ type FortuneWheelViewProps = {
  */
 export const FortuneWheelView = ({
   sectors,
-  rotation,
+  rotorStyle,
+  rotationDeg,
+  rotorTransition,
   spinning,
   landedIndex,
   hubLabel,
@@ -62,20 +78,26 @@ export const FortuneWheelView = ({
 }: FortuneWheelViewProps) => {
   const theme = useAppTheme();
   const styles = useSellerGamesStyles();
+  const isWeb = Platform.OS === "web";
+  const webRotorRef = useRef<View>(null);
+
+  useEffect(() => {
+    if (!isWeb || !webRotorRef.current) {
+      return;
+    }
+    const node = webRotorRef.current as unknown as { style?: CSSStyleDeclaration };
+    if (!node.style) {
+      return;
+    }
+    node.style.transition = rotorTransition ?? "";
+    node.style.transform = `rotate(${rotationDeg ?? 0}deg)`;
+  }, [isWeb, rotorTransition, rotationDeg]);
   const list = Array.isArray(sectors) ? sectors : [];
   const angles = resolveSectorAngles(list);
   const oddFill = mixHexWithWhite(theme.colors.action, 0.42);
 
-  const rotate = rotation.interpolate({
-    inputRange: [0, 360],
-    outputRange: ["0deg", "360deg"],
-  });
-
-  return (
-    <View style={styles.wheelStage}>
-      <View style={styles.wheelPointer} />
-      <Animated.View style={[styles.wheelRotor, { transform: [{ rotate }] }]}>
-        <Svg width="100%" height="100%" viewBox={`0 0 ${VIEW_SIZE} ${VIEW_SIZE}`}>
+  const wheelSvg = (
+    <Svg width="100%" height="100%" viewBox={`0 0 ${VIEW_SIZE} ${VIEW_SIZE}`}>
           <G>
             {list.map((sector, index) => {
               const { startDeg, endDeg, midDeg } = angles[index];
@@ -125,7 +147,22 @@ export const FortuneWheelView = ({
             })}
           </G>
         </Svg>
-      </Animated.View>
+  );
+
+  return (
+    <View style={styles.wheelStage}>
+      <View style={styles.wheelPointer} />
+      {isWeb ? (
+        // На web — обычный View: угол и transition ставим прямо на DOM-ноду
+        // (эффект выше), RNW из style-объекта их всё равно вырезает/перетирает.
+        <View ref={webRotorRef} style={styles.wheelRotor}>
+          {wheelSvg}
+        </View>
+      ) : (
+        <Animated.View style={[styles.wheelRotor, rotorStyle]}>
+          {wheelSvg}
+        </Animated.View>
+      )}
       <Pressable
         style={[styles.wheelHub, (hubDisabled || spinning) && styles.wheelHubDisabled]}
         disabled={hubDisabled || spinning}
