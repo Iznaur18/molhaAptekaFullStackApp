@@ -3,7 +3,12 @@ import { useRouter } from "expo-router";
 import ChevronRight from "lucide-react-native/icons/chevron-right";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Platform, Pressable, Text, View } from "react-native";
-import { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import Svg, { Circle, Line } from "react-native-svg";
 
 import { SellerStorefrontSheet } from "@/entities/user/ui/SellerStorefrontSheet";
@@ -293,7 +298,9 @@ export const SellerFortuneWheelGame = ({
                   <Text style={styles.resultTitle}>
                     {showWinResult
                       ? winIsProduct
-                        ? UI.WIN_PRODUCT_TITLE(playedResult?.prize?.prizeProductName ?? "")
+                        ? UI.WIN_PRODUCT_TITLE(
+                            playedResult?.prize?.prizeProductName ?? "",
+                          )
                         : UI.WIN_TITLE(playedResult?.prize?.discountPercent ?? 0)
                       : UI.EMPTY_TITLE}
                   </Text>
@@ -313,10 +320,7 @@ export const SellerFortuneWheelGame = ({
                   ) : null}
                 </View>
               ) : localError ? (
-                <Text
-                  style={[styles.hint, styles.hintError]}
-                  accessibilityRole="alert"
-                >
+                <Text style={[styles.hint, styles.hintError]} accessibilityRole="alert">
                   {localError}
                 </Text>
               ) : activeWin && !canSpin ? (
@@ -334,7 +338,10 @@ export const SellerFortuneWheelGame = ({
                         <Text style={styles.prizeChipText}>
                           {sector.prizeProductId
                             ? UI.PRIZE_CHIP_PRODUCT
-                            : UI.PRIZE_CHIP(sector.discountPercent, sector.durationHours)}
+                            : UI.PRIZE_CHIP(
+                                sector.discountPercent,
+                                sector.durationHours,
+                              )}
                         </Text>
                       </View>
                     ))}

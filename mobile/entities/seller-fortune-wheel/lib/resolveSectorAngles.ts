@@ -17,7 +17,9 @@ export function resolveSectorAngles(
   });
   const total = chances.reduce((sum, chance) => sum + chance, 0);
   const weights =
-    total > 0 ? chances.map((chance) => chance / total) : list.map(() => 1 / list.length);
+    total > 0
+      ? chances.map((chance) => chance / total)
+      : list.map(() => 1 / list.length);
 
   let cursor = 0;
   return weights.map((weight) => {

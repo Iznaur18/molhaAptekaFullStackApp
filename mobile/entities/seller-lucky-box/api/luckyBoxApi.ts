@@ -55,10 +55,12 @@ export async function fetchSellerLuckyBoxState(
     const { data } = await apiClient.get(
       `/seller-lucky-box/seller/${encodeURIComponent(sellerId)}`,
     );
-    return (data?.data as SellerLuckyBoxState | undefined) ?? {
-      enabled: false,
-      boxesTotal: 6,
-    };
+    return (
+      (data?.data as SellerLuckyBoxState | undefined) ?? {
+        enabled: false,
+        boxesTotal: 6,
+      }
+    );
   } catch (error) {
     throw new Error(formatApiErrorMessage(error, "Не удалось загрузить игру"));
   }

@@ -1,5 +1,12 @@
 import { useEffect, useRef } from "react";
-import { Platform, Pressable, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import {
+  Platform,
+  Pressable,
+  Text,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native";
 import Animated from "react-native-reanimated";
 import Svg, { G, Path, Text as SvgText } from "react-native-svg";
 
@@ -98,55 +105,55 @@ export const FortuneWheelView = ({
 
   const wheelSvg = (
     <Svg width="100%" height="100%" viewBox={`0 0 ${VIEW_SIZE} ${VIEW_SIZE}`}>
-          <G>
-            {list.map((sector, index) => {
-              const { startDeg, endDeg, midDeg } = angles[index];
-              const labelPoint = polarToPoint(TEXT_RADIUS, midDeg);
-              const isPrize = sector.enabled !== false;
-              const isEven = index % 2 === 0;
-              const isLanded = landedIndex === index;
-              const fill = isPrize
-                ? isEven
-                  ? theme.colors.action
-                  : oddFill
-                : theme.colors.surfaceMuted;
-              const labelFill = isPrize
-                ? isEven
-                  ? theme.colors.onContrast
-                  : theme.colors.ink
-                : theme.colors.textMuted;
-              const label = isPrize
-                ? sector.prizeProductId
-                  ? UI.SECTOR_PRODUCT_FACE
-                  : `${sector.discountPercent}%`
-                : UI.SECTOR_EMPTY_FACE;
-              return (
-                <G key={index}>
-                  <Path
-                    d={sectorPath(startDeg, endDeg)}
-                    fill={fill}
-                    stroke={isLanded ? theme.colors.ink : theme.colors.surface}
-                    strokeWidth={isLanded ? 2.5 : 1.5}
-                  />
-                  {endDeg - startDeg > 0 ? (
-                    <SvgText
-                      x={labelPoint.x.toFixed(2)}
-                      y={labelPoint.y.toFixed(2)}
-                      fill={labelFill}
-                      fontSize={isPrize ? 10 : 8}
-                      fontWeight={isPrize ? "800" : "600"}
-                      textAnchor="middle"
-                      alignmentBaseline="central"
-                      transform={`rotate(${midDeg} ${labelPoint.x.toFixed(2)} ${labelPoint.y.toFixed(2)})`}
-                    >
-                      {label}
-                    </SvgText>
-                  ) : null}
-                </G>
-              );
-            })}
-          </G>
-        </Svg>
+      <G>
+        {list.map((sector, index) => {
+          const { startDeg, endDeg, midDeg } = angles[index];
+          const labelPoint = polarToPoint(TEXT_RADIUS, midDeg);
+          const isPrize = sector.enabled !== false;
+          const isEven = index % 2 === 0;
+          const isLanded = landedIndex === index;
+          const fill = isPrize
+            ? isEven
+              ? theme.colors.action
+              : oddFill
+            : theme.colors.surfaceMuted;
+          const labelFill = isPrize
+            ? isEven
+              ? theme.colors.onContrast
+              : theme.colors.ink
+            : theme.colors.textMuted;
+          const label = isPrize
+            ? sector.prizeProductId
+              ? UI.SECTOR_PRODUCT_FACE
+              : `${sector.discountPercent}%`
+            : UI.SECTOR_EMPTY_FACE;
+          return (
+            <G key={index}>
+              <Path
+                d={sectorPath(startDeg, endDeg)}
+                fill={fill}
+                stroke={isLanded ? theme.colors.ink : theme.colors.surface}
+                strokeWidth={isLanded ? 2.5 : 1.5}
+              />
+              {endDeg - startDeg > 0 ? (
+                <SvgText
+                  x={labelPoint.x.toFixed(2)}
+                  y={labelPoint.y.toFixed(2)}
+                  fill={labelFill}
+                  fontSize={isPrize ? 10 : 8}
+                  fontWeight={isPrize ? "800" : "600"}
+                  textAnchor="middle"
+                  alignmentBaseline="central"
+                  transform={`rotate(${midDeg} ${labelPoint.x.toFixed(2)} ${labelPoint.y.toFixed(2)})`}
+                >
+                  {label}
+                </SvgText>
+              ) : null}
+            </G>
+          );
+        })}
+      </G>
+    </Svg>
   );
 
   return (

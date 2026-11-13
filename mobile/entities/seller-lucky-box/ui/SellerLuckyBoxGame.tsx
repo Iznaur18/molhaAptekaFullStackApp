@@ -69,12 +69,17 @@ export const SellerLuckyBoxGame = ({
   }, [state, localPlays]);
 
   const boxStates = useMemo<BoxState[]>(() => {
-    const states = Array.from({ length: LUCKY_BOX_BOXES_TOTAL }, () => "closed" as BoxState);
+    const states = Array.from(
+      { length: LUCKY_BOX_BOXES_TOTAL },
+      () => "closed" as BoxState,
+    );
     if (plays.length === 0) {
       return states;
     }
     const layout = plays.map((play) => play.layout).find(Boolean) ?? [];
-    const pickedByIndex = new Map(plays.map((play) => [play.pickedBoxIndex, play.result]));
+    const pickedByIndex = new Map(
+      plays.map((play) => [play.pickedBoxIndex, play.result]),
+    );
     for (let index = 0; index < LUCKY_BOX_BOXES_TOTAL; index += 1) {
       const pickedResult = pickedByIndex.get(index);
       if (pickedResult) {
