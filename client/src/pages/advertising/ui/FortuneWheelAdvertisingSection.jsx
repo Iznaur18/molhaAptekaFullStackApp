@@ -63,8 +63,9 @@ function normalizeSectorDraft(sector) {
 function evenChances(count) {
   const base = Math.floor(CHANCE_TOTAL / count);
   const remainder = CHANCE_TOTAL - base * count;
-  return Array.from({ length: count }, (_, index) =>
-    base + (index === 0 ? remainder : 0),
+  return Array.from(
+    { length: count },
+    (_, index) => base + (index === 0 ? remainder : 0),
   );
 }
 
@@ -101,8 +102,7 @@ function matchBuilderShape(sectors) {
     discount:
       sector?.enabled === false
         ? null
-        : Math.floor(Number(sector?.discountPercent)) ||
-          DEFAULT_SECTOR.discountPercent,
+        : Math.floor(Number(sector?.discountPercent)) || DEFAULT_SECTOR.discountPercent,
   }));
   // Играбельный конфиг: хотя бы одна призовая секция.
   if (!shape.some((sector) => sector.discount !== null)) {
@@ -202,7 +202,10 @@ export function FortuneWheelAdvertisingSection({ isAuthorized }) {
     if (sectorsSimple.length >= SECTORS_MAX) {
       return;
     }
-    setSectorsSimple((current) => [...current, { discount: DEFAULT_SECTOR.discountPercent }]);
+    setSectorsSimple((current) => [
+      ...current,
+      { discount: DEFAULT_SECTOR.discountPercent },
+    ]);
     setSelectedSector(sectorsSimple.length);
   };
 
@@ -366,7 +369,9 @@ export function FortuneWheelAdvertisingSection({ isAuthorized }) {
             <span className="fortune-wheel-admin__toggle-track" aria-hidden="true">
               <span className="fortune-wheel-admin__toggle-thumb" />
             </span>
-            <span className="fortune-wheel-admin__toggle-label">{UI.ENABLED_LABEL}</span>
+            <span className="fortune-wheel-admin__toggle-label">
+              {UI.ENABLED_LABEL}
+            </span>
           </label>
 
           {mode === "builder" ? (
@@ -374,7 +379,10 @@ export function FortuneWheelAdvertisingSection({ isAuthorized }) {
               <p className="fortune-wheel-admin__builder-hint">{UI.BUILDER_HINT}</p>
 
               <div className="fortune-wheel-admin__wheel-stage">
-                <div className="fortune-wheel-admin__wheel-pointer" aria-hidden="true" />
+                <div
+                  className="fortune-wheel-admin__wheel-pointer"
+                  aria-hidden="true"
+                />
                 <svg
                   className="fortune-wheel-admin__wheel"
                   viewBox={`0 0 ${VIEW_SIZE} ${VIEW_SIZE}`}
@@ -645,7 +653,11 @@ export function FortuneWheelAdvertisingSection({ isAuthorized }) {
                           max={100}
                           value={draft.chancePercent}
                           onChange={(event) =>
-                            handleSectorChange(index, "chancePercent", event.target.value)
+                            handleSectorChange(
+                              index,
+                              "chancePercent",
+                              event.target.value,
+                            )
                           }
                         />
                         <small className="fortune-wheel-admin__field-hint">

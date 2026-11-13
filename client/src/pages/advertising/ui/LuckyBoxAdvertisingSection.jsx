@@ -136,9 +136,7 @@ export function LuckyBoxAdvertisingSection({ isAuthorized }) {
     if (selectedBox === null || prizeDiscounts.length <= PRIZES_MIN) {
       return;
     }
-    setPrizeDiscounts((current) =>
-      current.filter((_, index) => index !== selectedBox),
-    );
+    setPrizeDiscounts((current) => current.filter((_, index) => index !== selectedBox));
     setSelectedBox(null);
   };
 
@@ -221,8 +219,7 @@ export function LuckyBoxAdvertisingSection({ isAuthorized }) {
     ...DISCOUNT_CHOICES,
     ...prizeDiscounts.filter((value) => !DISCOUNT_CHOICES.includes(value)),
   ];
-  const selectedIsPrize =
-    selectedBox !== null && selectedBox < prizeDiscounts.length;
+  const selectedIsPrize = selectedBox !== null && selectedBox < prizeDiscounts.length;
 
   return (
     <article className="advertising-page__card advertising-page__card_category lucky-box-admin">
