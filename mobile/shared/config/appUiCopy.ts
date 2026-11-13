@@ -3647,3 +3647,79 @@ export const SAFE_DEAL_BADGE_UI = {
       "Площадка проверила, что за продавцом стоит зарегистрированное ИП или ООО, а не аноним. Оплата пока проходит как обычно — напрямую продавцу, наличными или переводом.",
   },
 } as const;
+
+/**
+ * Игра «Коробки удачи» на витрине продавца — паритет web
+ * `client/src/shared/config/copy/lucky-box.js` (блок LUCKY_BOX_SECTION_UI).
+ */
+export const LUCKY_BOX_SECTION_UI = {
+  TITLE: "Коробки удачи",
+  SUBTITLE: (prizesCount: number) => {
+    const word = { 1: "одна", 2: "две", 3: "три", 4: "четыре" }[
+      prizesCount as 1 | 2 | 3 | 4
+    ];
+    return word
+      ? `Откройте коробку — среди шести спрятаны ${word} со скидкой`
+      : "Откройте коробку — среди шести есть коробки со скидкой";
+  },
+  ATTEMPT_HINT: "Две попытки в день: вторая — если первая оказалась пустой",
+  BUTTON_HINT: "Выигрывайте призы",
+  SECOND_ATTEMPT_HINT: "Пусто — но у вас есть ещё одна попытка!",
+  LOGIN_TEASER: "Войдите, чтобы открыть коробку и выиграть скидку у этого продавца",
+  LOGIN_BUTTON: "Войти",
+  BOX_ARIA: (index: number) => `Коробка ${index + 1}`,
+  ATTEMPTS_ARIA: (left: number, total: number) =>
+    `Осталось попыток: ${left} из ${total}`,
+  BOX_EMPTY_FACE: "пусто",
+  BOX_PRODUCT_FACE: "🎁",
+  BOX_PRIZE_LABEL: "скидка",
+  OPENING: "Открываем…",
+  WIN_TITLE: (percent: number) => `Скидка ${percent}% — ваша!`,
+  WIN_APPLIES: "Применится автоматически к заказу у этого продавца",
+  WIN_EXPIRES: (time: string) => `Действует до ${time}`,
+  EMPTY_TITLE: "Пусто",
+  EMPTY_HINT: "Сегодня не повезло. Приходите завтра — коробки перемешаются",
+  ACTIVE_WIN_NOTICE: (percent: number) =>
+    `У вас активна скидка ${percent}% — применится автоматически при оформлении заказа`,
+  WIN_PRODUCT_TITLE: (productName: string) => `Товар в подарок: ${productName}`,
+  WIN_PRODUCT_APPLIES: "Добавим бесплатно в ваш заказ у этого продавца",
+  ACTIVE_PRODUCT_WIN_NOTICE: (productName: string) =>
+    `У вас выигран товар «${productName}» — добавим бесплатно к заказу у этого продавца`,
+  LOAD_FALLBACK: "Не удалось загрузить игру",
+  PLAY_FALLBACK: "Не удалось открыть коробку",
+  CLOSE: "Закрыть",
+} as const;
+
+/**
+ * Игра «Колесо фортуны» на витрине продавца — паритет web
+ * `client/src/shared/config/copy/fortune-wheel.js` (блок FORTUNE_WHEEL_SECTION_UI).
+ */
+export const FORTUNE_WHEEL_SECTION_UI = {
+  TITLE: "Колесо фортуны",
+  SUBTITLE: "Один спин в день — какая скидка выпадет сегодня?",
+  BUTTON_HINT: "Испытайте удачу",
+  SPIN: "Крутить",
+  SPINNING: "Крутим…",
+  SPIN_ARIA: "Крутить колесо фортуны",
+  LOGIN_TEASER: "Войдите, чтобы крутить колесо и выиграть скидку у этого продавца",
+  LOGIN_BUTTON: "Войти",
+  SECTOR_EMPTY_FACE: "пусто",
+  SECTOR_PRODUCT_FACE: "🎁",
+  WIN_TITLE: (percent: number) => `Скидка ${percent}% — ваша!`,
+  WIN_APPLIES: "Применится автоматически к заказу у этого продавца",
+  WIN_EXPIRES: (time: string) => `Действует до ${time}`,
+  EMPTY_TITLE: "Пусто",
+  EMPTY_HINT: "Сегодня не повезло. Приходите завтра — колесо снова ждёт",
+  PRIZES_TITLE: "Что можно выиграть:",
+  PRIZE_CHIP: (percent: number, hours: number) => `${percent}% · ${hours} ч`,
+  PRIZE_CHIP_PRODUCT: "Товар",
+  ACTIVE_WIN_NOTICE: (percent: number) =>
+    `У вас активна скидка ${percent}% — применится автоматически при оформлении заказа`,
+  WIN_PRODUCT_TITLE: (productName: string) => `Товар в подарок: ${productName}`,
+  WIN_PRODUCT_APPLIES: "Добавим бесплатно в ваш заказ у этого продавца",
+  ACTIVE_PRODUCT_WIN_NOTICE: (productName: string) =>
+    `У вас выигран товар «${productName}» — добавим бесплатно к заказу у этого продавца`,
+  LOAD_FALLBACK: "Не удалось загрузить игру",
+  SPIN_FALLBACK: "Не удалось крутить колесо",
+  CLOSE: "Закрыть",
+} as const;
