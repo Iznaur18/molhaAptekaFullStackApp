@@ -9,6 +9,8 @@ import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
+import { SellerFortuneWheelGame } from "@/entities/seller-fortune-wheel/ui/SellerFortuneWheelGame";
+import { SellerLuckyBoxGame } from "@/entities/seller-lucky-box/ui/SellerLuckyBoxGame";
 import { fetchPublicSellerShelves } from "@/entities/seller-shelf/api/sellerShelfApi";
 import { sellerShelfQueryKeys } from "@/entities/seller-shelf/model/sellerShelfQueryKeys";
 import { userProfileQueryKeys } from "@/entities/user/model/userProfileQueryKeys";
@@ -41,6 +43,7 @@ import { navigateBackOrHome } from "@/shared/lib/navigateBackOrHome";
 import { useProductGridLayout } from "@/shared/model/useProductGridLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useSellerGamesStyles } from "@/shared/theme/sellerGamesStyles";
 import { useSellerProductsPageStyles } from "@/shared/theme/sellerFlowStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
@@ -48,6 +51,7 @@ export const SellerProductsPage = () => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const styles = useSellerProductsPageStyles();
+  const gamesStyles = useSellerGamesStyles();
   const theme = useAppTheme();
   const productGrid = useProductGridLayout();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
@@ -325,6 +329,20 @@ export const SellerProductsPage = () => {
                         />
                       </View>
                     ) : null}
+                  </View>
+
+                  {/* Игры продавца — паритет web: между мета-зоной и полками. */}
+                  <View style={gamesStyles.gamesRow}>
+                    <SellerLuckyBoxGame
+                      sellerId={sellerId}
+                      isAuthorized={isAuthorized}
+                      isSelf={isSelf}
+                    />
+                    <SellerFortuneWheelGame
+                      sellerId={sellerId}
+                      isAuthorized={isAuthorized}
+                      isSelf={isSelf}
+                    />
                   </View>
 
                   {shelves.length > 0 ? (

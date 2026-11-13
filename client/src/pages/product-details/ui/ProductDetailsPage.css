@@ -5,6 +5,9 @@
 .product-details-page {
   --product-details-page-enter-ms: 220ms;
   --product-details-page-exit-ms: 180ms;
+  /* Gutter контента страницы: на телефоне 0 (см. media ≤640 ниже),
+     на больших — 1rem. Паритет app-shell --app-shell-content-inline-padding. */
+  --product-details-page-inline-padding: var(--iz-space-4);
 
   /* fixed inset — не 100dvh внутри 100vh: на iOS Safari иначе дыра под CTA */
   position: fixed;
@@ -61,6 +64,17 @@
   }
 }
 
+/* Телефон: gutter 8px, как app-shell (safe-area остаётся). */
+@media (max-width: 640px) {
+  .product-details-page {
+    --product-details-page-inline-padding: max(
+      0.5rem,
+      env(safe-area-inset-left, 0px),
+      env(safe-area-inset-right, 0px)
+    );
+  }
+}
+
 /* ≥600px колонка уже уже viewport — скругление, иначе «окно» с острыми углами */
 @media (min-width: 600px) {
   .product-details-page {
@@ -100,7 +114,7 @@
 .product-details-modal--page .product-details-modal__tabs {
   flex-shrink: 0;
   margin: 0 0 var(--product-details-modal-tabs-gap-bottom);
-  padding: 0.25rem var(--iz-space-4) 0;
+  padding: 0.25rem var(--product-details-page-inline-padding) 0;
   border-bottom: 1px solid var(--iz-color-border);
   background: var(--iz-color-surface);
 }
@@ -158,7 +172,7 @@
 }
 
 .product-details-modal--page .product-details-modal__tab-panel--inset {
-  padding-inline: var(--iz-space-4);
+  padding-inline: var(--product-details-page-inline-padding);
 }
 
 .product-details-modal--page .product-media-gallery-readonly {
@@ -167,7 +181,7 @@
   max-width: 100%;
   margin-inline: 0;
   gap: 0.35rem;
-  padding: 0.75rem 0.75rem 0.35rem;
+  padding: 0.75rem var(--product-details-page-inline-padding) 0.35rem;
 }
 
 .product-details-modal--page .product-media-gallery-readonly__hero {
@@ -197,7 +211,7 @@
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  padding: 0 var(--iz-space-4) 0;
+  padding: 0 var(--product-details-page-inline-padding) 0;
   overflow-x: hidden;
 }
 
@@ -408,7 +422,7 @@
   gap: var(--product-details-section-gap);
   width: 100%;
   min-width: 0;
-  padding-inline: var(--iz-space-4);
+  padding-inline: var(--product-details-page-inline-padding);
 }
 
 .product-details-modal--page .product-details-seller-products-carousel {
@@ -418,20 +432,20 @@
 }
 
 .product-details-modal--page .product-details-modal__details {
-  padding-inline: var(--iz-space-4);
+  padding-inline: var(--product-details-page-inline-padding);
 }
 
 .product-details-modal--page .product-details-seller-preview {
   box-sizing: border-box;
-  width: calc(100% - 2 * var(--iz-space-4));
-  margin: 0 var(--iz-space-4);
+  width: calc(100% - 2 * var(--product-details-page-inline-padding));
+  margin: 0 var(--product-details-page-inline-padding);
 }
 
 .product-details-modal--page .product-details-modal__stats-grid--standalone {
   box-sizing: border-box;
   width: auto;
   max-width: none;
-  margin-inline: var(--iz-space-4);
+  margin-inline: var(--product-details-page-inline-padding);
   padding: 0;
 }
 
@@ -441,7 +455,8 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem var(--iz-space-4) calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  padding: 0.75rem var(--product-details-page-inline-padding)
+    calc(0.75rem + env(safe-area-inset-bottom, 0px));
 }
 
 /* Flex-sibling у низа fixed-страницы; бар тянется в home-indicator. */

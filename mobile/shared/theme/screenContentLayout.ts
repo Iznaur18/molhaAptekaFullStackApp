@@ -1,8 +1,8 @@
 import { resolveMobileBottomNavOverlayContentInset } from "@/shared/lib/mobileBottomNavLayout";
 import { resolveIsTabletScreen } from "@/shared/lib/screenBreakpoints";
 
-/** Базовый горизонтальный inset контента — паритет с web `app-shell` mobile (1rem). */
-export const SCREEN_CONTENT_PADDING_HORIZONTAL = 16;
+/** Базовый горизонтальный inset контента. */
+export const SCREEN_CONTENT_PADDING_HORIZONTAL = 8;
 
 /** Отступ между секциями на главной / в каталоге. */
 export const SCREEN_CONTENT_SECTION_GAP = 8;

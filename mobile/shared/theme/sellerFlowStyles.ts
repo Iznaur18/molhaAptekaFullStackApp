@@ -724,7 +724,8 @@ export const useSellerProductsPageStyles = createThemedStyles((theme) => ({
     paddingVertical: L.metaZonePaddingVertical,
     paddingHorizontal: L.metaZonePaddingHorizontal,
     borderRadius: L.metaZoneBorderRadius,
-    backgroundColor: theme.colors.actionSurface,
+    /* Паритет web PR #87: белый блок, как `.seller-products-page__seller-meta`. */
+    backgroundColor: theme.colors.surface,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
   },
@@ -844,7 +845,8 @@ export const useSellerProfileQuickStatsStyles = createThemedStyles((theme) => ({
     borderRadius: L.statsItemBorderRadius,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
-    backgroundColor: theme.colors.actionSurface,
+    /* Паритет web PR #87: белые блоки, как `.seller-profile-quick-stats__item`. */
+    backgroundColor: theme.colors.surface,
   },
   itemFollowers: {
     flex: L.statsColumnFlexFollowers,
@@ -924,7 +926,7 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
     alignItems: "flex-start",
     justifyContent: "space-between",
     gap: 12,
-    paddingHorizontal: 16,
+    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
     paddingTop: 16,
     paddingBottom: 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
@@ -1102,7 +1104,7 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
   },
   footer: {
     flexShrink: 0,
-    paddingHorizontal: 16,
+    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
     paddingVertical: 12,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: theme.colors.border,

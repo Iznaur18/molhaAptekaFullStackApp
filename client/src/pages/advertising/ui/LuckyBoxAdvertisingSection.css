@@ -227,3 +227,133 @@
   font-size: 0.78rem;
   color: var(--iz-color-text-muted);
 }
+
+/* --- Конструктор (простой режим) --- */
+
+.lucky-box-admin__builder-hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--iz-color-text-secondary);
+}
+
+.lucky-box-admin__boxes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+}
+
+.lucky-box-admin__box {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  border: 2px solid var(--iz-color-border);
+  border-radius: 16px;
+  background: var(--iz-color-surface);
+  font: inherit;
+  color: var(--iz-color-text-muted);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.lucky-box-admin__box:hover {
+  border-color: var(--iz-color-action);
+}
+
+.lucky-box-admin__box_prize {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-action);
+}
+
+.lucky-box-admin__box_selected {
+  outline: 3px solid color-mix(in srgb, var(--iz-color-action) 35%, transparent);
+  outline-offset: 2px;
+}
+
+.lucky-box-admin__box:focus-visible {
+  outline: 2px solid var(--iz-color-action);
+  outline-offset: 2px;
+}
+
+.lucky-box-admin__box-icon {
+  width: 30px;
+  height: 30px;
+}
+
+.lucky-box-admin__box-label {
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.lucky-box-admin__box-sub {
+  font-size: 0.7rem;
+}
+
+.lucky-box-admin__palette-label {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--iz-color-text-muted);
+}
+
+.lucky-box-admin__palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.lucky-box-admin__chip {
+  padding: 0.45rem 0.8rem;
+  border: 1.5px solid var(--iz-color-border);
+  border-radius: 999px;
+  background: var(--iz-color-surface);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--iz-color-text-secondary);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.lucky-box-admin__chip:hover {
+  border-color: var(--iz-color-action);
+}
+
+.lucky-box-admin__chip_active {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
+}
+
+.lucky-box-admin__chip_empty:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.lucky-box-admin__builder-note {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--iz-color-text-muted);
+}
+
+.lucky-box-admin__mode-switch {
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 0.82rem;
+  color: var(--iz-color-action);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}

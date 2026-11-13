@@ -9,7 +9,7 @@ const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const readRepoFile = (relativePath) =>
   readFileSync(join(REPO_ROOT, relativePath), "utf8");
 
-const SCREEN_CONTENT_PADDING_HORIZONTAL = 16;
+const SCREEN_CONTENT_PADDING_HORIZONTAL = 8;
 const CATALOG_BROWSER_GRID_GAP = 6;
 
 // Mirror of catalogBrowserGridConstants.ts

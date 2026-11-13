@@ -653,9 +653,10 @@
 
 @media (max-width: 640px) {
   .app-shell {
-    /* Паритет mobile SCREEN_CONTENT_PADDING_HORIZONTAL = 16 */
+    /* Gutter 8px — паритет mobile SCREEN_CONTENT_PADDING_HORIZONTAL = 8.
+       Safe-area остаётся. */
     --app-shell-content-inline-padding: max(
-      1rem,
+      0.5rem,
       env(safe-area-inset-left, 0px),
       env(safe-area-inset-right, 0px)
     );

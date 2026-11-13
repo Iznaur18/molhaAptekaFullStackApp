@@ -89,4 +89,22 @@ export const LUCKY_BOX_ADVERTISING_UI = {
   SAVING: "Сохраняем…",
   /** @param {number} plays @param {number} wins */
   STATS: (plays, wins) => `Открыто коробок: ${plays}, призов выиграно: ${wins}`,
+  /* --- Конструктор (простой режим) --- */
+  BUILDER_HINT:
+    "Нажмите на коробку, чтобы сделать её призовой или пустой — так, как увидит покупатель.",
+  BUILDER_PALETTE_LABEL: "Скидка в выбранной коробке:",
+  BUILDER_SELECT_BOX: "Сначала выберите коробку выше",
+  BUILDER_EMPTY_CHIP: "пусто",
+  BUILDER_NOTE:
+    "Скидка действует 24 часа. Срок действия и товар-приз — в расширенной настройке.",
+  MODE_ADVANCED: "Расширенная настройка",
+  MODE_BUILDER: "Вернуться к конструктору",
+  /** @param {number} index @param {number} discount */
+  BUILDER_BOX_PRIZE_ARIA: (index, discount) =>
+    `Коробка ${index + 1}: призовая, скидка ${discount}%`,
+  /** @param {number} index */
+  BUILDER_BOX_EMPTY_ARIA: (index) =>
+    `Коробка ${index + 1}: пустая, нажмите, чтобы сделать призовой`,
+  BUILDER_PRIZE_FACE_LABEL: "скидка",
+  BUILDER_EMPTY_FACE_LABEL: "пусто",
 };
