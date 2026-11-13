@@ -3674,7 +3674,7 @@ export const useCartScreenStyles = createThemedStyles((theme) => ({
   },
   stickyFooterInner: {
     paddingTop: 18,
-    paddingHorizontal: 16,
+    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
     paddingBottom: 16,
     gap: 10,
   },

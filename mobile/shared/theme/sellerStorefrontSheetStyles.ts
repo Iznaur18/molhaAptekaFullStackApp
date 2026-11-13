@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
+import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 
 /**
  * Окна витрины «QR-код» и «Соцсети и сайт» — паритет web `SellerQrSheet.css`
@@ -30,7 +31,7 @@ export const useSellerStorefrontSheetStyles = createThemedStyles((theme) => ({
     justifyContent: "space-between",
     gap: 12,
     paddingTop: 16,
-    paddingHorizontal: 16,
+    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
     paddingBottom: 12,
   },
   title: {
@@ -47,7 +48,7 @@ export const useSellerStorefrontSheetStyles = createThemedStyles((theme) => ({
   body: {
     gap: 12,
     paddingTop: 12,
-    paddingHorizontal: 16,
+    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
     borderTopWidth: 1,
     borderTopColor: theme.colors.border,
   },

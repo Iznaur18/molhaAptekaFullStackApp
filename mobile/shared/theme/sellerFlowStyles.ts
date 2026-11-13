@@ -926,7 +926,7 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
     alignItems: "flex-start",
     justifyContent: "space-between",
     gap: 12,
-    paddingHorizontal: 16,
+    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
     paddingTop: 16,
     paddingBottom: 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
@@ -1104,7 +1104,7 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
   },
   footer: {
     flexShrink: 0,
-    paddingHorizontal: 16,
+    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
     paddingVertical: 12,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: theme.colors.border,
