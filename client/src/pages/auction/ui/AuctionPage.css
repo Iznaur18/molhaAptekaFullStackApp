@@ -116,12 +116,6 @@
   background: var(--iz-color-warning-surface);
 }
 
-.auction-page__chip_active {
-  border-color: var(--iz-color-warning);
-  background: var(--iz-color-warning);
-  color: var(--iz-color-on-contrast);
-}
-
 .auction-page__overview {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

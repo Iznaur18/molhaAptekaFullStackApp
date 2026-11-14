@@ -689,9 +689,11 @@
 }
 
 .app-shell--header-v2 .app-shell__header--v2 {
-  /* липкий сам header: родитель (.app-shell) высокий, панели есть куда липнуть */
-  position: sticky;
-  top: 0.5rem;
+  /* Сам header остаётся в обычном потоке (баннер внутри него скроллится
+     вместе со страницей), жёстко фиксируется только панель поиска/кнопок
+     (см. правило ниже) — она не сдвигается ни при скролле, ни при смене
+     настроек (баннер, категории и т.п.). */
+  position: static;
   z-index: 50;
   box-sizing: border-box;
   align-items: flex-start;
@@ -711,11 +713,16 @@
 /* Макет главной (ноябрь 2026): без общей «капсулы» — белое поле поиска и рядом
    отдельные оранжевые кнопки-квадратики со скруглением. */
 .app-shell--header-v2 .app-shell__header-panel {
+  position: fixed;
+  top: var(--app-shell-header-fixed-top, 0.5rem);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
   box-sizing: border-box;
-  width: 100%;
+  width: min(100%, var(--app-shell-max-width, 60rem));
   max-width: 100%;
   min-width: 0;
-  padding: 0;
+  padding: 0 var(--app-shell-content-inline-padding);
   border: none;
   border-radius: 0;
   overflow: visible;
@@ -941,9 +948,15 @@
   outline-offset: 2px;
 }
 
-/* с баннером внутри липкость выключаем, иначе баннер «прилипает» вместе с панелью */
-.app-shell--header-v2 .app-shell__header--v2:has(.site-header-banner-carousel) {
-  position: static;
+/* Компенсация под зафиксированную панель: её высота (2.75rem) + смещение
+   сверху (0.5rem) + прежний зазор до контента. Правило срабатывает только
+   когда панель реально отрисована, поэтому на остальных страницах (корзина,
+   профиль и т.д.) лишнего отступа не появляется. Баннер шапки на фиксацию
+   не влияет: он остаётся в потоке и уходит со скроллом. */
+.app-shell--header-v2:has(.app-shell__header-panel) {
+  padding-top: calc(
+    var(--app-shell-header-fixed-top, 0.5rem) + 2.75rem + var(--iz-space-2)
+  );
 }
 
 @media (prefers-reduced-motion: reduce) {

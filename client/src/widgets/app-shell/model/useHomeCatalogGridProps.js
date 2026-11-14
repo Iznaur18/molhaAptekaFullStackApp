@@ -66,8 +66,14 @@ export const useHomeCatalogGridProps = () => {
     showCuratedCategoryLists,
     curatedCategoryListsQuery,
     handleHomeCuratedCategoryClick,
+    handleSellerPersonalCategoryTileClick,
     handlePlaceProductClick,
     viewerRegionCode,
+    isHomeCatalogMainView: isCatalogHomeRoute,
+    productSearchTerm,
+    setProductSearchTerm,
+    homeFeedSectionTab,
+    setHomeFeedSectionTab,
   } = ctx;
 
   const isCuratedProductListsLoading =
@@ -145,8 +151,14 @@ export const useHomeCatalogGridProps = () => {
       showCuratedCategoryLists,
       isCuratedCategoryListsLoading,
       onOpenCuratedCategory: handleHomeCuratedCategoryClick,
+      onSellerPersonalCategoryClick: handleSellerPersonalCategoryTileClick,
       isUserDataConfirmed,
       onPlaceProductClick: handlePlaceProductClick,
+      isCatalogHomeRoute,
+      productSearchTerm,
+      setProductSearchTerm,
+      homeFeedSectionTab,
+      setHomeFeedSectionTab,
     }),
     [
       catalogStatus,
@@ -207,9 +219,15 @@ export const useHomeCatalogGridProps = () => {
       showCuratedCategoryLists,
       isCuratedCategoryListsLoading,
       handleHomeCuratedCategoryClick,
+      handleSellerPersonalCategoryTileClick,
       isUserDataConfirmed,
       handlePlaceProductClick,
       viewerRegionCode,
+      isCatalogHomeRoute,
+      productSearchTerm,
+      setProductSearchTerm,
+      homeFeedSectionTab,
+      setHomeFeedSectionTab,
     ],
   );
 };

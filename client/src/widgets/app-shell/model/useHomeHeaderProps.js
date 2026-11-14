@@ -39,6 +39,7 @@ export const useHomeHeaderProps = () => {
     closeCatalogProductDetails,
     viewerRegionCode,
     setViewerRegionCode,
+    homeFeedSectionTab,
   } = ctx;
 
   const inAppNotificationsCount = inAppNotifications.length;
@@ -108,11 +109,16 @@ export const useHomeHeaderProps = () => {
 
   // Ввод только пишется в поле: ни запроса, ни перехода в каталог до «Найти».
   const handleProductSearchSubmit = useCallback(() => {
+    // На вкладке «Продавцы» строка шапки фильтрует плитки, а не товарный каталог.
+    if (homeFeedSectionTab === "sellers") {
+      return;
+    }
     submitProductSearch();
     if (productSearchTerm.trim() !== "" && !isCatalogHeaderMainView(mainView)) {
       handleNavigateToFullCatalogFromBreadcrumb();
     }
   }, [
+    homeFeedSectionTab,
     mainView,
     productSearchTerm,
     submitProductSearch,

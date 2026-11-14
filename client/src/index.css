@@ -2,6 +2,7 @@
 @import "./shared/styles/displayFont.css";
 @import "./shared/styles/controls.css";
 @import "./shared/styles/cancelButton.css";
+@import "./shared/styles/statusFilterChipActive.css";
 @import "./shared/ui/AppButton/AppButton.css";
 
 /* Прокрутка — да, щипок и двойной тап (масштаб) — нет. Раньше масштаб гасил

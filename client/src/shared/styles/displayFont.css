@@ -26,7 +26,8 @@
   grid-auto-columns: minmax(0, 1fr);
   grid-auto-flow: column;
   gap: 0.6rem;
-  padding: 0;
+  margin: var(--iz-space-4) 0 var(--iz-space-3);
+  padding-inline: var(--app-shell-content-inline-padding, var(--iz-space-4));
   font-family: inherit;
   font-size: 0.95rem;
   font-weight: 600;
@@ -54,11 +55,6 @@
 
 .home-feed-section-tab:hover {
   color: var(--iz-color-text);
-}
-
-.home-feed-section-tab[aria-pressed="true"] {
-  background: var(--iz-color-action);
-  color: var(--iz-color-on-contrast);
 }
 
 /* Обёртка не должна менять раскладку ленты, пока лента видна. */

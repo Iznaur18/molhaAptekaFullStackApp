@@ -1,0 +1,212 @@
+/**
+ * Активные pill-фильтры: *-surface + *-text вместо заливки + on-contrast.
+ * На пользовательской теме иначе белый текст на бледном фоне.
+ */
+
+.my-sales-page__status-chip_active,
+.my-sales-page__status-chip_active:hover {
+  border-color: color-mix(in srgb, var(--iz-color-success) 42%, var(--iz-color-border));
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success-text);
+}
+
+.my-sales-page__status-chip_active.my-sales-page__status-chip_pending,
+.my-sales-page__status-chip_active.my-sales-page__status-chip_pending:hover {
+  border-color: color-mix(in srgb, var(--iz-color-warning) 42%, var(--iz-color-border));
+  background: var(--iz-color-warning-surface);
+  color: var(--iz-color-warning-text);
+}
+
+.my-sales-page__status-chip_active.my-sales-page__status-chip_confirmed,
+.my-sales-page__status-chip_active.my-sales-page__status-chip_confirmed:hover {
+  border-color: color-mix(in srgb, var(--iz-color-action) 42%, var(--iz-color-border));
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-action);
+}
+
+.my-sales-page__status-chip_active.my-sales-page__status-chip_shipped,
+.my-sales-page__status-chip_active.my-sales-page__status-chip_shipped:hover {
+  border-color: color-mix(in srgb, var(--iz-color-accent) 42%, var(--iz-color-border));
+  background: var(--iz-color-accent-soft);
+  color: var(--iz-color-accent);
+}
+
+.my-sales-page__status-chip_active.my-sales-page__status-chip_delivered,
+.my-sales-page__status-chip_active.my-sales-page__status-chip_delivered:hover {
+  border-color: color-mix(in srgb, var(--iz-color-success) 42%, var(--iz-color-border));
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success-text);
+}
+
+.my-sales-page__status-chip_active.my-sales-page__status-chip_cancelled,
+.my-sales-page__status-chip_active.my-sales-page__status-chip_cancelled:hover {
+  border-color: color-mix(in srgb, var(--iz-color-danger) 42%, var(--iz-color-border));
+  background: var(--iz-color-danger-surface);
+  color: var(--iz-color-danger-text);
+}
+
+.my-orders-page__status-chip_active,
+.my-orders-page__status-chip_active:hover,
+.my-orders-page__status-chip_active.my-orders-page__status-chip_confirmed,
+.my-orders-page__status-chip_active.my-orders-page__status-chip_confirmed:hover {
+  border-color: color-mix(in srgb, var(--iz-color-action) 42%, var(--iz-color-border));
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-action);
+}
+
+.my-orders-page__status-chip_active.my-orders-page__status-chip_pending,
+.my-orders-page__status-chip_active.my-orders-page__status-chip_pending:hover {
+  border-color: color-mix(in srgb, var(--iz-color-warning) 42%, var(--iz-color-border));
+  background: var(--iz-color-warning-surface);
+  color: var(--iz-color-warning-text);
+}
+
+.my-orders-page__status-chip_active.my-orders-page__status-chip_shipped,
+.my-orders-page__status-chip_active.my-orders-page__status-chip_shipped:hover {
+  border-color: color-mix(in srgb, var(--iz-color-accent) 42%, var(--iz-color-border));
+  background: var(--iz-color-accent-soft);
+  color: var(--iz-color-accent);
+}
+
+.my-orders-page__status-chip_active.my-orders-page__status-chip_delivered,
+.my-orders-page__status-chip_active.my-orders-page__status-chip_delivered:hover {
+  border-color: color-mix(in srgb, var(--iz-color-success) 42%, var(--iz-color-border));
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success-text);
+}
+
+.my-orders-page__status-chip_active.my-orders-page__status-chip_cancelled,
+.my-orders-page__status-chip_active.my-orders-page__status-chip_cancelled:hover {
+  border-color: color-mix(in srgb, var(--iz-color-danger) 42%, var(--iz-color-border));
+  background: var(--iz-color-danger-surface);
+  color: var(--iz-color-danger-text);
+}
+
+.admin-orders-page__status-chip_active,
+.admin-orders-page__status-chip_active:hover {
+  border-color: color-mix(in srgb, var(--iz-color-primary) 42%, var(--iz-color-border));
+  background: color-mix(in srgb, var(--iz-color-primary) 10%, var(--iz-color-surface));
+  color: var(--iz-color-primary);
+}
+
+.admin-orders-page__status-chip_active.admin-orders-page__status-chip_pending,
+.admin-orders-page__status-chip_active.admin-orders-page__status-chip_pending:hover {
+  border-color: color-mix(in srgb, var(--iz-color-warning) 42%, var(--iz-color-border));
+  background: var(--iz-color-warning-surface);
+  color: var(--iz-color-warning-text);
+}
+
+.admin-orders-page__status-chip_active.admin-orders-page__status-chip_confirmed,
+.admin-orders-page__status-chip_active.admin-orders-page__status-chip_confirmed:hover {
+  border-color: color-mix(in srgb, var(--iz-color-action) 42%, var(--iz-color-border));
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-action);
+}
+
+.admin-orders-page__status-chip_active.admin-orders-page__status-chip_shipped,
+.admin-orders-page__status-chip_active.admin-orders-page__status-chip_shipped:hover {
+  border-color: color-mix(in srgb, var(--iz-color-accent) 42%, var(--iz-color-border));
+  background: var(--iz-color-accent-soft);
+  color: var(--iz-color-accent);
+}
+
+.admin-orders-page__status-chip_active.admin-orders-page__status-chip_delivered,
+.admin-orders-page__status-chip_active.admin-orders-page__status-chip_delivered:hover {
+  border-color: color-mix(in srgb, var(--iz-color-success) 42%, var(--iz-color-border));
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success-text);
+}
+
+.admin-orders-page__status-chip_active.admin-orders-page__status-chip_cancelled,
+.admin-orders-page__status-chip_active.admin-orders-page__status-chip_cancelled:hover {
+  border-color: color-mix(in srgb, var(--iz-color-danger) 42%, var(--iz-color-border));
+  background: var(--iz-color-danger-surface);
+  color: var(--iz-color-danger-text);
+}
+
+.installment-page__chip_active,
+.installment-page__chip_active:hover,
+.installment-page__chip_active.installment-page__chip_in_progress,
+.installment-page__chip_active.installment-page__chip_in_progress:hover,
+.installment-page__chip_active.installment-page__chip_completed,
+.installment-page__chip_active.installment-page__chip_completed:hover {
+  border-color: color-mix(in srgb, var(--iz-color-success) 42%, var(--iz-color-border));
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success-text);
+}
+
+.installment-page__chip_active.installment-page__chip_defaulted,
+.installment-page__chip_active.installment-page__chip_defaulted:hover {
+  border-color: color-mix(in srgb, var(--iz-color-warning) 42%, var(--iz-color-border));
+  background: var(--iz-color-warning-surface);
+  color: var(--iz-color-warning-text);
+}
+
+.installment-page__chip_active.installment-page__chip_cancelled,
+.installment-page__chip_active.installment-page__chip_cancelled:hover {
+  border-color: color-mix(in srgb, var(--iz-color-danger) 42%, var(--iz-color-border));
+  background: var(--iz-color-danger-surface);
+  color: var(--iz-color-danger-text);
+}
+
+.auction-page__chip_active,
+.auction-page__chip_active:hover {
+  border-color: color-mix(in srgb, var(--iz-color-warning) 42%, var(--iz-color-border));
+  background: var(--iz-color-warning-surface);
+  color: var(--iz-color-warning-text);
+}
+
+.product-reports-page__section-chip_active,
+.product-reports-page__section-chip_active:hover {
+  border-color: color-mix(in srgb, var(--iz-color-danger) 42%, var(--iz-color-border));
+  background: var(--iz-color-danger-surface);
+  color: var(--iz-color-danger-text);
+}
+
+.product-reports-page__section-chip_active.product-reports-page__section-chip_products,
+.product-reports-page__section-chip_active.product-reports-page__section-chip_products:hover {
+  border-color: color-mix(in srgb, var(--iz-color-warning) 42%, var(--iz-color-border));
+  background: var(--iz-color-warning-surface);
+  color: var(--iz-color-warning-text);
+}
+
+.product-reports-page__section-chip_active.product-reports-page__section-chip_stories,
+.product-reports-page__section-chip_active.product-reports-page__section-chip_stories:hover {
+  border-color: color-mix(in srgb, var(--iz-color-accent) 42%, var(--iz-color-border));
+  background: var(--iz-color-accent-soft);
+  color: var(--iz-color-accent);
+}
+
+.my-products-catalog-toolbar__chip_active,
+.my-products-catalog-toolbar__chip_active:hover {
+  border-color: color-mix(in srgb, var(--iz-color-action) 42%, var(--iz-color-border));
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-action);
+}
+
+.admin-analytics-page__period-chip_active,
+.admin-analytics-page__period-chip_active:hover {
+  border-color: color-mix(in srgb, var(--iz-color-action) 42%, var(--iz-color-border));
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-action);
+}
+
+.home-feed-section-tab[aria-pressed="true"],
+.home-feed-section-tab[aria-pressed="true"]:hover {
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-action);
+}
+
+.theme-preference-toggle__chip--active,
+.theme-preference-toggle__chip--active:hover {
+  border-color: color-mix(in srgb, var(--iz-color-action) 42%, var(--iz-color-border));
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-action);
+}
+
+.create-product-section__listing-origin-chip_active,
+.create-product-section__listing-origin-chip_active:hover {
+  border-color: color-mix(in srgb, var(--iz-color-action) 42%, var(--iz-color-border));
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-action);
+}

@@ -76,12 +76,6 @@
   border-color: color-mix(in srgb, var(--iz-color-action) 45%, transparent);
 }
 
-.create-product-section__listing-origin-chip_active {
-  border-color: var(--iz-color-action);
-  background: var(--iz-color-action);
-  color: var(--iz-color-on-contrast, #fff);
-}
-
 .create-product-section__listing-origin-chip:disabled {
   opacity: 0.65;
   cursor: not-allowed;

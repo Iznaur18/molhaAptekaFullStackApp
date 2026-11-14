@@ -70,37 +70,6 @@
   background: var(--iz-color-surface-elevated);
 }
 
-.admin-orders-page__status-chip_active {
-  border-color: var(--iz-color-primary);
-  background: var(--iz-color-primary);
-  color: var(--iz-color-on-contrast);
-}
-
-.admin-orders-page__status-chip_active.admin-orders-page__status-chip_pending {
-  border-color: var(--iz-color-warning);
-  background: var(--iz-color-warning);
-}
-
-.admin-orders-page__status-chip_active.admin-orders-page__status-chip_confirmed {
-  border-color: var(--iz-color-action);
-  background: var(--iz-color-action);
-}
-
-.admin-orders-page__status-chip_active.admin-orders-page__status-chip_shipped {
-  border-color: var(--iz-color-accent);
-  background: var(--iz-color-accent);
-}
-
-.admin-orders-page__status-chip_active.admin-orders-page__status-chip_delivered {
-  border-color: var(--iz-color-success);
-  background: var(--iz-color-success);
-}
-
-.admin-orders-page__status-chip_active.admin-orders-page__status-chip_cancelled {
-  border-color: var(--iz-color-danger);
-  background: var(--iz-color-danger);
-}
-
 .admin-orders-page__list {
   display: flex;
   flex-direction: column;

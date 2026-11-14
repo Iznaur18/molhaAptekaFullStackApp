@@ -24,15 +24,30 @@ import {
   useSaveSellerCommerceDefaultsMutation,
 } from "../../../entities/seller-commerce-defaults/model/sellerCommerceDefaultsQueries.js";
 import { CdekConnectionCard } from "../../../entities/cdek/ui/CdekConnectionCard.jsx";
-import { YandexDeliveryConnectionCard } from "../../../entities/yandex-delivery/ui/YandexDeliveryConnectionCard.jsx";
 import {
   useMyCdekConnectionQuery,
   useToggleCdekConnectionMutation,
 } from "../../../entities/cdek/model/cdekConnectionQueries.js";
-import { SELLER_COMMERCE_DEFAULTS_UI } from "../../../shared/config/appUiCopy.js";
+import { YandexDeliveryConnectionCard } from "../../../entities/yandex-delivery/ui/YandexDeliveryConnectionCard.jsx";
+import {
+  CDEK_CONNECTION_UI,
+  SELLER_COMMERCE_DEFAULTS_UI,
+  YANDEX_DELIVERY_CONNECTION_UI,
+} from "../../../shared/config/appUiCopy.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
+import { ModalSectionTabs } from "../../../shared/ui/ModalSectionTabs/ModalSectionTabs.jsx";
 
 import "./DeliveryPaymentPage.css";
+
+const DELIVERY_SECTION_TAB_MAIN = "main";
+const DELIVERY_SECTION_TAB_CDEK = "cdek";
+const DELIVERY_SECTION_TAB_YANDEX = "yandex";
+
+const SECTION_TABS = [
+  { id: DELIVERY_SECTION_TAB_MAIN, label: SELLER_COMMERCE_DEFAULTS_UI.SECTION_TAB_MAIN },
+  { id: DELIVERY_SECTION_TAB_CDEK, label: CDEK_CONNECTION_UI.TITLE },
+  { id: DELIVERY_SECTION_TAB_YANDEX, label: YANDEX_DELIVERY_CONNECTION_UI.TITLE },
+];
 
 const PAYMENT_METHOD_HINT = {
   [ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY]:
@@ -159,6 +174,7 @@ export function DeliveryPaymentPage() {
   const [sellerPayoutRequisites, setSellerPayoutRequisites] = useState("");
   const [error, setError] = useState("");
   const [savedMessage, setSavedMessage] = useState("");
+  const [sectionTab, setSectionTab] = useState(DELIVERY_SECTION_TAB_MAIN);
 
   const defaults = defaultsQuery.data;
   const userId = user?._id ? String(user._id) : "";
@@ -262,29 +278,41 @@ export function DeliveryPaymentPage() {
     );
   }
 
+  const isMainSection = sectionTab === DELIVERY_SECTION_TAB_MAIN;
+
   return (
     <section className="delivery-payment-page">
-      <header className="delivery-payment-page__header">
-        <div className="delivery-payment-page__header-copy">
-          <h1 className="delivery-payment-page__title">
-            {SELLER_COMMERCE_DEFAULTS_UI.TITLE}
-          </h1>
-          <p className="delivery-payment-page__intro">
-            {SELLER_COMMERCE_DEFAULTS_UI.INTRO}
-          </p>
-        </div>
-        <p
-          className={[
-            "delivery-payment-page__status",
-            isConfigured
-              ? "delivery-payment-page__status--ok"
-              : "delivery-payment-page__status--warn",
-          ].join(" ")}
-        >
-          {statusText}
-        </p>
-      </header>
+      <ModalSectionTabs
+        tabs={SECTION_TABS}
+        activeTabId={sectionTab}
+        onTabChange={setSectionTab}
+        ariaLabel={SELLER_COMMERCE_DEFAULTS_UI.SECTION_TABS_ARIA}
+      />
 
+      {isMainSection ? (
+        <header className="delivery-payment-page__header">
+          <div className="delivery-payment-page__header-copy">
+            <h1 className="delivery-payment-page__title">
+              {SELLER_COMMERCE_DEFAULTS_UI.TITLE}
+            </h1>
+            <p className="delivery-payment-page__intro">
+              {SELLER_COMMERCE_DEFAULTS_UI.INTRO}
+            </p>
+          </div>
+          <p
+            className={[
+              "delivery-payment-page__status",
+              isConfigured
+                ? "delivery-payment-page__status--ok"
+                : "delivery-payment-page__status--warn",
+            ].join(" ")}
+          >
+            {statusText}
+          </p>
+        </header>
+      ) : null}
+
+      {isMainSection ? (
       <form className="delivery-payment-page__form" onSubmit={handleSubmit}>
         <fieldset className="delivery-payment-page__block">
           <legend className="delivery-payment-page__legend">
@@ -486,11 +514,15 @@ export function DeliveryPaymentPage() {
           </button>
         </div>
       </form>
-
-      {/* Ключи СДЭК сохраняются отдельно: их проверяет сама служба, и общий
-          «Сохранить» не должен зависеть от доступности чужого API. */}
-      <CdekConnectionCard />
-      <YandexDeliveryConnectionCard />
+      ) : sectionTab === DELIVERY_SECTION_TAB_CDEK ? (
+        <div className="delivery-payment-page__carrier-panel">
+          <CdekConnectionCard />
+        </div>
+      ) : (
+        <div className="delivery-payment-page__carrier-panel">
+          <YandexDeliveryConnectionCard />
+        </div>
+      )}
     </section>
   );
 }

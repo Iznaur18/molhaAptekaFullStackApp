@@ -25,6 +25,7 @@ import { runInTransaction, withMongoSession } from "../../utils/mongoTransaction
 import { quoteAndConsumePromoReturnStreakAmount } from "../promo-return-streak/index.js";
 
 import { parseSellerPersonalCategorySubmitBody } from "./sellerPersonalCategoryServiceHelpers.js";
+import { listCatalogStorefrontSellerTiles } from "./listCatalogStorefrontSellerTiles.js";
 
 export async function getSellerPersonalCategoryConfig() {
   const activeSlots = await countActiveSellerPersonalCategorySlots();
@@ -46,8 +47,13 @@ export async function getSellerPersonalCategoryCatalogTiles({ viewerRegionCode }
     .limit(SELLER_PERSONAL_CATEGORY_ACTIVE_SLOT_LIMIT)
     .lean();
 
+  const paidTiles = rows.map(toSellerPersonalCategoryTilePayload);
+  const storefrontTiles = await listCatalogStorefrontSellerTiles({
+    excludeSellerIds: paidTiles.map((tile) => tile.sellerId),
+  });
+
   return {
-    tiles: rows.map(toSellerPersonalCategoryTilePayload),
+    tiles: [...paidTiles, ...storefrontTiles],
   };
 }
 

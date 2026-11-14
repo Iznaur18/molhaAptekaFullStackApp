@@ -47,11 +47,6 @@
   cursor: pointer;
 }
 
-.admin-analytics-page__period-chip_active {
-  border-color: var(--iz-color-primary, #2563eb);
-  background: color-mix(in srgb, var(--iz-color-primary, #2563eb) 12%, white);
-}
-
 .admin-analytics-page__meta {
   margin: 0;
   font-size: 12px;

@@ -1,12 +1,12 @@
-import { lazy, Suspense, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { HomeCuratedProductListsSection } from "../../../entities/curated-product-list/ui/HomeCuratedProductListsSection.jsx";
 import { CuratedProductListCarouselSkeleton } from "../../../entities/curated-product-list/ui/CuratedProductListCarouselSkeleton.jsx";
 import { BoostProductsHomeSection } from "../../../entities/product/ui/BoostProductsHomeSection.jsx";
-import { buildSellerStoreCuratedCategories } from "../../../entities/curated-category-list/lib/buildSellerStoreCuratedCategories.js";
-import { CuratedCategoryListCarousel } from "../../../entities/curated-category-list/ui/CuratedCategoryListCarousel.jsx";
 import { HomeCuratedCategoryListsSection } from "../../../entities/curated-category-list/ui/HomeCuratedCategoryListsSection.jsx";
+import { filterSellerStoreTilesBySearch } from "../../../entities/seller-personal-category/lib/filterSellerStoreTilesBySearch.js";
+import { SellerPersonalCategoriesGrid } from "../../../entities/seller-personal-category/ui/SellerPersonalCategoriesGrid.jsx";
 import { CuratedCategoryListCarouselSkeleton } from "../../../entities/curated-category-list/ui/CuratedCategoryListCarouselSkeleton.jsx";
 import { CatalogBrowserBreadcrumb } from "../../../entities/product-category-display/ui/CatalogBrowserBreadcrumb.jsx";
 import { CatalogBrowserLanding } from "../../../entities/product-category-display/ui/CatalogBrowserLanding.jsx";
@@ -16,9 +16,13 @@ import { useSellerPersonalCategoryCatalogTilesQuery } from "../../../entities/se
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { buildRafflePath } from "../../../shared/lib/rafflePaths.js";
 import { InlineErrorBanner } from "../../../shared/ui/InlineErrorBanner/InlineErrorBanner.jsx";
+import { SearchInput } from "../../../shared/ui/SearchInput/SearchInput.jsx";
 
 import { CatalogGridSkeleton } from "../../catalog-product-grid/ui/CatalogGridSkeleton.jsx";
 import { HomeCatalogGrid } from "../../catalog-product-grid/ui/HomeCatalogGrid.jsx";
+
+import "../../../entities/product-category-display/ui/CatalogFeedTilesGrid.css";
+import "./HomeFeedSellersSearch.css";
 
 const LazyRaffleFeaturedHomeSection = lazy(() =>
   import("../../../entities/raffle/ui/RaffleFeaturedHomeSection.jsx").then(
@@ -40,6 +44,7 @@ const LazyMyProductsCatalogSection = lazy(() =>
 /** Надписи-переключатели над лентой главного экрана. */
 const HOME_FEED_SECTION_TABS = [
   { id: "home", label: HOME_PAGE_UI.CATALOG_HOME_SECTION },
+  { id: "sellers", label: HOME_PAGE_UI.CATALOG_HOME_SECTION_SELLERS },
   { id: "categories", label: HOME_PAGE_UI.CATALOG_HOME_SECTION_CATEGORIES },
 ];
 
@@ -105,8 +110,14 @@ const HOME_FEED_SECTION_TABS = [
  *   showCuratedCategoryLists: boolean;
  *   isCuratedCategoryListsLoading: boolean;
  *   onOpenCuratedCategory: (category: import('../../../entities/curated-category-list/model/types.js').HomeCuratedCategoryFromApi) => void;
+ *   onSellerPersonalCategoryClick: (tile: { _id: string; sellerId: string; labelRu: string }) => void;
  *   isUserDataConfirmed?: boolean;
  *   onPlaceProductClick?: () => void;
+ *   isCatalogHomeRoute?: boolean;
+ *   productSearchTerm?: string;
+ *   setProductSearchTerm?: (next: string) => void;
+ *   homeFeedSectionTab?: "home" | "sellers" | "categories";
+ *   setHomeFeedSectionTab?: (tab: "home" | "sellers" | "categories") => void;
  * }} props
  */
 export function AppShellCatalogGridSection({
@@ -170,11 +181,16 @@ export function AppShellCatalogGridSection({
   showCuratedCategoryLists = false,
   isCuratedCategoryListsLoading = false,
   onOpenCuratedCategory,
+  onSellerPersonalCategoryClick,
   isUserDataConfirmed = false,
   onPlaceProductClick,
+  isCatalogHomeRoute = false,
+  productSearchTerm = "",
+  setProductSearchTerm = () => {},
+  homeFeedSectionTab = "home",
+  setHomeFeedSectionTab = () => {},
 }) {
   const navigate = useNavigate();
-  const [homeFeedSectionTab, setHomeFeedSectionTab] = useState("home");
   // Ряд «Буст продвижение» живёт там же, где подборки товаров: на чистой главной.
   const showBoostProductsRow =
     !isMineMode && isHomeCatalogMainView && showCuratedProductLists;
@@ -183,19 +199,40 @@ export function AppShellCatalogGridSection({
     regionCode: viewerRegionCode ?? "",
   });
   const boostProducts = boostProductsQuery.data ?? [];
-  // Оплаченные плитки продавцов нужны только на вкладке «Категории».
+  // Оплаченные плитки продавцов — только на вкладке «Продавцы».
   const sellerStoreTilesQuery = useSellerPersonalCategoryCatalogTilesQuery({
     enabled:
       !isMineMode &&
-      isHomeCatalogMainView &&
+      isCatalogHomeRoute &&
       showCuratedCategoryLists &&
-      homeFeedSectionTab === "categories",
+      homeFeedSectionTab === "sellers",
     regionCode: viewerRegionCode ?? "",
   });
-  const sellerStoreCategories = useMemo(
-    () => buildSellerStoreCuratedCategories(sellerStoreTilesQuery.data ?? []),
-    [sellerStoreTilesQuery.data],
+  const sellerStoreTiles = sellerStoreTilesQuery.data ?? [];
+  const sellerSearchTerm =
+    homeFeedSectionTab === "sellers" ? productSearchTerm : "";
+  const filteredSellerStoreTiles = useMemo(
+    () => filterSellerStoreTilesBySearch(sellerStoreTiles, sellerSearchTerm),
+    [sellerSearchTerm, sellerStoreTiles],
   );
+
+  useEffect(() => {
+    const isSellersTabOpen =
+      !isMineMode &&
+      isHomeCatalogMainView &&
+      showCuratedCategoryLists &&
+      homeFeedSectionTab === "sellers";
+    if (!isSellersTabOpen && !hasProductSearchQuery) {
+      setProductSearchTerm("");
+    }
+  }, [
+    hasProductSearchQuery,
+    homeFeedSectionTab,
+    isHomeCatalogMainView,
+    isMineMode,
+    setProductSearchTerm,
+    showCuratedCategoryLists,
+  ]);
 
   if (isMineMode) {
     return (
@@ -245,7 +282,9 @@ export function AppShellCatalogGridSection({
     ? HOME_FEED_SECTION_TABS
     : HOME_FEED_SECTION_TABS.slice(0, 1);
   const activeHomeFeedSectionTab = canShowCategoriesTab ? homeFeedSectionTab : "home";
+  const isSellersTabActive = activeHomeFeedSectionTab === "sellers";
   const isCategoriesTabActive = activeHomeFeedSectionTab === "categories";
+  const isHomeProductFeedTabActive = activeHomeFeedSectionTab === "home";
 
   return (
     <>
@@ -301,39 +340,71 @@ export function AppShellCatalogGridSection({
               type="button"
               className="home-feed-section-tab"
               aria-pressed={activeHomeFeedSectionTab === tab.id}
-              onClick={() => setHomeFeedSectionTab(tab.id)}
+              onClick={() => setHomeFeedSectionTab(/** @type {"home" | "sellers" | "categories"} */ (tab.id))}
             >
               {tab.label}
             </button>
           ))}
         </h2>
       ) : null}
-      {isCategoriesTabActive && sellerStoreTilesQuery.isError ? (
-        <InlineErrorBanner>{sellerStoreTilesQuery.error.message}</InlineErrorBanner>
+      {isSellersTabActive ? (
+        sellerStoreTilesQuery.isPending ? (
+          <CuratedCategoryListCarouselSkeleton />
+        ) : sellerStoreTilesQuery.isError ? (
+          <InlineErrorBanner>{sellerStoreTilesQuery.error.message}</InlineErrorBanner>
+        ) : sellerStoreTiles.length > 0 ? (
+          <div className="home-feed-sellers">
+            <div className="home-feed-sellers__search">
+              <SearchInput
+              value={productSearchTerm}
+              onChange={setProductSearchTerm}
+              placeholder={HOME_PAGE_UI.CATALOG_HOME_SECTION_SELLERS_SEARCH_PLACEHOLDER}
+              ariaLabel={HOME_PAGE_UI.CATALOG_HOME_SECTION_SELLERS_SEARCH_ARIA}
+              clearAriaLabel={HOME_PAGE_UI.CATALOG_HOME_SECTION_SELLERS_SEARCH_CLEAR_ARIA}
+              pendingAriaLabel={HOME_PAGE_UI.CATALOG_HOME_SECTION_SELLERS_SEARCH_ARIA}
+              showLeadingIcon
+              />
+            </div>
+            {filteredSellerStoreTiles.length > 0 ? (
+              <section
+                className="catalog-browser-landing__categories"
+                aria-label={HOME_PAGE_UI.CATALOG_HOME_SECTION_SELLERS}
+              >
+                <SellerPersonalCategoriesGrid
+                  tiles={filteredSellerStoreTiles}
+                  isLoading={false}
+                  errorMessage={null}
+                  onTileClick={onSellerPersonalCategoryClick}
+                />
+              </section>
+            ) : (
+              <p className="home-feed-section-empty">
+                {HOME_PAGE_UI.CATALOG_HOME_SECTION_SELLERS_SEARCH_EMPTY}
+              </p>
+            )}
+          </div>
+        ) : (
+          <p className="home-feed-section-empty">
+            {HOME_PAGE_UI.CATALOG_HOME_SECTION_SELLERS_EMPTY}
+          </p>
+        )
       ) : null}
-      {!isCategoriesTabActive ? null : sellerStoreCategories.length > 0 ||
+      {isCategoriesTabActive ? (
         homeCuratedCategoryLists.length > 0 ? (
-        <>
-          {/* Платное место — первым, над витринами админа. */}
-          <CuratedCategoryListCarousel
-            title={HOME_PAGE_UI.CATALOG_HOME_SECTION_SELLER_STORES}
-            categories={sellerStoreCategories}
-            onOpenCategory={onOpenCuratedCategory}
-          />
           <HomeCuratedCategoryListsSection
             lists={homeCuratedCategoryLists}
             onOpenCategory={onOpenCuratedCategory}
           />
-        </>
-      ) : isCuratedCategoryListsLoading || sellerStoreTilesQuery.isPending ? (
-        <CuratedCategoryListCarouselSkeleton />
-      ) : (
-        <p className="home-feed-section-empty">
-          {HOME_PAGE_UI.CATALOG_HOME_SECTION_CATEGORIES_EMPTY}
-        </p>
-      )}
+        ) : isCuratedCategoryListsLoading ? (
+          <CuratedCategoryListCarouselSkeleton />
+        ) : (
+          <p className="home-feed-section-empty">
+            {HOME_PAGE_UI.CATALOG_HOME_SECTION_CATEGORIES_EMPTY}
+          </p>
+        )
+      ) : null}
       {/* Лента остаётся смонтированной: её дозагрузка привязана к sentinel-ref. */}
-      <div className="home-feed-section-panel" hidden={isCategoriesTabActive}>
+      <div className="home-feed-section-panel" hidden={!isHomeProductFeedTabActive}>
         {isCatalogInitialLoading ? (
           <CatalogGridSkeleton
             withActionButton={catalogMainView === "catalog" && !isMineMode}

@@ -32,12 +32,6 @@
   cursor: pointer;
 }
 
-.theme-preference-toggle__chip--active {
-  border-color: var(--iz-color-action);
-  background: var(--iz-color-action);
-  color: var(--iz-color-on-contrast);
-}
-
 .theme-preference-toggle__chip:hover:not(.theme-preference-toggle__chip--active) {
   border-color: var(--iz-color-action);
   background: var(--iz-color-action-soft);
