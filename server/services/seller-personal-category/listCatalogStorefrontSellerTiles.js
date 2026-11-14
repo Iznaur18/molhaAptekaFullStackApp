@@ -18,9 +18,7 @@ export function buildStorefrontSellerTileId(sellerId) {
  *
  * @param {{ excludeSellerIds?: string[] }} [input]
  */
-export async function listCatalogStorefrontSellerTiles({
-  excludeSellerIds = [],
-} = {}) {
+export async function listCatalogStorefrontSellerTiles({ excludeSellerIds = [] } = {}) {
   const hiddenSellerIds = await getHiddenSellerIds();
   const excludeSet = new Set([
     ...excludeSellerIds.map(String),

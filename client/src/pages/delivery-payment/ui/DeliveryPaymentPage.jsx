@@ -44,7 +44,10 @@ const DELIVERY_SECTION_TAB_CDEK = "cdek";
 const DELIVERY_SECTION_TAB_YANDEX = "yandex";
 
 const SECTION_TABS = [
-  { id: DELIVERY_SECTION_TAB_MAIN, label: SELLER_COMMERCE_DEFAULTS_UI.SECTION_TAB_MAIN },
+  {
+    id: DELIVERY_SECTION_TAB_MAIN,
+    label: SELLER_COMMERCE_DEFAULTS_UI.SECTION_TAB_MAIN,
+  },
   { id: DELIVERY_SECTION_TAB_CDEK, label: CDEK_CONNECTION_UI.TITLE },
   { id: DELIVERY_SECTION_TAB_YANDEX, label: YANDEX_DELIVERY_CONNECTION_UI.TITLE },
 ];
@@ -313,207 +316,207 @@ export function DeliveryPaymentPage() {
       ) : null}
 
       {isMainSection ? (
-      <form className="delivery-payment-page__form" onSubmit={handleSubmit}>
-        <fieldset className="delivery-payment-page__block">
-          <legend className="delivery-payment-page__legend">
-            {SELLER_COMMERCE_DEFAULTS_UI.SECTION_PAYOUT}
-          </legend>
-          <label className="delivery-payment-page__field">
-            <input
-              className="delivery-payment-page__input"
-              type="text"
-              name="sellerPayoutRequisites"
-              value={sellerPayoutRequisites}
-              onChange={(event) => {
-                setSavedMessage("");
-                setSellerPayoutRequisites(event.target.value);
-              }}
-              maxLength={SELLER_PAYOUT_REQUISITES_MAX_LENGTH}
-              placeholder={SELLER_COMMERCE_DEFAULTS_UI.PAYOUT_PLACEHOLDER}
-              disabled={isSubmitting}
-              autoComplete="off"
-              aria-label={SELLER_COMMERCE_DEFAULTS_UI.SECTION_PAYOUT}
-            />
-            <span className="delivery-payment-page__block-hint">
-              {SELLER_COMMERCE_DEFAULTS_UI.PAYOUT_HINT}
-            </span>
-          </label>
-        </fieldset>
-
-        <fieldset className="delivery-payment-page__block">
-          <legend className="delivery-payment-page__legend">
-            {SELLER_COMMERCE_DEFAULTS_UI.SECTION_FULFILLMENT}
-          </legend>
-          <ProductPickupLocationFields
-            locations={locations}
-            pickupEnabled={form.productPickupEnabled !== false}
-            deliveryEnabled={form.productDeliveryCarrier === "seller"}
-            courierDeliveryEnabled={form.productDeliveryCarrier === "gitorg_courier"}
-            productDeliveryCarrier={String(form.productDeliveryCarrier ?? "")}
-            productRegionCode={String(form.productRegionCode ?? "")}
-            sellerRegionCode={String(user?.userRegionCode ?? "")}
-            disabled={isSubmitting}
-            savedAddresses={savedAddresses}
-            // Флажок «СДЭК» — тот же тумблер, что в карточке ключей ниже:
-            // сохраняется сразу, без общей кнопки «Сохранить».
-            cdekControl={{
-              connected: cdekConnectionQuery.data?.connected === true,
-              enabled: cdekConnectionQuery.data?.enabled !== false,
-              pending: cdekToggleMutation.isPending,
-              onToggle: (enabled) => cdekToggleMutation.mutate(enabled),
-            }}
-            onChange={(next) => {
-              setSavedMessage("");
-              setForm((prev) => ({
-                ...prev,
-                productPickupLocations: Array.isArray(next.productPickupLocations)
-                  ? next.productPickupLocations
-                  : [],
-                productPickupEnabled: next.productPickupEnabled !== false,
-                ...(next.productDeliveryCarrier === undefined
-                  ? {}
-                  : { productDeliveryCarrier: next.productDeliveryCarrier }),
-                ...(next.productRegionCode
-                  ? { productRegionCode: next.productRegionCode }
-                  : {}),
-              }));
-            }}
-          />
-        </fieldset>
-
-        {regionLimitApplies ? (
+        <form className="delivery-payment-page__form" onSubmit={handleSubmit}>
           <fieldset className="delivery-payment-page__block">
             <legend className="delivery-payment-page__legend">
-              {SELLER_COMMERCE_DEFAULTS_UI.SECTION_DELIVERY_ZONE}
+              {SELLER_COMMERCE_DEFAULTS_UI.SECTION_PAYOUT}
             </legend>
-            <label
-              className={[
-                "delivery-payment-page__method",
-                form.deliveryOutsideRegionEnabled
-                  ? "delivery-payment-page__method--on"
-                  : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-            >
+            <label className="delivery-payment-page__field">
               <input
-                className="delivery-payment-page__method-input"
-                type="checkbox"
-                checked={form.deliveryOutsideRegionEnabled}
+                className="delivery-payment-page__input"
+                type="text"
+                name="sellerPayoutRequisites"
+                value={sellerPayoutRequisites}
                 onChange={(event) => {
                   setSavedMessage("");
-                  setForm((prev) => ({
-                    ...prev,
-                    deliveryOutsideRegionEnabled: event.target.checked,
-                  }));
+                  setSellerPayoutRequisites(event.target.value);
                 }}
+                maxLength={SELLER_PAYOUT_REQUISITES_MAX_LENGTH}
+                placeholder={SELLER_COMMERCE_DEFAULTS_UI.PAYOUT_PLACEHOLDER}
                 disabled={isSubmitting}
+                autoComplete="off"
+                aria-label={SELLER_COMMERCE_DEFAULTS_UI.SECTION_PAYOUT}
               />
-              <span className="delivery-payment-page__method-copy">
-                <span className="delivery-payment-page__method-title">
-                  {SELLER_COMMERCE_DEFAULTS_UI.OUTSIDE_REGION_LABEL}
-                </span>
-                <span className="delivery-payment-page__method-hint">
-                  {SELLER_COMMERCE_DEFAULTS_UI.OUTSIDE_REGION_HINT}
-                </span>
+              <span className="delivery-payment-page__block-hint">
+                {SELLER_COMMERCE_DEFAULTS_UI.PAYOUT_HINT}
               </span>
             </label>
           </fieldset>
-        ) : null}
 
-        {ownDelivery ? (
           <fieldset className="delivery-payment-page__block">
             <legend className="delivery-payment-page__legend">
-              {SELLER_COMMERCE_DEFAULTS_UI.SECTION_TARIFF}
+              {SELLER_COMMERCE_DEFAULTS_UI.SECTION_FULFILLMENT}
             </legend>
-            <SellerDeliveryTariffFields
-              value={form.deliveryTariff}
+            <ProductPickupLocationFields
+              locations={locations}
+              pickupEnabled={form.productPickupEnabled !== false}
+              deliveryEnabled={form.productDeliveryCarrier === "seller"}
+              courierDeliveryEnabled={form.productDeliveryCarrier === "gitorg_courier"}
+              productDeliveryCarrier={String(form.productDeliveryCarrier ?? "")}
+              productRegionCode={String(form.productRegionCode ?? "")}
+              sellerRegionCode={String(user?.userRegionCode ?? "")}
               disabled={isSubmitting}
-              onChange={(deliveryTariff) => {
+              savedAddresses={savedAddresses}
+              // Флажок «СДЭК» — тот же тумблер, что в карточке ключей ниже:
+              // сохраняется сразу, без общей кнопки «Сохранить».
+              cdekControl={{
+                connected: cdekConnectionQuery.data?.connected === true,
+                enabled: cdekConnectionQuery.data?.enabled !== false,
+                pending: cdekToggleMutation.isPending,
+                onToggle: (enabled) => cdekToggleMutation.mutate(enabled),
+              }}
+              onChange={(next) => {
                 setSavedMessage("");
-                setForm((prev) => ({ ...prev, deliveryTariff }));
+                setForm((prev) => ({
+                  ...prev,
+                  productPickupLocations: Array.isArray(next.productPickupLocations)
+                    ? next.productPickupLocations
+                    : [],
+                  productPickupEnabled: next.productPickupEnabled !== false,
+                  ...(next.productDeliveryCarrier === undefined
+                    ? {}
+                    : { productDeliveryCarrier: next.productDeliveryCarrier }),
+                  ...(next.productRegionCode
+                    ? { productRegionCode: next.productRegionCode }
+                    : {}),
+                }));
               }}
             />
           </fieldset>
-        ) : null}
 
-        <fieldset className="delivery-payment-page__block">
-          <legend className="delivery-payment-page__legend">
-            {SELLER_COMMERCE_DEFAULTS_UI.SECTION_PAYMENT}
-          </legend>
-          <p className="delivery-payment-page__block-hint">
-            {SELLER_COMMERCE_DEFAULTS_UI.PAYMENT_HINT}
-          </p>
-          <ul className="delivery-payment-page__methods">
-            {ORDER_PAYMENT_METHODS.map((method) => {
-              const checked = form.paymentMethods.includes(method);
-              return (
-                <li key={method}>
-                  <label
-                    className={[
-                      "delivery-payment-page__method",
-                      checked ? "delivery-payment-page__method--on" : "",
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
-                  >
-                    <input
-                      className="delivery-payment-page__method-input"
-                      type="checkbox"
-                      checked={checked}
-                      onChange={() => togglePaymentMethod(method)}
-                      disabled={isSubmitting}
-                    />
-                    <span className="delivery-payment-page__method-copy">
-                      <span className="delivery-payment-page__method-title">
-                        {ORDER_PAYMENT_METHOD_LABEL_RU[method]}
-                      </span>
-                      {PAYMENT_METHOD_HINT[method] ? (
-                        <span className="delivery-payment-page__method-hint">
-                          {PAYMENT_METHOD_HINT[method]}
+          {regionLimitApplies ? (
+            <fieldset className="delivery-payment-page__block">
+              <legend className="delivery-payment-page__legend">
+                {SELLER_COMMERCE_DEFAULTS_UI.SECTION_DELIVERY_ZONE}
+              </legend>
+              <label
+                className={[
+                  "delivery-payment-page__method",
+                  form.deliveryOutsideRegionEnabled
+                    ? "delivery-payment-page__method--on"
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
+                <input
+                  className="delivery-payment-page__method-input"
+                  type="checkbox"
+                  checked={form.deliveryOutsideRegionEnabled}
+                  onChange={(event) => {
+                    setSavedMessage("");
+                    setForm((prev) => ({
+                      ...prev,
+                      deliveryOutsideRegionEnabled: event.target.checked,
+                    }));
+                  }}
+                  disabled={isSubmitting}
+                />
+                <span className="delivery-payment-page__method-copy">
+                  <span className="delivery-payment-page__method-title">
+                    {SELLER_COMMERCE_DEFAULTS_UI.OUTSIDE_REGION_LABEL}
+                  </span>
+                  <span className="delivery-payment-page__method-hint">
+                    {SELLER_COMMERCE_DEFAULTS_UI.OUTSIDE_REGION_HINT}
+                  </span>
+                </span>
+              </label>
+            </fieldset>
+          ) : null}
+
+          {ownDelivery ? (
+            <fieldset className="delivery-payment-page__block">
+              <legend className="delivery-payment-page__legend">
+                {SELLER_COMMERCE_DEFAULTS_UI.SECTION_TARIFF}
+              </legend>
+              <SellerDeliveryTariffFields
+                value={form.deliveryTariff}
+                disabled={isSubmitting}
+                onChange={(deliveryTariff) => {
+                  setSavedMessage("");
+                  setForm((prev) => ({ ...prev, deliveryTariff }));
+                }}
+              />
+            </fieldset>
+          ) : null}
+
+          <fieldset className="delivery-payment-page__block">
+            <legend className="delivery-payment-page__legend">
+              {SELLER_COMMERCE_DEFAULTS_UI.SECTION_PAYMENT}
+            </legend>
+            <p className="delivery-payment-page__block-hint">
+              {SELLER_COMMERCE_DEFAULTS_UI.PAYMENT_HINT}
+            </p>
+            <ul className="delivery-payment-page__methods">
+              {ORDER_PAYMENT_METHODS.map((method) => {
+                const checked = form.paymentMethods.includes(method);
+                return (
+                  <li key={method}>
+                    <label
+                      className={[
+                        "delivery-payment-page__method",
+                        checked ? "delivery-payment-page__method--on" : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                    >
+                      <input
+                        className="delivery-payment-page__method-input"
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => togglePaymentMethod(method)}
+                        disabled={isSubmitting}
+                      />
+                      <span className="delivery-payment-page__method-copy">
+                        <span className="delivery-payment-page__method-title">
+                          {ORDER_PAYMENT_METHOD_LABEL_RU[method]}
                         </span>
-                      ) : null}
-                    </span>
-                  </label>
-                </li>
-              );
-            })}
-          </ul>
-        </fieldset>
+                        {PAYMENT_METHOD_HINT[method] ? (
+                          <span className="delivery-payment-page__method-hint">
+                            {PAYMENT_METHOD_HINT[method]}
+                          </span>
+                        ) : null}
+                      </span>
+                    </label>
+                  </li>
+                );
+              })}
+            </ul>
+          </fieldset>
 
-        {error ? (
-          <p className="delivery-payment-page__error" role="alert">
-            <AppIcon
-              icon={CircleAlert}
-              className="delivery-payment-page__feedback-icon"
-              size={18}
-            />
-            <span>{error}</span>
-          </p>
-        ) : null}
-        {savedMessage ? (
-          <p className="delivery-payment-page__success" role="status">
-            <AppIcon
-              icon={CircleCheck}
-              className="delivery-payment-page__feedback-icon"
-              size={18}
-            />
-            <span>{savedMessage}</span>
-          </p>
-        ) : null}
+          {error ? (
+            <p className="delivery-payment-page__error" role="alert">
+              <AppIcon
+                icon={CircleAlert}
+                className="delivery-payment-page__feedback-icon"
+                size={18}
+              />
+              <span>{error}</span>
+            </p>
+          ) : null}
+          {savedMessage ? (
+            <p className="delivery-payment-page__success" role="status">
+              <AppIcon
+                icon={CircleCheck}
+                className="delivery-payment-page__feedback-icon"
+                size={18}
+              />
+              <span>{savedMessage}</span>
+            </p>
+          ) : null}
 
-        <div className="delivery-payment-page__actions">
-          <button
-            type="submit"
-            className="delivery-payment-page__submit"
-            disabled={isSubmitting}
-          >
-            {isSubmitting
-              ? SELLER_COMMERCE_DEFAULTS_UI.SAVING
-              : SELLER_COMMERCE_DEFAULTS_UI.SAVE}
-          </button>
-        </div>
-      </form>
+          <div className="delivery-payment-page__actions">
+            <button
+              type="submit"
+              className="delivery-payment-page__submit"
+              disabled={isSubmitting}
+            >
+              {isSubmitting
+                ? SELLER_COMMERCE_DEFAULTS_UI.SAVING
+                : SELLER_COMMERCE_DEFAULTS_UI.SAVE}
+            </button>
+          </div>
+        </form>
       ) : sectionTab === DELIVERY_SECTION_TAB_CDEK ? (
         <div className="delivery-payment-page__carrier-panel">
           <CdekConnectionCard />

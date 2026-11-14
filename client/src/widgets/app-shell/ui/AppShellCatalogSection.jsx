@@ -209,8 +209,7 @@ export function AppShellCatalogGridSection({
     regionCode: viewerRegionCode ?? "",
   });
   const sellerStoreTiles = sellerStoreTilesQuery.data ?? [];
-  const sellerSearchTerm =
-    homeFeedSectionTab === "sellers" ? productSearchTerm : "";
+  const sellerSearchTerm = homeFeedSectionTab === "sellers" ? productSearchTerm : "";
   const filteredSellerStoreTiles = useMemo(
     () => filterSellerStoreTilesBySearch(sellerStoreTiles, sellerSearchTerm),
     [sellerSearchTerm, sellerStoreTiles],
@@ -340,7 +339,11 @@ export function AppShellCatalogGridSection({
               type="button"
               className="home-feed-section-tab"
               aria-pressed={activeHomeFeedSectionTab === tab.id}
-              onClick={() => setHomeFeedSectionTab(/** @type {"home" | "sellers" | "categories"} */ (tab.id))}
+              onClick={() =>
+                setHomeFeedSectionTab(
+                  /** @type {"home" | "sellers" | "categories"} */ (tab.id),
+                )
+              }
             >
               {tab.label}
             </button>
@@ -356,13 +359,17 @@ export function AppShellCatalogGridSection({
           <div className="home-feed-sellers">
             <div className="home-feed-sellers__search">
               <SearchInput
-              value={productSearchTerm}
-              onChange={setProductSearchTerm}
-              placeholder={HOME_PAGE_UI.CATALOG_HOME_SECTION_SELLERS_SEARCH_PLACEHOLDER}
-              ariaLabel={HOME_PAGE_UI.CATALOG_HOME_SECTION_SELLERS_SEARCH_ARIA}
-              clearAriaLabel={HOME_PAGE_UI.CATALOG_HOME_SECTION_SELLERS_SEARCH_CLEAR_ARIA}
-              pendingAriaLabel={HOME_PAGE_UI.CATALOG_HOME_SECTION_SELLERS_SEARCH_ARIA}
-              showLeadingIcon
+                value={productSearchTerm}
+                onChange={setProductSearchTerm}
+                placeholder={
+                  HOME_PAGE_UI.CATALOG_HOME_SECTION_SELLERS_SEARCH_PLACEHOLDER
+                }
+                ariaLabel={HOME_PAGE_UI.CATALOG_HOME_SECTION_SELLERS_SEARCH_ARIA}
+                clearAriaLabel={
+                  HOME_PAGE_UI.CATALOG_HOME_SECTION_SELLERS_SEARCH_CLEAR_ARIA
+                }
+                pendingAriaLabel={HOME_PAGE_UI.CATALOG_HOME_SECTION_SELLERS_SEARCH_ARIA}
+                showLeadingIcon
               />
             </div>
             {filteredSellerStoreTiles.length > 0 ? (

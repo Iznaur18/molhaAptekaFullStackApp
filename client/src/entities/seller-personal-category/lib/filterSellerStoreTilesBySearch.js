@@ -14,7 +14,5 @@ export function filterSellerStoreTilesBySearch(tiles, searchTerm) {
   if (!term) {
     return tiles;
   }
-  return tiles.filter((tile) =>
-    normalizeSellerSearchText(tile.labelRu).includes(term),
-  );
+  return tiles.filter((tile) => normalizeSellerSearchText(tile.labelRu).includes(term));
 }
