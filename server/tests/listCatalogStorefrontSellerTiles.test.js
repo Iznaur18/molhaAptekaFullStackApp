@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
-import test from "node:test";
-import mongoose from "mongoose";
+import { after, before, test } from "node:test";
 
 import { PRODUCT_MODERATION_APPROVED } from "../constants/productModerationConstants.js";
 import { ProductModel, UserModel } from "../models/index.js";
@@ -8,6 +7,13 @@ import {
   buildStorefrontSellerTileId,
   listCatalogStorefrontSellerTiles,
 } from "../services/seller-personal-category/listCatalogStorefrontSellerTiles.js";
+import {
+  connectMongoTestReplSet,
+  disconnectMongoTestReplSet,
+} from "./helpers/mongoTestDb.js";
+
+before(connectMongoTestReplSet);
+after(disconnectMongoTestReplSet);
 
 test("listCatalogStorefrontSellerTiles: seller with visible product", async () => {
   const seller = await UserModel.create({
@@ -60,8 +66,4 @@ test("listCatalogStorefrontSellerTiles: excludeSellerIds skips paid slot", async
   });
 
   assert.ok(!tiles.some((tile) => tile.sellerId === String(seller._id)));
-});
-
-test.after(async () => {
-  await mongoose.disconnect();
 });
