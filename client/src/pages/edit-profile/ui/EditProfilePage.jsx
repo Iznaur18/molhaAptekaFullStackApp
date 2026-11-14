@@ -102,6 +102,7 @@ export function EditProfilePage({
     handlePhoneVerified,
     handleSubmit,
     setAddressEditorOpen,
+    passwordControlsRef,
   } = useEditProfileModal({
     isOpen: Boolean(user),
     onClose: onCancel,
@@ -274,7 +275,10 @@ export function EditProfilePage({
                 />
               </label>
             ) : null}
-            <ChangePasswordControls disabled={isSubmitting} />
+            <ChangePasswordControls
+              disabled={isSubmitting}
+              controllerRef={passwordControlsRef}
+            />
           </FormSection>
 
           <FormSection title={EDIT_PROFILE_MODAL_UI.SECTION_BUSINESS_HOURS}>
