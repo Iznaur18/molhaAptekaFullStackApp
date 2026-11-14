@@ -56,6 +56,9 @@ export function useEditProfileModal({
     phone: true,
   });
   const wasOpenRef = useRef(false);
+  // Контроллер блока смены пароля (ChangePasswordControls): если пользователь
+  // заполнил поля пароля и нажал общее «Сохранить», пароль меняем первым.
+  const passwordControlsRef = useRef(null);
   const initialSavedAddressesRef = useRef(
     /** @type {import('../../address/model/userSavedAddressTypes.js').UserSavedAddressFormValue[]} */ ([]),
   );
@@ -247,6 +250,19 @@ export function useEditProfileModal({
 
     setFeedback({ kind: "loading", message: "" });
 
+    // Если заполнены поля смены пароля, а нажато общее «Сохранить» —
+    // сначала меняем пароль, иначе он молча терялся (PATCH /user его игнорирует).
+    if (!adminMode) {
+      const passwordControls = passwordControlsRef.current;
+      if (passwordControls?.hasValues?.() === true) {
+        const passwordResult = await passwordControls.submit();
+        if (!passwordResult.ok) {
+          setFeedback({ kind: "error", message: passwordResult.message });
+          return;
+        }
+      }
+    }
+
     try {
       const profilePatchOptions = {
         initialPhoneNumber: user.userPhoneNumber,
@@ -300,5 +316,6 @@ export function useEditProfileModal({
     handleClose,
     handleSubmit,
     setAddressEditorOpen,
+    passwordControlsRef,
   };
 }

@@ -82,6 +82,7 @@ export function EditProfileModal({
     handleClose,
     handleSubmit,
     setAddressEditorOpen,
+    passwordControlsRef,
   } = useEditProfileModal({
     isOpen,
     onClose,
@@ -237,7 +238,12 @@ export function EditProfileModal({
                 />
               ) : null}
             </label>
-            {!adminMode ? <ChangePasswordControls disabled={isSubmitting} /> : null}
+            {!adminMode ? (
+              <ChangePasswordControls
+                disabled={isSubmitting}
+                controllerRef={passwordControlsRef}
+              />
+            ) : null}
             <label className="edit-profile-modal__label">
               {EDIT_PROFILE_MODAL_UI.LABEL_BIRTH}
               <input

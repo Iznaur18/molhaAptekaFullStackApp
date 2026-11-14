@@ -47,6 +47,23 @@ import { PHONE_CHANGE_REQUIRES_OTP_MESSAGE } from "../../constants/phoneVerifica
 /** Обновление профиля пользователя. PATCH /user/:userId (требует Authorization: Bearer <token>) */
 export const userUpdateProfileController = async (req, res) => {
   try {
+    // Парольные поля здесь не принимаются: whitelist ниже молча их отбросит,
+    // и пользователь будет думать, что пароль изменён. Явно отвечаем 400.
+    const PASSWORD_LIKE_FIELDS = [
+      "password",
+      "passwordHash",
+      "currentPassword",
+      "newPassword",
+      "newPasswordConfirm",
+    ];
+    if (PASSWORD_LIKE_FIELDS.some((field) => req.body?.[field] !== undefined)) {
+      return errorRes(
+        res,
+        400,
+        "Смена пароля выполняется через /auth/password/change",
+      );
+    }
+
     const currentUserId = req.userId; // кто обновляет (id из auth middleware) Прошел ли JWT авторизацию
     const targetUserId = req.params.userIdClient; // кого обновляем (id из URL) ID пользователя которого обновляем (валидация выполняется в middleware userIdParamValidation)
 

@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { changePassword } from "../api/passwordReset.js";
 import { EDIT_PROFILE_MODAL_UI } from "../../../shared/config/appUiCopy.js";
@@ -10,7 +10,7 @@ import { PasswordInputField } from "../../../shared/ui/PasswordInputField/Passwo
  *
  * @param {{ disabled?: boolean }} props
  */
-export function ChangePasswordControls({ disabled = false }) {
+export function ChangePasswordControls({ disabled = false, controllerRef = null }) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
@@ -23,23 +23,28 @@ export function ChangePasswordControls({ disabled = false }) {
 
   const isBusy = disabled || mutation.isPending;
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    event.stopPropagation();
+  /**
+   * Вся логика смены пароля в одном месте. Возвращает { ok, message },
+   * чтобы основная форма профиля могла вызвать её при общем сохранении.
+   */
+  const runSubmit = async () => {
     setLocalError("");
     setSuccess("");
 
     if (!currentPassword.trim()) {
-      setLocalError(EDIT_PROFILE_MODAL_UI.PASSWORD_CURRENT_REQUIRED);
-      return;
+      const message = EDIT_PROFILE_MODAL_UI.PASSWORD_CURRENT_REQUIRED;
+      setLocalError(message);
+      return { ok: false, message };
     }
     if (newPassword.length < EDIT_PROFILE_MODAL_UI.PASSWORD_MIN_LENGTH) {
-      setLocalError(EDIT_PROFILE_MODAL_UI.PASSWORD_TOO_SHORT);
-      return;
+      const message = EDIT_PROFILE_MODAL_UI.PASSWORD_TOO_SHORT;
+      setLocalError(message);
+      return { ok: false, message };
     }
     if (newPassword !== newPasswordConfirm) {
-      setLocalError(EDIT_PROFILE_MODAL_UI.PASSWORD_MISMATCH);
-      return;
+      const message = EDIT_PROFILE_MODAL_UI.PASSWORD_MISMATCH;
+      setLocalError(message);
+      return { ok: false, message };
     }
 
     try {
@@ -51,15 +56,41 @@ export function ChangePasswordControls({ disabled = false }) {
       setCurrentPassword("");
       setNewPassword("");
       setNewPasswordConfirm("");
-      setSuccess(data?.message || EDIT_PROFILE_MODAL_UI.PASSWORD_CHANGE_SUCCESS);
+      const message =
+        data?.message || EDIT_PROFILE_MODAL_UI.PASSWORD_CHANGE_SUCCESS;
+      setSuccess(message);
+      return { ok: true, message };
     } catch (error) {
-      setLocalError(
+      const message =
         error instanceof Error
           ? error.message
-          : EDIT_PROFILE_MODAL_UI.PASSWORD_CHANGE_ERROR,
-      );
+          : EDIT_PROFILE_MODAL_UI.PASSWORD_CHANGE_ERROR;
+      setLocalError(message);
+      return { ok: false, message };
     }
   };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    await runSubmit();
+  };
+
+  // Родительская форма читает контроллер: если поля пароля заполнены,
+  // общее «Сохранить» сначала меняет пароль, потом сохраняет профиль.
+  useEffect(() => {
+    if (!controllerRef) return undefined;
+    controllerRef.current = {
+      hasValues: () =>
+        Boolean(currentPassword || newPassword || newPasswordConfirm),
+      submit: runSubmit,
+    };
+    return () => {
+      if (controllerRef.current?.submit === runSubmit) {
+        controllerRef.current = null;
+      }
+    };
+  });
 
   const handleFieldsKeyDown = (event) => {
     if (event.key !== "Enter") {
