@@ -1,7 +1,7 @@
 /* Блок «Буст продвижение» на главной — белая карточка по макету:
    шапка с молнией и «Все товары →», ряд мини-карточек без бейджа. */
 .boost-home-section {
-  margin: 0;
+  margin: 0 0 var(--iz-space-2);
   padding: 14px;
   border-radius: var(--iz-radius-card-lg);
   background: var(--iz-color-surface);

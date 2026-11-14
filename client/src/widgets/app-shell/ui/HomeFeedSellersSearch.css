@@ -1,0 +1,21 @@
+.home-feed-sellers {
+  display: flex;
+  flex-direction: column;
+  gap: var(--iz-space-3);
+  margin: 0 0 var(--iz-space-4);
+  padding-inline: var(--app-shell-content-inline-padding, var(--iz-space-4));
+}
+
+.home-feed-sellers__search {
+  width: 100%;
+}
+
+.home-feed-sellers .catalog-browser-landing__categories {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.home-feed-sellers .home-feed-section-empty {
+  margin: 0;
+  padding: 0;
+}

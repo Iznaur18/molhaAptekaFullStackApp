@@ -69,22 +69,6 @@
   background: var(--iz-color-danger-surface);
 }
 
-.product-reports-page__section-chip_active {
-  border-color: var(--iz-color-danger);
-  background: var(--iz-color-danger);
-  color: var(--iz-color-on-contrast);
-}
-
-.product-reports-page__section-chip_active.product-reports-page__section-chip_products {
-  border-color: var(--iz-color-warning);
-  background: var(--iz-color-warning);
-}
-
-.product-reports-page__section-chip_active.product-reports-page__section-chip_stories {
-  border-color: var(--iz-color-accent);
-  background: var(--iz-color-accent);
-}
-
 .product-reports-page__section + .product-reports-page__section {
   margin-top: 0;
 }

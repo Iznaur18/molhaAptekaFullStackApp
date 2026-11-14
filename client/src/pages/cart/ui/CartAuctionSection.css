@@ -19,7 +19,7 @@
   margin: 0;
   font-size: 1rem;
   font-weight: 700;
-  color: var(--iz-color-ink);
+  color: var(--iz-color-text);
 }
 
 .cart-auction__hint {
@@ -88,7 +88,7 @@
   margin: 0;
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--iz-color-ink);
+  color: var(--iz-color-text);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -108,7 +108,7 @@
 .cart-auction-line__price-value {
   font-size: 1.05rem;
   font-weight: 800;
-  color: var(--iz-color-ink);
+  color: var(--iz-color-text);
 }
 
 .cart-auction-line__deadline {

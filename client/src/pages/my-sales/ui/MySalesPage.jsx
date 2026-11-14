@@ -76,7 +76,8 @@ export function MySalesPage({
   onSellerNameClick,
   onQueueChanged,
 }) {
-  const [statusFilter, setStatusFilter] = useState("");
+  // По умолчанию показываем заказы «В работе» — чаще всего нужны именно они.
+  const [statusFilter, setStatusFilter] = useState(MY_ORDERS_LIST_FILTER_IN_PROGRESS);
   const [attentionOnly, setAttentionOnly] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebouncedValue(

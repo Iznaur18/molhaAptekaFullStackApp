@@ -95,32 +95,6 @@
   background: var(--iz-color-success-surface);
 }
 
-.installment-page__chip_active {
-  border-color: var(--iz-color-success);
-  background: var(--iz-color-success);
-  color: var(--iz-color-on-contrast);
-}
-
-.installment-page__chip_active.installment-page__chip_in_progress {
-  border-color: var(--iz-color-success);
-  background: var(--iz-color-success);
-}
-
-.installment-page__chip_active.installment-page__chip_completed {
-  border-color: var(--iz-color-success);
-  background: var(--iz-color-success);
-}
-
-.installment-page__chip_active.installment-page__chip_defaulted {
-  border-color: var(--iz-color-warning);
-  background: var(--iz-color-warning);
-}
-
-.installment-page__chip_active.installment-page__chip_cancelled {
-  border-color: var(--iz-color-danger);
-  background: var(--iz-color-danger);
-}
-
 .installment-page__list {
   display: flex;
   flex-direction: column;

@@ -3,7 +3,7 @@ export const USER_BACKGROUND_PRESET_PREFIX = "preset:";
 /** @type {readonly { id: string; hex: string; labelRu: string }[]} */
 export const USER_BACKGROUND_PRESETS = [
   { id: "steel", hex: "#284B7E", labelRu: "Синий" },
-  { id: "gold", hex: "#FFC700", labelRu: "Золотой" },
+  { id: "gold", hex: "#E9A012", labelRu: "Золотой" },
   { id: "grape", hex: "#552781", labelRu: "Фиолетовый" },
   { id: "teal", hex: "#009999", labelRu: "Бирюзовый" },
   { id: "leaf", hex: "#64AA2B", labelRu: "Зелёный" },

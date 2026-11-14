@@ -67,6 +67,9 @@ export function useShellUiState() {
       null
     ),
   );
+  const [homeFeedSectionTab, setHomeFeedSectionTab] = useState(
+    /** @type {"home" | "sellers" | "categories"} */ ("home"),
+  );
   const [isDataConfirmationModalOpen, setIsDataConfirmationModalOpen] = useState(false);
   const [promotionProduct, setPromotionProduct] = useState(
     /** @type {ProductFromApi | null} */ (null),
@@ -126,6 +129,8 @@ export function useShellUiState() {
     setMyProductsSearchTerm,
     submittedMyProductsSearchTerm,
     submitMyProductsSearch,
+    homeFeedSectionTab,
+    setHomeFeedSectionTab,
     isLoginModalOpen,
     setIsLoginModalOpen,
     isRegisterModalOpen,
