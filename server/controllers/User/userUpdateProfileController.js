@@ -57,11 +57,7 @@ export const userUpdateProfileController = async (req, res) => {
       "newPasswordConfirm",
     ];
     if (PASSWORD_LIKE_FIELDS.some((field) => req.body?.[field] !== undefined)) {
-      return errorRes(
-        res,
-        400,
-        "Смена пароля выполняется через /auth/password/change",
-      );
+      return errorRes(res, 400, "Смена пароля выполняется через /auth/password/change");
     }
 
     const currentUserId = req.userId; // кто обновляет (id из auth middleware) Прошел ли JWT авторизацию

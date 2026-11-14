@@ -56,8 +56,7 @@ export function ChangePasswordControls({ disabled = false, controllerRef = null 
       setCurrentPassword("");
       setNewPassword("");
       setNewPasswordConfirm("");
-      const message =
-        data?.message || EDIT_PROFILE_MODAL_UI.PASSWORD_CHANGE_SUCCESS;
+      const message = data?.message || EDIT_PROFILE_MODAL_UI.PASSWORD_CHANGE_SUCCESS;
       setSuccess(message);
       return { ok: true, message };
     } catch (error) {
@@ -81,8 +80,7 @@ export function ChangePasswordControls({ disabled = false, controllerRef = null 
   useEffect(() => {
     if (!controllerRef) return undefined;
     controllerRef.current = {
-      hasValues: () =>
-        Boolean(currentPassword || newPassword || newPasswordConfirm),
+      hasValues: () => Boolean(currentPassword || newPassword || newPasswordConfirm),
       submit: runSubmit,
     };
     return () => {
