@@ -58,7 +58,7 @@ test("mobile bottom nav uses floating liquid-glass pill (web parity)", () => {
   const contentLayout = readFile(MOBILE_ROOT, "shared/theme/screenContentLayout.ts");
 
   assert.match(source, /MOBILE_BOTTOM_NAV_HORIZONTAL_INSET = 12/);
-  assert.match(source, /MOBILE_BOTTOM_NAV_FLOAT_OFFSET = 6/);
+  assert.match(source, /MOBILE_BOTTOM_NAV_FLOAT_OFFSET = 2/);
   assert.match(source, /MOBILE_BOTTOM_NAV_MIN_EDGE_GAP/);
   assert.match(source, /resolveMobileBottomNavPaddingBottom/);
   assert.match(source, /MOBILE_BOTTOM_NAV_BORDER_RADIUS = 999/);
@@ -76,7 +76,7 @@ test("mobile bottom nav uses floating liquid-glass pill (web parity)", () => {
   assert.match(tabBar, /position:\s*"absolute"/);
   assert.match(contentLayout, /resolveMobileBottomNavOverlayContentInset/);
   assert.match(cartScreen, /resolveMobileBottomNavLayoutHeight/);
-  assert.match(tabBar, /itemActive[\s\S]*backgroundColor: withAlpha/);
+  assert.match(tabBar, /itemActive[\s\S]*backgroundColor: mixHex/);
 
   const appShell = readFile(MOBILE_ROOT, "shared/lib/appShellLayout.ts");
   const indexCss = readFile(CLIENT_ROOT, "src/index.css");

@@ -19,10 +19,10 @@ export const HOME_CATALOG_HEADER_PANEL_PADDING = {
   bottom: 8,
 } as const;
 
-/** Web v2 `.app-shell__header-panel` `padding: 0.5rem 0.65rem`. */
+/** Web v2 `.app-shell__header-panel` `padding: 0 var(--app-shell-content-inline-padding)` — на телефоне 0.5rem. */
 export const HOME_CATALOG_HEADER_PANEL_FLOATING_PADDING = {
   top: 8,
-  horizontal: 10,
+  horizontal: 8,
   bottom: 8,
 } as const;
 
@@ -139,14 +139,17 @@ export const HOME_CATALOG_HEADER_USERS_PILL_PADDING = 0;
 /** Web `.app-shell__auth-actions--mobile-top` gap `0.3rem` @640. */
 export const HOME_CATALOG_HEADER_USERS_PILL_GAP = 4.8;
 
-/** Web v2 search field: `0.95rem`, leading-icon pad `2.375rem` / icon `0.875rem`. */
+/** Web v2 `.app-shell__header-search .search-input__field`: 1rem, pad `2.375rem`. */
 export const HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_VERTICAL = 8;
 export const HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_LEFT = 38;
 export const HOME_CATALOG_HEADER_SEARCH_ICON_SIZE = 20;
 export const HOME_CATALOG_HEADER_SEARCH_ICON_LEFT = 14;
 export const HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_RIGHT = 36;
 export const HOME_CATALOG_HEADER_SEARCH_INPUT_BORDER_RADIUS = 999;
-export const HOME_CATALOG_HEADER_SEARCH_INPUT_FONT_SIZE = 15;
+export const HOME_CATALOG_HEADER_SEARCH_INPUT_FONT_SIZE = 16;
+
+/** Кнопки у поиска на сайте v2: 2.75rem, radius 14px, не круг. */
+export const HOME_CATALOG_HEADER_CTA_BUTTON_RADIUS = 14;
 
 type ScreenSafeAreaInsets = {
   left?: number;

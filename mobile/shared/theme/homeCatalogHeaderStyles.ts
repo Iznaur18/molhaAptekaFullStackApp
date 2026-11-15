@@ -4,6 +4,7 @@ import {
   HOME_CATALOG_HEADER_BOTTOM_MARGIN,
   HOME_CATALOG_HEADER_CIRCLE_BUTTON_BORDER_WIDTH,
   HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE,
+  HOME_CATALOG_HEADER_CTA_BUTTON_RADIUS,
   HOME_CATALOG_HEADER_SEARCH_ICON_LEFT,
   HOME_CATALOG_HEADER_PANEL_BORDER_COLOR,
   HOME_CATALOG_HEADER_PANEL_INSET_LINE_COLOR,
@@ -23,7 +24,6 @@ import {
   HOME_CATALOG_HEADER_USERS_STRETCH_ITEM_GAP,
   HOME_CATALOG_HEADER_USERS_STRETCH_TOGGLE_GAP,
 } from "@/shared/lib/homeCatalogHeaderLayout";
-import { MOBILE_BOTTOM_NAV_BORDER_RADIUS } from "@/shared/lib/mobileBottomNavLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const panelShadowStyle =
@@ -53,8 +53,8 @@ export const useHomeCatalogHeaderStyles = createThemedStyles((theme) => ({
     ...panelShadowStyle,
   },
   /**
-   * Web v2 `.app-shell__header-panel`: отдельный стиль (не мержить с Ozon-panel),
-   * иначе на RN web longhand radius 0/18 перебивает pill.
+   * Web v2 `.app-shell__header-panel`: без капсулы, рамки и стекла.
+   * Поиск и кнопки лежат отдельно на фоне ленты.
    */
   panelFloating: {
     position: "relative",
@@ -62,15 +62,10 @@ export const useHomeCatalogHeaderStyles = createThemedStyles((theme) => ({
     marginBottom: HOME_CATALOG_HEADER_BOTTOM_MARGIN,
     paddingHorizontal: HOME_CATALOG_HEADER_PANEL_FLOATING_PADDING.horizontal,
     paddingBottom: HOME_CATALOG_HEADER_PANEL_FLOATING_PADDING.bottom,
-    borderWidth: 1,
-    borderColor: "rgba(17, 24, 39, 0.1)",
-    borderRadius: MOBILE_BOTTOM_NAV_BORDER_RADIUS,
-    borderTopLeftRadius: MOBILE_BOTTOM_NAV_BORDER_RADIUS,
-    borderTopRightRadius: MOBILE_BOTTOM_NAV_BORDER_RADIUS,
-    borderBottomLeftRadius: MOBILE_BOTTOM_NAV_BORDER_RADIUS,
-    borderBottomRightRadius: MOBILE_BOTTOM_NAV_BORDER_RADIUS,
-    /** Клип glass по бокам; stretch-меню в Modal — не режется. */
-    overflow: "hidden",
+    borderWidth: 0,
+    borderColor: "transparent",
+    borderRadius: 0,
+    overflow: "visible",
     backgroundColor: "transparent",
     shadowColor: "transparent",
     shadowOffset: { width: 0, height: 0 },
@@ -80,12 +75,6 @@ export const useHomeCatalogHeaderStyles = createThemedStyles((theme) => ({
     ...(Platform.OS === "web"
       ? ({ boxShadow: "none", outlineStyle: "none" } as unknown as ViewStyle)
       : null),
-  },
-  /** Glass fill под pill — дублируем radius (RN web absoluteFill иначе квадрат). */
-  panelFloatingGlass: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: MOBILE_BOTTOM_NAV_BORDER_RADIUS,
-    overflow: "hidden",
   },
   panelFlatSheet: {
     overflow: "visible",
@@ -161,7 +150,8 @@ export const useHomeCatalogHeaderStyles = createThemedStyles((theme) => ({
   searchInput: {
     width: "100%",
     minHeight: HOME_CATALOG_HEADER_SEARCH_INPUT_MIN_HEIGHT,
-    borderWidth: 0,
+    borderWidth: 1,
+    borderColor: `${theme.colors.text}0F`,
     borderRadius: HOME_CATALOG_HEADER_SEARCH_INPUT_BORDER_RADIUS,
     paddingLeft: HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_LEFT,
     paddingRight: HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_RIGHT,
@@ -169,8 +159,12 @@ export const useHomeCatalogHeaderStyles = createThemedStyles((theme) => ({
     fontSize: HOME_CATALOG_HEADER_SEARCH_INPUT_FONT_SIZE,
     lineHeight: 20,
     color: theme.colors.text,
-    /* Web v2: color-mix(text 7%, transparent) */
-    backgroundColor: `${theme.colors.text}12`,
+    backgroundColor: theme.colors.surface,
+    shadowColor: theme.colors.text,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 14,
+    elevation: 2,
   },
   usersNavPill: {
     position: "relative",
@@ -190,13 +184,13 @@ export const useHomeCatalogHeaderStyles = createThemedStyles((theme) => ({
   usersStretchShell: {
     width: HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE,
     borderWidth: HOME_CATALOG_HEADER_CIRCLE_BUTTON_BORDER_WIDTH,
-    borderRadius: HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE / 2,
+    borderRadius: HOME_CATALOG_HEADER_CTA_BUTTON_RADIUS,
     overflow: "hidden",
     alignItems: "center",
     shadowColor: theme.colors.action,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
-    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.55,
+    shadowRadius: 10,
     elevation: 4,
   },
   usersStretchShellPortal: {

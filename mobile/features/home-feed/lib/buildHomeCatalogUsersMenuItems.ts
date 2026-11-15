@@ -1,11 +1,11 @@
 import type { ComponentProps } from "react";
 import type MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
-import { HEADER_USERS_BUTTON_UI } from "@/shared/config";
+import { HEADER_USERS_BUTTON_UI, REGION_UI } from "@/shared/config";
 
 type MaterialIconName = ComponentProps<typeof MaterialIcons>["name"];
 
-export type HomeCatalogUsersMenuItemKey = "users" | "terms" | "faq";
+export type HomeCatalogUsersMenuItemKey = "users" | "terms" | "faq" | "region";
 
 export type HomeCatalogUsersMenuItemHref = "/users" | "/legal/terms" | "/faq";
 
@@ -34,5 +34,10 @@ export const buildHomeCatalogUsersMenuItems = (): HomeCatalogUsersMenuItem[] => 
     icon: "quiz",
     accessibilityLabel: HEADER_USERS_BUTTON_UI.MENU_ITEM_FAQ_ARIA,
     href: "/faq",
+  },
+  {
+    key: "region",
+    icon: "location-on",
+    accessibilityLabel: REGION_UI.VIEWER_ARIA,
   },
 ];

@@ -37,9 +37,6 @@ export const HomeCatalogHeaderPanel = ({
           <View style={styles.panelInsetLine} pointerEvents="none" />
         </>
       )}
-      {floating && !flatSheet ? (
-        <HomeCatalogHeaderGlassLayer style={styles.panelFloatingGlass} />
-      ) : null}
       <View style={styles.panelContent}>{children}</View>
     </View>
   );

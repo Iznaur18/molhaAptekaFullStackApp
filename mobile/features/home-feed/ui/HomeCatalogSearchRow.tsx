@@ -1,8 +1,6 @@
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { useViewerRegion } from "@/entities/region/model/ViewerRegionProvider";
-import { ViewerRegionSelect } from "@/entities/region/ui/ViewerRegionSelect";
 import { HomeCatalogFiltersButton } from "@/features/home-feed/ui/HomeCatalogFiltersButton";
 import { HomeCatalogHeaderPanel } from "@/features/home-feed/ui/HomeCatalogHeaderPanel";
 import { HomeCatalogHeaderSearch } from "@/features/home-feed/ui/HomeCatalogHeaderSearch";
@@ -35,7 +33,6 @@ export const HomeCatalogSearchRow = ({
 }: HomeCatalogSearchRowProps) => {
   const insets = useSafeAreaInsets();
   const styles = useHomeCatalogHeaderStyles();
-  const { viewerRegionCode, setViewerRegionCode } = useViewerRegion();
   const paddingTop = embeddedInForegroundSheet
     ? HOME_CATALOG_HEADER_PANEL_FLOATING_PADDING.top
     : resolveHomeCatalogHeaderPanelPaddingTop(insets.top);
@@ -58,7 +55,6 @@ export const HomeCatalogSearchRow = ({
             active={filtersActive}
             onPress={onOpenFilters}
           />
-          <ViewerRegionSelect value={viewerRegionCode} onChange={setViewerRegionCode} />
           <HomeCatalogUsersButton
             embeddedInForegroundSheet={embeddedInForegroundSheet}
           />

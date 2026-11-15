@@ -14,7 +14,7 @@ test("HomeCatalogSearchRow: glass panel, header search, users", () => {
 
   assert.doesNotMatch(source, /HomeCatalogBrandLogo/);
   assert.match(source, /HomeCatalogUsersButton/);
-  assert.match(source, /ViewerRegionSelect/);
+  assert.doesNotMatch(source, /ViewerRegionSelect/);
   assert.match(source, /authActions/);
   assert.match(source, /HomeCatalogHeaderPanel/);
   assert.match(source, /HomeCatalogHeaderSearch/);
@@ -28,7 +28,9 @@ test("home catalog header panel matches web mobile-split chrome", () => {
   const glass = readMobileFile("features/home-feed/ui/HomeCatalogHeaderGlassLayer.tsx");
   const styles = readMobileFile("shared/theme/homeCatalogHeaderStyles.ts");
   const layout = readMobileFile("shared/lib/homeCatalogHeaderLayout.ts");
-  const region = readMobileFile("entities/region/ui/ViewerRegionSelect.tsx");
+  const region = readMobileFile(
+    "features/home-feed/lib/buildHomeCatalogUsersMenuItems.ts",
+  );
 
   assert.match(panel, /HomeCatalogHeaderAccent/);
   assert.match(panel, /HomeCatalogHeaderGlassLayer/);
@@ -48,7 +50,7 @@ test("home catalog header panel matches web mobile-split chrome", () => {
   assert.match(styles, /borderTopLeftRadius: 0/);
   assert.match(styles, /borderBottomLeftRadius: HOME_CATALOG_HEADER_PANEL_RADIUS/);
   assert.match(styles, /panelFloating/);
-  assert.match(styles, /MOBILE_BOTTOM_NAV_BORDER_RADIUS/);
+  assert.match(styles, /borderRadius: 0/);
   assert.match(styles, /authActions/);
   assert.match(searchRow, /floating=\{embeddedInForegroundSheet\}/);
   assert.match(searchRow, /resolveHomeCatalogHeaderPanelPaddingTop/);
@@ -63,7 +65,10 @@ test("home catalog header panel matches web mobile-split chrome", () => {
   assert.match(layout, /HOME_CATALOG_HEADER_PANEL_BLUR_RADIUS = 18/);
   assert.match(layout, /HOME_CATALOG_HEADER_BOTTOM_MARGIN = 0/);
   assert.match(region, /location-on/);
-  assert.match(region, /RuRegionPickerSheet/);
+  assert.match(
+    readMobileFile("features/home-feed/ui/HomeCatalogUsersButton.tsx"),
+    /RuRegionPickerSheet/,
+  );
   assert.doesNotMatch(region, /compact/);
   assert.doesNotMatch(searchRow, /label=\{/);
 });
@@ -79,13 +84,16 @@ test("home feed search is in scroll flow, not sticky overlay", () => {
   assert.match(index, /homeFeedScrollTopInset/);
   assert.match(index, /HOME_CATALOG_HEADER_STICKY_TOP_OFFSET/);
   assert.doesNotMatch(index, /resolveHomeCatalogOverlayContentInsetTop/);
-  assert.match(styles, /borderRadius: MOBILE_BOTTOM_NAV_BORDER_RADIUS/);
-  assert.match(styles, /panelFloatingGlass/);
-  assert.match(styles, /overflow: "hidden"/);
+  assert.match(styles, /borderRadius: 0/);
+  assert.doesNotMatch(panel, /panelFloatingGlass/);
+  assert.match(styles, /overflow: "visible"/);
   assert.match(styles, /boxShadow: "none"/);
   assert.match(search, /PRODUCT_SEARCH_INPUT_UI/);
   assert.match(panel, /floating\s*\?\s*\[[\s\S]*styles\.panelFloating/);
-  assert.match(panel, /panelFloatingGlass/);
+  assert.doesNotMatch(
+    readMobileFile("features/home-feed/ui/HomeCatalogSearchRow.tsx"),
+    /ViewerRegionSelect/,
+  );
 });
 
 test("HomeCatalogUsersButton opens stretch menu from circle", () => {
@@ -150,6 +158,7 @@ test("HomeCatalogUsersButton opens stretch menu from circle", () => {
   assert.match(items, /href: "\/legal\/terms"/);
   assert.match(items, /icon: "article"/);
   assert.match(items, /MENU_ITEM_TERMS_ARIA/);
+  assert.match(items, /key: "region"/);
   assert.match(items, /key: "faq"/);
   assert.match(items, /href: "\/faq"/);
   assert.match(items, /icon: "quiz"/);

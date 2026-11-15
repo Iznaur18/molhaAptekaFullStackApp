@@ -35,16 +35,22 @@ test("RuRegionPickerSheet: Squircle shadow outer has bounded height (sheetFill)"
 });
 
 test("viewer / form region selects open RuRegionPickerSheet", () => {
-  const viewer = readMobileFile("entities/region/ui/ViewerRegionSelect.tsx");
+  const viewer = readMobileFile("features/home-feed/ui/HomeCatalogUsersButton.tsx");
   const form = readMobileFile("entities/region/ui/RuRegionSelect.tsx");
-  const searchRow = readMobileFile("features/home-feed/ui/HomeCatalogSearchRow.tsx");
+  const menu = readMobileFile(
+    "features/home-feed/lib/buildHomeCatalogUsersMenuItems.ts",
+  );
   const profile = readMobileFile("features/profile-edit/ui/EditProfileForm.tsx");
 
   assert.match(viewer, /RuRegionPickerSheet/);
-  assert.match(viewer, /setOpen\(true\)/);
+  assert.match(viewer, /setRegionOpen\(true\)/);
+  assert.match(menu, /location-on/);
   assert.match(form, /RuRegionPickerSheet/);
   assert.match(form, /setOpen\(true\)/);
-  assert.match(searchRow, /ViewerRegionSelect/);
+  assert.doesNotMatch(
+    readMobileFile("features/home-feed/ui/HomeCatalogSearchRow.tsx"),
+    /ViewerRegionSelect/,
+  );
   assert.match(profile, /LABEL_REGION/);
   assert.match(profile, /RuRegionSelect/);
 });

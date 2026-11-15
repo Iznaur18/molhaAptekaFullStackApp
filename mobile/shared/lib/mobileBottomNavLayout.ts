@@ -2,10 +2,9 @@
 export const MOBILE_BOTTOM_NAV_HORIZONTAL_INSET = 12;
 
 /**
- * Зазор над safe-area (или над min-edge, если safe-area = 0).
- * На iPhone home-indicator уже даёт большой inset — float держим умеренным.
+ * Зазор над safe-area. Паритет с web `--mobile-bottom-nav-float-offset: 0.125rem`.
  */
-export const MOBILE_BOTTOM_NAV_FLOAT_OFFSET = 6;
+export const MOBILE_BOTTOM_NAV_FLOAT_OFFSET = 2;
 
 /**
  * Мин. расстояние от нижнего края экрана до pill, когда `safeAreaBottom === 0`
@@ -19,8 +18,14 @@ export const MOBILE_BOTTOM_NAV_PADDING_VERTICAL = 6;
 /** Горизонтальный паддинг pill-контейнера (~0.45rem). */
 export const MOBILE_BOTTOM_NAV_PADDING_HORIZONTAL = 7;
 
-/** Мин. высота таба (~2.5rem web). */
-export const MOBILE_BOTTOM_NAV_ITEM_MIN_HEIGHT = 40;
+/** Мин. высота таба. Паритет с web `.mobile-bottom-nav__item` `min-height: 2.9rem`. */
+export const MOBILE_BOTTOM_NAV_ITEM_MIN_HEIGHT = 46.4;
+
+/** Скругление ячейки. Паритет с web `border-radius: 1.1rem`. */
+export const MOBILE_BOTTOM_NAV_ITEM_RADIUS = 17.6;
+
+/** Центральный «+». Паритет с web `.mobile-bottom-nav__item--primary` 2.9rem. */
+export const MOBILE_BOTTOM_NAV_PRIMARY_SIZE = 46.4;
 
 /** Скругление pill — паритет с `--iz-radius-pill`. */
 export const MOBILE_BOTTOM_NAV_BORDER_RADIUS = 999;
@@ -35,8 +40,8 @@ export const resolveMobileBottomNavPillHeight = (): number =>
  * Единая формула зазора от нижнего края устройства до pill:
  *   FLOAT_OFFSET + max(safeAreaBottom, MIN_EDGE_GAP)
  *
- * iPhone:  6 + max(34, 12) = 40
- * Android: 6 + max(0, 12)  = 18  (не прилипает к краю)
+ * iPhone:  2 + max(34, 12) = 36
+ * Android: 2 + max(0, 12)  = 14
  */
 export const resolveMobileBottomNavPaddingBottom = (safeAreaBottom = 0): number =>
   MOBILE_BOTTOM_NAV_FLOAT_OFFSET +

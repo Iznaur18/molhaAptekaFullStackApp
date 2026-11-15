@@ -946,15 +946,15 @@ export const MOBILE_BOTTOM_NAV_UI = {
   NAV_ARIA: "Основная навигация",
   TAB_HOME: "Главная",
   TAB_HOME_ARIA: "На главный экран",
-  TAB_CATALOG: "Каталог",
-  TAB_CATALOG_ARIA: "Обзор каталога",
+  TAB_CATALOG: "Категории",
+  TAB_CATALOG_ARIA: "Каталог категорий",
   TAB_PLACE_PRODUCT: "Разместить товар",
   TAB_PLACE_PRODUCT_ARIA: "Разместить товар",
   TAB_PLACE_PRODUCT_LOGIN_ARIA: "Войдите, чтобы разместить товар",
   TAB_CART: "Корзина",
   TAB_CART_ARIA: "Корзина",
-  TAB_PROFILE: "Мой профиль",
-  TAB_PROFILE_ARIA: "Мой профиль",
+  TAB_PROFILE: "Профиль",
+  TAB_PROFILE_ARIA: "Профиль",
 } as const;
 
 export const HEADER_USERS_BUTTON_UI = {

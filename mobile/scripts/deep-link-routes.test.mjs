@@ -103,6 +103,12 @@ test("каждый путь HOME_MAIN_VIEW_PATH веба либо открыва
     "/staff-audit-log-admin",
     "/broadcast-notifications-admin",
     "/admin-analytics",
+    "/safe-deal-moderation",
+    "/become-courier",
+    "/courier-moderation",
+    "/courier-overview",
+    "/shipment-disputes",
+    "/shipping-carriers",
   ]);
 
   const unmapped = webPaths.filter(
