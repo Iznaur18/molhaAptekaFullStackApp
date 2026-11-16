@@ -5,7 +5,11 @@
   --mobile-bottom-nav-min-edge-gap: 0.75rem;
 
   position: fixed;
-  left: 50%;
+  /* left/right + margin, не translateX(-50%): transform на fixed в Safari/Chrome
+     привязывает бар к layout viewport, и после адресной строки он зависает выше края. */
+  right: 0;
+  left: 0;
+  margin-inline: auto;
   bottom: calc(
     var(--mobile-bottom-nav-float-offset) +
       max(var(--mobile-bottom-nav-min-edge-gap), env(safe-area-inset-bottom, 0px))
@@ -34,6 +38,17 @@
   border: 1px solid
     color-mix(in srgb, var(--iz-color-on-contrast) 42%, var(--iz-color-border));
   border-radius: var(--iz-radius-pill);
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Стекло на псевдоэлементе: backdrop-filter на самом fixed тоже отрывает бар от края. */
+.mobile-bottom-nav::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  border-radius: inherit;
+  inset: 0;
   background:
     linear-gradient(
       165deg,
@@ -44,8 +59,7 @@
     color-mix(in srgb, var(--iz-color-surface) 55%, transparent);
   backdrop-filter: blur(18px) saturate(1.35);
   -webkit-backdrop-filter: blur(18px) saturate(1.35);
-  box-shadow: none;
-  transform: translateX(-50%);
+  pointer-events: none;
 }
 
 .mobile-bottom-nav__item {
@@ -178,7 +192,7 @@ body:has(.product-details-modal) .app-shell {
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  .mobile-bottom-nav {
+  .mobile-bottom-nav::before {
     background: color-mix(in srgb, var(--iz-color-on-contrast) 94%, transparent);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
