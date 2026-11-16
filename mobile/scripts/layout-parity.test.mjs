@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import {
   resolveContentMaxWidth,
   resolveProductGridGap,
+  resolveScreenContentInlinePadding,
   SCREEN_CONTENT_MAX_WIDTH_LARGE_TABLET,
   SCREEN_CONTENT_MAX_WIDTH_MEDIUM_TABLET,
   SCREEN_CONTENT_MAX_WIDTH_SMALL_TABLET,
@@ -40,14 +41,45 @@ test("лесенка ширин совпадает с web --app-shell-max-width"
   assert.equal(resolveContentMaxWidth(375), undefined);
 });
 
-test("поля по краям — 8 (паритет web --app-shell-content-inline-padding на телефоне)", () => {
-  // Модуль тянет алиас `@/`, поэтому читаем значение из исходника.
+test("поля по краям — 8 на телефоне, 12 в полосе 667, 16 шире", () => {
   const layout = readMobileFile("shared/theme/screenContentLayout.ts");
   assert.match(layout, /SCREEN_CONTENT_PADDING_HORIZONTAL = 8;/);
+  assert.match(layout, /resolveScreenContentInlinePadding\(width\)/);
   const tokens = readRepoFile("client/src/shared/styles/designTokens.css");
   assert.match(tokens, /--iz-space-4: 1rem;/);
   const shell = readRepoFile("client/src/app/ui/AppShell.css");
   assert.match(shell, /--app-shell-content-inline-padding: var\(--iz-space-4\)/);
+  assert.match(shell, /max-width: 640px/);
+  assert.match(shell, /max-width: 667px/);
+  assert.equal(resolveScreenContentInlinePadding(375), 8);
+  assert.equal(resolveScreenContentInlinePadding(640), 8);
+  assert.equal(resolveScreenContentInlinePadding(650), 12);
+  assert.equal(resolveScreenContentInlinePadding(667), 12);
+  assert.equal(resolveScreenContentInlinePadding(668), 16);
+  assert.equal(resolveScreenContentInlinePadding(1280), 16);
+});
+
+test("карточка каталога: мобильный padding до 1023, десктоп 0.55/0.75/0.65", () => {
+  const layout = readMobileFile(
+    "entities/product/lib/productCardMobileCatalogLayout.ts",
+  );
+  const card = readMobileFile("entities/product/ui/ProductCard.tsx");
+  const webMobile = readRepoFile(
+    "client/src/entities/product/ui/product-card/ProductCardMobileCatalog.css",
+  );
+  const webFrame = readRepoFile(
+    "client/src/entities/product/ui/product-card/ProductCardFrame.css",
+  );
+  assert.match(webMobile, /padding: 0 0 10px/);
+  assert.match(layout, /bottomPadding: 10/);
+  assert.match(layout, /contentInsetX: 10/);
+  assert.match(webFrame, /padding: 0\.55rem 0\.75rem 0\.65rem/);
+  assert.match(layout, /paddingTop: 8\.8/);
+  assert.match(layout, /paddingHorizontal: 12/);
+  assert.match(layout, /paddingBottom: 10\.4/);
+  assert.match(layout, /PRODUCT_CARD_DESKTOP_MIN_WIDTH = 1024/);
+  assert.match(card, /PRODUCT_CARD_DESKTOP_MIN_WIDTH/);
+  assert.match(card, /cardCatalogDesktop/);
 });
 
 test("зазор сетки товаров повторяет web по всем брейкпоинтам", () => {

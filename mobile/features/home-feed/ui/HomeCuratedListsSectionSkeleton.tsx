@@ -12,7 +12,6 @@ import {
   useHomeCuratedListsStyles,
 } from "@/shared/theme/catalogProductStyles";
 import { useHomeFeedSkeletonStyles } from "@/shared/theme/homeFeedSkeletonStyles";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 
 /**
  * Плейсхолдер секции подборок на время загрузки. Использует стили и
@@ -23,12 +22,12 @@ export const HomeCuratedListsSectionSkeleton = () => {
   const styles = useHomeCuratedListsStyles();
   const cardStyles = useCuratedProductCompactCardStyles();
   const skeletonStyles = useHomeFeedSkeletonStyles();
-  const { layoutWidth } = useScreenLayout();
+  const { layoutWidth, contentPaddingHorizontal } = useScreenLayout();
 
   const compactCardWidth = useMemo(() => {
-    const scrollContainerWidth = layoutWidth - SCREEN_CONTENT_PADDING_HORIZONTAL * 2;
+    const scrollContainerWidth = layoutWidth - contentPaddingHorizontal * 2;
     return resolveCuratedCompactCardWidth(scrollContainerWidth);
-  }, [layoutWidth]);
+  }, [contentPaddingHorizontal, layoutWidth]);
 
   return (
     <SkeletonShimmer style={styles.listBlock}>

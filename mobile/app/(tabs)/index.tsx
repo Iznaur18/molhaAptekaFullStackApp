@@ -133,9 +133,9 @@ export default function CatalogScreen() {
   const styles = useFeedScreenStyles();
   const theme = useAppTheme();
   const queryClient = useQueryClient();
-  const productGrid = useProductGridLayout();
   const { centeredContentStyle, contentPaddingBottom, contentPaddingHorizontal } =
     useScreenLayout();
+  const productGrid = useProductGridLayout(contentPaddingHorizontal);
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const router = useRouter();
@@ -691,9 +691,17 @@ export default function CatalogScreen() {
     (): ViewStyle[] => [
       styles.listContent,
       resolveCatalogGridListContentStyle(productGrid.gap),
-      { paddingBottom: contentPaddingBottom },
+      {
+        paddingBottom: contentPaddingBottom,
+        paddingHorizontal: contentPaddingHorizontal,
+      },
     ],
-    [contentPaddingBottom, productGrid.gap, styles.listContent],
+    [
+      contentPaddingBottom,
+      contentPaddingHorizontal,
+      productGrid.gap,
+      styles.listContent,
+    ],
   );
 
   const renderCatalogGridRow = useCallback(

@@ -9,6 +9,8 @@ import {
   HOME_CATALOG_HEADER_PANEL_FLOATING_PADDING,
   resolveHomeCatalogHeaderPanelPaddingTop,
 } from "@/shared/lib/homeCatalogHeaderLayout";
+import { resolveScreenContentInlinePadding } from "@/shared/lib/screenBreakpoints";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useHomeCatalogHeaderStyles } from "@/shared/theme/homeCatalogHeaderStyles";
 
 type HomeCatalogSearchRowProps = {
@@ -32,16 +34,19 @@ export const HomeCatalogSearchRow = ({
   embeddedInForegroundSheet = false,
 }: HomeCatalogSearchRowProps) => {
   const insets = useSafeAreaInsets();
+  const { width } = useScreenLayout();
   const styles = useHomeCatalogHeaderStyles();
   const paddingTop = embeddedInForegroundSheet
     ? HOME_CATALOG_HEADER_PANEL_FLOATING_PADDING.top
     : resolveHomeCatalogHeaderPanelPaddingTop(insets.top);
+  const inlinePadding = resolveScreenContentInlinePadding(width);
 
   return (
     <HomeCatalogHeaderPanel
       paddingTop={paddingTop}
-      flatSheet={false}
-      floating={embeddedInForegroundSheet}
+      style={{
+        paddingHorizontal: embeddedInForegroundSheet ? 0 : inlinePadding,
+      }}
     >
       <View style={styles.topRow}>
         <HomeCatalogHeaderSearch

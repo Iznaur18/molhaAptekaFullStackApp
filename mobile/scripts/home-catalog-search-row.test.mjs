@@ -25,34 +25,37 @@ test("HomeCatalogSearchRow: glass panel, header search, users", () => {
 test("home catalog header panel matches web mobile-split chrome", () => {
   const searchRow = readMobileFile("features/home-feed/ui/HomeCatalogSearchRow.tsx");
   const panel = readMobileFile("features/home-feed/ui/HomeCatalogHeaderPanel.tsx");
-  const glass = readMobileFile("features/home-feed/ui/HomeCatalogHeaderGlassLayer.tsx");
   const styles = readMobileFile("shared/theme/homeCatalogHeaderStyles.ts");
   const layout = readMobileFile("shared/lib/homeCatalogHeaderLayout.ts");
   const region = readMobileFile(
     "features/home-feed/lib/buildHomeCatalogUsersMenuItems.ts",
   );
 
-  assert.match(panel, /HomeCatalogHeaderAccent/);
-  assert.match(panel, /HomeCatalogHeaderGlassLayer/);
+  assert.doesNotMatch(panel, /HomeCatalogHeaderAccent/);
+  assert.doesNotMatch(panel, /HomeCatalogHeaderGlassLayer/);
   assert.match(panel, /paddingTop/);
-  assert.match(glass, /backdropFilter/);
-  assert.match(glass, /resolveHomeCatalogHeaderGlassTint/);
+  assert.match(panel, /styles\.panelFloating/);
+  assert.doesNotMatch(panel, /styles\.panel,/);
+  assert.doesNotMatch(panel, /styles\.panel\]/);
   assert.match(styles, /bannerBelowPanel/);
   assert.match(layout, /HOME_CATALOG_HEADER_BANNER_BELOW_PANEL_MARGIN/);
   assert.doesNotMatch(searchRow, /SiteHeaderBannerSlot/);
   assert.match(styles, /backgroundColor: "transparent"/);
   assert.match(
     styles,
-    /paddingHorizontal: HOME_CATALOG_HEADER_PANEL_PADDING\.horizontal/,
+    /paddingHorizontal: HOME_CATALOG_HEADER_PANEL_FLOATING_PADDING\.horizontal/,
   );
-  assert.match(styles, /paddingBottom: HOME_CATALOG_HEADER_PANEL_PADDING\.bottom/);
+  assert.match(
+    styles,
+    /paddingBottom: HOME_CATALOG_HEADER_PANEL_FLOATING_PADDING\.bottom/,
+  );
   assert.match(styles, /HOME_CATALOG_HEADER_SEARCH_INPUT_MIN_HEIGHT/);
-  assert.match(styles, /borderTopLeftRadius: 0/);
-  assert.match(styles, /borderBottomLeftRadius: HOME_CATALOG_HEADER_PANEL_RADIUS/);
+  assert.doesNotMatch(styles, /HOME_CATALOG_HEADER_PANEL_RADIUS/);
   assert.match(styles, /panelFloating/);
   assert.match(styles, /borderRadius: 0/);
   assert.match(styles, /authActions/);
-  assert.match(searchRow, /floating=\{embeddedInForegroundSheet\}/);
+  assert.doesNotMatch(searchRow, /floating=\{embeddedInForegroundSheet\}/);
+  assert.match(searchRow, /resolveScreenContentInlinePadding/);
   assert.match(searchRow, /resolveHomeCatalogHeaderPanelPaddingTop/);
   assert.match(layout, /HOME_CATALOG_HEADER_PANEL_TOP_GAP = 0/);
   assert.match(layout, /horizontal: HOME_CATALOG_HEADER_SHELL_HORIZONTAL_INSET/);
@@ -89,7 +92,8 @@ test("home feed search is in scroll flow, not sticky overlay", () => {
   assert.match(styles, /overflow: "visible"/);
   assert.match(styles, /boxShadow: "none"/);
   assert.match(search, /PRODUCT_SEARCH_INPUT_UI/);
-  assert.match(panel, /floating\s*\?\s*\[[\s\S]*styles\.panelFloating/);
+  assert.match(panel, /styles\.panelFloating/);
+  assert.doesNotMatch(panel, /HomeCatalogHeaderGlassLayer/);
   assert.doesNotMatch(
     readMobileFile("features/home-feed/ui/HomeCatalogSearchRow.tsx"),
     /ViewerRegionSelect/,

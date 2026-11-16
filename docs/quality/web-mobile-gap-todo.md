@@ -6,7 +6,7 @@
 Новый чат: читать этот файл целиком. `[x]` — сделано в приложении. `[ ]` — ещё нет.
 Цифры — px при 16px = 1rem. Скриншоты устройств не снимались.
 
-Срез шапки ленты, нижней панели и адресов розыгрышей/личных категорий закоммичен. Весь список не закрыт: смотри «Дальше».
+Закоммичено: нижняя панель, шапка v2 (и вне ленты), gutter ленты и каталога, карточка шире 1023px. Весь список не закрыт: смотри «Дальше».
 
 ## Решения (16.11.2026, «дефолты ок»)
 
@@ -70,14 +70,15 @@
 - [x] Поиск: фон `surface`, рамка text 6% (`0F`), тень `0 4 14` opacity 0.06, шрифт 16px, line-height 20. Высота 44 и radius 999 как были.
 - [x] Фильтр и меню: 44×44, radius 14, заливка `action`, тень offset 6 / opacity 0.55 / radius 10.
 - [x] Регион убран отдельной кнопкой. Пункт `location-on` внутри меню, открывает `RuRegionPickerSheet`. Как `buildHeaderUsersMenuItems({ includeRegion })` на сайте.
-- [x] Горизонтальный padding плавающей панели: 8px (0.5rem), не 10.
-- [ ] Ozon-панель (`styles.panel`, нижние углы 18, hairline, accent) всё ещё включается, когда `floating={false}` — это не лента главной (`showHomeFeed === false`). На сайте v2 этой шапки нет.
+- [x] Горизонтальный padding плавающей панели в стиле: 8px (0.5rem), не 10. На ленте ряд обнуляет его: список уже даёт gutter.
+- [x] Ozon-панель снята. И лента, и каталог с фильтрами рисуют v2: без капсулы, стекла, hairline и нижних углов 18. Вне ленты боковой padding шапки = gutter (8 / 12 / 16). Внутри ленты свой padding панели 0 — отступ уже даёт список.
 
 ## E. Дизайн: ещё не сверено
 
-- [ ] Gutter шире 640px. Сайт возвращает 16px (`--iz-space-4`). Приложение держит 8px на всех ширинах.
-- [ ] Сетка товаров шире 903px на сайте `1rem`. На телефоне 2px совпадает (`layout-parity`).
-- [ ] Карточка каталога: padding `0.55rem 0.75rem 0.65rem` со `catalogProductStyles.ts` по пикселям не сверялась.
+- [x] Gutter ленты и каталога. Сайт: ≤640 — 8px (`0.5rem`), 641–667 — 12px (`0.75rem` в `@media 667`), шире — 16px (`--iz-space-4`). `resolveScreenContentInlinePadding` + `useScreenLayout`. Сетка товаров на главной берёт этот padding.
+- [ ] Остальные экраны. `paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL` в StyleSheet по-прежнему 8px на любой ширине. Хук их не переписывает.
+- [x] Сетка товаров шире 903px — 16px (`1rem`), `resolveProductGridGap`. Телефон ≤667 — 2px: на сайте 2px включает `@media 640`, который перекрывает `0.1rem`.
+- [x] Карточка каталога. До 1023px сайт ставит `padding: 0 0 10px` и inset 10px (`ProductCardMobileCatalog.css` перекрывает `0.55rem 0.75rem 0.65rem`). Приложение: `cardCatalogGrid`. Шире 1023px — padding 8.8 / 12 / 10.4, gap карточки 6.4, gap тела 5.12, bleed картинки 8 / 6.08.
 
 ## F. Что не расхождение
 
@@ -87,10 +88,9 @@
 
 ## Прогон 16.11.2026
 
-`npm run test:home-catalog-search-row`, `test:screen-content-layout`, `test:layout-parity`, `test:deep-link-routes`, `node --test scripts/ru-region-picker-sheet.test.mjs`, `node scripts/intro-ad-moderation-merge.test.mjs` — зелёные.
+`npm run test:home-catalog-search-row`, `test:screen-content-layout`, `test:layout-parity`, `test:screen-layout` — зелёные на срезе шапки, gutter и карточки.
 
 ## Дальше
 
-1. Ozon-шапка вне ленты (последний пункт D).
-2. Блок E.
-3. Блок A и экран заказа — только по отдельной команде.
+1. Статичный gutter 8px на экранах вне ленты (последний открытый пункт E).
+2. Блок A и экран заказа — только по отдельной команде.

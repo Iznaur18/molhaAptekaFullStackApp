@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { memo, useCallback, useState, type ReactNode } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, useWindowDimensions, View } from "react-native";
 
 import { ProductCardRatingRow } from "@/entities/product/ui/ProductCardRatingRow";
 import {
@@ -15,7 +15,10 @@ import { useProductCardImageTapActions } from "@/entities/product/lib/useProduct
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { resolveProductCardImageOverlayInsetX } from "@/entities/product/lib/productCardBadgePalette";
-import { resolveProductCardCatalogGridTotalHeight } from "@/entities/product/lib/productCardMobileCatalogLayout";
+import {
+  PRODUCT_CARD_DESKTOP_MIN_WIDTH,
+  resolveProductCardCatalogGridTotalHeight,
+} from "@/entities/product/lib/productCardMobileCatalogLayout";
 import { useProductCardChromeFlags } from "@/entities/product/lib/useProductCardChromeFlags";
 import { resolveProductCardPromotionFrameStyle } from "@/entities/product/lib/resolveProductCardPromotionFrameStyle";
 import { resolveProductCardRaffleParticipantFrameStyle } from "@/entities/product/lib/resolveProductCardRaffleParticipantFrameStyle";
@@ -121,6 +124,7 @@ export const ProductCard = memo(
     const router = useRouter();
     const theme = useAppTheme();
     const styles = useProductCardStyles();
+    const { width: windowWidth } = useWindowDimensions();
     const { isPremiumUser } = useUserAccess();
     const isAuthorized = useIsAuthorized();
     const sessionQuery = useAuthSessionQuery();
@@ -190,6 +194,8 @@ export const ProductCard = memo(
     const gallerySlideCount = Math.max(cardMedia.mediaSlides.length, 1);
 
     const isCatalogGrid = layout === "catalog-grid";
+    const desktopCatalogCard =
+      isCatalogGrid && windowWidth >= PRODUCT_CARD_DESKTOP_MIN_WIDTH;
     const imageOverlayInsetX = resolveProductCardImageOverlayInsetX(
       isCatalogGrid ? "catalog-grid" : "default",
     );
@@ -245,7 +251,10 @@ export const ProductCard = memo(
     const showPurchaseSlot =
       typeof renderPurchaseAction === "function" && !isMineMode && !isModerationQueue;
     const catalogGridMinHeight =
-      isCatalogGrid && catalogGridTileWidth != null && catalogGridTileWidth > 0
+      isCatalogGrid &&
+      !desktopCatalogCard &&
+      catalogGridTileWidth != null &&
+      catalogGridTileWidth > 0
         ? resolveProductCardCatalogGridTotalHeight(catalogGridTileWidth, undefined, {
             withAction: showPurchaseSlot,
           })
@@ -255,7 +264,8 @@ export const ProductCard = memo(
       <View
         style={[
           styles.card,
-          isCatalogGrid && styles.cardCatalogGrid,
+          isCatalogGrid &&
+            (desktopCatalogCard ? styles.cardCatalogDesktop : styles.cardCatalogGrid),
           catalogGridMinHeight != null ? { minHeight: catalogGridMinHeight } : null,
           isCatalogGrid && isModerationQueue && styles.cardCatalogGridModerationQueue,
           showOutOfStockOverlay && styles.cardOutOfStock,
@@ -272,7 +282,15 @@ export const ProductCard = memo(
           />
         ) : null}
 
-        <View style={[styles.imageWrap, isCatalogGrid && styles.imageWrapCatalogGrid]}>
+        <View
+          style={[
+            styles.imageWrap,
+            isCatalogGrid &&
+              (desktopCatalogCard
+                ? styles.imageWrapCatalogDesktop
+                : styles.imageWrapCatalogGrid),
+          ]}
+        >
           <ProductMediaHorizontalPager
             style={styles.imagePressable}
             slideCount={gallerySlideCount}
@@ -354,7 +372,15 @@ export const ProductCard = memo(
           />
         </View>
 
-        <View style={[styles.content, isCatalogGrid && styles.contentCatalogGrid]}>
+        <View
+          style={[
+            styles.content,
+            isCatalogGrid &&
+              (desktopCatalogCard
+                ? styles.contentCatalogDesktop
+                : styles.contentCatalogGrid),
+          ]}
+        >
           <Pressable
             style={[
               styles.contentPressable,
@@ -490,7 +516,15 @@ export const ProductCard = memo(
         </View>
 
         {showPurchaseSlot ? (
-          <View style={styles.purchaseSlot}>{renderPurchaseAction(product)}</View>
+          <View
+            style={
+              desktopCatalogCard
+                ? styles.purchaseSlotCatalogDesktop
+                : styles.purchaseSlot
+            }
+          >
+            {renderPurchaseAction(product)}
+          </View>
         ) : null}
 
         {showSellerFooter ? (

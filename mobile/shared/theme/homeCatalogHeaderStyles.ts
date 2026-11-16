@@ -6,12 +6,7 @@ import {
   HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE,
   HOME_CATALOG_HEADER_CTA_BUTTON_RADIUS,
   HOME_CATALOG_HEADER_SEARCH_ICON_LEFT,
-  HOME_CATALOG_HEADER_PANEL_BORDER_COLOR,
-  HOME_CATALOG_HEADER_PANEL_INSET_LINE_COLOR,
-  HOME_CATALOG_HEADER_PANEL_PADDING,
   HOME_CATALOG_HEADER_PANEL_FLOATING_PADDING,
-  HOME_CATALOG_HEADER_PANEL_RADIUS,
-  HOME_CATALOG_HEADER_PANEL_SHADOW,
   HOME_CATALOG_HEADER_SEARCH_INPUT_BORDER_RADIUS,
   HOME_CATALOG_HEADER_SEARCH_INPUT_FONT_SIZE,
   HOME_CATALOG_HEADER_SEARCH_INPUT_MIN_HEIGHT,
@@ -26,32 +21,7 @@ import {
 } from "@/shared/lib/homeCatalogHeaderLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const panelShadowStyle =
-  Platform.OS === "ios"
-    ? {
-        shadowColor: HOME_CATALOG_HEADER_PANEL_SHADOW.color,
-        shadowOffset: { width: 0, height: HOME_CATALOG_HEADER_PANEL_SHADOW.offsetY },
-        shadowOpacity: 1,
-        shadowRadius: HOME_CATALOG_HEADER_PANEL_SHADOW.radius,
-      }
-    : { elevation: 6 };
-
 export const useHomeCatalogHeaderStyles = createThemedStyles((theme) => ({
-  panel: {
-    position: "relative",
-    overflow: "hidden",
-    marginBottom: HOME_CATALOG_HEADER_BOTTOM_MARGIN,
-    paddingHorizontal: HOME_CATALOG_HEADER_PANEL_PADDING.horizontal,
-    paddingBottom: HOME_CATALOG_HEADER_PANEL_PADDING.bottom,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: HOME_CATALOG_HEADER_PANEL_BORDER_COLOR,
-    borderTopLeftRadius: 0,
-    borderTopRightRadius: 0,
-    borderBottomLeftRadius: HOME_CATALOG_HEADER_PANEL_RADIUS,
-    borderBottomRightRadius: HOME_CATALOG_HEADER_PANEL_RADIUS,
-    backgroundColor: "transparent",
-    ...panelShadowStyle,
-  },
   /**
    * Web v2 `.app-shell__header-panel`: без капсулы, рамки и стекла.
    * Поиск и кнопки лежат отдельно на фоне ленты.
@@ -90,30 +60,10 @@ export const useHomeCatalogHeaderStyles = createThemedStyles((theme) => ({
     shadowRadius: 0,
     elevation: 0,
   },
-  panelInsetLine: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 1,
-    backgroundColor: HOME_CATALOG_HEADER_PANEL_INSET_LINE_COLOR,
-    zIndex: 2,
-  },
   panelContent: {
     position: "relative",
     zIndex: 3,
     overflow: "visible",
-  },
-  accentSlot: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 3,
-    borderBottomLeftRadius: 4,
-    borderBottomRightRadius: 4,
-    overflow: "hidden",
-    zIndex: 4,
   },
   topRow: {
     flexDirection: "row",

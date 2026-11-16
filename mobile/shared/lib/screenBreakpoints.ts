@@ -32,6 +32,26 @@ export const PROFILE_CONTENT_MAX_WIDTH_TABLET = PROFILE_CONTENT_MAX_WIDTH_SMALL_
 
 export const PRODUCT_GRID_GAP = 8;
 
+/**
+ * `--app-shell-content-inline-padding`.
+ * ≤640: 0.5rem. 641–667: 0.75rem (`@media max-width 667`). Шире: `--iz-space-4` 1rem.
+ */
+export const SCREEN_CONTENT_INLINE_PADDING_PHONE_MAX_WIDTH = 640;
+export const SCREEN_CONTENT_INLINE_PADDING_COMPACT_MAX_WIDTH = 667;
+export const SCREEN_CONTENT_INLINE_PADDING_PHONE = 8;
+export const SCREEN_CONTENT_INLINE_PADDING_COMPACT = 12;
+export const SCREEN_CONTENT_INLINE_PADDING_WIDE = 16;
+
+export const resolveScreenContentInlinePadding = (width: number): number => {
+  if (width <= SCREEN_CONTENT_INLINE_PADDING_PHONE_MAX_WIDTH) {
+    return SCREEN_CONTENT_INLINE_PADDING_PHONE;
+  }
+  if (width <= SCREEN_CONTENT_INLINE_PADDING_COMPACT_MAX_WIDTH) {
+    return SCREEN_CONTENT_INLINE_PADDING_COMPACT;
+  }
+  return SCREEN_CONTENT_INLINE_PADDING_WIDE;
+};
+
 /** ≤667px — 2 колонки как web mobile */
 export const SCREEN_PRODUCT_GRID_2_COL_MAX_WIDTH = 667;
 
