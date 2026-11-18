@@ -4,6 +4,7 @@ import {
   EXPO_PUSH_TOKEN_PREFIXES,
   EXPO_PUSH_TOKENS_MAX_PER_USER,
 } from "../../constants/expoPushConstants.js";
+import { AppError } from "../../errors/AppError.js";
 import { UserModel } from "../../models/index.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 
@@ -41,12 +42,12 @@ export function isValidExpoPushToken(token) {
 export async function registerExpoPushTokenForUser(userId, token, platform) {
   const normalizedToken = String(token).trim();
   if (!isValidExpoPushToken(normalizedToken)) {
-    throw new Error("Невалидный Expo push token");
+    throw new AppError(400, "Невалидный Expo push token");
   }
 
   const user = await UserModel.findById(userId).select("expoPushTokens");
   if (!user) {
-    throw new Error("Пользователь не найден");
+    throw new AppError(404, "Пользователь не найден");
   }
 
   const now = new Date();

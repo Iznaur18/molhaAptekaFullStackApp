@@ -1,5 +1,6 @@
 import { UserModel } from "../models/index.js";
 import { errorRes } from "../services/http/index.js";
+import { attachStaffAuditContext } from "./staffAuditContext.js";
 
 const ADMIN_ROLE = "admin";
 
@@ -19,7 +20,7 @@ export const checkAdminMW = async (req, res, next) => {
     }
 
     req.userRole = user.userRole;
-    req.staffAudit = { role: user.userRole };
+    attachStaffAuditContext(req, user.userRole);
     return next();
   } catch (error) {
     return next(error);

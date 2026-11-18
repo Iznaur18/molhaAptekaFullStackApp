@@ -1,29 +1,28 @@
-export const ORDER_STATUS_PENDING = "pending";
-export const ORDER_STATUS_CONFIRMED = "confirmed";
-export const ORDER_STATUS_SHIPPED = "shipped";
-export const ORDER_STATUS_DELIVERED = "delivered";
-export const ORDER_STATUS_CANCELLED = "cancelled";
-/** Товар уехал и вернулся: отказ у двери, неудачное вручение. */
-export const ORDER_STATUS_RETURNED = "returned";
-/** Ступени сборки, общие для самовывоза и доставки. */
-export const ORDER_STATUS_ACCEPTED = "accepted";
-export const ORDER_STATUS_ASSEMBLING = "assembling";
-/** Развилка лестниц: самовывоз ждут на точке, доставку — отгружают. */
-export const ORDER_STATUS_READY_FOR_PICKUP = "ready_for_pickup";
-export const ORDER_STATUS_READY_TO_SHIP = "ready_to_ship";
-/** Ступени курьера. */
-export const ORDER_STATUS_COURIER_ASSIGNED = "courier_assigned";
-export const ORDER_STATUS_COURIER_HOLDING = "courier_holding";
-export const ORDER_STATUS_IN_DELIVERY = "in_delivery";
-/** Товар вне контроля: разбирается модератором. */
-export const ORDER_STATUS_DISPUTED = "disputed";
-
-/**
- * Все статусы в порядке показа (фильтры, селекты). Значения совпадают с
- * `ORDER_STATUSES` в контракте и `server/constants/orderConstants.js`.
- */
-export const ORDER_STATUSES = [
+import {
+  ORDER_STATUS_ACCEPTED,
+  ORDER_STATUS_ASSEMBLING,
+  ORDER_STATUS_CANCELLED,
+  ORDER_STATUS_CONFIRMED,
+  ORDER_STATUS_COURIER_ASSIGNED,
+  ORDER_STATUS_COURIER_HOLDING,
+  ORDER_STATUS_DELIVERED,
+  ORDER_STATUS_DISPUTED,
+  ORDER_STATUS_IN_DELIVERY,
   ORDER_STATUS_PENDING,
+  ORDER_STATUS_READY_FOR_PICKUP,
+  ORDER_STATUS_READY_TO_SHIP,
+  ORDER_STATUS_RETURNED,
+  ORDER_STATUS_SHIPPED,
+  ORDER_STATUSES as ORDER_STATUSES_CONTRACT,
+} from "@molha/api-contract";
+
+export {
+  ORDER_STATUS_PENDING,
+  ORDER_STATUS_CONFIRMED,
+  ORDER_STATUS_SHIPPED,
+  ORDER_STATUS_DELIVERED,
+  ORDER_STATUS_CANCELLED,
+  ORDER_STATUS_RETURNED,
   ORDER_STATUS_ACCEPTED,
   ORDER_STATUS_ASSEMBLING,
   ORDER_STATUS_READY_FOR_PICKUP,
@@ -31,13 +30,29 @@ export const ORDER_STATUSES = [
   ORDER_STATUS_COURIER_ASSIGNED,
   ORDER_STATUS_COURIER_HOLDING,
   ORDER_STATUS_IN_DELIVERY,
-  ORDER_STATUS_CONFIRMED,
-  ORDER_STATUS_SHIPPED,
-  ORDER_STATUS_DELIVERED,
-  ORDER_STATUS_CANCELLED,
-  ORDER_STATUS_RETURNED,
   ORDER_STATUS_DISPUTED,
-] as const;
+};
+
+/**
+ * Все статусы в порядке показа (фильтры, селекты).
+ * Литералы — `@molha/api-contract`; здесь только UI/pure поверх них.
+ */
+export const ORDER_STATUSES = ORDER_STATUSES_CONTRACT as readonly [
+  typeof ORDER_STATUS_PENDING,
+  typeof ORDER_STATUS_ACCEPTED,
+  typeof ORDER_STATUS_ASSEMBLING,
+  typeof ORDER_STATUS_READY_FOR_PICKUP,
+  typeof ORDER_STATUS_READY_TO_SHIP,
+  typeof ORDER_STATUS_COURIER_ASSIGNED,
+  typeof ORDER_STATUS_COURIER_HOLDING,
+  typeof ORDER_STATUS_IN_DELIVERY,
+  typeof ORDER_STATUS_CONFIRMED,
+  typeof ORDER_STATUS_SHIPPED,
+  typeof ORDER_STATUS_DELIVERED,
+  typeof ORDER_STATUS_CANCELLED,
+  typeof ORDER_STATUS_RETURNED,
+  typeof ORDER_STATUS_DISPUTED,
+];
 
 export type OrderStatus = (typeof ORDER_STATUSES)[number];
 

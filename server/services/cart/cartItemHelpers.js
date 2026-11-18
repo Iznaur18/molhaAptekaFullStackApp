@@ -8,7 +8,7 @@ import {
 } from "../../constants/cartConstants.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import { ProductModel } from "../../models/index.js";
-import { getSellerIdsBlockingBuyer } from "../../services/user/userBlockHelpers.js";
+import { getSellerIdsBlockingBuyer } from "../user/userBlockHelpers.js";
 
 /**
  * Приводит сырые данные из БД/тела к объекту productId -> quantity.

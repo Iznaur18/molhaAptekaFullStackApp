@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 
 import {
   getFaqItemLinksController,
@@ -11,7 +11,7 @@ import {
   patchFaqItemLinkValidation,
 } from "../validations/faq/faqItemLinkValidation.js";
 
-const router = Router();
+const router = createAsyncRouter();
 
 router.get("/item-links", getFaqItemLinksController);
 router.patch(

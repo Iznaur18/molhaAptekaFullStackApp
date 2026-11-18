@@ -232,7 +232,7 @@ export async function assertProfileUpdateRules({
 
   const targetUserBeforeUpdate = await UserModel.findById(targetUserId)
     .select(
-      "isPremiumUser premiumExpiresAt userBackgroundUrl isUserDataConfirmed userRole isBlockedUser isActiveUser",
+      "isPremiumUser premiumExpiresAt userBackgroundUrl isUserDataConfirmed userRole isBlockedUser isActiveUser userPhoneNumber",
     )
     .lean();
 
@@ -244,6 +244,23 @@ export async function assertProfileUpdateRules({
   assertLoyaltyChangeAllowed(updateData, editorContext);
   assertAdminProtectedFieldsAllowed(updateData, editorContext, targetUserBeforeUpdate);
   await assertUniqueProfileFields(updateData, targetUserId);
+
+  if (
+    updateData.userPhoneNumber &&
+    updateData.userPhoneNumber !== null &&
+    updateData.userPhoneNumber !== ""
+  ) {
+    const prevPhone = String(targetUserBeforeUpdate.userPhoneNumber ?? "").trim();
+    const nextPhone = String(updateData.userPhoneNumber).trim();
+    if (nextPhone !== prevPhone) {
+      updateData.isPhoneVerified = false;
+    }
+  } else if (
+    Object.prototype.hasOwnProperty.call(updateData, "userPhoneNumber") &&
+    (updateData.userPhoneNumber === null || updateData.userPhoneNumber === "")
+  ) {
+    updateData.isPhoneVerified = false;
+  }
 
   const premiumState = applyPremiumAndBackgroundRules(
     updateData,

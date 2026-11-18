@@ -366,8 +366,12 @@ export async function fetchInstallmentBuyerActionCount() {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
     return Number(data.data?.count) || 0;
-  } catch {
-    return 0;
+  } catch (error) {
+    throw new Error(
+      error?.response?.data?.message ??
+        error?.message ??
+        "Не удалось загрузить счётчик рассрочек",
+    );
   }
 }
 
@@ -378,8 +382,12 @@ export async function fetchInstallmentSellerActionCount() {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
     return Number(data.data?.count) || 0;
-  } catch {
-    return 0;
+  } catch (error) {
+    throw new Error(
+      error?.response?.data?.message ??
+        error?.message ??
+        "Не удалось загрузить счётчик продаж в рассрочку",
+    );
   }
 }
 

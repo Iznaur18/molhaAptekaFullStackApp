@@ -1,4 +1,4 @@
-import { errorRes, successRes } from "../../services/http/index.js";
+import { successRes } from "../../services/http/index.js";
 import {
   registerExpoPushTokenForUser,
   removeExpoPushTokenForUser,
@@ -7,17 +7,7 @@ import {
 /** `PUT /auth/me/push-token` — регистрация Expo push token (mobile). */
 export const registerPushTokenController = async (req, res) => {
   const { token, platform } = req.body ?? {};
-
-  try {
-    await registerExpoPushTokenForUser(req.userId, token, platform);
-  } catch (registerError) {
-    return errorRes(
-      res,
-      400,
-      registerError instanceof Error ? registerError.message : "Невалидный push token",
-    );
-  }
-
+  await registerExpoPushTokenForUser(req.userId, token, platform);
   return successRes(res, { registered: true });
 };
 

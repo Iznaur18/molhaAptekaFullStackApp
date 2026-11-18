@@ -1,6 +1,7 @@
 import webpush from "web-push";
 
 import { WEB_PUSH_SUBSCRIPTIONS_MAX_PER_USER } from "../../constants/webPushConstants.js";
+import { AppError } from "../../errors/AppError.js";
 import { UserModel } from "../../models/index.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 
@@ -29,6 +30,18 @@ export const getWebPushVapidPublicKey = () => {
 
 export const isWebPushConfigured = () =>
   Boolean(getWebPushVapidPublicKey() && process.env.VAPID_PRIVATE_KEY?.trim());
+
+/** @returns {{ publicKey: string }} */
+export function requireWebPushVapidPublicKey() {
+  if (!isWebPushConfigured()) {
+    throw new AppError(503, "Web Push не настроен на сервере");
+  }
+  const publicKey = getWebPushVapidPublicKey();
+  if (!publicKey) {
+    throw new AppError(503, "Web Push не настроен на сервере");
+  }
+  return { publicKey };
+}
 
 /**
  * @param {{
@@ -128,14 +141,14 @@ function normalizeSubscription(subscription) {
 export async function registerWebPushSubscriptionForUser(userId, subscription) {
   const normalized = normalizeSubscription(subscription);
   if (!normalized) {
-    throw new Error("Невалидная web-push подписка");
+    throw new AppError(400, "Невалидная web-push подписка");
   }
 
   const user = await UserModel.findById(userId).select(
     "webPushSubscriptions notificationsEnabled",
   );
   if (!user) {
-    throw new Error("Пользователь не найден");
+    throw new AppError(404, "Пользователь не найден");
   }
 
   const now = new Date();

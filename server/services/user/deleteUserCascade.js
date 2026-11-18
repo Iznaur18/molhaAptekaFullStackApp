@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 
-import { normalizeStoredCartItems } from "../../controllers/Cart/cartItemHelpers.js";
+import { normalizeStoredCartItems } from "../cart/cartItemHelpers.js";
 import {
   deleteUserWishlistAndDecrementCounts,
   removeProductIdsFromAllWishlists,
-} from "../../controllers/Favorites/favoritesItemHelpers.js";
+} from "../favorites/favoritesItemHelpers.js";
 import {
   CartModel,
   ProductModel,

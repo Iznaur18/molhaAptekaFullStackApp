@@ -6,8 +6,8 @@ import {
   PRODUCT_PROMOTION_STATUS_ACTIVE,
   PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
 } from "../../constants/productPromotionConstants.js";
-import { normalizeStoredCartItems } from "../../controllers/Cart/cartItemHelpers.js";
-import { removeProductIdsFromAllWishlists } from "../../controllers/Favorites/favoritesItemHelpers.js";
+import { normalizeStoredCartItems } from "../cart/cartItemHelpers.js";
+import { removeProductIdsFromAllWishlists } from "../favorites/favoritesItemHelpers.js";
 import {
   CartModel,
   ProductModel,

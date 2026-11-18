@@ -1,6 +1,17 @@
 export const EMPTY_PROFILE_UPDATE_MESSAGE =
   "Нет данных для обновления. Укажите хотя бы одно разрешенное поле";
 
+export const PASSWORD_CHANGE_VIA_AUTH_MESSAGE =
+  "Смена пароля выполняется через /auth/password/change";
+
+export const PASSWORD_LIKE_PROFILE_FIELDS = Object.freeze([
+  "password",
+  "passwordHash",
+  "currentPassword",
+  "newPassword",
+  "newPasswordConfirm",
+]);
+
 export const INVALID_EDITOR_TOKEN_MESSAGE =
   "Текущий пользователь не найден. Токен недействителен";
 

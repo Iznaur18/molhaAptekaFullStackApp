@@ -1,148 +1,42 @@
-import ProductCategoryModel from "../../models/ProductCategoryModel.js";
-import { deleteUploadFileByUrl } from "../../services/upload/deleteUploadFileByUrl.js";
+import { successRes } from "../../services/http/index.js";
 import {
-  resolveProductCategoryDisplayPatchTarget,
-  upsertProductCategoryDisplay,
-} from "../../services/product/productCategoryDisplayPatch.js";
-import {
-  getCategoryTileImagesEnabled,
-  setCategoryTileImagesEnabled,
-} from "../../services/product/productCategoryDisplaySettings.js";
-import { errorRes, successRes } from "../../services/http/index.js";
-import ProductCategoryDisplayModel from "../../models/ProductCategoryDisplayModel.js";
-import { normalizeUploadUrlForStorage } from "@izibuy/shared-lib";
+  listProductCategoryDisplays,
+  patchProductCategoryDisplayById,
+  patchProductCategoryDisplayBySlug,
+  patchProductCategoryDisplaySettings,
+} from "../../services/product/productCategoryDisplayAdmin.js";
 
-/**
- * @param {import('mongoose').Document | Record<string, unknown> | null | undefined} row
- */
-const toCategoryDisplayPayload = (row) => ({
-  categorySlug:
-    typeof row?.categorySlug === "string" && row.categorySlug.trim()
-      ? row.categorySlug.trim()
-      : null,
-  categoryId: row?.categoryId ? String(row.categoryId) : null,
-  customLabel:
-    typeof row?.customLabel === "string" && row.customLabel.trim()
-      ? row.customLabel.trim()
-      : null,
-  imageUrl:
-    typeof row?.imageUrl === "string" && row.imageUrl.trim()
-      ? row.imageUrl.trim()
-      : null,
-  updatedAt: row?.updatedAt ?? null,
-});
-
-/**
- * @param {Record<string, unknown> | null | undefined} existing
- * @param {Record<string, unknown>} body
- * @param {string} userId
- */
-const buildCategoryDisplayUpdate = async (existing, body, userId) => {
-  const { customLabel, imageUrl, resetCustomLabel, resetImageUrl } = body ?? {};
-
-  /** @type {Record<string, unknown>} */
-  const update = {
-    updatedBy: userId,
-  };
-
-  if (resetCustomLabel === true) {
-    update.customLabel = null;
-  } else if (customLabel !== undefined) {
-    const nextLabel =
-      customLabel == null || String(customLabel).trim() === ""
-        ? null
-        : String(customLabel).trim();
-    update.customLabel = nextLabel;
-  }
-
-  if (resetImageUrl === true) {
-    if (existing?.imageUrl) {
-      await deleteUploadFileByUrl(existing.imageUrl);
-    }
-    update.imageUrl = null;
-  } else if (imageUrl !== undefined) {
-    const raw =
-      imageUrl == null || String(imageUrl).trim() === ""
-        ? null
-        : String(imageUrl).trim();
-    const nextUrl = raw ? normalizeUploadUrlForStorage(raw) || null : null;
-    if (existing?.imageUrl && nextUrl && existing.imageUrl !== nextUrl) {
-      await deleteUploadFileByUrl(existing.imageUrl);
-    }
-    if (!nextUrl && existing?.imageUrl) {
-      await deleteUploadFileByUrl(existing.imageUrl);
-    }
-    update.imageUrl = nextUrl;
-  }
-
-  return update;
-};
-
-/** GET /product/category-displays — публичные переопределения подписи/картинки категорий. */
+/** GET /product/category-displays */
 export async function getProductCategoryDisplaysController(_req, res) {
-  const [rows, tileImagesEnabled] = await Promise.all([
-    ProductCategoryDisplayModel.find().lean(),
-    getCategoryTileImagesEnabled(),
-  ]);
-  successRes(res, {
-    displays: rows.map(toCategoryDisplayPayload),
-    // Общий переключатель админа: клиенты рисуют плитки без картинок.
-    tileImagesEnabled,
-  });
+  const data = await listProductCategoryDisplays();
+  return successRes(res, data);
 }
 
 /** PATCH /product/category-display-settings — только admin. */
 export async function patchProductCategoryDisplaySettingsController(req, res) {
-  const tileImagesEnabled = await setCategoryTileImagesEnabled({
+  const data = await patchProductCategoryDisplaySettings({
     tileImagesEnabled: req.body.tileImagesEnabled,
     adminId: String(req.userId),
   });
-  successRes(res, { tileImagesEnabled });
+  return successRes(res, data);
 }
 
 /** PATCH /product/category-displays/:categorySlug — только admin. */
 export async function patchProductCategoryDisplayController(req, res) {
-  const categorySlug = String(req.params.categorySlug ?? "").trim();
-  const target = await resolveProductCategoryDisplayPatchTarget({ categorySlug });
-  const update = await buildCategoryDisplayUpdate(
-    target.existing,
-    req.body,
-    req.userId,
-  );
-
-  const saved = await upsertProductCategoryDisplay({
-    categorySlug,
-    categoryId: target.categoryId,
-    update,
+  const data = await patchProductCategoryDisplayBySlug({
+    categorySlug: String(req.params.categorySlug ?? "").trim(),
+    body: req.body ?? {},
+    adminId: String(req.userId),
   });
-
-  successRes(res, {
-    display: toCategoryDisplayPayload(saved),
-  });
+  return successRes(res, data);
 }
 
 /** PATCH /product/category-node-displays/:categoryId — только admin. */
 export async function patchProductCategoryNodeDisplayController(req, res) {
-  const categoryId = String(req.params.categoryId ?? "").trim();
-  const categoryExists = await ProductCategoryModel.exists({ _id: categoryId });
-
-  if (!categoryExists) {
-    return errorRes(res, 404, "Категория не найдена");
-  }
-
-  const target = await resolveProductCategoryDisplayPatchTarget({ categoryId });
-  const update = await buildCategoryDisplayUpdate(
-    target.existing,
-    req.body,
-    req.userId,
-  );
-
-  const saved = await upsertProductCategoryDisplay({
-    categoryId,
-    update,
+  const data = await patchProductCategoryDisplayById({
+    categoryId: String(req.params.categoryId ?? "").trim(),
+    body: req.body ?? {},
+    adminId: String(req.userId),
   });
-
-  successRes(res, {
-    display: toCategoryDisplayPayload(saved),
-  });
+  return successRes(res, data);
 }

@@ -1,8 +1,8 @@
 import "dotenv/config";
 import mongoose from "mongoose";
 
-import { normalizeStoredCartItems } from "../controllers/Cart/cartItemHelpers.js";
-import { normalizeStoredWishlistItems } from "../controllers/Favorites/favoritesItemHelpers.js";
+import { normalizeStoredCartItems } from "../services/cart/cartItemHelpers.js";
+import { normalizeStoredWishlistItems } from "../services/favorites/favoritesItemHelpers.js";
 import {
   CartModel,
   CuratedProductListModel,

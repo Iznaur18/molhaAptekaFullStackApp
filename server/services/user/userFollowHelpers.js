@@ -7,9 +7,13 @@ import {
   IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_NEW_PRODUCT,
   IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_RAFFLE_COMPLETED,
   IN_APP_NOTIFICATION_KIND_NEW_FOLLOWER,
+  USER_FOLLOW_CANNOT_FOLLOW_SELF_MESSAGE,
   USER_FOLLOW_MAX_LIST_LIMIT,
+  USER_FOLLOW_TARGET_BLOCKED_MESSAGE,
+  USER_FOLLOW_TARGET_NOT_FOUND_MESSAGE,
 } from "../../constants/userFollowConstants.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
+import { AppError } from "../../errors/AppError.js";
 import { UserFollowModel, UserModel } from "../../models/index.js";
 import { createUserInAppNotification } from "./userInAppNotifications.js";
 import { getHiddenSellerIds } from "../access/adminUserGuard.js";
@@ -86,7 +90,7 @@ export async function deleteAllFollowsForUser(userId) {
  */
 export async function followUser(followerId, followingId) {
   if (String(followerId) === String(followingId)) {
-    return { ok: false, status: 400, message: "SELF" };
+    throw new AppError(400, USER_FOLLOW_CANNOT_FOLLOW_SELF_MESSAGE);
   }
 
   const target = await UserModel.findById(followingId)
@@ -94,10 +98,10 @@ export async function followUser(followerId, followingId) {
     .lean();
 
   if (!target) {
-    return { ok: false, status: 404, message: "NOT_FOUND" };
+    throw new AppError(404, USER_FOLLOW_TARGET_NOT_FOUND_MESSAGE);
   }
   if (target.isBlockedUser) {
-    return { ok: false, status: 403, message: "BLOCKED" };
+    throw new AppError(403, USER_FOLLOW_TARGET_BLOCKED_MESSAGE);
   }
 
   await UserFollowModel.updateOne(
@@ -117,7 +121,8 @@ export async function followUser(followerId, followingId) {
 
   const counts = await getUserFollowCounts(followingId);
   return {
-    ok: true,
+    message: "Подписка оформлена",
+    isFollowing: true,
     followersCount: counts.followersCount,
     followingCount: counts.followingCount,
   };
@@ -131,7 +136,8 @@ export async function unfollowUser(followerId, followingId) {
   await UserFollowModel.deleteOne({ followerId, followingId });
   const counts = await getUserFollowCounts(followingId);
   return {
-    ok: true,
+    message: "Подписка отменена",
+    isFollowing: false,
     followersCount: counts.followersCount,
     followingCount: counts.followingCount,
   };

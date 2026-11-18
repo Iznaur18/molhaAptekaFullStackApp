@@ -1,13 +1,13 @@
 import mongoose from "mongoose";
 
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
+import { AppError } from "../../errors/AppError.js";
 import { ProductModel, WishlistModel } from "../../models/index.js";
-import { attachProductSellerSnapshots } from "../../utils/attachProductSellerSnapshots.js";
 import { runInTransaction, withMongoSession } from "../../utils/mongoTransaction.js";
-import { attachProductAvailablePurchaseQuantity } from "../../utils/productStock.js";
-import { attachProductSellerClosedState } from "../../services/product/attachProductSellerClosedState.js";
-import { applyProductWishlistCountDelta } from "../../services/product/productWishlistCount.js";
-
+import { attachProductSellerSnapshots } from "../product/attachProductSellerSnapshots.js";
+import { attachProductAvailablePurchaseQuantity } from "../product/productStock.js";
+import { attachProductSellerClosedState } from "../product/attachProductSellerClosedState.js";
+import { applyProductWishlistCountDelta } from "../product/productWishlistCount.js";
 import { resolveFavoritesUserId } from "./resolveFavoritesUserId.js";
 
 /**
@@ -131,7 +131,7 @@ export async function populateWishlistProducts(items, viewerUserId = null) {
 
 /**
  * @param {Record<string, number>} items
- * @param {import('../utils/productStock.js').ProductFromApi[]} products
+ * @param {Array<{ _id: unknown }>} products
  */
 function reconcileWishlistItemsWithProducts(items, products) {
   const productIds = new Set(products.map((product) => String(product._id)));
@@ -149,7 +149,7 @@ function reconcileWishlistItemsWithProducts(items, products) {
 export async function syncWishlistForUser(userId, nextItems) {
   const userObjectId = resolveFavoritesUserId(userId);
   if (!userObjectId) {
-    throw new Error("INVALID_USER");
+    throw new AppError(401, "Не авторизован");
   }
 
   return runInTransaction(async (session) => {

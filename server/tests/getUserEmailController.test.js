@@ -3,6 +3,7 @@ import { afterEach, describe, it, mock } from "node:test";
 
 process.env.JWT_SECRET ||= "test-secret-for-user-email";
 
+const { AppError } = await import("../errors/AppError.js");
 const { UserModel } = await import("../models/index.js");
 const { getUserEmailController } =
   await import("../controllers/User/getUserEmailController.js");
@@ -45,13 +46,23 @@ describe("GET /user/:id/email", () => {
 
   it("без почты — 404", async () => {
     mockUser({ email: "", isBlockedUser: false });
-    const res = await callController();
-    assert.equal(res.statusCode, 404);
+    await assert.rejects(
+      () => callController(),
+      (error) =>
+        error instanceof AppError &&
+        error.statusCode === 404 &&
+        error.message === "Почта не указана",
+    );
   });
 
   it("заблокированного не показываем", async () => {
     mockUser({ email: "x@mail.ru", isBlockedUser: true });
-    const res = await callController();
-    assert.equal(res.statusCode, 404);
+    await assert.rejects(
+      () => callController(),
+      (error) =>
+        error instanceof AppError &&
+        error.statusCode === 404 &&
+        error.message === "Пользователь не найден",
+    );
   });
 });

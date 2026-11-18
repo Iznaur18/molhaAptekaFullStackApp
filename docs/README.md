@@ -12,6 +12,9 @@
 | [**clients/**](clients/) | Web + Mobile (общие планы) | Фичи в приложении / parity |
 | [**product/**](product/) | Продуктовые спеки (1С, СДЭК, QA) | Новые интеграции и фичи |
 | [**architecture/**](architecture/) | Рост, масштаб, аудит стека | Планирование инфраструктуры |
+| [**decisions/**](decisions/) | ADR (решения «почему так») | Спорный архитектурный выбор |
+
+Карта для IDE/агентов (короткие указатели): [ARCHITECTURE.md](ARCHITECTURE.md) · [PROJECT_MAP.md](PROJECT_MAP.md) · [DATA_MODEL.md](DATA_MODEL.md) · [API.md](API.md) · корневой [`AGENTS.md`](../AGENTS.md)
 | [**quality/**](quality/) | Баги, lint, smoke, аудиты | Перед релизом / triage |
 
 ---

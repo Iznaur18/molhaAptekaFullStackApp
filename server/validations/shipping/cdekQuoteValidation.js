@@ -1,10 +1,11 @@
-import { z } from "zod";
 import {
-  cdekIntakeBodySchema,
-  cdekWaybillBodySchema,
-  mongoIdSchema,
+  cdekAvailabilityQuerySchema,
   cdekDeliveryPointsQuerySchema,
+  cdekIntakeBodySchema,
+  cdekOrderIdParamsSchema,
   cdekQuoteBodySchema,
+  cdekReceptionPointsQuerySchema,
+  cdekWaybillBodySchema,
 } from "@molha/api-contract";
 
 import { validateBodyZod } from "../../middlewares/validateBodyZod.js";
@@ -14,7 +15,7 @@ import { validateParamsZod } from "../../middlewares/validateParamsZod.js";
 export const cdekQuoteValidation = [validateBodyZod(cdekQuoteBodySchema)];
 
 export const cdekAvailabilityValidation = [
-  validateQueryZod(z.object({ sellerId: mongoIdSchema })),
+  validateQueryZod(cdekAvailabilityQuerySchema),
 ];
 
 export const cdekDeliveryPointsValidation = [
@@ -22,19 +23,17 @@ export const cdekDeliveryPointsValidation = [
 ];
 
 export const cdekWaybillValidation = [
-  validateParamsZod(z.object({ orderId: mongoIdSchema })),
+  validateParamsZod(cdekOrderIdParamsSchema),
   validateBodyZod(cdekWaybillBodySchema),
 ];
 
-export const cdekWaybillParamsValidation = [
-  validateParamsZod(z.object({ orderId: mongoIdSchema })),
-];
+export const cdekWaybillParamsValidation = [validateParamsZod(cdekOrderIdParamsSchema)];
 
 export const cdekReceptionPointsValidation = [
-  validateQueryZod(z.object({ city: z.string().trim().min(2).max(100) })),
+  validateQueryZod(cdekReceptionPointsQuerySchema),
 ];
 
 export const cdekIntakeValidation = [
-  validateParamsZod(z.object({ orderId: mongoIdSchema })),
+  validateParamsZod(cdekOrderIdParamsSchema),
   validateBodyZod(cdekIntakeBodySchema),
 ];

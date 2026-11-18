@@ -1,0 +1,212 @@
+import mongoose from "mongoose";
+import { summarizeOrderItems } from "@izibuy/shared-lib";
+
+import { AppError } from "../../errors/AppError.js";
+import { OrderModel, ProductModel, UserModel } from "../../models/index.js";
+import { buildRegexSearchOr } from "../../utils/buildRegexSearchOr.js";
+import { loadInstallmentPlanSummariesByIds } from "../installment/installmentHelpers.js";
+import { sanitizeOrderForSellerApi } from "./buyerPassportShare.js";
+import { attachShipmentCourierInfo } from "./attachShipmentCourierInfo.js";
+import {
+  ORDER_AFFILIATE_REFERRER_POPULATE,
+  ORDER_BUYER_PUBLIC_FIELDS,
+  ORDER_ITEMS_POPULATE,
+} from "./orderQueries.js";
+import {
+  fetchMySalesOrderPageIds,
+  orderRowsByIds,
+} from "./fetchMySalesOrderPageIds.js";
+import {
+  buildOrderStatusFromItems,
+  normalizeOrderItemsForRuntime,
+} from "./orderStatus.js";
+
+const DEFAULT_PAGE = 1;
+const DEFAULT_LIMIT = 20;
+const MAX_LIMIT = 100;
+const MAX_PRODUCT_IDS_IN_FILTER = 50;
+
+/**
+ * @param {unknown} raw
+ * @param {import('mongoose').Types.ObjectId[]} sellerProductIds
+ */
+const resolveProductIdsFilter = (raw, sellerProductIds) => {
+  if (raw == null || String(raw).trim() === "") {
+    return {
+      productIdSet: null,
+      queryProductIds: sellerProductIds,
+    };
+  }
+
+  const parts = String(raw)
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const unique = [...new Set(parts)];
+
+  if (unique.length === 0) {
+    return {
+      productIdSet: null,
+      queryProductIds: sellerProductIds,
+    };
+  }
+
+  if (unique.length > MAX_PRODUCT_IDS_IN_FILTER) {
+    throw new AppError(400, `Не более ${MAX_PRODUCT_IDS_IN_FILTER} товаров в фильтре`);
+  }
+  for (const id of unique) {
+    if (!mongoose.isValidObjectId(id)) {
+      throw new AppError(400, "Неверный идентификатор товара в фильтре");
+    }
+  }
+
+  const sellerSet = new Set(sellerProductIds.map((id) => String(id)));
+  for (const id of unique) {
+    if (!sellerSet.has(id)) {
+      throw new AppError(400, "Указан товар не из вашего каталога");
+    }
+  }
+
+  return {
+    productIdSet: new Set(unique),
+    queryProductIds: unique.map((id) => new mongoose.Types.ObjectId(id)),
+  };
+};
+
+const parsePagination = (query) => {
+  const page = Math.max(1, Number(query.page) || DEFAULT_PAGE);
+  const limit = Math.min(MAX_LIMIT, Math.max(1, Number(query.limit) || DEFAULT_LIMIT));
+  const skip = (page - 1) * limit;
+  return { page, limit, skip };
+};
+
+const normalizeId = (value) => String(value ?? "");
+
+const buildBuyerIdsBySearch = async (searchTerm) => {
+  if (!searchTerm) return null;
+
+  const buyerSearchQuery = buildRegexSearchOr(searchTerm, [
+    "userName",
+    "email",
+    "userPhoneNumber",
+  ]);
+  if (!buyerSearchQuery) return null;
+
+  const buyers = await UserModel.find(buyerSearchQuery).select("_id").lean();
+  return buyers.map((buyer) => buyer._id);
+};
+
+/**
+ * @param {{
+ *   sellerId: string;
+ *   page?: unknown;
+ *   limit?: unknown;
+ *   status?: unknown;
+ *   search?: unknown;
+ *   productIds?: unknown;
+ * }} args
+ */
+export async function getMySales({
+  sellerId,
+  page: pageRaw,
+  limit: limitRaw,
+  status,
+  search,
+  productIds,
+}) {
+  const { page, limit, skip } = parsePagination({ page: pageRaw, limit: limitRaw });
+
+  const sellerProducts = await ProductModel.find({ productSeller: sellerId })
+    .select("_id")
+    .lean();
+  const sellerProductIds = sellerProducts.map((product) => product._id);
+
+  if (sellerProductIds.length === 0) {
+    return { orders: [], total: 0, page, limit };
+  }
+
+  const { productIdSet, queryProductIds } = resolveProductIdsFilter(
+    productIds,
+    sellerProductIds,
+  );
+
+  const buyerIds = await buildBuyerIdsBySearch(search);
+  if (search && buyerIds?.length === 0) {
+    return { orders: [], total: 0, page, limit };
+  }
+
+  const query = {
+    "items.productId": { $in: queryProductIds },
+    ...(buyerIds ? { userBuyerId: { $in: buyerIds } } : {}),
+  };
+  const pendingFirst = !status;
+  const { orderIds, total } = await fetchMySalesOrderPageIds({
+    query,
+    sellerProductIds: queryProductIds,
+    pendingFirst,
+    skip,
+    limit,
+  });
+
+  const rawOrdersUnordered =
+    orderIds.length === 0
+      ? []
+      : await OrderModel.find({ _id: { $in: orderIds } })
+          .populate("userBuyerId", ORDER_BUYER_PUBLIC_FIELDS)
+          .populate(ORDER_ITEMS_POPULATE)
+          .populate(ORDER_AFFILIATE_REFERRER_POPULATE)
+          .lean();
+  const rawOrders = orderRowsByIds(orderIds, rawOrdersUnordered);
+
+  const orders = rawOrders
+    .map((order) => {
+      normalizeOrderItemsForRuntime(order.items);
+      const sellerItems = order.items
+        .map((item, itemIndex) => ({ ...item, itemIndex }))
+        .filter((item) => {
+          if (!item?.productId || typeof item.productId === "string") return false;
+          const itemProductIdStr = normalizeId(item.productId._id ?? item.productId);
+          if (productIdSet && !productIdSet.has(itemProductIdStr)) return false;
+          const itemSellerId = normalizeId(
+            item.productId.productSeller?._id ?? item.productId.productSeller,
+          );
+          const statusMatches = status ? item.status === status : true;
+          return itemSellerId === sellerId && statusMatches;
+        });
+
+      if (sellerItems.length === 0) return null;
+
+      return {
+        ...order,
+        items: sellerItems,
+        totalAmount: summarizeOrderItems(sellerItems).totalAmount,
+        status: buildOrderStatusFromItems(sellerItems),
+      };
+    })
+    .filter(Boolean);
+
+  const contractIds = orders
+    .map((order) => order.installmentContractId)
+    .filter(Boolean);
+  const planSummaryByContractId = await loadInstallmentPlanSummariesByIds(contractIds);
+
+  const ordersWithInstallment = orders.map((order) => {
+    const contractId = order.installmentContractId
+      ? String(order.installmentContractId)
+      : null;
+    const installmentContract =
+      contractId != null ? (planSummaryByContractId[contractId] ?? null) : null;
+
+    const withPlan = installmentContract ? { ...order, installmentContract } : order;
+    return sanitizeOrderForSellerApi(withPlan);
+  });
+
+  await attachShipmentCourierInfo(ordersWithInstallment);
+
+  return {
+    orders: ordersWithInstallment,
+    total,
+    page,
+    limit,
+  };
+}

@@ -121,6 +121,21 @@ export const cdekDeliveryPointsQuerySchema = z.object({
   city: z.string().trim().min(2).max(100).optional(),
 });
 
+/** Query `GET /order/cdek-availability`. */
+export const cdekAvailabilityQuerySchema = z.object({
+  sellerId: mongoIdSchema,
+});
+
+/** Params маршрутов с `:orderId` для СДЭК. */
+export const cdekOrderIdParamsSchema = z.object({
+  orderId: mongoIdSchema,
+});
+
+/** Query `GET /order/cdek-reception-points`. */
+export const cdekReceptionPointsQuerySchema = z.object({
+  city: z.string().trim().min(2).max(100),
+});
+
 export const CDEK_RECIPIENT_NAME_MAX_LENGTH = 100;
 
 /**

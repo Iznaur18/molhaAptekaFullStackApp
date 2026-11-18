@@ -1,21 +1,21 @@
 import { sanitizeMarketingAttribution } from "@izibuy/shared-lib";
 import bcrypt from "bcrypt";
 import { EMAIL_AUTH_DISABLED_MESSAGE } from "@izibuy/shared-lib";
-import { errorRes, successRes } from "../../services/http/index.js";
+
+import { AppError } from "../../errors/AppError.js";
+import { successRes } from "../../services/http/index.js";
 import { sendUserWithToken } from "../../services/auth/sendUserWithToken.js";
 import {
   confirmPendingRegistration,
   createPendingRegistration,
   resendPendingRegistrationCode,
 } from "../../services/auth/pendingRegistration.js";
+import { throwMappedAuthChannelError } from "../../services/auth/mapAuthChannelError.js";
 import {
   EMAIL_VERIFICATION_SENT_MESSAGE,
   PENDING_REGISTRATION_TAKEN_MESSAGE,
 } from "../../constants/emailVerificationConstants.js";
 import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
-
-const REGISTRATION_START_FAILED_MESSAGE =
-  "Не удалось начать регистрацию. Попробуйте ещё раз через минуту";
 import { PHONE_VERIFICATION_SENT_MESSAGE } from "../../constants/phoneVerificationConstants.js";
 import { DEFAULT_AVATAR_URL } from "../../constants/constants.js";
 import {
@@ -23,6 +23,9 @@ import {
   getDefaultUserBackgroundStoredValue,
   isUserBackgroundPresetId,
 } from "../../constants/userBackgroundPresets.js";
+
+const REGISTRATION_START_FAILED_MESSAGE =
+  "Не удалось начать регистрацию. Попробуйте ещё раз через минуту";
 
 function pickUrlOrDefault(value, defaultUrl) {
   if (value == null || String(value).trim() === "") return defaultUrl;
@@ -58,17 +61,13 @@ export const registerUserController = async (req, res) => {
   } = req.body;
 
   const normalizedUserName = String(userName).trim().toLowerCase();
-
   const salt = await bcrypt.genSalt(10);
   const passwordHash = await bcrypt.hash(password, salt);
-
   const userPhoneNumber =
     phoneNumber != null && phoneNumber !== "" ? String(phoneNumber).trim() : null;
 
   let pendingInfo;
   try {
-    // все опциональные поля передаются явно (null/""), чтобы upsert по email
-    // полностью заменял предыдущую заявку, а не смешивался с ней
     pendingInfo = await createPendingRegistration({
       email,
       passwordHash,
@@ -88,27 +87,28 @@ export const registerUserController = async (req, res) => {
       marketingAttribution: sanitizeMarketingAttribution(marketingAttribution),
     });
   } catch (registrationError) {
+    if (registrationError instanceof AppError) {
+      throw registrationError;
+    }
     const message =
       registrationError instanceof Error
         ? registrationError.message
         : "Не удалось начать регистрацию";
-    if (message === EMAIL_AUTH_DISABLED_MESSAGE) {
-      return errorRes(res, 503, message);
-    }
-    if (message === "EMAIL_DELIVERY_UNAVAILABLE") {
-      return errorRes(res, 503, "Не удалось отправить письмо. Попробуйте позже");
-    }
     if (message === PENDING_REGISTRATION_TAKEN_MESSAGE) {
-      return errorRes(res, 400, message);
+      throw new AppError(400, message);
     }
-    // Всё остальное — сбой сервера (база и т. п.): сырой текст ошибки
-    // пользователю не показываем (17.10.2026 на экран попал E11000 Mongo).
+    if (
+      message === EMAIL_AUTH_DISABLED_MESSAGE ||
+      message === "EMAIL_DELIVERY_UNAVAILABLE"
+    ) {
+      throwMappedAuthChannelError(registrationError);
+    }
     logServerEvent("error", {
       event: "auth.register_start_failed",
       requestId: req.requestId,
       ...formatLogError(registrationError),
     });
-    return errorRes(res, 500, REGISTRATION_START_FAILED_MESSAGE);
+    throw new AppError(500, REGISTRATION_START_FAILED_MESSAGE);
   }
 
   return successRes(res, {
@@ -130,14 +130,17 @@ export const confirmRegistrationController = async (req, res) => {
   try {
     user = await confirmPendingRegistration(registrationId, code);
   } catch (confirmError) {
+    if (confirmError instanceof AppError) {
+      throw confirmError;
+    }
     const message =
       confirmError instanceof Error
         ? confirmError.message
         : "Не удалось подтвердить регистрацию";
     if (message === EMAIL_AUTH_DISABLED_MESSAGE) {
-      return errorRes(res, 503, message);
+      throw new AppError(503, message);
     }
-    return errorRes(res, 400, message);
+    throw new AppError(400, message);
   }
 
   return sendUserWithToken(user, res, req);
@@ -153,15 +156,9 @@ export const resendRegistrationCodeController = async (req, res) => {
   try {
     result = await resendPendingRegistrationCode(registrationId);
   } catch (resendError) {
-    const message =
-      resendError instanceof Error ? resendError.message : "Не удалось отправить код";
-    if (message === EMAIL_AUTH_DISABLED_MESSAGE) {
-      return errorRes(res, 503, message);
-    }
-    if (message === "SMS_DELIVERY_UNAVAILABLE") {
-      return errorRes(res, 503, "Не удалось отправить SMS. Попробуйте позже");
-    }
-    return errorRes(res, 400, message);
+    throwMappedAuthChannelError(resendError, {
+      fallbackMessage: "Не удалось отправить код",
+    });
   }
 
   const isPhone = Boolean(result?.phoneNumber);

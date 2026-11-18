@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 
 import { REFRESH_TOKEN_TTL_DAYS } from "../../constants/authCookieConstants.js";
+import { AppError } from "../../errors/AppError.js";
 
 export const TOKEN_TYPE_ACCESS = "access";
 export const TOKEN_TYPE_REFRESH = "refresh";
@@ -14,7 +15,7 @@ export function resolveJwtAccessSecret() {
   const secret =
     process.env.JWT_ACCESS_SECRET?.trim() || process.env.JWT_SECRET?.trim();
   if (!secret) {
-    throw new Error("JWT_ACCESS_SECRET / JWT_SECRET не задан");
+    throw new AppError(500, "JWT_ACCESS_SECRET / JWT_SECRET не задан");
   }
   return secret;
 }
@@ -26,7 +27,7 @@ export function resolveJwtRefreshSecret() {
   const secret =
     process.env.JWT_REFRESH_SECRET?.trim() || process.env.JWT_SECRET?.trim();
   if (!secret) {
-    throw new Error("JWT_REFRESH_SECRET / JWT_SECRET не задан");
+    throw new AppError(500, "JWT_REFRESH_SECRET / JWT_SECRET не задан");
   }
   return secret;
 }
@@ -62,7 +63,7 @@ export const signRefreshToken = (userId, authTokenVersion = 0) =>
 export const verifyAccessToken = (token) => {
   const decoded = jwt.verify(token, resolveJwtAccessSecret(), JWT_VERIFY_OPTIONS);
   if (decoded.typ && decoded.typ !== TOKEN_TYPE_ACCESS) {
-    throw new Error("INVALID_TOKEN_TYPE");
+    throw new AppError(401, "INVALID_TOKEN_TYPE");
   }
   return decoded;
 };
@@ -73,7 +74,7 @@ export const verifyAccessToken = (token) => {
 export const verifyRefreshToken = (token) => {
   const decoded = jwt.verify(token, resolveJwtRefreshSecret(), JWT_VERIFY_OPTIONS);
   if (decoded.typ !== TOKEN_TYPE_REFRESH) {
-    throw new Error("INVALID_TOKEN_TYPE");
+    throw new AppError(401, "INVALID_TOKEN_TYPE");
   }
   return decoded;
 };

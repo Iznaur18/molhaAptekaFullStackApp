@@ -2,7 +2,8 @@ import { sanitizeMarketingAttribution } from "@izibuy/shared-lib";
 import bcrypt from "bcrypt";
 
 import { UserModel } from "../../models/index.js";
-import { errorRes, successRes } from "../../services/http/index.js";
+import { AppError } from "../../errors/AppError.js";
+import { successRes } from "../../services/http/index.js";
 import { sendUserWithToken } from "../../services/auth/sendUserWithToken.js";
 import { DUMMY_PASSWORD_HASH } from "../../services/auth/dummyPasswordHash.js";
 import {
@@ -12,12 +13,12 @@ import {
   requestPhoneLoginOtp,
 } from "../../services/auth/phoneVerification.js";
 import { createPendingPhoneRegistration } from "../../services/auth/pendingRegistration.js";
+import { throwMappedAuthChannelError } from "../../services/auth/mapAuthChannelError.js";
 import {
   PHONE_LOGIN_INVALID_MESSAGE,
   PHONE_OTP_LOGIN_GENERIC_MESSAGE,
   PHONE_VERIFICATION_SENT_MESSAGE,
   PHONE_VERIFICATION_SUCCESS_MESSAGE,
-  SMS_DELIVERY_UNAVAILABLE_MESSAGE,
 } from "../../constants/phoneVerificationConstants.js";
 import { DEFAULT_AVATAR_URL } from "../../constants/constants.js";
 import {
@@ -27,7 +28,6 @@ import {
 } from "../../constants/userBackgroundPresets.js";
 import {
   logSecurityEvent,
-  logSecurityFailure,
   securityRequestFields,
 } from "../../services/auth/logSecurityEvent.js";
 
@@ -43,30 +43,6 @@ function resolveRegisterBackground(presetId) {
     return getDefaultUserBackgroundStoredValue();
   }
   return formatUserBackgroundPresetValue(id);
-}
-
-function isSmsDeliveryFailure(message) {
-  return (
-    message === "SMS_DELIVERY_UNAVAILABLE" ||
-    message.startsWith("SMS_DELIVERY_UNAVAILABLE") ||
-    message === SMS_DELIVERY_UNAVAILABLE_MESSAGE ||
-    message.startsWith(`${SMS_DELIVERY_UNAVAILABLE_MESSAGE}:`)
-  );
-}
-
-function mapSmsDeliveryError(error) {
-  const message = error instanceof Error ? error.message : String(error);
-  if (!isSmsDeliveryFailure(message)) {
-    return message;
-  }
-  const detail =
-    error?.smspilotDescription ||
-    (message.includes(": ") ? message.slice(message.indexOf(": ") + 2).trim() : "");
-  if (detail && !detail.startsWith(SMS_DELIVERY_UNAVAILABLE_MESSAGE)) {
-    return `${SMS_DELIVERY_UNAVAILABLE_MESSAGE}: ${detail}`;
-  }
-  if (detail) return detail;
-  return SMS_DELIVERY_UNAVAILABLE_MESSAGE;
 }
 
 /** POST /auth/register/phone */
@@ -108,14 +84,9 @@ export const registerPhoneUserController = async (req, res) => {
       marketingAttribution: sanitizeMarketingAttribution(marketingAttribution),
     });
   } catch (registrationError) {
-    const message = mapSmsDeliveryError(registrationError);
-    if (
-      isSmsDeliveryFailure(message) ||
-      isSmsDeliveryFailure(String(registrationError?.message ?? ""))
-    ) {
-      return errorRes(res, 503, message);
-    }
-    return errorRes(res, 400, message || "Не удалось начать регистрацию");
+    throwMappedAuthChannelError(registrationError, {
+      fallbackMessage: "Не удалось начать регистрацию",
+    });
   }
 
   return successRes(res, {
@@ -128,59 +99,54 @@ export const registerPhoneUserController = async (req, res) => {
 
 /** POST /auth/login/phone — телефон + пароль */
 export const loginPhonePasswordController = async (req, res) => {
-  try {
-    const { phoneNumber, password } = req.body;
+  const { phoneNumber, password } = req.body;
 
-    const user = await UserModel.findOne({ userPhoneNumber: phoneNumber }).select(
-      "+passwordHash +authTokenVersion",
-    );
+  const user = await UserModel.findOne({ userPhoneNumber: phoneNumber }).select(
+    "+passwordHash +authTokenVersion",
+  );
 
-    const passwordHashToCompare = user?.passwordHash ?? DUMMY_PASSWORD_HASH;
-    const isValidPassword = await bcrypt.compare(password, passwordHashToCompare);
+  const passwordHashToCompare = user?.passwordHash ?? DUMMY_PASSWORD_HASH;
+  const isValidPassword = await bcrypt.compare(password, passwordHashToCompare);
 
-    if (!user || !isValidPassword) {
-      logSecurityEvent("warn", "login_failed", {
-        ...securityRequestFields(req),
-        methodKind: "phone_password",
-        reason: "invalid_credentials",
-      });
-      return errorRes(res, 400, PHONE_LOGIN_INVALID_MESSAGE);
-    }
-
-    if (user.isBlockedUser) {
-      logSecurityEvent("warn", "login_failed", {
-        ...securityRequestFields(req),
-        methodKind: "phone_password",
-        reason: "blocked",
-        userId: String(user._id),
-      });
-      return errorRes(res, 403, "Аккаунт заблокирован");
-    }
-
-    if (user.isActiveUser === false) {
-      logSecurityEvent("warn", "login_failed", {
-        ...securityRequestFields(req),
-        methodKind: "phone_password",
-        reason: "disabled",
-        userId: String(user._id),
-      });
-      return errorRes(res, 403, "Аккаунт отключён администратором");
-    }
-
-    user.userLastLoginAt = new Date();
-    await user.save({ validateBeforeSave: false });
-
-    logSecurityEvent("info", "login_ok", {
+  if (!user || !isValidPassword) {
+    logSecurityEvent("warn", "login_failed", {
       ...securityRequestFields(req),
       methodKind: "phone_password",
+      reason: "invalid_credentials",
+    });
+    throw new AppError(400, PHONE_LOGIN_INVALID_MESSAGE);
+  }
+
+  if (user.isBlockedUser) {
+    logSecurityEvent("warn", "login_failed", {
+      ...securityRequestFields(req),
+      methodKind: "phone_password",
+      reason: "blocked",
       userId: String(user._id),
     });
-
-    return sendUserWithToken(user, res, req);
-  } catch (error) {
-    logSecurityFailure("login", securityRequestFields(req), error);
-    return errorRes(res, 500, "Ошибка при входе");
+    throw new AppError(403, "Аккаунт заблокирован");
   }
+
+  if (user.isActiveUser === false) {
+    logSecurityEvent("warn", "login_failed", {
+      ...securityRequestFields(req),
+      methodKind: "phone_password",
+      reason: "disabled",
+      userId: String(user._id),
+    });
+    throw new AppError(403, "Аккаунт отключён администратором");
+  }
+
+  user.userLastLoginAt = new Date();
+  await user.save({ validateBeforeSave: false });
+
+  logSecurityEvent("info", "login_ok", {
+    ...securityRequestFields(req),
+    methodKind: "phone_password",
+    userId: String(user._id),
+  });
+
+  return sendUserWithToken(user, res, req);
 };
 
 /** POST /auth/login/phone/otp/request */
@@ -190,14 +156,7 @@ export const loginPhoneOtpRequestController = async (req, res) => {
   try {
     await requestPhoneLoginOtp(phoneNumber);
   } catch (error) {
-    const message = mapSmsDeliveryError(error);
-    if (
-      isSmsDeliveryFailure(message) ||
-      isSmsDeliveryFailure(String(error?.message ?? ""))
-    ) {
-      return errorRes(res, 503, message);
-    }
-    return errorRes(res, 400, message);
+    throwMappedAuthChannelError(error);
   }
 
   // Anti-enumeration: одинаковый ответ, даже если SMS не слали
@@ -226,10 +185,13 @@ export const loginPhoneOtpConfirmController = async (req, res) => {
       methodKind: "phone_otp",
       reason,
     });
-    if (message === "Аккаунт заблокирован" || message.includes("отключён")) {
-      return errorRes(res, 403, message);
+    if (error instanceof AppError) {
+      throw error;
     }
-    return errorRes(res, 400, message);
+    if (message === "Аккаунт заблокирован" || message.includes("отключён")) {
+      throw new AppError(403, message);
+    }
+    throw new AppError(400, message);
   }
 
   logSecurityEvent("info", "login_ok", {
@@ -243,37 +205,30 @@ export const loginPhoneOtpConfirmController = async (req, res) => {
 
 /** POST /auth/phone/bind/request (auth) */
 export const phoneBindRequestController = async (req, res) => {
+  let result;
   try {
-    const result = await requestPhoneBindForUser(req.userId, req.body.phoneNumber);
-    return successRes(res, {
-      phoneNumber: result.phoneNumber,
-      message: PHONE_VERIFICATION_SENT_MESSAGE,
-    });
+    result = await requestPhoneBindForUser(req.userId, req.body.phoneNumber);
   } catch (error) {
-    const message = mapSmsDeliveryError(error);
-    if (
-      isSmsDeliveryFailure(message) ||
-      isSmsDeliveryFailure(String(error?.message ?? ""))
-    ) {
-      return errorRes(res, 503, message);
-    }
-    return errorRes(res, 400, message);
+    throwMappedAuthChannelError(error);
   }
+  return successRes(res, {
+    phoneNumber: result.phoneNumber,
+    message: PHONE_VERIFICATION_SENT_MESSAGE,
+  });
 };
 
 /** POST /auth/phone/bind/confirm (auth) */
 export const phoneBindConfirmController = async (req, res) => {
+  let result;
   try {
-    const result = await confirmPhoneBindForUser(req.userId, req.body.code);
-    return successRes(res, {
-      phoneNumber: result.phoneNumber,
-      message: PHONE_VERIFICATION_SUCCESS_MESSAGE,
-    });
+    result = await confirmPhoneBindForUser(req.userId, req.body.code);
   } catch (error) {
-    return errorRes(
-      res,
-      400,
-      error instanceof Error ? error.message : "Не удалось подтвердить телефон",
-    );
+    throwMappedAuthChannelError(error, {
+      fallbackMessage: "Не удалось подтвердить телефон",
+    });
   }
+  return successRes(res, {
+    phoneNumber: result.phoneNumber,
+    message: PHONE_VERIFICATION_SUCCESS_MESSAGE,
+  });
 };

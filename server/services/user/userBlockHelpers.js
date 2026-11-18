@@ -3,9 +3,14 @@ import mongoose from "mongoose";
 import {
   buildUserBlockedNotificationMessage,
   IN_APP_NOTIFICATION_KIND_USER_BLOCKED,
+  USER_BLOCK_CANNOT_BLOCK_SELF_MESSAGE,
+  USER_BLOCK_LIMIT_REACHED_MESSAGE,
   USER_BLOCK_MAX_PER_USER,
   USER_BLOCK_LIST_MAX_LIMIT,
+  USER_BLOCK_NOT_BLOCKED_MESSAGE,
+  USER_BLOCK_TARGET_NOT_FOUND_MESSAGE,
 } from "../../constants/userBlockConstants.js";
+import { AppError } from "../../errors/AppError.js";
 import { UserBlockModel, UserFollowModel, UserModel } from "../../models/index.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 import { createUserInAppNotification } from "./userInAppNotifications.js";
@@ -100,7 +105,7 @@ export function scheduleUserBlockSideEffects({
  */
 export async function blockUser(blockerId, blockedId) {
   if (String(blockerId) === String(blockedId)) {
-    return { ok: false, status: 400, message: "SELF" };
+    throw new AppError(400, USER_BLOCK_CANNOT_BLOCK_SELF_MESSAGE);
   }
 
   const [target, blocker] = await Promise.all([
@@ -108,7 +113,7 @@ export async function blockUser(blockerId, blockedId) {
     UserModel.findById(blockerId).select("userName").lean(),
   ]);
   if (!target) {
-    return { ok: false, status: 404, message: "NOT_FOUND" };
+    throw new AppError(404, USER_BLOCK_TARGET_NOT_FOUND_MESSAGE);
   }
 
   const existing = await UserBlockModel.findOne({ blockerId, blockedId })
@@ -116,7 +121,7 @@ export async function blockUser(blockerId, blockedId) {
     .lean();
   if (existing) {
     return {
-      ok: true,
+      message: "Пользователь уже заблокирован",
       isBlockedByMe: true,
       blockedAt: null,
       alreadyBlocked: true,
@@ -125,7 +130,7 @@ export async function blockUser(blockerId, blockedId) {
 
   const count = await UserBlockModel.countDocuments({ blockerId });
   if (count >= USER_BLOCK_MAX_PER_USER) {
-    return { ok: false, status: 400, message: "LIMIT" };
+    throw new AppError(400, USER_BLOCK_LIMIT_REACHED_MESSAGE);
   }
 
   const doc = await UserBlockModel.create({ blockerId, blockedId });
@@ -137,7 +142,7 @@ export async function blockUser(blockerId, blockedId) {
   });
 
   return {
-    ok: true,
+    message: "Пользователь заблокирован",
     isBlockedByMe: true,
     blockedAt: doc.createdAt?.toISOString?.() ?? null,
     alreadyBlocked: false,
@@ -150,11 +155,35 @@ export async function blockUser(blockerId, blockedId) {
  */
 export async function unblockUser(blockerId, blockedId) {
   const result = await UserBlockModel.deleteOne({ blockerId, blockedId });
+  if (result.deletedCount === 0) {
+    throw new AppError(404, USER_BLOCK_NOT_BLOCKED_MESSAGE);
+  }
   return {
-    ok: true,
+    message: "Пользователь разблокирован",
     isBlockedByMe: false,
-    wasBlocked: result.deletedCount > 0,
   };
+}
+
+/**
+ * @param {{
+ *   viewerId: string;
+ *   blockedId: string;
+ *   asUserId?: unknown;
+ * }} args
+ */
+export async function unblockUserForViewer({ viewerId, blockedId, asUserId }) {
+  const viewer = await UserModel.findById(viewerId).select("userRole").lean();
+  const isModerator = viewer?.userRole === "admin" || viewer?.userRole === "moderator";
+
+  const asUser =
+    asUserId != null && String(asUserId).trim() !== "" ? String(asUserId).trim() : "";
+  const blockerId = isModerator && asUser ? asUser : viewerId;
+
+  if (blockerId !== viewerId && !isModerator) {
+    throw new AppError(403, "Недостаточно прав");
+  }
+
+  return unblockUser(blockerId, blockedId);
 }
 
 /**

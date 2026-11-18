@@ -1,179 +1,90 @@
-import { CURATED_PRODUCT_LIST_TITLE_MAX_LENGTH } from "../../constants/curatedProductListConstants.js";
-import CuratedProductListModel from "../../models/CuratedProductListModel.js";
-import { getHiddenSellerIds } from "../../services/access/adminUserGuard.js";
+import { successRes } from "../../services/http/index.js";
 import {
-  assertCuratedListProductMatchesRegion,
-  buildAdminCuratedListsResponse,
-  buildCuratedListProductPreview,
-  buildHomeCuratedListsResponse,
-  normalizeCuratedProductListRegionCode,
-  normalizeCuratedProductListTitle,
-  reorderCuratedProductLists,
-  toCuratedProductListPayload,
-} from "../../services/product/curatedProductListHelpers.js";
-import { getClosedSellerIdsNow } from "../../services/product/getClosedSellerIdsNow.js";
-import { resolveViewerRegionCodeForRequest } from "../../services/user/userRegionCatalogFilter.js";
-import { errorRes, successRes } from "../../services/http/index.js";
-
-const sortCuratedLists = { sortOrder: 1, createdAt: 1 };
+  addCuratedProductListItem,
+  createCuratedProductList,
+  deleteCuratedProductList,
+  listAdminCuratedProductLists,
+  listHomeCuratedProductLists,
+  patchCuratedProductList,
+  previewCuratedListProduct,
+  removeCuratedProductListItem,
+  reorderAdminCuratedProductLists,
+} from "../../services/product/curatedProductListsAdmin.js";
 
 /** GET /product/curated-lists/home */
 export async function getHomeCuratedProductListsController(req, res) {
-  const [hiddenSellerIds, closedSellerIds, viewerRegionCode] = await Promise.all([
-    getHiddenSellerIds(),
-    getClosedSellerIdsNow({ excludeUserId: req.userId ?? null }),
-    resolveViewerRegionCodeForRequest({
-      userId: req.userId,
-      queryRegionCode: req.query.regionCode,
-    }),
-  ]);
-
-  const lists = await CuratedProductListModel.find({ regionCode: viewerRegionCode })
-    .sort(sortCuratedLists)
-    .lean();
-  const curatedLists = await buildHomeCuratedListsResponse(lists, hiddenSellerIds, {
-    viewerRegionCode,
-    closedSellerIds,
+  const data = await listHomeCuratedProductLists({
+    userId: req.userId ?? null,
+    queryRegionCode: req.query.regionCode,
   });
-  successRes(res, { lists: curatedLists });
+  return successRes(res, data);
 }
 
 /** GET /product/admin/curated-lists */
 export async function listCuratedProductListsAdminController(_req, res) {
-  const hiddenSellerIds = await getHiddenSellerIds();
-  const lists = await CuratedProductListModel.find().sort(sortCuratedLists).lean();
-  const curatedLists = await buildAdminCuratedListsResponse(lists, hiddenSellerIds);
-  successRes(res, { lists: curatedLists });
+  const data = await listAdminCuratedProductLists();
+  return successRes(res, data);
 }
 
 /** GET /product/admin/curated-lists/product-preview/:productId */
 export async function previewCuratedListProductAdminController(req, res) {
-  const productId = String(req.params.productId ?? "").trim();
-  const preview = await buildCuratedListProductPreview(productId);
-  successRes(res, { preview });
+  const data = await previewCuratedListProduct({
+    productId: req.params.productId,
+  });
+  return successRes(res, data);
 }
 
 /** POST /product/admin/curated-lists */
 export async function createCuratedProductListAdminController(req, res) {
-  const title = normalizeCuratedProductListTitle(req.body?.title);
-  if (title.length > CURATED_PRODUCT_LIST_TITLE_MAX_LENGTH) {
-    return errorRes(res, 400, "Слишком длинный заголовок");
-  }
-
-  const regionCode = normalizeCuratedProductListRegionCode(req.body?.regionCode);
-
-  const maxSortOrder = await CuratedProductListModel.findOne()
-    .sort({ sortOrder: -1 })
-    .select("sortOrder")
-    .lean();
-  const sortOrder = Number(maxSortOrder?.sortOrder ?? -1) + 1;
-
-  const doc = await CuratedProductListModel.create({
-    title,
-    regionCode,
-    sortOrder,
-    updatedBy: req.userId ?? null,
+  const data = await createCuratedProductList({
+    title: req.body?.title,
+    regionCode: req.body?.regionCode,
+    userId: req.userId ?? null,
   });
-
-  successRes(res, { list: toCuratedProductListPayload(doc.toObject()) }, 201);
+  return successRes(res, { list: data.list }, data.statusCode ?? 201);
 }
 
 /** PATCH /product/admin/curated-lists/reorder */
 export async function reorderCuratedProductListsAdminController(req, res) {
-  const orderedListIds = Array.isArray(req.body?.orderedListIds)
-    ? req.body.orderedListIds.map((id) => String(id))
-    : [];
-  if (!orderedListIds.length) {
-    return errorRes(res, 400, "Укажите orderedListIds");
-  }
-
-  await reorderCuratedProductLists(orderedListIds);
-  const hiddenSellerIds = await getHiddenSellerIds();
-  const lists = await CuratedProductListModel.find().sort(sortCuratedLists).lean();
-  const curatedLists = await buildAdminCuratedListsResponse(lists, hiddenSellerIds);
-  successRes(res, { lists: curatedLists });
+  const data = await reorderAdminCuratedProductLists({
+    orderedListIds: req.body?.orderedListIds,
+  });
+  return successRes(res, data);
 }
 
 /** PATCH /product/admin/curated-lists/:listId */
 export async function patchCuratedProductListAdminController(req, res) {
-  const listId = String(req.params.listId ?? "");
-  const doc = await CuratedProductListModel.findById(listId);
-  if (!doc) {
-    return errorRes(res, 404, "Список не найден");
-  }
-
-  if (req.body?.title !== undefined) {
-    const title = normalizeCuratedProductListTitle(req.body.title);
-    if (title.length > CURATED_PRODUCT_LIST_TITLE_MAX_LENGTH) {
-      return errorRes(res, 400, "Слишком длинный заголовок");
-    }
-    doc.title = title;
-  }
-
-  if (req.body?.regionCode !== undefined) {
-    doc.regionCode = normalizeCuratedProductListRegionCode(req.body.regionCode);
-  }
-
-  doc.updatedBy = req.userId ?? null;
-  await doc.save();
-  successRes(res, { list: toCuratedProductListPayload(doc.toObject()) });
+  const data = await patchCuratedProductList({
+    listId: req.params.listId,
+    title: req.body?.title,
+    regionCode: req.body?.regionCode,
+    userId: req.userId ?? null,
+  });
+  return successRes(res, data);
 }
 
 /** DELETE /product/admin/curated-lists/:listId */
 export async function deleteCuratedProductListAdminController(req, res) {
-  const listId = String(req.params.listId ?? "");
-  const deleted = await CuratedProductListModel.findByIdAndDelete(listId);
-  if (!deleted) {
-    return errorRes(res, 404, "Список не найден");
-  }
-  successRes(res, { deletedId: listId });
+  const data = await deleteCuratedProductList({ listId: req.params.listId });
+  return successRes(res, data);
 }
 
 /** POST /product/admin/curated-lists/:listId/products */
 export async function addCuratedProductListItemAdminController(req, res) {
-  const listId = String(req.params.listId ?? "");
-  const productId = String(req.body?.productId ?? "").trim();
-
-  const doc = await CuratedProductListModel.findById(listId);
-  if (!doc) {
-    return errorRes(res, 404, "Список не найден");
-  }
-
-  await assertCuratedListProductMatchesRegion(productId, doc.regionCode);
-
-  const existingIds = (doc.productIds ?? []).map((id) => String(id));
-  if (existingIds.includes(productId)) {
-    return errorRes(res, 409, "Товар уже есть в этом списке");
-  }
-
-  doc.productIds = [...existingIds, productId];
-  doc.updatedBy = req.userId ?? null;
-  await doc.save();
-
-  successRes(res, { list: toCuratedProductListPayload(doc.toObject()) });
+  const data = await addCuratedProductListItem({
+    listId: req.params.listId,
+    productId: req.body?.productId,
+    userId: req.userId ?? null,
+  });
+  return successRes(res, data);
 }
 
 /** DELETE /product/admin/curated-lists/:listId/products/:productId */
 export async function removeCuratedProductListItemAdminController(req, res) {
-  const listId = String(req.params.listId ?? "");
-  const productId = String(req.params.productId ?? "").trim();
-
-  const doc = await CuratedProductListModel.findById(listId);
-  if (!doc) {
-    return errorRes(res, 404, "Список не найден");
-  }
-
-  const nextIds = (doc.productIds ?? [])
-    .map((id) => String(id))
-    .filter((id) => id !== productId);
-
-  if (nextIds.length === (doc.productIds ?? []).length) {
-    return errorRes(res, 404, "Товар не найден в списке");
-  }
-
-  doc.productIds = nextIds;
-  doc.updatedBy = req.userId ?? null;
-  await doc.save();
-
-  successRes(res, { list: toCuratedProductListPayload(doc.toObject()) });
+  const data = await removeCuratedProductListItem({
+    listId: req.params.listId,
+    productId: req.params.productId,
+    userId: req.userId ?? null,
+  });
+  return successRes(res, data);
 }

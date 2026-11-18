@@ -1,15 +1,24 @@
-/** Способы оплаты — совпадают с `enum` в `server/constants/orderConstants.js`. */
-export const ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY = "cashOnDelivery";
-/** Значение в базе осталось `cardPrepaid` — это предоплата через площадку по СБП. */
-export const ORDER_PAYMENT_METHOD_CARD_PREPAID = "cardPrepaid";
-/** Перевод продавцу при получении — платформа денег не касается. */
-export const ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY = "cardOnDelivery";
-
-export const ORDER_PAYMENT_METHODS = [
-  ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
-  ORDER_PAYMENT_METHOD_CARD_PREPAID,
+import {
   ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY,
-] as const;
+  ORDER_PAYMENT_METHOD_CARD_PREPAID,
+  ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
+  ORDER_PAYMENT_METHODS as ORDER_PAYMENT_METHODS_CONTRACT,
+} from "@molha/api-contract";
+
+export {
+  ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
+  /** Значение в базе осталось `cardPrepaid` — предоплата через площадку по СБП. */
+  ORDER_PAYMENT_METHOD_CARD_PREPAID,
+  /** Перевод продавцу при получении — платформа денег не касается. */
+  ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY,
+};
+
+/** Литералы — `@molha/api-contract`; здесь UI/pure поверх них. */
+export const ORDER_PAYMENT_METHODS = ORDER_PAYMENT_METHODS_CONTRACT as readonly [
+  typeof ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
+  typeof ORDER_PAYMENT_METHOD_CARD_PREPAID,
+  typeof ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY,
+];
 
 export type OrderPaymentMethod = (typeof ORDER_PAYMENT_METHODS)[number];
 

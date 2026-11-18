@@ -92,6 +92,19 @@ describe("API-префиксы и nginx", () => {
       "docs/deploy/nginx-izibuy.conf.example отстал от списка префиксов",
     );
   });
+
+  it("образец конфига проксирует GET /health (app.get, не app.use)", () => {
+    const conf = readFileSync(EXAMPLE_CONF_PATH, "utf8");
+    const missing = findMissingPrefixes({
+      required: ["/health"],
+      conf,
+    });
+    assert.deepEqual(
+      missing,
+      [],
+      "location /health обязателен в nginx-izibuy.conf.example",
+    );
+  });
 });
 
 /**

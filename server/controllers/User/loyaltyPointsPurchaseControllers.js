@@ -1,32 +1,21 @@
-import { UserModel } from "../../models/index.js";
-import { errorRes, successRes } from "../../services/http/index.js";
-import { adminCreditOwnLoyaltyPoints } from "../../services/loyalty/adminCreditOwnLoyaltyPoints.js";
+import { successRes } from "../../services/http/index.js";
+import {
+  adminCreditOwnLoyaltyPoints,
+  getMyLoyaltyPointsStatus,
+} from "../../services/loyalty/adminCreditOwnLoyaltyPoints.js";
 
 export const getMyLoyaltyPointsStatusController = async (req, res) => {
-  const userId = String(req.userId);
-  const user = await UserModel.findById(userId)
-    .select("userLoyaltyPoints userLoyaltyPointsReserved")
-    .lean();
-
-  if (!user) {
-    return errorRes(res, 404, "Пользователь не найден");
-  }
-
-  return successRes(res, {
-    loyaltyPointsBalance: Number(user.userLoyaltyPoints) || 0,
-    loyaltyPointsReserved: Number(user.userLoyaltyPointsReserved) || 0,
+  const data = await getMyLoyaltyPointsStatus({
+    userId: String(req.userId),
   });
+  return successRes(res, data);
 };
 
 export const adminCreditOwnLoyaltyPointsController = async (req, res) => {
-  const userId = String(req.userId);
-  const amount = req.body.amount;
-  const idempotencyKey = req.body.idempotencyKey;
-
   const result = await adminCreditOwnLoyaltyPoints({
-    userId,
-    amount,
-    idempotencyKey,
+    userId: String(req.userId),
+    amount: req.body.amount,
+    idempotencyKey: req.body.idempotencyKey,
   });
 
   return successRes(res, {

@@ -12,6 +12,7 @@ import {
   PASSWORD_RESET_MAX_ATTEMPTS,
   PASSWORD_RESET_TOKEN_TTL_MS,
 } from "../../constants/passwordResetConstants.js";
+import { AppError } from "../../errors/AppError.js";
 import { isSmtpConfigured, sendSmtpMail } from "../../utils/smtpMail.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 import {
@@ -20,6 +21,9 @@ import {
 } from "./emailVerification.js";
 import { deliverPhoneVerificationSms } from "./phoneVerification.js";
 import { bumpUserAuthTokenVersion } from "./userAuthTokenVersion.js";
+
+const EMAIL_DELIVERY_UNAVAILABLE_MESSAGE =
+  "Не удалось отправить письмо. Попробуйте позже";
 
 const PASSWORD_RESET_CODE_PATTERN = new RegExp(`^\\d{${PASSWORD_RESET_CODE_LENGTH}}$`);
 
@@ -70,7 +74,7 @@ export async function deliverPasswordResetEmail({ email, userName, code }) {
 
   if (!isSmtpConfigured()) {
     if (isProduction) {
-      throw new Error("EMAIL_DELIVERY_UNAVAILABLE");
+      throw new AppError(503, EMAIL_DELIVERY_UNAVAILABLE_MESSAGE);
     }
     logServerEvent("info", {
       event: "password_reset_dev_code",
@@ -97,7 +101,7 @@ export async function deliverPasswordResetEmail({ email, userName, code }) {
       error: error instanceof Error ? error.message : String(error),
     });
     if (isProduction) {
-      throw new Error("EMAIL_DELIVERY_UNAVAILABLE");
+      throw new AppError(503, EMAIL_DELIVERY_UNAVAILABLE_MESSAGE);
     }
     logServerEvent("info", {
       event: "password_reset_fallback_code",
@@ -170,23 +174,23 @@ export async function requestPasswordReset({ email, phoneNumber }) {
 async function assertValidPasswordResetCode(user, rawCode) {
   const code = String(rawCode ?? "").trim();
   if (!PASSWORD_RESET_CODE_PATTERN.test(code)) {
-    throw new Error(PASSWORD_RESET_INVALID_CODE_MESSAGE);
+    throw new AppError(400, PASSWORD_RESET_INVALID_CODE_MESSAGE);
   }
 
   if ((user.passwordResetAttemptCount ?? 0) >= PASSWORD_RESET_MAX_ATTEMPTS) {
-    throw new Error(PASSWORD_RESET_ATTEMPTS_EXCEEDED_MESSAGE);
+    throw new AppError(400, PASSWORD_RESET_ATTEMPTS_EXCEEDED_MESSAGE);
   }
 
   const now = new Date();
   if (!user.passwordResetExpiresAt || user.passwordResetExpiresAt <= now) {
-    throw new Error(PASSWORD_RESET_INVALID_CODE_MESSAGE);
+    throw new AppError(400, PASSWORD_RESET_INVALID_CODE_MESSAGE);
   }
 
   if (user.passwordResetTokenHash !== hashEmailVerificationSecret(code)) {
     await UserModel.findByIdAndUpdate(user._id, {
       $inc: { passwordResetAttemptCount: 1 },
     });
-    throw new Error(PASSWORD_RESET_INVALID_CODE_MESSAGE);
+    throw new AppError(400, PASSWORD_RESET_INVALID_CODE_MESSAGE);
   }
 }
 
@@ -219,14 +223,14 @@ export async function confirmPasswordReset({ email, phoneNumber, code, newPasswo
 
   if (!user) {
     crypto.randomBytes(8);
-    throw new Error(PASSWORD_RESET_INVALID_CODE_MESSAGE);
+    throw new AppError(400, PASSWORD_RESET_INVALID_CODE_MESSAGE);
   }
 
   if (user.isBlockedUser) {
-    throw new Error("Аккаунт заблокирован");
+    throw new AppError(403, "Аккаунт заблокирован");
   }
   if (user.isActiveUser === false) {
-    throw new Error("Аккаунт отключён администратором");
+    throw new AppError(403, "Аккаунт отключён администратором");
   }
 
   await assertValidPasswordResetCode(user, code);
@@ -268,16 +272,16 @@ export async function changePasswordForUser(userId, { currentPassword, newPasswo
     "+passwordHash +authTokenVersion +passwordResetTokenHash +passwordResetExpiresAt",
   );
   if (!user) {
-    throw new Error(PASSWORD_CHANGE_INVALID_CURRENT_MESSAGE);
+    throw new AppError(400, PASSWORD_CHANGE_INVALID_CURRENT_MESSAGE);
   }
 
   if (!user.passwordHash) {
-    throw new Error(PASSWORD_CHANGE_NO_PASSWORD_MESSAGE);
+    throw new AppError(400, PASSWORD_CHANGE_NO_PASSWORD_MESSAGE);
   }
 
   const isValid = await bcrypt.compare(currentPassword, user.passwordHash);
   if (!isValid) {
-    throw new Error(PASSWORD_CHANGE_INVALID_CURRENT_MESSAGE);
+    throw new AppError(400, PASSWORD_CHANGE_INVALID_CURRENT_MESSAGE);
   }
 
   const salt = await bcrypt.genSalt(10);
