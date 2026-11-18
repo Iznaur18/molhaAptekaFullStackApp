@@ -28,14 +28,17 @@ export function CuratedCategoryCompactCard({ category, onOpen, showDetails = fal
       : null;
   const businessHours = String(category.sellerBusinessHoursLabel ?? "").trim();
   const isPersonal = category.kind === "personal";
+  const isUser = category.kind === "user";
   // У плитки продавца без своей картинки показываем название, а не общую заглушку:
   // иначе оплаченные плитки разных продавцов выглядят одинаково.
   const showLabelInsteadOfImage = isPersonal && (failed || !resolved);
-  const showTreeLabel = showDetails && !isPersonal;
+  const showTreeLabel = showDetails && category.kind === "tree";
+  const showUserLabel = showDetails && isUser;
   const showSellerMeta = showDetails && isPersonal;
   const showRating = showSellerMeta && ratingAverage != null;
   const hasDetails =
     showTreeLabel ||
+    showUserLabel ||
     (showSellerMeta &&
       (Boolean(sellerFullName) || showRating || Boolean(businessHours)));
 
@@ -79,7 +82,7 @@ export function CuratedCategoryCompactCard({ category, onOpen, showDetails = fal
             .filter(Boolean)
             .join(" ")}
         >
-          {showTreeLabel ? (
+          {showTreeLabel || showUserLabel ? (
             <span className="curated-category-compact-card__label">
               {category.label}
             </span>

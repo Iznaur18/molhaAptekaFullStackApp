@@ -65,7 +65,10 @@ export function PopularProductsAdminCategoriesTab() {
         list.items.some(
           (item) =>
             item.refId.toLowerCase().includes(query) ||
-            item.itemKey.toLowerCase().includes(query),
+            item.itemKey.toLowerCase().includes(query) ||
+            String(item.label ?? "")
+              .toLowerCase()
+              .includes(query),
         ),
     );
   }, [lists, searchQuery]);

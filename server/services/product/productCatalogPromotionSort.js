@@ -6,6 +6,7 @@ import {
 import {
   PRODUCT_SORT_DISCOUNT,
   PRODUCT_SORT_NEWEST,
+  PRODUCT_SORT_OLDEST,
   PRODUCT_SORT_PRICE_ASC,
   PRODUCT_SORT_PRICE_DESC,
   PRODUCT_SORT_PURCHASES,
@@ -83,6 +84,15 @@ export const catalogPromotionNewestSortKeys = {
   _promotionSortTier: -1,
   _promotionSortActivatedAt: -1,
   createdAt: -1,
+};
+
+/** Как newest, но `createdAt` ↑ — главная без `sort`. */
+export const catalogPromotionOldestSortKeys = {
+  _promotionGlobalTop: -1,
+  _promotionGlobalTopActivatedAt: -1,
+  _promotionSortTier: -1,
+  _promotionSortActivatedAt: -1,
+  createdAt: 1,
 };
 
 export const catalogReviewsSortKeys = {
@@ -172,7 +182,8 @@ export const buildCatalogPromotionSortStage = (sort, options = {}) => {
         },
       };
     }
-    // newest + search: ТОП выше релевантности поиска
+    // oldest/newest + search: ТОП выше релевантности поиска
+    const createdAtDir = sort === PRODUCT_SORT_OLDEST ? 1 : -1;
     return {
       $sort: {
         _promotionGlobalTop: -1,
@@ -180,7 +191,7 @@ export const buildCatalogPromotionSortStage = (sort, options = {}) => {
         [searchScoreField]: -1,
         _promotionSortTier: -1,
         _promotionSortActivatedAt: -1,
-        createdAt: -1,
+        createdAt: createdAtDir,
       },
     };
   }
@@ -193,6 +204,9 @@ export const buildCatalogPromotionSortStage = (sort, options = {}) => {
   }
   if (sort === PRODUCT_SORT_REVIEWS) {
     return { $sort: catalogReviewsSortKeys };
+  }
+  if (sort === PRODUCT_SORT_OLDEST) {
+    return { $sort: catalogPromotionOldestSortKeys };
   }
   if (sort !== PRODUCT_SORT_NEWEST) {
     return { $sort: { createdAt: -1 } };

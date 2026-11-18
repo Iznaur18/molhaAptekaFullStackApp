@@ -246,6 +246,11 @@
   color: var(--iz-color-danger);
 }
 
+.premium-page__buy-points {
+  align-self: stretch;
+  width: 100%;
+}
+
 .premium-page__actions {
   display: flex;
   flex-direction: column;

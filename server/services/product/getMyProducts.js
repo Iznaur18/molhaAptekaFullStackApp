@@ -1,5 +1,6 @@
 import {
   PRODUCT_CATALOG_REVIEWS_MIN_REVIEW_COUNT,
+  PRODUCT_SORT_NEWEST,
   PRODUCT_SORT_REVIEWS,
 } from "../../constants/productCatalogSort.js";
 import { getProductIdsWithOpenSales } from "./productOrderLocks.js";
@@ -40,7 +41,7 @@ export async function getMyProducts({ userId, query }) {
   const { page, limit, skip } = parsePagination(query);
   const category = categoryFromQuery(query);
   const reviewsOnly = query.sort === PRODUCT_SORT_REVIEWS;
-  const sort = parseProductSortFromQuery(query);
+  const sort = parseProductSortFromQuery(query, PRODUCT_SORT_NEWEST);
   const listFilter = parseMyProductsListFilter(query?.moderationStatus);
   const listFilterQuery = buildMyProductsListFilterQuery({ listFilter });
 

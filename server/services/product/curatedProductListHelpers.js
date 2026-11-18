@@ -191,9 +191,24 @@ const resolveOrderedListProducts = (list, productsById) => {
 };
 
 /**
+ * @param {unknown} product
+ * @param {Set<string>} closedSellerIdSet
+ */
+const isProductSellerClosedInSet = (product, closedSellerIdSet) => {
+  if (closedSellerIdSet.size === 0) {
+    return false;
+  }
+  const sellerId = String(product?.productSeller?._id ?? product?.productSeller ?? "");
+  return sellerId.length > 0 && closedSellerIdSet.has(sellerId);
+};
+
+/**
  * @param {import('mongoose').LeanDocument<import('../models/CuratedProductListModel.js').default>[]} lists
  * @param {string[]} hiddenSellerIds
- * @param {{ viewerRegionCode?: string | null }} [options]
+ * @param {{
+ *   viewerRegionCode?: string | null;
+ *   closedSellerIds?: unknown[];
+ * }} [options]
  */
 export const buildHomeCuratedListsResponse = async (
   lists,
@@ -204,6 +219,7 @@ export const buildHomeCuratedListsResponse = async (
     lists,
     options.viewerRegionCode,
   );
+  // Autopurge только по «мёртвым» товарам — не по графику (иначе вырежет насовсем).
   const purgedLists = await autopurgeCuratedProductLists(regionLists, hiddenSellerIds);
   const allProductIds = [
     ...new Set(
@@ -215,10 +231,15 @@ export const buildHomeCuratedListsResponse = async (
     hiddenSellerIds,
     options,
   );
+  const closedSellerIdSet = new Set(
+    (options.closedSellerIds ?? []).map((id) => String(id)),
+  );
 
   return purgedLists
     .map((list) => {
-      const products = resolveOrderedListProducts(list, productsById);
+      const products = resolveOrderedListProducts(list, productsById).filter(
+        (product) => !isProductSellerClosedInSet(product, closedSellerIdSet),
+      );
       return {
         ...toCuratedProductListPayload(list),
         products,

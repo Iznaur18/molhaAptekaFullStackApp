@@ -11,6 +11,7 @@ import {
   reorderCuratedProductLists,
   toCuratedProductListPayload,
 } from "../../services/product/curatedProductListHelpers.js";
+import { getClosedSellerIdsNow } from "../../services/product/getClosedSellerIdsNow.js";
 import { resolveViewerRegionCodeForRequest } from "../../services/user/userRegionCatalogFilter.js";
 import { errorRes, successRes } from "../../services/http/index.js";
 
@@ -18,17 +19,21 @@ const sortCuratedLists = { sortOrder: 1, createdAt: 1 };
 
 /** GET /product/curated-lists/home */
 export async function getHomeCuratedProductListsController(req, res) {
-  const hiddenSellerIds = await getHiddenSellerIds();
-  const viewerRegionCode = await resolveViewerRegionCodeForRequest({
-    userId: req.userId,
-    queryRegionCode: req.query.regionCode,
-  });
+  const [hiddenSellerIds, closedSellerIds, viewerRegionCode] = await Promise.all([
+    getHiddenSellerIds(),
+    getClosedSellerIdsNow({ excludeUserId: req.userId ?? null }),
+    resolveViewerRegionCodeForRequest({
+      userId: req.userId,
+      queryRegionCode: req.query.regionCode,
+    }),
+  ]);
 
   const lists = await CuratedProductListModel.find({ regionCode: viewerRegionCode })
     .sort(sortCuratedLists)
     .lean();
   const curatedLists = await buildHomeCuratedListsResponse(lists, hiddenSellerIds, {
     viewerRegionCode,
+    closedSellerIds,
   });
   successRes(res, { lists: curatedLists });
 }

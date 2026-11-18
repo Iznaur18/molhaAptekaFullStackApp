@@ -1,4 +1,6 @@
 /** Query `sort` для GET /product и GET /product/my */
+/** Главная без `sort`: сначала старые (`createdAt` ↑), промо сверху. */
+export const PRODUCT_SORT_OLDEST = "oldest";
 export const PRODUCT_SORT_NEWEST = "newest";
 export const PRODUCT_SORT_VIEWS = "views";
 export const PRODUCT_SORT_PURCHASES = "purchases";
@@ -37,6 +39,7 @@ export const PRODUCT_SORTS_WITHOUT_BOOST = [
 export const PRODUCT_CATALOG_REVIEWS_MIN_REVIEW_COUNT = 1;
 
 export const PRODUCT_SORT_VALUES = [
+  PRODUCT_SORT_OLDEST,
   PRODUCT_SORT_NEWEST,
   PRODUCT_SORT_VIEWS,
   PRODUCT_SORT_PURCHASES,

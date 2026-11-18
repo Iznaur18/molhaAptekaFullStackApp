@@ -42,7 +42,7 @@ describe("catalogFiltersDraft", () => {
       applyCatalogFiltersDraft(applied, createEmptyCatalogFiltersDraft()),
     ).toMatchObject({
       categoryId: CATEGORY_ID,
-      sort: "newest",
+      sort: "oldest",
       saleOnly: false,
       priceMax: null,
       delivery: [],

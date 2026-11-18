@@ -4,6 +4,7 @@ import { isCatalogBrowserLandingSearch } from "../../../entities/product-categor
 import { IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED } from "../../../entities/product-category-tree/lib/isCatalogBrowserSubcategoryFilterEnabled.js";
 import {
   CATALOG_SORT_CONFIRMED,
+  CATALOG_SORT_DEFAULT,
   CATALOG_SORT_NEWEST,
   CATALOG_SORT_PREMIUM,
   CATALOG_SORT_VIEWS,
@@ -51,7 +52,7 @@ export function useCatalogFilterState({
   );
   const [categoryTreeLabel, setCategoryTreeLabel] = useState(null);
   const [catalogSort, setCatalogSort] = useState(
-    () => initialCatalogQuery?.sort ?? CATALOG_SORT_NEWEST,
+    () => initialCatalogQuery?.sort ?? CATALOG_SORT_DEFAULT,
   );
   const [catalogFollowingOnly, setCatalogFollowingOnly] = useState(
     () => initialCatalogQuery?.followingOnly ?? false,

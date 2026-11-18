@@ -2779,6 +2779,7 @@ export const PREMIUM_PAGE_UI = {
     `Недостаточно баллов: нужно ${required}, у вас ${balance}.`,
   SUBMIT: "Оформить премиум",
   SUBMIT_PENDING: "Оформляем…",
+  BUY_POINTS: "Купить баллы",
 } as const;
 
 export const LOYALTY_POINTS_PAGE_UI = {

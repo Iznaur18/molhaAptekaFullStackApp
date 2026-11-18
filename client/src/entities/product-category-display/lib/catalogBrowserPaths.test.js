@@ -27,19 +27,19 @@ const baseQuery = {
 describe("buildCatalogProductsLocation", () => {
   it("routes filtered products to home when compact", () => {
     expect(buildCatalogProductsLocation(baseQuery, { compact: true })).toBe(
-      "/?categoryId=64aaaaaaaaaaaaaaaaaaaaaa",
+      "/?sort=newest&categoryId=64aaaaaaaaaaaaaaaaaaaaaa",
     );
   });
 
   it("routes filtered products to /catalog on desktop", () => {
     expect(buildCatalogProductsLocation(baseQuery)).toBe(
-      "/catalog?categoryId=64aaaaaaaaaaaaaaaaaaaaaa",
+      "/catalog?sort=newest&categoryId=64aaaaaaaaaaaaaaaaaaaaaa",
     );
   });
 
   it("buildCatalogBrowserLocation always uses /catalog", () => {
     expect(buildCatalogBrowserLocation(baseQuery)).toBe(
-      "/catalog?categoryId=64aaaaaaaaaaaaaaaaaaaaaa",
+      "/catalog?sort=newest&categoryId=64aaaaaaaaaaaaaaaaaaaaaa",
     );
   });
 
@@ -50,6 +50,6 @@ describe("buildCatalogProductsLocation", () => {
         categoryId: null,
         near: true,
       }),
-    ).toBe("/catalog?near=true");
+    ).toBe("/catalog?sort=newest&near=true");
   });
 });

@@ -1,21 +1,10 @@
-import {
-  CURATED_PRODUCT_LIST_HOME_CARD_GAP_PX,
-  CURATED_PRODUCT_LIST_HOME_VISIBLE_CARD_MAX,
-} from "../../curated-product-list/lib/curatedProductListHomeLayout.js";
+import { CURATED_PRODUCT_LIST_HOME_CARD_GAP_PX } from "../../curated-product-list/lib/curatedProductListHomeLayout.js";
 
-/** Превью 172×86 (2:1) при базовой высоте карточки товара 86px. */
-export const CURATED_CATEGORY_LIST_HOME_CARD_WIDTH_SCALE = 2;
-
+/** Превью категории на главной: ~160×120 (4:3), visible ≈ 2.2. */
 export { CURATED_PRODUCT_LIST_HOME_CARD_GAP_PX as CURATED_CATEGORY_LIST_HOME_CARD_GAP_PX };
 
-export const CURATED_CATEGORY_LIST_HOME_VISIBLE_CARD_MAX = Math.max(
-  1,
-  Math.round(
-    CURATED_PRODUCT_LIST_HOME_VISIBLE_CARD_MAX /
-      CURATED_CATEGORY_LIST_HOME_CARD_WIDTH_SCALE,
-  ),
-);
+export const CURATED_CATEGORY_LIST_HOME_VISIBLE_CARD_MAX = 2.2;
 
-export const CURATED_CATEGORY_LIST_HOME_CARD_MIN_WIDTH_PX = 172;
+export const CURATED_CATEGORY_LIST_HOME_CARD_MIN_WIDTH_PX = 200;
 
-export const CURATED_CATEGORY_LIST_HOME_CARD_MAX_WIDTH_PX = 336;
+export const CURATED_CATEGORY_LIST_HOME_CARD_MAX_WIDTH_PX = 280;

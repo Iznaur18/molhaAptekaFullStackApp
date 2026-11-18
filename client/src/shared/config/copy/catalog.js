@@ -52,7 +52,7 @@ export const HOME_PAGE_UI = {
   CATALOG_HOME_SECTION_SELLERS_SEARCH_ARIA: "Поиск продавцов на главной",
   CATALOG_HOME_SECTION_SELLERS_SEARCH_CLEAR_ARIA: "Очистить поиск продавцов",
   CATALOG_HOME_SECTION_SELLERS_SEARCH_EMPTY: "Никого не нашли по запросу",
-  CATALOG_HOME_SECTION_CATEGORIES: "Категории",
+  CATALOG_HOME_SECTION_CATEGORIES: "Каталог",
   CATALOG_HOME_SECTION_CATEGORIES_EMPTY: "Здесь пока нет категорий",
   CATALOG_HOME_SECTION_SELLER_STORES: "Магазины продавцов",
   CATALOG_HOME_SECTION_BOOST_PRODUCTS: "Буст продвижение",
@@ -121,6 +121,7 @@ export const HOME_PAGE_UI = {
   CATALOG_FILTERS_SHEET_NOTHING_FOUND: "Ничего не найдено",
   /** Подписи вариантов окна фильтров (ключ — параметр адреса или значение `sort`). */
   CATALOG_FILTERS_SHEET_OPTION: {
+    oldest: "Сначала старые",
     newest: "Новинки",
     purchases: "Популярные",
     price_asc: "Дешевле",
@@ -420,6 +421,7 @@ export const CURATED_PRODUCT_COMPACT_CARD_UI = {
 
 /** Заголовок карусели подборки на главной */
 export const CURATED_LIST_CAROUSEL_UI = {
+  VIEW_ALL: "Все",
   /** @param {string} listTitle */
   VIEW_ALL_ARIA: (listTitle) => `Все из подборки «${listTitle}»`,
   SHEET_CLOSE_ARIA: "Закрыть подборку",

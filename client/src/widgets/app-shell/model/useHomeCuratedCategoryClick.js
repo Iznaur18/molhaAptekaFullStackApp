@@ -19,8 +19,8 @@ export function useHomeCuratedCategoryClick({
 }) {
   return useCallback(
     (category) => {
-      if (category.kind === "personal") {
-        const sellerId = category.sellerId?.trim();
+      if (category.kind === "personal" || category.kind === "user") {
+        const sellerId = category.sellerId?.trim() || category.refId?.trim();
         if (sellerId) {
           navigate(buildSellerProductsPath(sellerId));
           return;

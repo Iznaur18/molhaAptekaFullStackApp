@@ -10,9 +10,8 @@ import "./CuratedProductCompactCard.css";
 import "./CuratedProductListCarouselSkeleton.css";
 
 /**
- * Плейсхолдер карусели подборок на время загрузки. Использует те же
- * классы и layout-константы, что и реальная карусель, чтобы каталог
- * под ней не сдвигался после ответа API (CLS).
+ * Плейсхолдер карусели подборок на время загрузки. Шапка + ряд карточек —
+ * те же классы/константы, что у реальной карусели (CLS).
  */
 export function CuratedProductListCarouselSkeleton() {
   return (
@@ -26,6 +25,10 @@ export function CuratedProductListCarouselSkeleton() {
         "--curated-card-max-width": `${CURATED_PRODUCT_LIST_HOME_CARD_MAX_WIDTH_PX}px`,
       }}
     >
+      <div className="curated-product-list-carousel__header">
+        <span className="curated-product-list-carousel-skeleton__title curated-product-list-carousel-skeleton__shimmer" />
+        <span className="curated-product-list-carousel-skeleton__view-all curated-product-list-carousel-skeleton__shimmer" />
+      </div>
       <div className="curated-product-list-carousel__scroll">
         <ul className="curated-product-list-carousel__track" role="list">
           {Array.from(

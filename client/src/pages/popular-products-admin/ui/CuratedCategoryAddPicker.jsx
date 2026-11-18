@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { USER_SEARCH_MIN_LENGTH } from "@molha/api-contract";
 
 import { buildCatalogSubcategoryPickerTiles } from "../../../entities/product-category-display/lib/buildCatalogSubcategoryPickerTiles.js";
 import { buildResolvedProductCategoryDisplaysFromRoots } from "../../../entities/product-category-display/lib/resolveProductCategoryDisplay.js";
@@ -7,10 +8,16 @@ import { CatalogCategoryTilesGridSkeleton } from "../../../entities/product-cate
 import { useProductCategoryLevelQuery } from "../../../entities/product-category-tree/model/useProductCategoryLevelQuery.js";
 import { useProductCategorySearchQuery } from "../../../entities/product-category-tree/model/useProductCategorySearchQuery.js";
 import { useSellerPersonalCategoryCatalogTilesQuery } from "../../../entities/seller-personal-category/model/useSellerPersonalCategoryCatalogTilesQuery.js";
+import { useUsersSearchQuery } from "../../../entities/user/model/useUsersSearchQuery.js";
+import { resolveUploadedImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { PRODUCT_CATEGORY_TREE_UI } from "../../../shared/config/appUiCopy.js";
 import { POPULAR_CATEGORIES_ADMIN_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./CuratedCategoryAddPicker.css";
+
+/**
+ * @typedef {"tree" | "personal" | "user"} CuratedCategoryAddKind
+ */
 
 /**
  * @param {import('../../../entities/product-category-tree/model/types.js').ProductCategoryNode} node
@@ -24,12 +31,26 @@ function formatCategoryPath(node) {
 }
 
 /**
+ * @param {string} value
+ * @returns {CuratedCategoryAddKind}
+ */
+function normalizeKind(value) {
+  if (value === "personal") {
+    return "personal";
+  }
+  if (value === "user") {
+    return "user";
+  }
+  return "tree";
+}
+
+/**
  * @param {{
- *   kind: "tree" | "personal";
- *   onKindChange: (kind: "tree" | "personal") => void;
+ *   kind: CuratedCategoryAddKind;
+ *   onKindChange: (kind: CuratedCategoryAddKind) => void;
  *   listRegionCode: string;
  *   selectedRefId: string;
- *   onSelect: (payload: { kind: "tree" | "personal"; refId: string; label: string }) => void;
+ *   onSelect: (payload: { kind: CuratedCategoryAddKind; refId: string; label: string }) => void;
  *   disabled?: boolean;
  * }} props
  */
@@ -42,6 +63,8 @@ export function CuratedCategoryAddPicker({
   disabled = false,
 }) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [userSearchDraft, setUserSearchDraft] = useState("");
+  const [submittedUserSearch, setSubmittedUserSearch] = useState("");
   const [trail, setTrail] = useState(
     /** @type {{ id: string; labelRu: string }[]} */ ([]),
   );
@@ -53,6 +76,14 @@ export function CuratedCategoryAddPicker({
   const personalTilesQuery = useSellerPersonalCategoryCatalogTilesQuery({
     enabled: kind === "personal",
     regionCode: listRegionCode,
+  });
+  const submittedUserSearchNormalized = submittedUserSearch.trim();
+  const canFetchSubmittedUsers =
+    kind === "user" &&
+    submittedUserSearchNormalized.length >= USER_SEARCH_MIN_LENGTH;
+  const usersSearch = useUsersSearchQuery({
+    search: submittedUserSearchNormalized,
+    enabled: canFetchSubmittedUsers,
   });
 
   const activeParentId = trail.length === 0 ? null : trail[trail.length - 1].id;
@@ -69,6 +100,7 @@ export function CuratedCategoryAddPicker({
   const personalTiles = personalTilesQuery.data ?? [];
   const treeOptions = levelQuery.categories;
   const displays = displaysQuery.data ?? [];
+  const users = usersSearch.users;
 
   const treeTiles = useMemo(() => {
     if (activeParentId == null) {
@@ -131,6 +163,18 @@ export function CuratedCategoryAddPicker({
     setTrail((prev) => prev.slice(0, -1));
   };
 
+  const handleSelectUser = (user) => {
+    const nickname = String(user.userName ?? "").trim();
+    if (!nickname) {
+      return;
+    }
+    onSelect({
+      kind: "user",
+      refId: String(user._id),
+      label: nickname,
+    });
+  };
+
   return (
     <div className="curated-category-add-picker">
       <label className="curated-category-add-picker__kind">
@@ -139,8 +183,10 @@ export function CuratedCategoryAddPicker({
           className="curated-category-add-picker__input"
           value={kind}
           onChange={(event) => {
-            onKindChange(event.target.value === "personal" ? "personal" : "tree");
+            onKindChange(normalizeKind(event.target.value));
             setSearchQuery("");
+            setUserSearchDraft("");
+            setSubmittedUserSearch("");
             setTrail([]);
           }}
           disabled={disabled}
@@ -150,6 +196,9 @@ export function CuratedCategoryAddPicker({
           </option>
           <option value="personal">
             {POPULAR_CATEGORIES_ADMIN_PAGE_UI.CATEGORY_KIND_PERSONAL}
+          </option>
+          <option value="user">
+            {POPULAR_CATEGORIES_ADMIN_PAGE_UI.CATEGORY_KIND_USER}
           </option>
         </select>
       </label>
@@ -299,7 +348,9 @@ export function CuratedCategoryAddPicker({
             </button>
           ) : null}
         </>
-      ) : (
+      ) : null}
+
+      {kind === "personal" ? (
         <label className="curated-category-add-picker__personal">
           {POPULAR_CATEGORIES_ADMIN_PAGE_UI.PERSONAL_CATEGORY_LABEL}
           <select
@@ -331,7 +382,126 @@ export function CuratedCategoryAddPicker({
             ))}
           </select>
         </label>
-      )}
+      ) : null}
+
+      {kind === "user" ? (
+        <>
+          <form
+            className="curated-category-add-picker__user-search"
+            onSubmit={(event) => {
+              event.preventDefault();
+              const next = userSearchDraft.trim();
+              if (next.length < USER_SEARCH_MIN_LENGTH) {
+                setSubmittedUserSearch("");
+                return;
+              }
+              setSubmittedUserSearch(next);
+            }}
+          >
+            <label className="curated-category-add-picker__search">
+              {POPULAR_CATEGORIES_ADMIN_PAGE_UI.USER_SEARCH_LABEL}
+              <input
+                className="curated-category-add-picker__input"
+                value={userSearchDraft}
+                onChange={(event) => setUserSearchDraft(event.target.value)}
+                placeholder={POPULAR_CATEGORIES_ADMIN_PAGE_UI.USER_SEARCH_PLACEHOLDER}
+                disabled={disabled}
+              />
+            </label>
+            <button
+              type="submit"
+              className="app-btn app-btn--secondary curated-category-add-picker__user-search-submit"
+              disabled={disabled}
+            >
+              {POPULAR_CATEGORIES_ADMIN_PAGE_UI.USER_SEARCH_SUBMIT}
+            </button>
+          </form>
+
+          <div className="curated-category-add-picker__results">
+            {!canFetchSubmittedUsers &&
+            userSearchDraft.trim().length > 0 &&
+            userSearchDraft.trim().length < USER_SEARCH_MIN_LENGTH ? (
+              <p className="curated-category-add-picker__hint">
+                {POPULAR_CATEGORIES_ADMIN_PAGE_UI.USER_SEARCH_TOO_SHORT}
+              </p>
+            ) : null}
+            {!canFetchSubmittedUsers &&
+            userSearchDraft.trim().length === 0 &&
+            submittedUserSearchNormalized.length === 0 ? (
+              <p className="curated-category-add-picker__hint">
+                {POPULAR_CATEGORIES_ADMIN_PAGE_UI.USER_SEARCH_HINT}
+              </p>
+            ) : null}
+            {canFetchSubmittedUsers && usersSearch.phase === "loading" ? (
+              <p className="curated-category-add-picker__hint">
+                {POPULAR_CATEGORIES_ADMIN_PAGE_UI.USER_SEARCH_LOADING}
+              </p>
+            ) : null}
+            {canFetchSubmittedUsers && usersSearch.error ? (
+              <p className="curated-category-add-picker__error" role="alert">
+                {usersSearch.error}
+              </p>
+            ) : null}
+            {canFetchSubmittedUsers &&
+            usersSearch.phase === "success" &&
+            users.length === 0 ? (
+              <p className="curated-category-add-picker__hint">
+                {POPULAR_CATEGORIES_ADMIN_PAGE_UI.USER_SEARCH_EMPTY}
+              </p>
+            ) : null}
+            {canFetchSubmittedUsers && users.length > 0 ? (
+              <ul className="curated-category-add-picker__results-list" role="list">
+                {users.map((user) => {
+                  const nickname = String(user.userName ?? "").trim();
+                  const avatarUrl = user.userAvatarUrl
+                    ? resolveUploadedImageUrl(user.userAvatarUrl)
+                    : null;
+
+                  return (
+                    <li
+                      key={user._id}
+                      className="curated-category-add-picker__results-item"
+                    >
+                      <button
+                        type="button"
+                        className={[
+                          "curated-category-add-picker__result-btn",
+                          "curated-category-add-picker__result-btn--user",
+                          selectedRefId === user._id &&
+                            "curated-category-add-picker__result-btn_selected",
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
+                        disabled={disabled || !nickname}
+                        onClick={() => handleSelectUser(user)}
+                      >
+                        {avatarUrl ? (
+                          <img
+                            className="curated-category-add-picker__user-avatar"
+                            src={avatarUrl}
+                            alt=""
+                            loading="lazy"
+                            decoding="async"
+                            draggable={false}
+                          />
+                        ) : (
+                          <span
+                            className="curated-category-add-picker__user-avatar curated-category-add-picker__user-avatar--empty"
+                            aria-hidden="true"
+                          />
+                        )}
+                        <span className="curated-category-add-picker__result-label">
+                          {nickname || user._id}
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : null}
+          </div>
+        </>
+      ) : null}
 
       {kind === "personal" && personalTilesQuery.isError ? (
         <p className="curated-category-add-picker__error" role="alert">

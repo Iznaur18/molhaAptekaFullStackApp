@@ -15,6 +15,7 @@ import {
 
 /** Паритет с `client/.../productConstants.js` → `CATALOG_SORT_LABEL_RU`. */
 const CATALOG_SORT_LABEL_RU: Record<string, string> = {
+  oldest: "Сначала старые",
   [CATALOG_SORT_NEWEST]: "Новинки",
   views: "По просмотрам",
   purchases: "Больше всего купили",

@@ -1,8 +1,9 @@
 /**
  * @typedef {Object} CuratedCategoryListItemFromApi
- * @property {"tree" | "personal"} kind
+ * @property {"tree" | "personal" | "user"} kind
  * @property {string} refId
  * @property {string} itemKey
+ * @property {string | null} [label]
  */
 
 /**
@@ -18,7 +19,7 @@
 
 /**
  * @typedef {Object} HomeCuratedCategoryFromApi
- * @property {"tree" | "personal"} kind
+ * @property {"tree" | "personal" | "user"} kind
  * @property {string} refId
  * @property {string} itemKey
  * @property {string} label
@@ -37,7 +38,7 @@
 
 /**
  * @typedef {Object} CuratedCategoryListItemPreviewFromApi
- * @property {"tree" | "personal"} kind
+ * @property {"tree" | "personal" | "user"} kind
  * @property {string} refId
  * @property {string} label
  * @property {string | null} imageUrl

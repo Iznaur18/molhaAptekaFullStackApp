@@ -9,7 +9,10 @@ import {
   pickCatalogExtraFilters,
 } from "@izibuy/shared-lib";
 
-import { CATALOG_SORT_NEWEST, PRODUCT_CATEGORIES } from "../model/productConstants.js";
+import {
+  CATALOG_SORT_DEFAULT,
+  PRODUCT_CATEGORIES,
+} from "../model/productConstants.js";
 
 // Разбор фильтров окна общий с приложением — живёт в shared-lib.
 export {
@@ -69,7 +72,7 @@ const parseCatalogSort = (raw) => {
   if (raw && PRODUCT_CATALOG_SORT_VALUES.includes(raw)) {
     return raw;
   }
-  return CATALOG_SORT_NEWEST;
+  return CATALOG_SORT_DEFAULT;
 };
 
 /**
@@ -297,7 +300,7 @@ export function buildCatalogSearchParams(query) {
   } = query;
   const params = new URLSearchParams();
 
-  if (sort !== CATALOG_SORT_NEWEST) {
+  if (sort !== CATALOG_SORT_DEFAULT) {
     params.set(CATALOG_QUERY_PARAM_SORT, sort);
   }
   if (sellerPersonalCategoryId) {
@@ -350,8 +353,8 @@ export function buildCatalogSearchParams(query) {
 
 /**
  * Query для `/catalog`.
- * По умолчанию `sort=newest` не пишется — лендинг (`/catalog` без query).
- * `omitDefaultSort: false` — явная лента «Новинки» (`/catalog?sort=newest`).
+ * По умолчанию `sort=oldest` не пишется — лендинг (`/catalog` без query).
+ * `omitDefaultSort: false` — явная лента (`/catalog?sort=oldest` или `newest`).
  *
  * @param {CatalogQuery} query
  * @param {{ omitDefaultSort?: boolean }} [options]
@@ -379,7 +382,7 @@ export function buildCatalogBrowserSearchParams(
   } = query;
   const params = new URLSearchParams();
 
-  if (sort !== CATALOG_SORT_NEWEST || !omitDefaultSort) {
+  if (sort !== CATALOG_SORT_DEFAULT || !omitDefaultSort) {
     params.set(CATALOG_QUERY_PARAM_SORT, sort);
   }
 

@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { usePurchasePremiumMutation } from "../../../entities/user/model/usePurchasePremiumMutation.js";
 import { useMyPremiumStatusQuery } from "../../../entities/user/model/useMyPremiumStatusQuery.js";
 import { UserPremiumVerifiedBadge } from "../../../entities/user/ui/UserPremiumVerifiedBadge.jsx";
 import { PREMIUM_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { mainViewToPathname } from "../../../shared/lib/homeMainViewPaths.js";
 import { pluralizeRuBall } from "../../../shared/lib/pluralizeRuBall.js";
 
 import "./PremiumPage.css";
@@ -100,6 +102,7 @@ function ErrorIcon() {
  * }} props
  */
 export function PremiumPage({ isAuthorized, onRequestLogin, onPurchased }) {
+  const navigate = useNavigate();
   const purchasePremiumMutation = usePurchasePremiumMutation();
   const statusQuery = useMyPremiumStatusQuery({ enabled: isAuthorized });
   const [feedback, setFeedback] = useState("");
@@ -223,6 +226,16 @@ export function PremiumPage({ isAuthorized, onRequestLogin, onPurchased }) {
           {PREMIUM_PAGE_UI.BALANCE(loyaltyPointsBalance)}
         </p>
       </div>
+
+      <button
+        type="button"
+        className="app-btn app-btn--primary premium-page__buy-points"
+        onClick={() => {
+          navigate(mainViewToPathname("loyalty-points"));
+        }}
+      >
+        {PREMIUM_PAGE_UI.BUY_POINTS}
+      </button>
 
       {isActive ? (
         <div className="premium-page__banner premium-page__banner_ok" role="status">

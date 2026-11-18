@@ -8,6 +8,7 @@ import { getHiddenSellerIds } from "../access/adminUserGuard.js";
 import { buildProductRegionMatch } from "../user/userRegionCatalogFilter.js";
 import { attachProductSellerSnapshots } from "./attachProductSellerSnapshots.js";
 import { buildCatalogVisibleProductFilter } from "./curatedProductListHelpers.js";
+import { getClosedSellerIdsNow } from "./getClosedSellerIdsNow.js";
 import { enrichProductApiFields } from "./productDiscount.js";
 
 /**
@@ -34,16 +35,27 @@ export const BOOST_PRODUCTS_SORT = { catalogPromotionActivatedAt: -1, _id: -1 };
 /**
  * Товары с действующим «Бустом» в регионе зрителя — ряд на главной.
  * Отдаёт те же каталожные карточки, что и подборки товаров.
+ * Закрытые по графику продавцы скрыты (свои — видны).
  *
- * @param {{ viewerRegionCode?: string | null }} [input]
+ * @param {{
+ *   viewerRegionCode?: string | null;
+ *   viewerUserId?: string | null;
+ * }} [input]
  */
-export async function getProductPromotionBoostProducts({ viewerRegionCode } = {}) {
-  const hiddenSellerIds = await getHiddenSellerIds();
+export async function getProductPromotionBoostProducts({
+  viewerRegionCode,
+  viewerUserId = null,
+} = {}) {
+  const [hiddenSellerIds, closedSellerIds] = await Promise.all([
+    getHiddenSellerIds(),
+    getClosedSellerIdsNow({ excludeUserId: viewerUserId }),
+  ]);
+  const excludeSellerIds = [...hiddenSellerIds, ...closedSellerIds];
   const rows = await ProductModel.find(
     buildActiveBoostProductsMatch({
       now: new Date(),
       viewerRegionCode: String(viewerRegionCode ?? ""),
-      hiddenSellerIds,
+      hiddenSellerIds: excludeSellerIds,
     }),
   )
     .sort(BOOST_PRODUCTS_SORT)

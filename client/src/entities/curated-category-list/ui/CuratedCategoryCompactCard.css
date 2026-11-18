@@ -18,9 +18,6 @@
   border: 1px solid var(--iz-color-border);
   border-radius: 1.4rem;
   background: var(--iz-color-surface-elevated);
-  transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
 }
 
 @supports (corner-shape: squircle) {
@@ -28,11 +25,6 @@
     border-radius: 1.5rem;
     corner-shape: squircle;
   }
-}
-
-.curated-category-compact-card:hover .curated-category-compact-card__image-wrap {
-  border-color: var(--iz-color-accent-soft);
-  box-shadow: 0 8px 20px var(--iz-color-accent-shadow);
 }
 
 .curated-category-compact-card__image {

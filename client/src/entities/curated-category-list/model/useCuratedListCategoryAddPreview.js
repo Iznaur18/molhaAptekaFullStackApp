@@ -6,7 +6,7 @@ import { curatedCategoryListQueryKeys } from "./curatedCategoryListQueryKeys.js"
 const REF_ID_RE = /^[a-f\d]{24}$/i;
 
 /**
- * @param {"tree" | "personal"} kind
+ * @param {"tree" | "personal" | "user"} kind
  * @param {string} refIdDraft
  */
 export function useCuratedListCategoryAddPreview(kind, refIdDraft) {

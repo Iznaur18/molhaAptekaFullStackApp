@@ -1,8 +1,8 @@
-import { CATALOG_SORT_NEWEST } from "../../../entities/product/model/productConstants.js";
+import { CATALOG_SORT_DEFAULT } from "../../../entities/product/model/productConstants.js";
 
 /** @type {ReturnType<typeof import('../../../entities/product/lib/catalogCatalogQuery.js').parseCatalogQueryFromSearchParams>} */
 export const CATALOG_LANDING_QUERY = {
-  sort: CATALOG_SORT_NEWEST,
+  sort: CATALOG_SORT_DEFAULT,
   category: null,
   categoryId: null,
   sellerPersonalCategoryId: null,

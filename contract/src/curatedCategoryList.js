@@ -6,7 +6,7 @@ import { requiredRuRegionCodeFieldSchema } from "./ruRegions.js";
 
 export const CURATED_CATEGORY_LIST_TITLE_MAX_LENGTH = 60;
 
-export const CURATED_CATEGORY_ITEM_KINDS = ["tree", "personal"];
+export const CURATED_CATEGORY_ITEM_KINDS = ["tree", "personal", "user"];
 
 const curatedCategoryListTitleSchema = z
   .string()
@@ -63,7 +63,7 @@ export function formatCuratedCategoryRegionMismatchMessage(
 }
 
 /**
- * @param {"tree" | "personal"} kind
+ * @param {"tree" | "personal" | "user"} kind
  * @param {string} refId
  */
 export function buildCuratedCategoryItemKey(kind, refId) {

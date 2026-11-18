@@ -59,6 +59,8 @@ test("ratingMin — только 3, 4 или 5", () => {
 
 test("новые сортировки и флаги принимаются, старые sort=premium/confirmed — тоже", () => {
   for (const sort of [
+    "oldest",
+    "newest",
     "price_asc",
     "price_desc",
     "rating",

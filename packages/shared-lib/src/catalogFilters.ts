@@ -9,12 +9,14 @@ import {
  * применённые фильтры — снаружи (адрес страницы на web, состояние экрана в приложении).
  */
 
-/** Порядок по умолчанию: «Новинки». */
-export const CATALOG_FILTERS_DEFAULT_SORT = "newest";
-const CATALOG_SORT_NEWEST = CATALOG_FILTERS_DEFAULT_SORT;
+/** Порядок по умолчанию на главной без `sort`: «Сначала старые». */
+export const CATALOG_FILTERS_DEFAULT_SORT = "oldest";
+const CATALOG_SORT_OLDEST = CATALOG_FILTERS_DEFAULT_SORT;
+const CATALOG_SORT_NEWEST = "newest";
 
 /** Сортировки окна фильтров («По просмотрам» осталась только в адресе web). */
 export const CATALOG_FILTERS_SHEET_SORTS = [
+  CATALOG_SORT_OLDEST,
   CATALOG_SORT_NEWEST,
   "purchases",
   "price_asc",
@@ -180,7 +182,7 @@ export function createCatalogFiltersDraft(
 ): CatalogFiltersDraft {
   const extra = pickCatalogExtraFilters(query);
   const draft = {
-    sort: typeof query.sort === "string" ? query.sort : CATALOG_SORT_NEWEST,
+    sort: typeof query.sort === "string" ? query.sort : CATALOG_SORT_OLDEST,
     priceMin: extra.priceMin,
     priceMax: extra.priceMax,
     delivery: extra.delivery,
@@ -194,7 +196,7 @@ export function createCatalogFiltersDraft(
 
 /** «Сбросить»: всё по умолчанию. Поиск и категория в окне не хранятся. */
 export function createEmptyCatalogFiltersDraft(): CatalogFiltersDraft {
-  return createCatalogFiltersDraft({ sort: CATALOG_SORT_NEWEST });
+  return createCatalogFiltersDraft({ sort: CATALOG_SORT_OLDEST });
 }
 
 export function areCatalogFiltersDraftsEqual(

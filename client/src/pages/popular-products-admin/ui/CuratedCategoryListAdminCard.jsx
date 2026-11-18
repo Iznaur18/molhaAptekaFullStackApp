@@ -4,6 +4,7 @@ import { DEFAULT_VIEWER_REGION_CODE } from "@molha/api-contract";
 import { resolveCuratedAddCategoryBlockReason } from "../../../entities/curated-category-list/lib/resolveCuratedAddCategoryBlockReason.js";
 import { useCuratedListCategoryAddPreview } from "../../../entities/curated-category-list/model/useCuratedListCategoryAddPreview.js";
 import { RuRegionSelect } from "../../../entities/region/ui/RuRegionSelect.jsx";
+import { resolveUploadedImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { POPULAR_CATEGORIES_ADMIN_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
 import { CuratedCategoryAddPicker } from "./CuratedCategoryAddPicker.jsx";
@@ -19,10 +20,20 @@ import "./CuratedCategoryListAdminCard.css";
  *   onMoveDown: () => void;
  *   onDeleteList: () => void;
  *   onSaveList: (payload: { title: string; regionCode: string }) => Promise<void>;
- *   onAddCategory: (payload: { kind: "tree" | "personal"; refId: string }) => Promise<void>;
+ *   onAddCategory: (payload: { kind: "tree" | "personal" | "user"; refId: string }) => Promise<void>;
  *   onRemoveCategory: (itemKey: string) => Promise<void>;
  * }} props
  */
+function formatAdminItemKindLabel(kind) {
+  if (kind === "personal") {
+    return POPULAR_CATEGORIES_ADMIN_PAGE_UI.KIND_LABEL_PERSONAL;
+  }
+  if (kind === "user") {
+    return POPULAR_CATEGORIES_ADMIN_PAGE_UI.KIND_LABEL_USER;
+  }
+  return POPULAR_CATEGORIES_ADMIN_PAGE_UI.KIND_LABEL_TREE;
+}
+
 export function CuratedCategoryListAdminCard({
   list,
   isFirst,
@@ -40,7 +51,7 @@ export function CuratedCategoryListAdminCard({
     list.regionCode || DEFAULT_VIEWER_REGION_CODE,
   );
   const [kindDraft, setKindDraft] = useState(
-    /** @type {"tree" | "personal"} */ ("tree"),
+    /** @type {"tree" | "personal" | "user"} */ ("tree"),
   );
   const [refIdDraft, setRefIdDraft] = useState("");
   const [selectedLabel, setSelectedLabel] = useState("");
@@ -251,6 +262,19 @@ export function CuratedCategoryListAdminCard({
             </span>
             <span>{preview.label}</span>
           </p>
+          {preview.kind === "user" && preview.imageUrl ? (
+            <p className="curated-list-admin-card__preview-row">
+              <img
+                className="curated-list-admin-card__preview-avatar"
+                src={resolveUploadedImageUrl(preview.imageUrl) ?? preview.imageUrl}
+                alt=""
+                width={40}
+                height={40}
+                loading="lazy"
+                decoding="async"
+              />
+            </p>
+          ) : null}
           {preview.kind === "personal" ? (
             <p className="curated-list-admin-card__preview-row">
               <span className="curated-list-admin-card__preview-label">
@@ -294,7 +318,8 @@ export function CuratedCategoryListAdminCard({
               role="listitem"
             >
               <code className="curated-list-admin-card__product-id">
-                {item.kind === "personal" ? "Личная" : "Дерево"} · {item.refId}
+                {formatAdminItemKindLabel(item.kind)} ·{" "}
+                {item.label?.trim() || item.refId}
               </code>
               <button
                 type="button"

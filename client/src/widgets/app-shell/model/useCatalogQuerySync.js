@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { isExplicitCatalogNewestFeedSearch } from "../../../entities/product-category-display/lib/catalogBrowserLanding.js";
 import { findCategoryRootIdForLegacySlug } from "../../../entities/product-category-tree/lib/findCategoryRootIdForLegacySlug.js";
 import { IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED } from "../../../entities/product-category-tree/lib/isCatalogBrowserSubcategoryFilterEnabled.js";
-import { CATALOG_SORT_NEWEST } from "../../../entities/product/model/productConstants.js";
+import { CATALOG_SORT_DEFAULT } from "../../../entities/product/model/productConstants.js";
 import { catalogMainViewToPathname } from "../../../shared/lib/catalogMainViewPaths.js";
 import {
   areCatalogExtraFiltersEqual,
@@ -157,8 +157,8 @@ export function useCatalogQuerySync({
     const nextSellerPersonalCategoryId = writeScopedFilters
       ? sellerPersonalCategoryId
       : null;
-    const isDefaultNewestFeed =
-      catalogSort === CATALOG_SORT_NEWEST &&
+    const isDefaultLandingFeed =
+      catalogSort === CATALOG_SORT_DEFAULT &&
       !nextCategory &&
       !nextCategoryId &&
       !nextSellerPersonalCategoryId &&
@@ -175,7 +175,7 @@ export function useCatalogQuerySync({
       !catalogFlashSaleOnly &&
       !hasCatalogExtraFilters(catalogExtraFilters);
     const omitDefaultSort =
-      isDefaultNewestFeed && !isExplicitCatalogNewestFeedSearch(location.search);
+      isDefaultLandingFeed && !isExplicitCatalogNewestFeedSearch(location.search);
     const queryPayload = {
       sort: catalogSort,
       category: nextCategory,

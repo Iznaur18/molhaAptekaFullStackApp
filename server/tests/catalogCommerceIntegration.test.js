@@ -141,7 +141,7 @@ test("seller limit: POST /product сверх лимита → 403", async () => 
   assert.equal(blocked.status, 403);
   const message = await parseErrorMessage(blocked);
   // Сообщение называет действующий лимит: у продавца может быть персональный,
-  // и прежний текст про «50 для обычных, 100 для премиум» ему бы врал.
+  // и прежний текст про «50 для обычных, 250 для премиум» ему бы врал.
   assert.equal(message, sellerProductsLimitErrorMessage(SELLER_PRODUCTS_LIMIT_REGULAR));
 });
 

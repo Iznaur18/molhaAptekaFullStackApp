@@ -1,6 +1,7 @@
 import {
   PRODUCT_SORT_DISCOUNT,
   PRODUCT_SORT_NEWEST,
+  PRODUCT_SORT_OLDEST,
   PRODUCT_SORT_PRICE_ASC,
   PRODUCT_SORT_PRICE_DESC,
   PRODUCT_SORT_PURCHASES,
@@ -23,8 +24,13 @@ import { withCatalogRegionPrioritySort } from "../user/userRegionCatalogFilter.j
 
 const { ObjectId } = mongoose.Types;
 
-/** Сортировки из query, кроме «новинок» по умолчанию. */
+/**
+ * Сортировки из query. Без `sort` → `oldest` (главная).
+ * `newest` обязан быть в сете, иначе `?sort=newest` схлопнется в дефолт.
+ */
 const PARSEABLE_CATALOG_SORTS = new Set([
+  PRODUCT_SORT_OLDEST,
+  PRODUCT_SORT_NEWEST,
   PRODUCT_SORT_VIEWS,
   PRODUCT_SORT_PURCHASES,
   PRODUCT_SORT_REVIEWS,
@@ -110,13 +116,17 @@ export const normalizeProductsQueryForAggregate = (productsQuery) => {
 
 /**
  * @param {import('express').Request['query']} query
+ * @param {string} [defaultSort] каталог — `oldest`; «Мои товары» — `newest`
  */
-export const parseProductSortFromQuery = (query) => {
+export const parseProductSortFromQuery = (
+  query,
+  defaultSort = PRODUCT_SORT_OLDEST,
+) => {
   const raw = query?.sort;
   if (typeof raw === "string" && PARSEABLE_CATALOG_SORTS.has(raw)) {
     return raw;
   }
-  return PRODUCT_SORT_NEWEST;
+  return defaultSort;
 };
 
 const sellerLookupStages = () => [
@@ -198,7 +208,7 @@ export const buildCatalogSortPipeline = (
     stages.push(searchRankAddFieldsStage(searchRank));
   }
 
-  if (sort === PRODUCT_SORT_NEWEST) {
+  if (sort === PRODUCT_SORT_NEWEST || sort === PRODUCT_SORT_OLDEST) {
     stages.push(buildCatalogPromotionSortBoostAddFieldsStage(viewerRegionCode));
   }
   if (sort === PRODUCT_SORT_DISCOUNT) {

@@ -21,6 +21,7 @@ import { SellerPersonalCategoryModel } from "../../models/index.js";
 import { getHiddenSellerIds, isUserStaff } from "../access/adminUserGuard.js";
 import { getVisibleFollowingSellerIds } from "../user/userFollowHelpers.js";
 import { getConfirmedSellerIds } from "./confirmedSellerCatalog.js";
+import { getClosedSellerIdsNow } from "./getClosedSellerIdsNow.js";
 import {
   mergeProductCatalogCategoryFilter,
   parseCategoryIdFromQuery,
@@ -288,9 +289,10 @@ export async function loadCatalogFilterContext({
   filters,
   includeAllSellerSets = false,
 }) {
-  const [hiddenSellerIds, isStaff] = await Promise.all([
+  const [hiddenSellerIds, isStaff, closedSellerIds] = await Promise.all([
     getHiddenSellerIds(),
     isUserStaff(userId),
+    getClosedSellerIdsNow({ excludeUserId: userId ?? null }),
   ]);
 
   const wantPremium = includeAllSellerSets || filters.sellerPremium;
@@ -327,6 +329,7 @@ export async function loadCatalogFilterContext({
     isStaff,
     includeHiddenStaff: isStaff && filters.includeHidden,
     hiddenSellerIds,
+    closedSellerIds,
     premiumSellerIds,
     confirmedSellerIds,
     followingSellerIds,
@@ -386,6 +389,9 @@ export function buildCatalogFilterClauses(filters, context) {
   }
   if (context.hiddenSellerIds.length > 0) {
     add("hiddenSellers", { productSeller: { $nin: context.hiddenSellerIds } });
+  }
+  if (context.closedSellerIds.length > 0) {
+    add("closedSellers", { productSeller: { $nin: context.closedSellerIds } });
   }
   if (filters.sellerPremium) {
     add("sellerPremium", buildSellerSetClause(context.premiumSellerIds));

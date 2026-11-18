@@ -6,6 +6,7 @@ import { PRODUCT_PRICE_RUB_MAX } from "./productWrite.js";
 import { optionalRuRegionCodeFieldSchema } from "./ruRegions.js";
 
 export const PRODUCT_CATALOG_SORT_VALUES = [
+  "oldest",
   "newest",
   "views",
   "purchases",

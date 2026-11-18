@@ -419,9 +419,12 @@ export default function CatalogScreen() {
    */
   const handleOpenCuratedCategory = useCallback(
     (category: HomeCuratedCategory) => {
-      if (category.kind === "personal" && category.sellerId?.trim()) {
-        router.push(`/seller/${category.sellerId.trim()}`);
-        return;
+      if (category.kind === "personal" || category.kind === "user") {
+        const sellerId = category.sellerId?.trim() || category.refId?.trim();
+        if (sellerId) {
+          router.push(`/seller/${sellerId}`);
+          return;
+        }
       }
       setSearchInput("");
       setSubmittedSearch("");

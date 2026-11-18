@@ -5,3 +5,20 @@
 .curated-category-list-carousel-skeleton .curated-category-list-carousel__scroll {
   overflow-x: hidden;
 }
+
+.curated-category-list-carousel-skeleton__title {
+  display: block;
+  flex: 1 1 auto;
+  width: 40%;
+  max-width: 140px;
+  height: 1rem;
+  border-radius: 6px;
+}
+
+.curated-category-list-carousel-skeleton__view-all {
+  display: block;
+  flex: 0 0 auto;
+  width: 56px;
+  height: 28px;
+  border-radius: var(--iz-radius-pill, 999px);
+}

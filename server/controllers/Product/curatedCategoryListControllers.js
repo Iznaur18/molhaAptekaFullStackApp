@@ -147,7 +147,8 @@ export async function addCuratedCategoryListItemAdminController(req, res) {
   doc.updatedBy = req.userId ?? null;
   await doc.save();
 
-  successRes(res, { list: toCuratedCategoryListPayload(doc.toObject()) });
+  const [list] = await buildAdminCuratedCategoryListsResponse([doc.toObject()]);
+  successRes(res, { list });
 }
 
 /** DELETE /product/admin/curated-category-lists/:listId/items/:itemKey */
@@ -172,5 +173,6 @@ export async function removeCuratedCategoryListItemAdminController(req, res) {
   doc.updatedBy = req.userId ?? null;
   await doc.save();
 
-  successRes(res, { list: toCuratedCategoryListPayload(doc.toObject()) });
+  const [list] = await buildAdminCuratedCategoryListsResponse([doc.toObject()]);
+  successRes(res, { list });
 }

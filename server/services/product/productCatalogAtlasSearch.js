@@ -1,6 +1,7 @@
 import {
   PRODUCT_SORT_DISCOUNT,
   PRODUCT_SORT_NEWEST,
+  PRODUCT_SORT_OLDEST,
   PRODUCT_SORTS_WITHOUT_BOOST,
 } from "../../constants/productCatalogSort.js";
 import { getCatalogProductModel } from "../../db/mongoReadConnection.js";
@@ -43,7 +44,7 @@ const sellerLookupStages = () => [
  */
 const sortStagesForAtlasCatalog = (sort, viewerRegionCode = null) => {
   const stages = [];
-  if (sort === PRODUCT_SORT_NEWEST) {
+  if (sort === PRODUCT_SORT_NEWEST || sort === PRODUCT_SORT_OLDEST) {
     stages.push(buildCatalogPromotionSortBoostAddFieldsStage(viewerRegionCode));
   }
   if (sort === PRODUCT_SORT_DISCOUNT) {

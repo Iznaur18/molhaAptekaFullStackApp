@@ -36,6 +36,7 @@ export const HOME_PAGE_UI = {
   CATALOG_FILTERS_SHEET_NOTHING_FOUND: "Ничего не найдено",
   /** Подписи вариантов окна фильтров (ключ — параметр запроса или значение `sort`). */
   CATALOG_FILTERS_SHEET_OPTION: {
+    oldest: "Сначала старые",
     newest: "Новинки",
     purchases: "Популярные",
     price_asc: "Дешевле",

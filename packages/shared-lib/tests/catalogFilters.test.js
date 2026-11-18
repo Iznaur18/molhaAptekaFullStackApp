@@ -54,8 +54,9 @@ describe("catalogFilters", () => {
     assert.deepEqual(next.delivery, ["seller", "courier"]);
   });
 
-  it("пустой черновик — «Новинки» без фильтров", () => {
+  it("пустой черновик — «Сначала старые» без фильтров", () => {
     assert.equal(isCatalogFiltersDraftEmpty(createEmptyCatalogFiltersDraft()), true);
+    assert.equal(createEmptyCatalogFiltersDraft().sort, "oldest");
     assert.equal(
       isCatalogFiltersDraftEmpty(
         createCatalogFiltersDraft({ sort: "newest", near: true }),

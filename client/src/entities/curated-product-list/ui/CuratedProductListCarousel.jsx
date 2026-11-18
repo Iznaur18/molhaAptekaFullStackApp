@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ArrowRight } from "lucide-react";
 
 import { CURATED_LIST_CAROUSEL_UI } from "../../../shared/config/appUiCopy.js";
 
@@ -42,24 +43,24 @@ export function CuratedProductListCarousel({ title, products, onOpenProduct }) {
           "--curated-card-max-width": `${CURATED_PRODUCT_LIST_HOME_CARD_MAX_WIDTH_PX}px`,
         }}
       >
+        <div className="curated-product-list-carousel__header">
+          <h2 className="curated-product-list-carousel__title">{title}</h2>
+          <button
+            type="button"
+            className="curated-product-list-carousel__view-all"
+            aria-label={CURATED_LIST_CAROUSEL_UI.VIEW_ALL_ARIA(title)}
+            onClick={() => setIsViewAllOpen(true)}
+          >
+            {CURATED_LIST_CAROUSEL_UI.VIEW_ALL}
+            <ArrowRight size={14} aria-hidden />
+          </button>
+        </div>
         <div
           ref={scrollRef}
           className="curated-product-list-carousel__scroll"
           {...dragScrollProps}
         >
           <ul className="curated-product-list-carousel__track" role="list">
-            <li className="curated-product-list-carousel__item curated-product-list-carousel__item_title">
-              <button
-                type="button"
-                className="curated-product-compact-card curated-product-list-carousel__title-tile"
-                aria-label={CURATED_LIST_CAROUSEL_UI.VIEW_ALL_ARIA(title)}
-                onClick={() => setIsViewAllOpen(true)}
-              >
-                <span className="curated-product-list-carousel__title-tile-name">
-                  {title}
-                </span>
-              </button>
-            </li>
             {products.map((product) => (
               <li key={product._id} className="curated-product-list-carousel__item">
                 <CuratedProductCompactCard product={product} onOpen={onOpenProduct} />

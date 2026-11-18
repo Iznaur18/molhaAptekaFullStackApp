@@ -14,7 +14,7 @@ import type {
   CatalogSort,
 } from "@/entities/product/model/catalogListFilters";
 
-const CATALOG_SORT_NEWEST = CATALOG_FILTERS_DEFAULT_SORT;
+const CATALOG_SORT_DEFAULT = CATALOG_FILTERS_DEFAULT_SORT;
 
 export type HomeCatalogFeedFiltersState = Pick<
   CatalogListFilters,
@@ -127,13 +127,13 @@ export const homeCatalogFeedFiltersToDraft = (
 ): CatalogFiltersDraft =>
   createCatalogFiltersDraft({
     ...filters,
-    sort: filters.sort ?? CATALOG_SORT_NEWEST,
+    sort: filters.sort ?? CATALOG_SORT_DEFAULT,
   });
 
 /**
- * «Показать»: черновик → фильтры ленты. «Новинки» — порядок по умолчанию,
+ * «Показать»: черновик → фильтры ленты. «Сначала старые» — порядок по умолчанию,
  * как на web без `sort` в адресе: лента без фильтров остаётся главной.
- * Явные «Новинки» от плитки каталога сохраняем, если их не меняли.
+ * Явные «Новинки» / другие сортировки от плитки сохраняем, если их не меняли.
  */
 export const homeCatalogFeedFiltersFromDraft = (
   draft: CatalogFiltersDraft,
@@ -144,8 +144,8 @@ export const homeCatalogFeedFiltersFromDraft = (
     draft.priceMax,
   );
   const sort =
-    draft.sort === CATALOG_SORT_NEWEST
-      ? applied.sort === CATALOG_SORT_NEWEST
+    draft.sort === CATALOG_SORT_DEFAULT
+      ? applied.sort === CATALOG_SORT_DEFAULT
         ? applied.sort
         : undefined
       : draft.sort;
