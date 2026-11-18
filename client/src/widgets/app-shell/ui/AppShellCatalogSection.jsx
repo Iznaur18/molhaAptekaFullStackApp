@@ -520,8 +520,6 @@ export function AppShellCatalogSection({
   categoryDisplaysStatus,
   onFeedTileClick,
   onCategoryClick,
-  personalCategoryTiles = [],
-  onPersonalCategoryClick,
   onEditCategoryClick,
   onEditFeedTileClick,
   selectedCategoryLabel,
@@ -562,8 +560,6 @@ export function AppShellCatalogSection({
         }
         onFeedTileClick={onFeedTileClick}
         onCategoryClick={onCategoryClick}
-        personalCategoryTiles={personalCategoryTiles}
-        onPersonalCategoryClick={onPersonalCategoryClick}
         onEditCategoryClick={onEditCategoryClick}
         pendingCategoryKey={resolvingLandingCategoryKey}
         onEditFeedTileClick={onEditFeedTileClick}

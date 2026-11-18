@@ -215,7 +215,6 @@ export const useHomeCatalogLoader = ({
     handleCatalogCategoryGridClick: browser.handleCatalogCategoryGridClick,
     handleSellerPersonalCategoryTileClick:
       browser.handleSellerPersonalCategoryTileClick,
-    personalCategoryTiles: browser.personalCategoryTiles,
     handleCatalogFeedTileClick: browser.handleCatalogFeedTileClick,
     handleCategoryDisplaySaved: browser.handleCategoryDisplaySaved,
     handleFeedTileDisplaySaved: browser.handleFeedTileDisplaySaved,

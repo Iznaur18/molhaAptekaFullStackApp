@@ -5,7 +5,6 @@ import {
   resolveCatalogBrowserGridColumns,
 } from "@/features/catalog-browser/lib/catalogBrowserGridConstants";
 import { useProductGridLayout } from "@/shared/model/useProductGridLayout";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 
 export {
   CATALOG_BROWSER_GRID_GAP,
@@ -14,7 +13,4 @@ export {
 };
 
 export const useCatalogBrowserGridLayout = () =>
-  useProductGridLayout(
-    SCREEN_CONTENT_PADDING_HORIZONTAL,
-    catalogBrowserProductGridResolvers,
-  );
+  useProductGridLayout(undefined, catalogBrowserProductGridResolvers);

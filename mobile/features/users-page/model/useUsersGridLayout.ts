@@ -10,7 +10,7 @@ import {
   resolveLayoutContentWidth,
   SCREEN_SMALL_TABLET_MIN_WIDTH,
 } from "@/shared/lib/screenBreakpoints";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
 
 export type UsersGridLayout = {
   columns: number;
@@ -20,14 +20,14 @@ export type UsersGridLayout = {
   tileWidth: number;
 };
 
-export const useUsersGridLayout = (
-  pagePadding: number = SCREEN_CONTENT_PADDING_HORIZONTAL,
-): UsersGridLayout => {
+export const useUsersGridLayout = (pagePadding?: number): UsersGridLayout => {
   const { width } = useWindowDimensions();
+  const { contentPaddingHorizontal } = useScreenLayout();
+  const resolvedPagePadding = pagePadding ?? contentPaddingHorizontal;
 
   return useMemo(() => {
     const layoutWidth = resolveLayoutContentWidth(width);
-    const contentWidth = layoutWidth - pagePadding * 2;
+    const contentWidth = layoutWidth - resolvedPagePadding * 2;
     const gap = resolveUsersGridGap(width);
     const autoColumns = Math.max(
       1,
@@ -41,8 +41,8 @@ export const useUsersGridLayout = (
       columns,
       listKey: `users-grid-${columns}-${gap}`,
       gap,
-      padding: pagePadding,
+      padding: resolvedPagePadding,
       tileWidth,
     };
-  }, [pagePadding, width]);
+  }, [resolvedPagePadding, width]);
 };

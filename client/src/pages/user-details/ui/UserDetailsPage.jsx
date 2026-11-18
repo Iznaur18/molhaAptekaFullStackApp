@@ -259,6 +259,7 @@ export function UserDetailsPage() {
           <UserProfileProductsList
             targetUserId={userId}
             onProductClick={handleProductClick}
+            isAdminViewer={isAdmin}
           />
         ) : null}
 
