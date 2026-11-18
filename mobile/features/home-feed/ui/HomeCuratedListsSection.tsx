@@ -11,7 +11,6 @@ import { HOME_FEED_UI } from "@/shared/config";
 import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useHomeCuratedListsStyles } from "@/shared/theme/catalogProductStyles";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { SquircleView } from "@/shared/ui/SquircleView";
 
 type HomeCuratedListsSectionProps = {
@@ -20,12 +19,12 @@ type HomeCuratedListsSectionProps = {
 
 export const HomeCuratedListsSection = ({ lists }: HomeCuratedListsSectionProps) => {
   const styles = useHomeCuratedListsStyles();
-  const { layoutWidth } = useScreenLayout();
+  const { layoutWidth, contentPaddingHorizontal } = useScreenLayout();
 
   const compactCardWidth = useMemo(() => {
-    const scrollContainerWidth = layoutWidth - SCREEN_CONTENT_PADDING_HORIZONTAL * 2;
+    const scrollContainerWidth = layoutWidth - contentPaddingHorizontal * 2;
     return resolveCuratedCompactCardWidth(scrollContainerWidth);
-  }, [layoutWidth]);
+  }, [contentPaddingHorizontal, layoutWidth]);
 
   if (lists.length === 0) {
     return null;

@@ -37,21 +37,29 @@ Nginx конфиг:   /etc/nginx/sites-available/gitorg
 
 ## 2. Подключение к серверу (SSH)
 
-На **ПК** в PowerShell / терминале Cursor:
+На этом ПК уже есть алиас в `%USERPROFILE%\.ssh\config` → `Host gitorg`.
 
-```powershell
-ssh root@135.106.146.218
-```
-
-После входа prompt станет похож на `root@...#` — ты **на сервере**.
-
-Выйти:
+**Git Bash** (предпочтительно):
 
 ```bash
-exit
+ssh gitorg
 ```
 
-> Если Cursor открыт через Remote SSH — команды ниже пиши в **том** терминале, где уже сервер.
+**PowerShell** (в PATH часто нет `ssh` от Git):
+
+```powershell
+& "C:\Program Files\Git\usr\bin\ssh.exe" gitorg
+```
+
+Прямой IP тоже работает: `ssh root@135.106.146.218` (ключ `id_ed25519`).
+
+После входа prompt станет `root@...#` — ты **на сервере**. Выйти: `exit`.
+
+Проверка без входа в шелл:
+
+```bash
+ssh gitorg 'curl -sS https://gitorg.ru/health'
+```
 
 ---
 
@@ -59,99 +67,92 @@ exit
 
 | Команда | Где |
 |---|---|
-| `git commit` / `git push` | только ПК |
+| `git commit` / PR / `git push` | только ПК |
+| `bash scripts/deploy-prod.sh` | только ПК (Git Bash) |
 | `cd /var/www/gitorg` | только сервер |
 | `systemctl restart ...` | только сервер |
 | правка `server/.env` прода | только сервер (через nano) |
 
-На ПК путь `/var/www/gitorg` **не существует**.
+На ПК путь `/var/www/gitorg` **не существует**.  
+На VPS **нет доступа к GitHub** — обычный `git pull origin main` на сервере **не работает**. Код везёт `deploy-prod.sh` через `git bundle`.
 
 ---
 
-## 4. Обновление сайта (самый частый сценарий)
+## 4. Деплой на прод (единственный штатный путь)
 
-### На ПК
+### Перед выкатом
 
-1. Поправил код, проверил локально.
-2. Запушил:
+1. Код вмержен в `main` через **PR с зелёным CI** (`main` защищён, прямой push часто режется).
+2. Локально: `git checkout main && git pull`.
+3. **Погаси Vite / `npm run dev`** — иначе `npm ci` на Windows падает с `EPERM` на esbuild.
+4. SSH-ключ к серверу живой: `ssh gitorg 'echo ok'`.
 
-```powershell
-git add .
-git commit -m "что изменил"
-git push origin main
-```
-
-### На сервере
+### Одна команда (с ПК, Git Bash, корень репо)
 
 ```bash
-cd /var/www/gitorg
-git pull origin main
-```
-
-Дальше — **по тому, что менял** (см. таблицу ниже). Если не уверен — полный релиз (§5).
-
-| Менял | На сервере после `git pull` |
-|---|---|
-| Только `client/` (кнопки, страницы) | `cd /var/www/gitorg/client && npm ci --ignore-scripts && npm run build` |
-| `server/` (API, логика) | `cd /var/www/gitorg/server && npm ci --ignore-scripts && npm rebuild bcrypt` → миграции → restart API |
-| Миграции БД | `cd /var/www/gitorg/server && npm run migrate:apply` |
-| `contract/` или `packages/shared-lib` | пересобрать shared-lib + `server` deps + restart |
-| Только `.env` на сервере | правишь файл → restart API/worker (**без** git) |
-| Nginx / SSL | редко; после правок: `nginx -t && systemctl reload nginx` |
-
-Перезапуск API (нужен после смены бэкенда / `.env`):
-
-```bash
-sudo systemctl restart gitorg-api gitorg-worker
-```
-
-Проверка:
-
-```bash
-curl -sS https://gitorg.ru/health
-```
-
-Ожидай: `{"status":"ok"}` (или похожее). В браузере: https://gitorg.ru + Ctrl+F5.
-
----
-
-## 4a. Деплой одной командой (рекомендуется)
-
-Чтобы каждый раз не собирать вручную — на **ПК** из Git Bash, из корня репо:
-
-```bash
+cd /c/Users/Izna/projects/molhaAptekaFullStackApp
 bash scripts/deploy-prod.sh
 ```
 
-Скрипт сам: `git push` → соберёт `client` локально → зальёт `dist` на сервер →
-на сервере сделает `git pull` + deps + миграции + рестарт → проверит `/health`.
-Нужен только рабочий SSH-ключ к серверу. Внутри — ровно шаги §4–§5.
+Выкатить конкретную ветку, не переключаясь на неё:
 
-Заливка `dist` **не сносит старые хешированные ассеты**, а переносит их в новый
-каталог: у части посетителей в кеше висит прошлый `index.html`, и без своих
-файлов он падает в белый экран (на iOS Safari — стабильно). Прошлые снимки
-лежат рядом как `dist.prev-<метка>`, храним два последних — это же и откат.
+```bash
+DEPLOY_REF=fix/моя-ветка bash scripts/deploy-prod.sh
+```
+
+(`DEPLOY_REF` пушится в `origin/main` и выкатывается на VPS — не делай так вслепую.)
+
+### Что делает скрипт (6 шагов)
+
+| # | Где | Действие |
+|---|---|---|
+| 1 | ПК | `git push origin $DEPLOY_REF:main` |
+| 2 | ПК | `npm ci` из **корня** + `npm run build --workspace=client` (VPS слабый — client там не собираем) |
+| 3 | ПК→VPS | `git bundle` от прод-SHA до локального SHA, `scp` на сервер |
+| 4 | VPS | ff-only merge → `contract`/`shared-lib`/`server` deps → `migrate:apply` → права на `uploads` → rolling restart `gitorg-api2` (4445) + `gitorg-api` (4444) + `gitorg-worker` |
+| 5 | ПК→VPS | заливка `client/dist` (старые hashed-ассеты **сохраняются**; снимки `dist.prev-*`) |
+| 6 | ПК | `https://gitorg.ru/health` + сверка nginx с `nginx-api-prefixes.txt` |
+
+Успех: `✅ Готово` → открой https://gitorg.ru и Ctrl+F5.  
+Предупреждение про nginx: код уже живой, но новые API-префиксы без `location` отдают HTML/405 — правь `/etc/nginx/sites-available/gitorg` (§8).
+
+### Если скрипт остановился: «прод не предок»
+
+На VPS когда-то катили мимо скрипта / руками. Fast-forward невозможен. Не форсируй. Разбери историю (локальный SHA vs `ssh gitorg 'git -C /var/www/gitorg rev-parse HEAD'`), потом снова через bundle/ff. Force-push на `main` запрещён.
+
+### Только `.env` / только nginx (без кода)
+
+- `.env`: `ssh gitorg` → `nano /var/www/gitorg/server/.env` → `systemctl restart gitorg-api gitorg-api2 gitorg-worker`
+- Nginx: правь `/etc/nginx/sites-available/gitorg` → бэкап `cp -L` → `nginx -t && systemctl reload nginx`
+
+### Откат фронта
+
+На сервере в `/var/www/gitorg/client` лежат `dist.prev-<метка>` (два последних). Вернуть предыдущий `dist` руками, если новый фронт сломан, а API ок.
 
 ---
 
-## 5. Полный релиз (когда не уверен)
+## 5. Ручной полный релиз на сервере (аварийный, не штат)
 
-Скопируй блок **целиком** на сервере:
+Штатно — только §4. Руками на VPS — если `deploy-prod.sh` недоступен и код **уже** попал на сервер (bundle/merge сделан):
 
 ```bash
 cd /var/www/gitorg
-git pull origin main
+# package-lock на проде часто dirty — мешает merge:
+git checkout -- package-lock.json 2>/dev/null || true
 
 cd /var/www/gitorg/contract && npm ci
 cd /var/www/gitorg/packages/shared-lib && npm install --ignore-scripts && npx tsc -p tsconfig.json
 cd /var/www/gitorg/server && npm ci --ignore-scripts && npm rebuild bcrypt && npm run migrate:apply
-cd /var/www/gitorg/client && npm ci --ignore-scripts && npm run build
+chown -R www-data:www-data /var/www/gitorg/server/uploads
 
-sudo systemctl restart gitorg-api gitorg-worker
+systemctl restart gitorg-api2   # если юнит есть
+systemctl restart gitorg-api gitorg-worker
 curl -sS https://gitorg.ru/health
 ```
 
-Сборка `client` на слабом VPS может быть долгой / тяжёлой по RAM. Если зависает — собери `client` на ПК и залей `dist` (см. `DEPLOY.md` §11).
+`client` на VPS **не собирай** (RAM). Собери на ПК и залей `dist`, как делает шаг [5/6] в `scripts/deploy-prod.sh`, либо снова запусти весь скрипт.
+
+Устаревший `scripts/deploy-branch-to-prod.sh` (fetch с origin + build на VPS) — **не использовать**: на проде нет GitHub и слабый RAM.
 
 ---
 
@@ -330,12 +331,14 @@ cd /var/www/gitorg/server && npm run preflight:prod
 ```bash
 cd /var/www/gitorg
 git status
-git pull origin main
+git log -1 --oneline
+git rev-parse HEAD
 ```
 
-- На сервере **не коммить** рабочие правки «на живую». Правь на ПК → push → pull.
-- Если `git pull` ругается на локальные правки — не паникуй: `git status`, разберись что изменил, или спроси в чате с агентом.
-- Папку `server/uploads` git не должен затирать; не делай `rm -rf` по uploads.
+- Код на VPS меняет только `deploy-prod.sh` (bundle + `merge --ff-only`). **Не** `git pull origin main` — с VPS GitHub недоступен.
+- На сервере **не коммить** «на живую». Правь на ПК → PR → `deploy-prod.sh`.
+- Грязный `package-lock.json` на проде скрипт сбрасывает перед merge (`git checkout -- package-lock.json`).
+- Папку `server/uploads` не трогай (`rm -rf` запрещён) — там фото и private-сканы.
 
 ---
 
@@ -473,25 +476,29 @@ mongorestore --uri="$MONGO_URI" --gzip --drop --archive=/tmp/restore.archive.gz
 | Симптом | Куда смотреть |
 |---|---|
 | Сайт не открывается с телефона, с ПК ок | DNS / другой DNS (1.1.1.1), подождать пропагацию |
-| Белый экран / старый UI после деплоя | не собрал `client` (`npm run build`), Ctrl+F5 |
-| Белый экран только на iPhone | старый `index.html` в кеше Safari просит удалённый ассет. Проверь `curl -I https://gitorg.ru/` → должен быть `Cache-Control: no-cache`, и что при выкате старый `dist/assets` не сносится целиком |
-| API ошибки / 502 | `journalctl -u gitorg-api -n 100`; `systemctl status gitorg-api` |
-| После смены `.env` «как будто ничего» | забыл `systemctl restart gitorg-api gitorg-worker` |
-| `git pull` конфликт | не правь прод руками; откатить лишнее или разрулить на ПК |
-| Нет места / OOM при `npm run build` | `df -h` / `free -h`; собрать client на ПК |
+| Белый экран / старый UI после деплоя | шаг [5/6] не залил `dist`, или Ctrl+F5; откат → `dist.prev-*` |
+| Белый экран только на iPhone | старый `index.html` в кеше Safari. `curl -I https://gitorg.ru/` → `Cache-Control: no-cache`; скрипт обязан сохранять старые `dist/assets` |
+| API ошибки / 502 | `journalctl -u gitorg-api -n 100`; также `gitorg-api2` на `:4445` |
+| PUT/POST API → 405 или HTML | нет `location` в nginx для нового префикса; образец `nginx-izibuy.conf.example`, список — `server/docs/deploy/nginx-api-prefixes.txt` / check в конце `deploy-prod.sh` |
+| После смены `.env` «как будто ничего» | забыл restart `gitorg-api` (+ `gitorg-api2`) / `gitorg-worker` |
+| `deploy-prod.sh`: «прод не предок» | на VPS чужой коммит мимо скрипта — разбери SHA, не force-push |
+| `npm ci` EPERM / esbuild на ПК | убей Vite/`node` держащий `client/node_modules` |
+| Нет места / OOM | `df -h` / `free -h`; client только на ПК через скрипт |
 | Mongo не коннектится | сверить `MONGO_URI` в `.env` с реальным юзером БД |
 
 ---
 
 ## 13. Чеклист одного обновления (распечатай себе)
 
-1. ПК: код ок → `git push origin main`
-2. SSH: `ssh root@135.106.146.218`
-3. `cd /var/www/gitorg && git pull origin main`
-4. Сборка / deps по таблице §4 (или полный блок §5)
-5. `sudo systemctl restart gitorg-api gitorg-worker` (если трогал server/env)
-6. `curl -sS https://gitorg.ru/health`
-7. Браузер: https://gitorg.ru + Ctrl+F5
+1. PR в `main` вмержен, CI зелёный
+2. ПК: `git checkout main && git pull`
+3. Погасить Vite / dev-серверы
+4. Git Bash, корень репо: `bash scripts/deploy-prod.sh`
+5. Дождаться `✅ Готово` (или починить nginx, если скрипт предупредил)
+6. Браузер: https://gitorg.ru + Ctrl+F5
+7. При сомнении: `ssh gitorg 'journalctl -u gitorg-api -n 50 --no-pager'`
+
+Только секреты/nginx без кода — §4 «Только `.env` / только nginx».
 
 ---
 
@@ -584,6 +591,7 @@ ss -tlnp | grep 4444        # ждём 127.0.0.1:4444
 
 | Файл | Зачем |
 |---|---|
+| [`SHPARGALKA-LOCAL.md`](SHPARGALKA-LOCAL.md) | локальный стек на этом ПК (Mongo / API / Vite / Expo) |
 | [`docs/README.md`](../README.md) | оглавление всей документации |
 | [`DEPLOY.md`](DEPLOY.md) | полная установка с нуля + релиз |
 | [`CERTBOT-SSL.md`](CERTBOT-SSL.md) | SSL |
@@ -592,4 +600,4 @@ ss -tlnp | grep 4444        # ждём 127.0.0.1:4444
 
 ---
 
-*Актуально для прода: домен `gitorg.ru`, путь `/var/www/gitorg`, юниты `gitorg-api` / `gitorg-worker`.*
+*Актуально для прода: домен `gitorg.ru`, путь `/var/www/gitorg`, юниты `gitorg-api` / `gitorg-api2` / `gitorg-worker`. Штатный выкат — `bash scripts/deploy-prod.sh` с ПК.*

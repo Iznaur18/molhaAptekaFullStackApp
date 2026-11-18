@@ -52,16 +52,6 @@ export default function HubSectionScreen() {
       return;
     }
 
-    if (sectionId === "seller-personal-category-moderation") {
-      router.replace("/hub/intro-ad-moderation" as never);
-      return;
-    }
-
-    if (sectionId === "raffles") {
-      router.replace("/hub/intro-ad-moderation" as never);
-      return;
-    }
-
     if (sectionId === "product-promotions") {
       router.replace("/hub/product-moderation" as never);
       return;

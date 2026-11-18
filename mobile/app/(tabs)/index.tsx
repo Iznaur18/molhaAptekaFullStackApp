@@ -50,6 +50,7 @@ import type { HomeCuratedCategory } from "@/entities/curated-category-list/api/f
 import { isHomeCuratedProductListsVisible } from "@/entities/curated-product-list/lib/isHomeCuratedProductListsVisible";
 import { CATALOG_SORT_NEWEST } from "@/entities/product/model/productConstants";
 import { isHomeCatalogMainView } from "@/features/home-feed/lib/isHomeCatalogMainView";
+import type { HomeFeedSectionTab } from "@/features/home-feed/model/homeFeedSectionTab";
 import {
   buildHomeCatalogFeedListRows,
   HOME_CATALOG_FEED_META_ROW_COUNT,
@@ -133,9 +134,9 @@ export default function CatalogScreen() {
   const styles = useFeedScreenStyles();
   const theme = useAppTheme();
   const queryClient = useQueryClient();
-  const productGrid = useProductGridLayout();
   const { centeredContentStyle, contentPaddingBottom, contentPaddingHorizontal } =
     useScreenLayout();
+  const productGrid = useProductGridLayout(contentPaddingHorizontal);
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const router = useRouter();
@@ -152,6 +153,9 @@ export default function CatalogScreen() {
   const { height: windowHeight } = useWindowDimensions();
   const [searchInput, setSearchInput] = useState("");
   const [submittedSearch, setSubmittedSearch] = useState("");
+  const [homeFeedSectionTab, setHomeFeedSectionTab] =
+    useState<HomeFeedSectionTab>("home");
+  const blockProductSearchRef = useRef(false);
   const [isPullRefreshing, setIsPullRefreshing] = useState(false);
   const [selectedRootSlug, setSelectedRootSlug] = useState<string | null>(null);
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<string | null>(
@@ -190,6 +194,9 @@ export default function CatalogScreen() {
   }, []);
 
   const handleSearchSubmit = useCallback(() => {
+    if (blockProductSearchRef.current) {
+      return;
+    }
     const trimmed = searchInput.trim();
     setSubmittedSearch(trimmed.length >= CATALOG_SEARCH_MIN_LENGTH ? trimmed : "");
   }, [searchInput]);
@@ -398,6 +405,7 @@ export default function CatalogScreen() {
   const resetToHomeMainView = useCallback(() => {
     setSearchInput("");
     setSubmittedSearch("");
+    setHomeFeedSectionTab("home");
     setSelectedRootSlug(null);
     setSelectedSubcategoryId(null);
     setSelectedSellerPersonalCategoryId(null);
@@ -474,10 +482,32 @@ export default function CatalogScreen() {
     ],
   );
 
+  const activeHomeFeedSectionTab: HomeFeedSectionTab = showCuratedProductLists
+    ? homeFeedSectionTab
+    : "home";
+  blockProductSearchRef.current =
+    showHomeFeed && activeHomeFeedSectionTab === "sellers";
+
   const homeFeedListRows = useMemo(
-    () => buildHomeCatalogFeedListRows(catalogGridRows),
-    [catalogGridRows],
+    () =>
+      buildHomeCatalogFeedListRows(
+        activeHomeFeedSectionTab === "home" ? catalogGridRows : [],
+      ),
+    [activeHomeFeedSectionTab, catalogGridRows],
   );
+
+  const previousSectionTabRef = useRef<HomeFeedSectionTab>("home");
+  useEffect(() => {
+    const previous = previousSectionTabRef.current;
+    previousSectionTabRef.current = homeFeedSectionTab;
+    if (
+      previous === "sellers" &&
+      homeFeedSectionTab !== "sellers" &&
+      submittedSearch === ""
+    ) {
+      setSearchInput("");
+    }
+  }, [homeFeedSectionTab, submittedSearch]);
 
   const handleRefresh = useCallback(async () => {
     setIsPullRefreshing(true);
@@ -516,6 +546,9 @@ export default function CatalogScreen() {
   ) : null;
 
   const handleLoadMore = () => {
+    if (showHomeFeed && activeHomeFeedSectionTab !== "home") {
+      return;
+    }
     if (
       catalogQuery.hasNextPage &&
       !catalogQuery.isFetchingNextPage &&
@@ -565,6 +598,10 @@ export default function CatalogScreen() {
       isCatalogEmpty={false}
       emptyLabel={catalogEmptyLabel}
       styles={styles}
+      sectionTab={activeHomeFeedSectionTab}
+      onSectionTabChange={setHomeFeedSectionTab}
+      sellerSearch={searchInput}
+      onSellerSearchChange={handleSearchInputChange}
       onOpenCuratedCategory={handleOpenCuratedCategory}
     />
   );
@@ -578,14 +615,21 @@ export default function CatalogScreen() {
         isCatalogEmpty={catalogGridRows.length === 0}
         emptyLabel={catalogEmptyLabel}
         styles={styles}
+        sectionTab={activeHomeFeedSectionTab}
+        onSectionTabChange={setHomeFeedSectionTab}
+        sellerSearch={searchInput}
+        onSellerSearchChange={handleSearchInputChange}
         onOpenCuratedCategory={handleOpenCuratedCategory}
       />
     ),
     [
+      activeHomeFeedSectionTab,
       catalogBreadcrumbLabel,
       catalogEmptyLabel,
       catalogGridRows.length,
       handleOpenCuratedCategory,
+      handleSearchInputChange,
+      searchInput,
       showCuratedProductLists,
       styles,
     ],
@@ -691,9 +735,17 @@ export default function CatalogScreen() {
     (): ViewStyle[] => [
       styles.listContent,
       resolveCatalogGridListContentStyle(productGrid.gap),
-      { paddingBottom: contentPaddingBottom },
+      {
+        paddingBottom: contentPaddingBottom,
+        paddingHorizontal: contentPaddingHorizontal,
+      },
     ],
-    [contentPaddingBottom, productGrid.gap, styles.listContent],
+    [
+      contentPaddingBottom,
+      contentPaddingHorizontal,
+      productGrid.gap,
+      styles.listContent,
+    ],
   );
 
   const renderCatalogGridRow = useCallback(

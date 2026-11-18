@@ -1,5 +1,9 @@
-import Feather from "@expo/vector-icons/Feather";
 import { isDimColorScheme } from "@izibuy/design-tokens";
+import Home from "lucide-react-native/icons/home";
+import LayoutGrid from "lucide-react-native/icons/layout-grid";
+import Plus from "lucide-react-native/icons/plus";
+import ShoppingCart from "lucide-react-native/icons/shopping-cart";
+import User from "lucide-react-native/icons/user";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { BlurView } from "expo-blur";
 import { usePathname, useRouter } from "expo-router";
@@ -28,8 +32,10 @@ import { isProfileTabBarRoute } from "@/shared/lib/isProfileTabBarRoute";
 import {
   MOBILE_BOTTOM_NAV_BORDER_RADIUS,
   MOBILE_BOTTOM_NAV_ITEM_MIN_HEIGHT,
+  MOBILE_BOTTOM_NAV_ITEM_RADIUS,
   MOBILE_BOTTOM_NAV_PADDING_HORIZONTAL,
   MOBILE_BOTTOM_NAV_PADDING_VERTICAL,
+  MOBILE_BOTTOM_NAV_PRIMARY_SIZE,
   resolveMobileBottomNavHorizontalInset,
   resolveMobileBottomNavLayoutHeight,
   resolveMobileBottomNavPaddingBottom,
@@ -41,48 +47,69 @@ import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { AppText } from "@/shared/ui/AppText";
 
 const TAB_ICON_SIZE = 24;
+const TAB_ICON_STROKE = 2.25;
 const PLACE_PRODUCT_ROUTE = "place-product";
 const HOME_TAB_ROUTE = "index";
-const NAV_ITEMS_GAP = 2;
+/** Паритет с web `gap: 0.1rem`. */
+const NAV_ITEMS_GAP = 1.6;
+
+type TabIcon = typeof Home;
+
+const mixHex = (base: string, over: string, overWeight: number): string => {
+  const channel = (hex: string) => {
+    const raw = hex.replace("#", "");
+    return [
+      Number.parseInt(raw.slice(0, 2), 16),
+      Number.parseInt(raw.slice(2, 4), 16),
+      Number.parseInt(raw.slice(4, 6), 16),
+    ];
+  };
+  const [baseR, baseG, baseB] = channel(base);
+  const [overR, overG, overB] = channel(over);
+  const mix = (from: number, to: number) =>
+    Math.round(from * (1 - overWeight) + to * overWeight);
+  const byte = (value: number) => value.toString(16).padStart(2, "0");
+  return `#${byte(mix(baseR, overR))}${byte(mix(baseG, overG))}${byte(mix(baseB, overB))}`;
+};
 const INTRO_REPLAY_HOLD_MS = 1000;
 
 const withAlpha = (hex: string, alphaHex: string): string => `${hex}${alphaHex}`;
 
 type TabItemConfig = {
   routeName: string;
-  icon: keyof typeof Feather.glyphMap;
-  label: string;
+  icon: TabIcon;
+  label: string | null;
   accessibilityLabel: string;
 };
 
 const TAB_ITEMS: TabItemConfig[] = [
   {
     routeName: "index",
-    icon: "home",
+    icon: Home,
     label: MOBILE_BOTTOM_NAV_UI.TAB_HOME,
     accessibilityLabel: MOBILE_BOTTOM_NAV_UI.TAB_HOME_ARIA,
   },
   {
     routeName: "catalog",
-    icon: "menu",
+    icon: LayoutGrid,
     label: MOBILE_BOTTOM_NAV_UI.TAB_CATALOG,
     accessibilityLabel: MOBILE_BOTTOM_NAV_UI.TAB_CATALOG_ARIA,
   },
   {
     routeName: PLACE_PRODUCT_ROUTE,
-    icon: "plus",
-    label: MOBILE_BOTTOM_NAV_UI.TAB_PLACE_PRODUCT,
+    icon: Plus,
+    label: null,
     accessibilityLabel: MOBILE_BOTTOM_NAV_UI.TAB_PLACE_PRODUCT_ARIA,
   },
   {
     routeName: "cart",
-    icon: "shopping-cart",
+    icon: ShoppingCart,
     label: MOBILE_BOTTOM_NAV_UI.TAB_CART,
     accessibilityLabel: MOBILE_BOTTOM_NAV_UI.TAB_CART_ARIA,
   },
   {
     routeName: "me",
-    icon: "user",
+    icon: User,
     label: MOBILE_BOTTOM_NAV_UI.TAB_PROFILE,
     accessibilityLabel: MOBILE_BOTTOM_NAV_UI.TAB_PROFILE_ARIA,
   },
@@ -103,18 +130,15 @@ const useTabBarStyles = createThemedStyles((theme) => ({
     alignSelf: "center",
     pointerEvents: "box-none",
   },
-  /** Liquid-glass pill — паритет с web MobileBottomNav.css */
+  /** Liquid-glass pill — паритет с web MobileBottomNav.css (`box-shadow: none`). */
   navPill: {
     overflow: "hidden",
     borderRadius: MOBILE_BOTTOM_NAV_BORDER_RADIUS,
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: withAlpha(theme.colors.onContrast, "6B"),
+    borderWidth: 1,
+    borderColor: mixHex(theme.colors.border, theme.colors.onContrast, 0.42),
     backgroundColor: withAlpha(theme.colors.surface, "8C"),
-    shadowColor: theme.colors.ink,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.12,
-    shadowRadius: 16,
-    elevation: 10,
+    shadowOpacity: 0,
+    elevation: 0,
   },
   navBlur: {
     overflow: "hidden",
@@ -136,19 +160,43 @@ const useTabBarStyles = createThemedStyles((theme) => ({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    gap: 2.4,
     minHeight: MOBILE_BOTTOM_NAV_ITEM_MIN_HEIGHT,
-    paddingVertical: 2,
-    paddingHorizontal: 2,
-    borderRadius: MOBILE_BOTTOM_NAV_BORDER_RADIUS,
+    paddingVertical: 4,
+    paddingHorizontal: 2.4,
+    borderRadius: MOBILE_BOTTOM_NAV_ITEM_RADIUS,
     backgroundColor: "transparent",
   },
   itemActive: {
-    backgroundColor: withAlpha(theme.colors.onContrast, "6B"),
-    shadowColor: theme.colors.ink,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 2,
-    elevation: 1,
+    backgroundColor: mixHex(theme.colors.actionSoft, theme.colors.onContrast, 0.42),
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  itemPrimary: {
+    minHeight: 0,
+    paddingVertical: 0,
+    paddingHorizontal: 0,
+    borderRadius: 0,
+    backgroundColor: "transparent",
+  },
+  primaryButton: {
+    width: MOBILE_BOTTOM_NAV_PRIMARY_SIZE,
+    height: MOBILE_BOTTOM_NAV_PRIMARY_SIZE,
+    borderRadius: MOBILE_BOTTOM_NAV_PRIMARY_SIZE / 2,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: theme.colors.action,
+    shadowColor: theme.colors.action,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 16,
+    elevation: 6,
+  },
+  label: {
+    maxWidth: "100%",
+    fontSize: 10.56,
+    fontWeight: "600",
+    lineHeight: 12,
   },
   iconWrap: {
     position: "relative",
@@ -157,8 +205,8 @@ const useTabBarStyles = createThemedStyles((theme) => ({
   },
   badge: {
     position: "absolute",
-    top: -5,
-    right: -8,
+    top: -4.8,
+    right: -6.4,
     minWidth: 15,
     height: 15,
     borderRadius: 999,
@@ -319,7 +367,13 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
         : item.routeName === "me"
           ? profileBadge
           : null;
-    const iconColor = isFocused ? theme.colors.action : theme.colors.textSecondary;
+    const isPrimary = item.routeName === PLACE_PRODUCT_ROUTE;
+    const iconColor = isPrimary
+      ? theme.colors.onContrast
+      : isFocused
+        ? theme.colors.action
+        : theme.colors.textSecondary;
+    const Icon = item.icon;
     const placeProductAria = isAuthorized
       ? MOBILE_BOTTOM_NAV_UI.TAB_PLACE_PRODUCT_ARIA
       : MOBILE_BOTTOM_NAV_UI.TAB_PLACE_PRODUCT_LOGIN_ARIA;
@@ -329,32 +383,53 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
         key={item.routeName}
         accessibilityRole="tab"
         accessibilityState={{ selected: isFocused }}
-        accessibilityLabel={
-          item.routeName === PLACE_PRODUCT_ROUTE
-            ? placeProductAria
-            : item.accessibilityLabel
-        }
+        accessibilityLabel={isPrimary ? placeProductAria : item.accessibilityLabel}
         onPress={() => handlePress(item.routeName)}
         onLongPress={() => handleLongPress(item.routeName)}
         onPressIn={item.routeName === HOME_TAB_ROUTE ? startIntroHoldTimer : undefined}
         onPressOut={item.routeName === HOME_TAB_ROUTE ? clearIntroHoldTimer : undefined}
-        style={[styles.item, isFocused && styles.itemActive]}
+        style={[
+          styles.item,
+          isPrimary && styles.itemPrimary,
+          isFocused && styles.itemActive,
+        ]}
       >
-        <View style={styles.iconWrap}>
-          <Feather name={item.icon} size={TAB_ICON_SIZE} color={iconColor} />
-          {badge ? (
-            <View
-              style={styles.badge}
-              accessibilityLabel={
-                item.routeName === "cart" && cartCount > 0
-                  ? CART_PAGE_UI.TITLE
-                  : undefined
-              }
-            >
-              <AppText style={styles.badgeText}>{badge}</AppText>
+        {isPrimary ? (
+          <View style={styles.primaryButton}>
+            <Icon
+              size={TAB_ICON_SIZE}
+              strokeWidth={TAB_ICON_STROKE}
+              color={iconColor}
+            />
+          </View>
+        ) : (
+          <>
+            <View style={styles.iconWrap}>
+              <Icon
+                size={TAB_ICON_SIZE}
+                strokeWidth={TAB_ICON_STROKE}
+                color={iconColor}
+              />
+              {badge ? (
+                <View
+                  style={styles.badge}
+                  accessibilityLabel={
+                    item.routeName === "cart" && cartCount > 0
+                      ? CART_PAGE_UI.TITLE
+                      : undefined
+                  }
+                >
+                  <AppText style={styles.badgeText}>{badge}</AppText>
+                </View>
+              ) : null}
             </View>
-          ) : null}
-        </View>
+            {item.label ? (
+              <AppText style={[styles.label, { color: iconColor }]} numberOfLines={1}>
+                {item.label}
+              </AppText>
+            ) : null}
+          </>
+        )}
       </Pressable>
     );
   });
@@ -383,9 +458,16 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
         >
           <View style={styles.navPill}>
             <BlurView
-              intensity={Platform.OS === "web" ? 0 : 72}
+              intensity={Platform.OS === "web" ? 18 : 40}
               tint={isDimColorScheme(colorScheme) ? "dark" : "light"}
-              style={styles.navBlur}
+              style={[
+                styles.navBlur,
+                Platform.OS === "web"
+                  ? ({
+                      backdropFilter: "blur(18px) saturate(1.35)",
+                    } as object)
+                  : null,
+              ]}
             >
               <View style={styles.liquidOverlay} pointerEvents="none" />
               <View style={styles.navRow}>{items}</View>

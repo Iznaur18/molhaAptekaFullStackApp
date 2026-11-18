@@ -5,6 +5,7 @@ import { HOME_PAGE_UI } from "@/shared/config/homePageUi";
 import {
   HOME_CATALOG_HEADER_CIRCLE_BUTTON_BORDER_WIDTH,
   HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE,
+  HOME_CATALOG_HEADER_CTA_BUTTON_RADIUS,
 } from "@/shared/lib/homeCatalogHeaderLayout";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
@@ -18,14 +19,14 @@ const useHomeCatalogFiltersButtonStyles = createThemedStyles((theme) => ({
     flexShrink: 0,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE / 2,
+    borderRadius: HOME_CATALOG_HEADER_CTA_BUTTON_RADIUS,
     borderWidth: HOME_CATALOG_HEADER_CIRCLE_BUTTON_BORDER_WIDTH,
     borderColor: "transparent",
     backgroundColor: theme.colors.action,
     shadowColor: theme.colors.action,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
-    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.55,
+    shadowRadius: 10,
     elevation: 4,
   },
 }));

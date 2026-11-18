@@ -1,8 +1,6 @@
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { useViewerRegion } from "@/entities/region/model/ViewerRegionProvider";
-import { ViewerRegionSelect } from "@/entities/region/ui/ViewerRegionSelect";
 import { HomeCatalogFiltersButton } from "@/features/home-feed/ui/HomeCatalogFiltersButton";
 import { HomeCatalogHeaderPanel } from "@/features/home-feed/ui/HomeCatalogHeaderPanel";
 import { HomeCatalogHeaderSearch } from "@/features/home-feed/ui/HomeCatalogHeaderSearch";
@@ -11,6 +9,8 @@ import {
   HOME_CATALOG_HEADER_PANEL_FLOATING_PADDING,
   resolveHomeCatalogHeaderPanelPaddingTop,
 } from "@/shared/lib/homeCatalogHeaderLayout";
+import { resolveScreenContentInlinePadding } from "@/shared/lib/screenBreakpoints";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useHomeCatalogHeaderStyles } from "@/shared/theme/homeCatalogHeaderStyles";
 
 type HomeCatalogSearchRowProps = {
@@ -34,17 +34,19 @@ export const HomeCatalogSearchRow = ({
   embeddedInForegroundSheet = false,
 }: HomeCatalogSearchRowProps) => {
   const insets = useSafeAreaInsets();
+  const { width } = useScreenLayout();
   const styles = useHomeCatalogHeaderStyles();
-  const { viewerRegionCode, setViewerRegionCode } = useViewerRegion();
   const paddingTop = embeddedInForegroundSheet
     ? HOME_CATALOG_HEADER_PANEL_FLOATING_PADDING.top
     : resolveHomeCatalogHeaderPanelPaddingTop(insets.top);
+  const inlinePadding = resolveScreenContentInlinePadding(width);
 
   return (
     <HomeCatalogHeaderPanel
       paddingTop={paddingTop}
-      flatSheet={false}
-      floating={embeddedInForegroundSheet}
+      style={{
+        paddingHorizontal: embeddedInForegroundSheet ? 0 : inlinePadding,
+      }}
     >
       <View style={styles.topRow}>
         <HomeCatalogHeaderSearch
@@ -58,7 +60,6 @@ export const HomeCatalogSearchRow = ({
             active={filtersActive}
             onPress={onOpenFilters}
           />
-          <ViewerRegionSelect value={viewerRegionCode} onChange={setViewerRegionCode} />
           <HomeCatalogUsersButton
             embeddedInForegroundSheet={embeddedInForegroundSheet}
           />

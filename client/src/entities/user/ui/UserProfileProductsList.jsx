@@ -5,7 +5,10 @@ import { useUserProfileProductsQuery } from "../model/useUserProfileProductsQuer
 import { USER_PROFILE_PRODUCTS_PREVIEW_LIMIT } from "../api/fetchUserProducts.js";
 import { resolveProductImageUrls } from "../../product/lib/resolveProductImageUrls.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../product/model/productConstants.js";
-import { isProfileProductThumbUnavailable } from "../lib/resolveProfileProductThumbState.js";
+import {
+  isProfileProductThumbClickBlocked,
+  isProfileProductThumbUnavailable,
+} from "../lib/resolveProfileProductThumbState.js";
 import {
   API_CLIENT_UI,
   USER_PROFILE_PRODUCTS_UI,
@@ -35,6 +38,7 @@ function getThumbSrc(item) {
  *   ) => void;
  *   onViewAllProducts?: () => void;
  *   isSelf?: boolean;
+ *   isAdminViewer?: boolean;
  * }} props
  */
 export function UserProfileProductsList({
@@ -42,6 +46,7 @@ export function UserProfileProductsList({
   onProductClick,
   onViewAllProducts,
   isSelf = false,
+  isAdminViewer = false,
 }) {
   const productsQuery = useUserProfileProductsQuery({
     userId: targetUserId,
@@ -84,7 +89,7 @@ export function UserProfileProductsList({
 
   /** @param {import('../model/userProfileProductThumbTypes.js').UserProfileProductThumbItem} item */
   const handleItemClick = (item) => {
-    if (isProfileProductThumbUnavailable(item, { isSelf })) {
+    if (isProfileProductThumbClickBlocked(item, { isSelf, isAdminViewer })) {
       return;
     }
 
@@ -155,6 +160,10 @@ export function UserProfileProductsList({
           <ul className="user-profile-purchases__list" role="list">
             {items.map((item) => {
               const isUnavailable = isProfileProductThumbUnavailable(item, { isSelf });
+              const isClickBlocked = isProfileProductThumbClickBlocked(item, {
+                isSelf,
+                isAdminViewer,
+              });
               const thumbSrc = failedThumbIds.has(item.productId)
                 ? PRODUCT_IMAGE_PLACEHOLDER_URL
                 : getThumbSrc(item);
@@ -170,7 +179,7 @@ export function UserProfileProductsList({
                       .filter(Boolean)
                       .join(" ")}
                     onClick={() => handleItemClick(item)}
-                    disabled={isUnavailable}
+                    disabled={isClickBlocked}
                     aria-label={item.productName}
                     title={item.productName}
                   >

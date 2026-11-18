@@ -9,7 +9,7 @@ import {
   resolveProductGridGap,
   type ScreenSizeInput,
 } from "@/shared/lib/screenBreakpoints";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
 
 export type ProductGridLayout = {
   columns: number;
@@ -36,11 +36,13 @@ const defaultProductGridResolvers: ProductGridLayoutResolvers = {
 };
 
 export const useProductGridLayout = (
-  pagePadding: number = SCREEN_CONTENT_PADDING_HORIZONTAL,
+  pagePadding?: number,
   resolvers: ProductGridLayoutResolvers = defaultProductGridResolvers,
   options: ProductGridLayoutOptions = {},
 ): ProductGridLayout => {
   const { width, height } = useWindowDimensions();
+  const { contentPaddingHorizontal } = useScreenLayout();
+  const resolvedPagePadding = pagePadding ?? contentPaddingHorizontal;
   const reservedLeadingWidth = options.reservedLeadingWidth ?? 0;
 
   return useMemo(() => {
@@ -49,7 +51,7 @@ export const useProductGridLayout = (
     const columns = resolvers.resolveColumns({ width: viewportWidth, height });
     const contentWidth = Math.max(
       0,
-      layoutWidth - pagePadding * 2 - reservedLeadingWidth,
+      layoutWidth - resolvedPagePadding * 2 - reservedLeadingWidth,
     );
     const gap = resolvers.resolveGap(viewportWidth);
     const tileWidth = resolveGridTileWidth(contentWidth, columns, gap);
@@ -58,9 +60,9 @@ export const useProductGridLayout = (
       columns,
       listKey: `product-grid-${columns}-${contentWidth}`,
       gap,
-      padding: pagePadding,
+      padding: resolvedPagePadding,
       contentWidth,
       tileWidth,
     };
-  }, [width, height, pagePadding, reservedLeadingWidth, resolvers]);
+  }, [width, height, resolvedPagePadding, reservedLeadingWidth, resolvers]);
 };

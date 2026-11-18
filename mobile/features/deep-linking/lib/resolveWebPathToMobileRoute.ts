@@ -22,6 +22,12 @@ const WEB_ONLY_PATHS = new Set([
   "/staff-audit-log-admin",
   "/broadcast-notifications-admin",
   "/admin-analytics",
+  "/safe-deal-moderation",
+  "/become-courier",
+  "/courier-moderation",
+  "/courier-overview",
+  "/shipment-disputes",
+  "/shipping-carriers",
 ]);
 
 /** Точные пути сайта. Ключи в нижнем регистре. */
@@ -85,7 +91,7 @@ const STATIC_PATH_ROUTES: Record<string, string> = {
   "/product-reports": "/hub/product-reports",
   /** В вебе `/product-promotions` — редирект на `/moderation-products`. */
   "/product-promotions": "/hub/product-moderation",
-  "/staff-raffles": "/hub/intro-ad-moderation",
+  "/staff-raffles": "/hub/raffles",
   "/data-confirmation-requests": "/hub/data-confirmation-requests",
   "/installment-disputes": "/hub/installment-disputes",
   "/admin-orders": "/hub/admin-orders",

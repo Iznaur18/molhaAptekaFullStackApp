@@ -1,8 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { isAdminRole } from "@izibuy/shared-lib";
+
 import { useAuthSession } from "../../../user/model/useAuthSession.js";
-import { isProfileProductThumbUnavailable } from "../../../user/lib/resolveProfileProductThumbState.js";
+import {
+  isProfileProductThumbClickBlocked,
+  isProfileProductThumbUnavailable,
+} from "../../../user/lib/resolveProfileProductThumbState.js";
 import { useUserProfileProductsQuery } from "../../../user/model/useUserProfileProductsQuery.js";
 import { USER_PROFILE_PRODUCTS_PREVIEW_LIMIT } from "../../../user/api/fetchUserProducts.js";
 import { resolveProductImageUrl } from "../../lib/resolveProductImageUrl.js";
@@ -29,9 +34,12 @@ export function ProductDetailsSellerProductsCarousel({
   excludeProductId = "",
 }) {
   const navigate = useNavigate();
-  const { currentUserId } = useAuthSession();
+  const { currentUserId, currentUserRole } = useAuthSession();
   const isSelf =
     currentUserId != null && String(currentUserId) === String(sellerId).trim();
+  const isAdminViewer = isAdminRole(
+    /** @type {import('@izibuy/shared-lib').UserRole} */ (currentUserRole ?? "user"),
+  );
   const productsQuery = useUserProfileProductsQuery({
     userId: sellerId,
     limit: USER_PROFILE_PRODUCTS_PREVIEW_LIMIT,
@@ -75,6 +83,10 @@ export function ProductDetailsSellerProductsCarousel({
               currentProductId.length > 0 &&
               String(item.productId) === currentProductId;
             const isUnavailable = isProfileProductThumbUnavailable(item, { isSelf });
+            const isClickBlocked = isProfileProductThumbClickBlocked(item, {
+              isSelf,
+              isAdminViewer,
+            });
 
             return (
               <li
@@ -96,9 +108,9 @@ export function ProductDetailsSellerProductsCarousel({
                     .join(" ")}
                   aria-label={item.productName || USER_PROFILE_PRODUCTS_UI.UNAVAILABLE}
                   aria-current={isCurrent ? "page" : undefined}
-                  disabled={isUnavailable || isCurrent}
+                  disabled={isClickBlocked || isCurrent}
                   onClick={() => {
-                    if (isUnavailable || isCurrent || item.product == null) {
+                    if (isClickBlocked || isCurrent || item.product == null) {
                       return;
                     }
                     navigateToProductDetails(navigate, item.product);

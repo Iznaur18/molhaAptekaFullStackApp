@@ -25,6 +25,7 @@ import { PRODUCT_DETAILS_BADGE_SOFT_COLORS } from "@/entities/product/lib/produc
 import { resolveProductCardSoftElevationShadow } from "@/entities/product/lib/productCardPromotionFramePalette";
 import { PRODUCT_CARD_RATING_LAYOUT as RL } from "@/entities/product/lib/productCardRatingLayout";
 import {
+  PRODUCT_CARD_DESKTOP_LAYOUT as PCD,
   PRODUCT_CARD_MOBILE_CATALOG_LAYOUT as MCL,
   resolveProductCardCatalogGridContentBelowImageHeight,
 } from "@/entities/product/lib/productCardMobileCatalogLayout";
@@ -383,6 +384,17 @@ export const useProductCardStyles = createThemedStyles((theme) => {
       paddingHorizontal: 0,
       paddingBottom: MCL.bottomPadding,
     },
+    /** Шире 1023px: padding 0.55rem 0.75rem 0.65rem, gap 0.4rem. */
+    cardCatalogDesktop: {
+      flexGrow: 0,
+      flexShrink: 0,
+      width: "100%",
+      margin: 0,
+      paddingTop: PCD.paddingTop,
+      paddingHorizontal: PCD.paddingHorizontal,
+      paddingBottom: PCD.paddingBottom,
+      gap: PCD.cardGap,
+    },
     cardCatalogGridModerationQueue: {
       height: undefined,
       minHeight: undefined,
@@ -400,6 +412,15 @@ export const useProductCardStyles = createThemedStyles((theme) => {
       borderBottomLeftRadius: MCL.imageBottomRadius,
       borderBottomRightRadius: MCL.imageBottomRadius,
     },
+    imageWrapCatalogDesktop: {
+      marginTop: -PCD.imageBleedTop,
+      marginHorizontal: -PCD.imageBleedX,
+      aspectRatio: PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO,
+      borderTopLeftRadius: PCD.imageTopRadius,
+      borderTopRightRadius: PCD.imageTopRadius,
+      borderBottomLeftRadius: PCD.imageBottomRadius,
+      borderBottomRightRadius: PCD.imageBottomRadius,
+    },
     contentCatalogGrid: {
       paddingHorizontal: MCL.contentInsetX,
       paddingTop: MCL.bodyGap,
@@ -407,6 +428,13 @@ export const useProductCardStyles = createThemedStyles((theme) => {
       flexGrow: 0,
       flexShrink: 0,
       height: resolveProductCardCatalogGridContentBelowImageHeight(),
+    },
+    contentCatalogDesktop: {
+      paddingHorizontal: 0,
+      paddingTop: 0,
+      gap: PCD.bodyGap,
+      flexGrow: 0,
+      flexShrink: 0,
     },
     contentPressableCatalogGrid: {
       alignSelf: "stretch",
@@ -506,6 +534,10 @@ export const useProductCardStyles = createThemedStyles((theme) => {
       paddingTop: MCL.actionTopGap,
       paddingHorizontal: MCL.contentInsetX,
       justifyContent: "flex-end",
+    },
+    purchaseSlotCatalogDesktop: {
+      height: undefined,
+      paddingHorizontal: 0,
     },
     footerActions: {
       marginTop: "auto",

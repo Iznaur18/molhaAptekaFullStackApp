@@ -25,6 +25,26 @@ export const PRODUCT_CARD_MOBILE_CATALOG_LAYOUT = {
   actionTopGap: 8,
 } as const;
 
+/** `@media (max-width: 1023px)` в ProductCardMobileCatalog.css кончается здесь. */
+export const PRODUCT_CARD_DESKTOP_MIN_WIDTH = 1024;
+
+/**
+ * Шире 1023px: `.product-card` padding `0.55rem 0.75rem 0.65rem`, gap `0.4rem`.
+ * Тело `0.32rem`. Bleed картинки: `--iz-space-2` и `0.38rem`.
+ */
+export const PRODUCT_CARD_DESKTOP_LAYOUT = {
+  paddingTop: 8.8,
+  paddingHorizontal: 12,
+  paddingBottom: 10.4,
+  cardGap: 6.4,
+  bodyGap: 5.12,
+  imageBleedX: 8,
+  imageBleedTop: 6.08,
+  /** `--product-card-radius` 16 − 2 */
+  imageTopRadius: 14,
+  imageBottomRadius: 10,
+} as const;
+
 export type ProductCardMobileCatalogLayout = typeof PRODUCT_CARD_MOBILE_CATALOG_LAYOUT;
 
 /** Фиксированная высота текстового стека под фото в catalog-grid. */

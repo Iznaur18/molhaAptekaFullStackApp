@@ -35,6 +35,22 @@ test("curated home layout uses web card gap", () => {
   assert.match(source, /SCROLL_PADDING_BOTTOM = 0/);
 });
 
+test("home feed sellers tab filters storefront tiles like web", () => {
+  const index = readMobileFile("app/(tabs)/index.tsx");
+  const sellers = readMobileFile("features/home-feed/ui/HomeFeedSellersSection.tsx");
+  const tabs = readMobileFile("features/home-feed/ui/HomeFeedSectionTabs.tsx");
+  const header = readMobileFile("features/home-feed/ui/HomeFeedListHeader.tsx");
+
+  assert.match(tabs, /CATALOG_HOME_SECTION_SELLERS/);
+  assert.match(tabs, /CATALOG_HOME_SECTION_CATEGORIES/);
+  assert.match(sellers, /filterSellerStoreTilesBySearch/);
+  assert.match(sellers, /router\.push\(`\/seller\/\$\{id\}`\)/);
+  assert.match(header, /HomeFeedSellersSection/);
+  assert.match(header, /activeTab === "home"/);
+  assert.match(index, /activeHomeFeedSectionTab === "home"/);
+  assert.match(index, /blockProductSearchRef/);
+});
+
 test("home catalog screen wires home-feed refresh", () => {
   const index = readMobileFile("app/(tabs)/index.tsx");
   const header = readMobileFile("features/home-feed/ui/HomeFeedHeader.tsx");

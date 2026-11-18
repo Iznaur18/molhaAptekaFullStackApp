@@ -84,8 +84,10 @@ export function useCatalogBrowserLanding({
     enabled: displaysEnabled,
   });
   const categoryRootsQuery = useProductCategoryRootsQuery({ enabled: rootsEnabled });
+  const personalCategoryTilesEnabled =
+    displaysEnabled && Boolean(catalogQueryFromUrl.sellerPersonalCategoryId);
   const personalCategoryTilesQuery = useSellerPersonalCategoryCatalogTilesQuery({
-    enabled: displaysEnabled,
+    enabled: personalCategoryTilesEnabled,
     regionCode: viewerRegionCode,
   });
   const breadcrumbQuery = useProductCategoryBreadcrumbQuery({
@@ -113,8 +115,7 @@ export function useCatalogBrowserLanding({
       displaysEnabled &&
       (categoryDisplaysQuery.isPending ||
         feedTileDisplaysQuery.isPending ||
-        categoryRootsQuery.isPending ||
-        personalCategoryTilesQuery.isPending);
+        categoryRootsQuery.isPending);
     if (isLoading) {
       return { kind: "loading", message: "" };
     }
@@ -122,8 +123,7 @@ export function useCatalogBrowserLanding({
     const queryError =
       categoryDisplaysQuery.error ??
       feedTileDisplaysQuery.error ??
-      categoryRootsQuery.error ??
-      personalCategoryTilesQuery.error;
+      categoryRootsQuery.error;
     if (queryError instanceof Error) {
       return { kind: "error", message: queryError.message };
     }
@@ -143,8 +143,6 @@ export function useCatalogBrowserLanding({
     displaysEnabled,
     feedTileDisplaysQuery.error,
     feedTileDisplaysQuery.isPending,
-    personalCategoryTilesQuery.error,
-    personalCategoryTilesQuery.isPending,
   ]);
 
   useEffect(() => {
@@ -466,7 +464,6 @@ export function useCatalogBrowserLanding({
     handleCatalogMenuClick,
     handleCatalogCategoryGridClick,
     handleSellerPersonalCategoryTileClick,
-    personalCategoryTiles,
     handleCatalogFeedTileClick,
     handleCategoryDisplaySaved,
     handleFeedTileDisplaySaved,

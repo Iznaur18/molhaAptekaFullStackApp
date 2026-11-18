@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { Home, LayoutGrid, Plus, ShoppingCart, User } from "lucide-react";
 
 import { useCart } from "../../../entities/cart/model/useCart.js";
@@ -9,6 +10,7 @@ import {
   HOME_PAGE_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
+import { useMobileBottomNavViewportPin } from "../model/useMobileBottomNavViewportPin.js";
 
 import "./MobileBottomNav.css";
 
@@ -42,6 +44,8 @@ export function MobileBottomNav({
   onCartClick,
   onProfileClick,
 }) {
+  const navRef = useRef(null);
+  useMobileBottomNavViewportPin(navRef);
   const { totalCount } = useCart();
   const cartBadge = totalCount > 0 ? totalCount : null;
   const profileBadge =
@@ -66,7 +70,11 @@ export function MobileBottomNav({
   };
 
   return (
-    <nav className="mobile-bottom-nav" aria-label={HOME_PAGE_UI.NAV_MOBILE_BOTTOM_ARIA}>
+    <nav
+      ref={navRef}
+      className="mobile-bottom-nav"
+      aria-label={HOME_PAGE_UI.NAV_MOBILE_BOTTOM_ARIA}
+    >
       <MobileBottomNavItem
         ariaLabel={HOME_PAGE_UI.NAV_MOBILE_HOME_ARIA}
         label={HOME_PAGE_UI.NAV_MOBILE_HOME}
