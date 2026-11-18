@@ -18,7 +18,10 @@ export {
   creditLoyaltyPoints,
   refundLoyaltyPoints,
 } from "./loyaltyPointsSpend.js";
-export { adminCreditOwnLoyaltyPoints } from "./adminCreditOwnLoyaltyPoints.js";
+export {
+  adminCreditOwnLoyaltyPoints,
+  getMyLoyaltyPointsStatus,
+} from "./adminCreditOwnLoyaltyPoints.js";
 export {
   InsufficientRubBalanceError,
   deductRubBalance,

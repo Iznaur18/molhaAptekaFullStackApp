@@ -1,5 +1,6 @@
 import { STAFF_BROADCAST_NOTIFICATION_KIND } from "@molha/api-contract";
 
+import { AppError } from "../../errors/AppError.js";
 import { UserInAppNotificationModel, UserModel } from "../../models/index.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 import {
@@ -49,10 +50,16 @@ export async function countStaffBroadcastRecipients() {
  * }} params
  */
 export async function broadcastStaffNotificationToAllUsers({
-  title,
-  message,
+  title: titleRaw,
+  message: messageRaw,
   actorUserId,
 }) {
+  const title = String(titleRaw ?? "").trim();
+  const message = String(messageRaw ?? "").trim();
+  if (!title || !message) {
+    throw new AppError(400, "Укажите заголовок и текст");
+  }
+
   const recipients = await UserModel.find(recipientFilter).select("_id").lean();
   const combinedMessage = `${title}\n${message}`;
 

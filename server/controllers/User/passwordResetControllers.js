@@ -1,5 +1,7 @@
-import { errorRes, successRes } from "../../services/http/index.js";
+import { successRes } from "../../services/http/index.js";
+import { AppError } from "../../errors/AppError.js";
 import { issueRotatedAuthSession } from "../../services/auth/issueAuthSession.js";
+import { throwMappedAuthChannelError } from "../../services/auth/mapAuthChannelError.js";
 import {
   changePasswordForUser,
   confirmPasswordReset,
@@ -10,38 +12,22 @@ import {
   PASSWORD_RESET_GENERIC_MESSAGE,
   PASSWORD_RESET_SUCCESS_MESSAGE,
 } from "../../constants/passwordResetConstants.js";
-import { SMS_DELIVERY_UNAVAILABLE_MESSAGE } from "../../constants/phoneVerificationConstants.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 
-function isSmsDeliveryFailure(message) {
-  return (
-    message === "SMS_DELIVERY_UNAVAILABLE" ||
-    message.startsWith("SMS_DELIVERY_UNAVAILABLE") ||
-    message === SMS_DELIVERY_UNAVAILABLE_MESSAGE ||
-    message.startsWith(`${SMS_DELIVERY_UNAVAILABLE_MESSAGE}:`)
-  );
-}
-
-function isEmailDeliveryFailure(message) {
-  return message === "EMAIL_DELIVERY_UNAVAILABLE";
-}
-
-function mapDeliveryError(error) {
-  const message = error instanceof Error ? error.message : String(error);
-  if (isEmailDeliveryFailure(message)) {
-    return "Не удалось отправить письмо. Попробуйте позже";
+/**
+ * @param {unknown} error
+ * @param {string} fallbackMessage
+ * @returns {never}
+ */
+function throwPasswordResetError(error, fallbackMessage) {
+  if (error instanceof AppError) {
+    throw error;
   }
-  if (isSmsDeliveryFailure(message)) {
-    const detail =
-      error?.smspilotDescription ||
-      (message.includes(": ") ? message.slice(message.indexOf(": ") + 2).trim() : "");
-    if (detail && !detail.startsWith(SMS_DELIVERY_UNAVAILABLE_MESSAGE)) {
-      return `${SMS_DELIVERY_UNAVAILABLE_MESSAGE}: ${detail}`;
-    }
-    if (detail) return detail;
-    return SMS_DELIVERY_UNAVAILABLE_MESSAGE;
+  const message = error instanceof Error ? error.message : String(error ?? "");
+  if (message === "Аккаунт заблокирован" || message.includes("отключён")) {
+    throw new AppError(403, message);
   }
-  return message;
+  throwMappedAuthChannelError(error, { fallbackMessage });
 }
 
 /** POST /auth/password/reset/request */
@@ -51,15 +37,9 @@ export const passwordResetRequestController = async (req, res) => {
   try {
     await requestPasswordReset({ email, phoneNumber });
   } catch (error) {
-    const message = mapDeliveryError(error);
-    if (
-      isEmailDeliveryFailure(String(error?.message ?? "")) ||
-      isSmsDeliveryFailure(message) ||
-      isSmsDeliveryFailure(String(error?.message ?? ""))
-    ) {
-      return errorRes(res, 503, message);
-    }
-    return errorRes(res, 400, message);
+    throwMappedAuthChannelError(error, {
+      fallbackMessage: "Не удалось отправить код сброса пароля",
+    });
   }
 
   return successRes(res, { message: PASSWORD_RESET_GENERIC_MESSAGE });
@@ -72,12 +52,7 @@ export const passwordResetConfirmController = async (req, res) => {
   try {
     await confirmPasswordReset({ email, phoneNumber, code, newPassword });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Не удалось сбросить пароль";
-    if (message === "Аккаунт заблокирован" || message.includes("отключён")) {
-      return errorRes(res, 403, message);
-    }
-    return errorRes(res, 400, message);
+    throwPasswordResetError(error, "Не удалось сбросить пароль");
   }
 
   return successRes(res, { message: PASSWORD_RESET_SUCCESS_MESSAGE });
@@ -85,15 +60,11 @@ export const passwordResetConfirmController = async (req, res) => {
 
 /** POST /auth/password/change (auth) */
 export const passwordChangeController = async (req, res) => {
+  let user;
   try {
-    const user = await changePasswordForUser(req.userId, {
+    user = await changePasswordForUser(req.userId, {
       currentPassword: req.body.currentPassword,
       newPassword: req.body.newPassword,
-    });
-    const data = await issueRotatedAuthSession(user, res, req);
-    return successRes(res, {
-      ...data,
-      message: PASSWORD_CHANGE_SUCCESS_MESSAGE,
     });
   } catch (error) {
     const message =
@@ -103,6 +74,14 @@ export const passwordChangeController = async (req, res) => {
       userId: String(req.userId ?? ""),
       error: message,
     });
-    return errorRes(res, 400, message);
+    throwMappedAuthChannelError(error, {
+      fallbackMessage: "Не удалось сменить пароль",
+    });
   }
+
+  const data = await issueRotatedAuthSession(user, res, req);
+  return successRes(res, {
+    ...data,
+    message: PASSWORD_CHANGE_SUCCESS_MESSAGE,
+  });
 };

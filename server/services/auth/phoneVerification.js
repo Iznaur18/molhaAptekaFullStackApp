@@ -12,6 +12,7 @@ import {
   PHONE_VERIFICATION_TOKEN_TTL_MS,
   SMS_DELIVERY_UNAVAILABLE_MESSAGE,
 } from "../../constants/phoneVerificationConstants.js";
+import { AppError } from "../../errors/AppError.js";
 import { sendSmspilotSms } from "../../utils/smspilotClient.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 import {
@@ -43,7 +44,8 @@ export async function deliverPhoneVerificationSms({ phoneNumber, code }) {
       const detail =
         error?.smspilotDescription ||
         (message.includes(": ") ? message.slice(message.indexOf(": ") + 2) : "");
-      const wrapped = new Error(
+      const wrapped = new AppError(
+        503,
         detail
           ? `${SMS_DELIVERY_UNAVAILABLE_MESSAGE}: ${detail}`
           : SMS_DELIVERY_UNAVAILABLE_MESSAGE,
@@ -125,7 +127,7 @@ export async function requestPhoneBindForUser(userId, rawPhone) {
     "userPhoneNumber isPhoneVerified",
   );
   if (!user) {
-    throw new Error(PHONE_VERIFICATION_INVALID_CODE_MESSAGE);
+    throw new AppError(400, PHONE_VERIFICATION_INVALID_CODE_MESSAGE);
   }
 
   const phoneNumber =
@@ -136,7 +138,7 @@ export async function requestPhoneBindForUser(userId, rawPhone) {
         : "";
 
   if (!phoneNumber) {
-    throw new Error(PHONE_NOT_SET_MESSAGE);
+    throw new AppError(400, PHONE_NOT_SET_MESSAGE);
   }
 
   if (
@@ -144,7 +146,7 @@ export async function requestPhoneBindForUser(userId, rawPhone) {
     user.userPhoneNumber === phoneNumber &&
     (rawPhone == null || String(rawPhone).trim() === "")
   ) {
-    throw new Error(PHONE_VERIFICATION_ALREADY_VERIFIED_MESSAGE);
+    throw new AppError(400, PHONE_VERIFICATION_ALREADY_VERIFIED_MESSAGE);
   }
 
   const taken = await UserModel.findOne({
@@ -152,7 +154,7 @@ export async function requestPhoneBindForUser(userId, rawPhone) {
     _id: { $ne: user._id },
   }).select("_id");
   if (taken) {
-    throw new Error(PHONE_TAKEN_MESSAGE);
+    throw new AppError(400, PHONE_TAKEN_MESSAGE);
   }
 
   const code = await issuePhoneVerificationCode(user._id, phoneNumber);
@@ -170,35 +172,35 @@ export async function requestPhoneBindForUser(userId, rawPhone) {
 export async function confirmPhoneBindForUser(userId, rawCode) {
   const code = String(rawCode ?? "").trim();
   if (!PHONE_CODE_PATTERN.test(code)) {
-    throw new Error(PHONE_VERIFICATION_INVALID_CODE_MESSAGE);
+    throw new AppError(400, PHONE_VERIFICATION_INVALID_CODE_MESSAGE);
   }
 
   const user = await UserModel.findById(userId).select(
     "+phoneVerificationTokenHash +phoneVerificationExpiresAt +phoneVerificationAttemptCount +pendingPhoneNumber userPhoneNumber",
   );
   if (!user) {
-    throw new Error(PHONE_VERIFICATION_INVALID_CODE_MESSAGE);
+    throw new AppError(400, PHONE_VERIFICATION_INVALID_CODE_MESSAGE);
   }
 
   if ((user.phoneVerificationAttemptCount ?? 0) >= PHONE_VERIFICATION_MAX_ATTEMPTS) {
-    throw new Error(PHONE_VERIFICATION_ATTEMPTS_EXCEEDED_MESSAGE);
+    throw new AppError(400, PHONE_VERIFICATION_ATTEMPTS_EXCEEDED_MESSAGE);
   }
 
   const now = new Date();
   if (!user.phoneVerificationExpiresAt || user.phoneVerificationExpiresAt <= now) {
-    throw new Error(PHONE_VERIFICATION_INVALID_CODE_MESSAGE);
+    throw new AppError(400, PHONE_VERIFICATION_INVALID_CODE_MESSAGE);
   }
 
   const phoneNumber = String(user.pendingPhoneNumber ?? "").trim();
   if (!phoneNumber) {
-    throw new Error(PHONE_VERIFICATION_INVALID_CODE_MESSAGE);
+    throw new AppError(400, PHONE_VERIFICATION_INVALID_CODE_MESSAGE);
   }
 
   if (user.phoneVerificationTokenHash !== hashPhoneVerificationSecret(code)) {
     await UserModel.findByIdAndUpdate(userId, {
       $inc: { phoneVerificationAttemptCount: 1 },
     });
-    throw new Error(PHONE_VERIFICATION_INVALID_CODE_MESSAGE);
+    throw new AppError(400, PHONE_VERIFICATION_INVALID_CODE_MESSAGE);
   }
 
   const taken = await UserModel.findOne({
@@ -207,7 +209,7 @@ export async function confirmPhoneBindForUser(userId, rawCode) {
   }).select("_id");
   if (taken) {
     await clearPhoneVerificationChallenge(userId);
-    throw new Error(PHONE_TAKEN_MESSAGE);
+    throw new AppError(400, PHONE_TAKEN_MESSAGE);
   }
 
   await markUserPhoneVerified(userId, phoneNumber);
@@ -251,7 +253,7 @@ export async function requestPhoneLoginOtp(phoneNumber) {
 export async function confirmPhoneLoginOtp(phoneNumber, rawCode) {
   const code = String(rawCode ?? "").trim();
   if (!PHONE_CODE_PATTERN.test(code)) {
-    throw new Error(PHONE_VERIFICATION_INVALID_CODE_MESSAGE);
+    throw new AppError(400, PHONE_VERIFICATION_INVALID_CODE_MESSAGE);
   }
 
   const user = await UserModel.findOne({ userPhoneNumber: phoneNumber }).select(
@@ -261,35 +263,35 @@ export async function confirmPhoneLoginOtp(phoneNumber, rawCode) {
   if (!user) {
     // Константный «промах» без утечки существования номера
     crypto.randomBytes(8);
-    throw new Error(PHONE_VERIFICATION_INVALID_CODE_MESSAGE);
+    throw new AppError(400, PHONE_VERIFICATION_INVALID_CODE_MESSAGE);
   }
 
   if (user.isBlockedUser) {
-    throw new Error("Аккаунт заблокирован");
+    throw new AppError(403, "Аккаунт заблокирован");
   }
   if (user.isActiveUser === false) {
-    throw new Error("Аккаунт отключён администратором");
+    throw new AppError(403, "Аккаунт отключён администратором");
   }
 
   if ((user.phoneVerificationAttemptCount ?? 0) >= PHONE_VERIFICATION_MAX_ATTEMPTS) {
-    throw new Error(PHONE_VERIFICATION_ATTEMPTS_EXCEEDED_MESSAGE);
+    throw new AppError(400, PHONE_VERIFICATION_ATTEMPTS_EXCEEDED_MESSAGE);
   }
 
   const now = new Date();
   if (!user.phoneVerificationExpiresAt || user.phoneVerificationExpiresAt <= now) {
-    throw new Error(PHONE_VERIFICATION_INVALID_CODE_MESSAGE);
+    throw new AppError(400, PHONE_VERIFICATION_INVALID_CODE_MESSAGE);
   }
 
   const pendingPhone = String(user.pendingPhoneNumber ?? "").trim();
   if (pendingPhone && pendingPhone !== phoneNumber) {
-    throw new Error(PHONE_VERIFICATION_INVALID_CODE_MESSAGE);
+    throw new AppError(400, PHONE_VERIFICATION_INVALID_CODE_MESSAGE);
   }
 
   if (user.phoneVerificationTokenHash !== hashPhoneVerificationSecret(code)) {
     await UserModel.findByIdAndUpdate(user._id, {
       $inc: { phoneVerificationAttemptCount: 1 },
     });
-    throw new Error(PHONE_VERIFICATION_INVALID_CODE_MESSAGE);
+    throw new AppError(400, PHONE_VERIFICATION_INVALID_CODE_MESSAGE);
   }
 
   await markUserPhoneVerified(user._id, phoneNumber);

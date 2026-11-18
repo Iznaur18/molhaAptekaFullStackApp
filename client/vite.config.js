@@ -3,7 +3,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { visualizer } from "rollup-plugin-visualizer";
 
-import { buildSpaContentSecurityPolicy } from "../server/utils/buildSpaContentSecurityPolicy.js";
+import { buildSpaContentSecurityPolicy } from "@izibuy/shared-lib";
 import {
   DEV_API_PROXY_PREFIXES,
   shouldProxyToApi,

@@ -26,6 +26,10 @@ export {
 export {
   rejectPendingDataConfirmationForUser,
   getPendingDataConfirmationRequests,
+  submitDataConfirmationRequest,
+  getMyDataConfirmationRequest,
+  countPendingDataConfirmationRequests,
+  resolveDataConfirmationRequest,
 } from "./userDataConfirmationHelpers.js";
 export {
   createUserInAppNotification,
@@ -39,8 +43,16 @@ export {
 export {
   isPremiumActive,
   syncPremiumExpiryForUser,
+  getMyPremiumStatus,
+  purchasePremium,
   purchasePremiumSubscription,
 } from "./premiumAccess.js";
+export {
+  castUserVote,
+  getMyVoteForTarget,
+  getUserVoteRating,
+  listReceivedUserVotes,
+} from "./userVoteRating.js";
 export { expireStaleUserStories } from "./userStoryHelpers.js";
 export { getOptionalViewerFromRequest } from "./optionalViewerFromRequest.js";
 export { sanitizeUserProfileForViewer } from "./userProfileVisibility.js";

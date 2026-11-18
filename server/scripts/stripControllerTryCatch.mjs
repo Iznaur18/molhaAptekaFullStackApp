@@ -16,10 +16,6 @@ const SKIP = new Set([
   "index.js",
   "orderQueries.js",
   "orderStatus.js",
-  "cartItemHelpers.js",
-  "resolveCartUserId.js",
-  "favoritesItemHelpers.js",
-  "resolveFavoritesUserId.js",
   "controllerAsync.js",
 ]);
 

@@ -1,3 +1,4 @@
+import { successRes } from "../http/index.js";
 import { issueAuthSession } from "./issueAuthSession.js";
 
 /**
@@ -7,5 +8,5 @@ import { issueAuthSession } from "./issueAuthSession.js";
  */
 export const sendUserWithToken = (user, res, req) => {
   const data = issueAuthSession(user, res, req);
-  return res.status(200).json({ success: true, data });
+  return successRes(res, data);
 };

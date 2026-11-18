@@ -11,19 +11,17 @@ import {
   PENDING_REGISTRATION_TAKEN_MESSAGE,
   PENDING_REGISTRATION_TTL_MS,
 } from "../../constants/emailVerificationConstants.js";
+import { PHONE_VERIFICATION_TOKEN_TTL_MS } from "../../constants/phoneVerificationConstants.js";
+import { AppError } from "../../errors/AppError.js";
+import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
+import { attachReferralAttribution } from "../referral/attachReferralAttribution.js";
+import { ensureUserReferralCode } from "../referral/ensureUserReferralCode.js";
 import {
   deliverEmailVerification,
   generateEmailVerificationCode,
   hashEmailVerificationSecret,
 } from "./emailVerification.js";
 import { deliverPhoneVerificationSms } from "./phoneVerification.js";
-import {
-  PHONE_VERIFICATION_TOKEN_TTL_MS,
-  SMS_DELIVERY_UNAVAILABLE_MESSAGE,
-} from "../../constants/phoneVerificationConstants.js";
-import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
-import { attachReferralAttribution } from "../referral/attachReferralAttribution.js";
-import { ensureUserReferralCode } from "../referral/ensureUserReferralCode.js";
 
 const PENDING_CODE_PATTERN = new RegExp(`^\\d{${EMAIL_VERIFICATION_CODE_LENGTH}}$`);
 
@@ -58,7 +56,7 @@ function assertEmailRegistrationChannelAllowed(pending) {
   if (isPendingPhoneChannel(pending) || isEmailAuthEnabled()) {
     return;
   }
-  throw new Error(EMAIL_AUTH_DISABLED_MESSAGE);
+  throw new AppError(503, EMAIL_AUTH_DISABLED_MESSAGE);
 }
 
 /**
@@ -85,7 +83,7 @@ function assertEmailRegistrationChannelAllowed(pending) {
  */
 export async function createPendingRegistration(fields) {
   if (!isEmailAuthEnabled()) {
-    throw new Error(EMAIL_AUTH_DISABLED_MESSAGE);
+    throw new AppError(503, EMAIL_AUTH_DISABLED_MESSAGE);
   }
 
   const email = String(fields.email).trim().toLowerCase();
@@ -98,7 +96,7 @@ export async function createPendingRegistration(fields) {
     }),
   }).select("_id");
   if (exists) {
-    throw new Error(PENDING_REGISTRATION_TAKEN_MESSAGE);
+    throw new AppError(400, PENDING_REGISTRATION_TAKEN_MESSAGE);
   }
 
   const code = generateEmailVerificationCode();
@@ -171,7 +169,7 @@ export async function createPendingPhoneRegistration(fields) {
     }),
   }).select("_id");
   if (exists) {
-    throw new Error(PENDING_REGISTRATION_TAKEN_MESSAGE);
+    throw new AppError(400, PENDING_REGISTRATION_TAKEN_MESSAGE);
   }
 
   const code = generateEmailVerificationCode();
@@ -214,7 +212,7 @@ export async function createPendingPhoneRegistration(fields) {
 export async function resendPendingRegistrationCode(registrationId) {
   const pending = await PendingRegistrationModel.findById(registrationId);
   if (!pending || pending.expiresAt <= new Date()) {
-    throw new Error(PENDING_REGISTRATION_NOT_FOUND_MESSAGE);
+    throw new AppError(400, PENDING_REGISTRATION_NOT_FOUND_MESSAGE);
   }
 
   assertEmailRegistrationChannelAllowed(pending);
@@ -232,18 +230,7 @@ export async function resendPendingRegistrationCode(registrationId) {
 
   if (isPhoneChannel) {
     const phoneNumber = String(pending.userPhoneNumber).trim();
-    try {
-      await deliverPhoneVerificationSms({ phoneNumber, code });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      if (
-        message === SMS_DELIVERY_UNAVAILABLE_MESSAGE ||
-        message === "SMS_DELIVERY_UNAVAILABLE"
-      ) {
-        throw new Error("SMS_DELIVERY_UNAVAILABLE");
-      }
-      throw error;
-    }
+    await deliverPhoneVerificationSms({ phoneNumber, code });
     return { phoneNumber };
   }
 
@@ -266,27 +253,27 @@ export async function resendPendingRegistrationCode(registrationId) {
 export async function confirmPendingRegistration(registrationId, rawCode) {
   const code = String(rawCode ?? "").trim();
   if (!PENDING_CODE_PATTERN.test(code)) {
-    throw new Error(EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
+    throw new AppError(400, EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
   }
 
   const pending = await PendingRegistrationModel.findById(registrationId).select(
     "+passwordHash +codeHash",
   );
   if (!pending || pending.expiresAt <= new Date()) {
-    throw new Error(PENDING_REGISTRATION_NOT_FOUND_MESSAGE);
+    throw new AppError(400, PENDING_REGISTRATION_NOT_FOUND_MESSAGE);
   }
 
   assertEmailRegistrationChannelAllowed(pending);
 
   if ((pending.codeAttemptCount ?? 0) >= EMAIL_VERIFICATION_MAX_ATTEMPTS) {
-    throw new Error(EMAIL_VERIFICATION_ATTEMPTS_EXCEEDED_MESSAGE);
+    throw new AppError(400, EMAIL_VERIFICATION_ATTEMPTS_EXCEEDED_MESSAGE);
   }
 
   if (pending.codeHash !== hashEmailVerificationSecret(code)) {
     await PendingRegistrationModel.findByIdAndUpdate(pending._id, {
       $inc: { codeAttemptCount: 1 },
     });
-    throw new Error(EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
+    throw new AppError(400, EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
   }
 
   // Пока заявка ждала подтверждения, email/ник/телефон мог занять другой
@@ -296,7 +283,7 @@ export async function confirmPendingRegistration(registrationId, rawCode) {
   }).select("_id");
   if (exists) {
     await PendingRegistrationModel.findByIdAndDelete(pending._id);
-    throw new Error(PENDING_REGISTRATION_TAKEN_MESSAGE);
+    throw new AppError(400, PENDING_REGISTRATION_TAKEN_MESSAGE);
   }
 
   const isPhoneChannel = isPendingPhoneChannel(pending);
@@ -343,7 +330,7 @@ export async function confirmPendingRegistration(registrationId, rawCode) {
     // гонка: между проверкой и save() кто-то успел занять email/ник
     if (saveError?.code === 11000) {
       await PendingRegistrationModel.findByIdAndDelete(pending._id);
-      throw new Error(PENDING_REGISTRATION_TAKEN_MESSAGE);
+      throw new AppError(400, PENDING_REGISTRATION_TAKEN_MESSAGE);
     }
     throw saveError;
   }

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 import { CartModel, ProductModel } from "../../models/index.js";
-import { normalizeStoredCartItems } from "../../controllers/Cart/cartItemHelpers.js";
+import { normalizeStoredCartItems } from "../cart/cartItemHelpers.js";
 
 /**
  * Удаляет из корзины `blockedId` товары продавца `blockerId`.

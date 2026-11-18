@@ -1,12 +1,13 @@
 import mongoose from "mongoose";
 
-import { ReferralLedgerEntryModel, UserModel } from "../../models/index.js";
 import {
   REFERRAL_CASHBACK_PERCENT,
   REFERRAL_LEDGER_ENTRY_CREDIT,
   REFERRAL_LEDGER_ENTRY_REVERSAL,
   REFERRAL_QUERY_PARAM,
 } from "../../constants/referralConstants.js";
+import { AppError } from "../../errors/AppError.js";
+import { ReferralLedgerEntryModel, UserModel } from "../../models/index.js";
 import { resolveFrontendOrigin } from "../../utils/resolveFrontendOrigin.js";
 import { ensureUserReferralCode } from "./ensureUserReferralCode.js";
 import { migratePartnerBalanceToLoyaltyPoints } from "./migratePartnerBalanceToLoyaltyPoints.js";
@@ -31,7 +32,7 @@ export async function getMyReferralProgram(userId) {
   const referralCode = await ensureUserReferralCode(userId);
   const me = await UserModel.findById(userId).select("userLoyaltyPoints").lean();
   if (!me) {
-    throw new Error("USER_NOT_FOUND");
+    throw new AppError(404, "Пользователь не найден");
   }
 
   const referrerObjectId = new mongoose.Types.ObjectId(String(userId));

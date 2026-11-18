@@ -23,27 +23,48 @@ import {
 } from "./productPickup.js";
 import { PRODUCT_PICKUP_LOCATION_ID_MAX_LENGTH } from "./productPickupLocations.js";
 
-/** Синхрон с `server/constants/orderConstants.js`. */
+/** Способы оплаты — единый источник для server / shared-lib / клиентов. */
+export const ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY = "cashOnDelivery";
+export const ORDER_PAYMENT_METHOD_CARD_PREPAID = "cardPrepaid";
+export const ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY = "cardOnDelivery";
+
 export const ORDER_PAYMENT_METHODS = [
-  "cashOnDelivery",
-  "cardPrepaid",
-  "cardOnDelivery",
+  ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
+  ORDER_PAYMENT_METHOD_CARD_PREPAID,
+  ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY,
 ];
+
+/** Жизненный цикл статуса заказа — единый источник литералов. */
+export const ORDER_STATUS_PENDING = "pending";
+export const ORDER_STATUS_ACCEPTED = "accepted";
+export const ORDER_STATUS_ASSEMBLING = "assembling";
+export const ORDER_STATUS_READY_FOR_PICKUP = "ready_for_pickup";
+export const ORDER_STATUS_READY_TO_SHIP = "ready_to_ship";
+export const ORDER_STATUS_COURIER_ASSIGNED = "courier_assigned";
+export const ORDER_STATUS_COURIER_HOLDING = "courier_holding";
+export const ORDER_STATUS_IN_DELIVERY = "in_delivery";
+export const ORDER_STATUS_CONFIRMED = "confirmed";
+export const ORDER_STATUS_SHIPPED = "shipped";
+export const ORDER_STATUS_DELIVERED = "delivered";
+export const ORDER_STATUS_RETURNED = "returned";
+export const ORDER_STATUS_CANCELLED = "cancelled";
+export const ORDER_STATUS_DISPUTED = "disputed";
+
 export const ORDER_STATUSES = [
-  "pending",
-  "accepted",
-  "assembling",
-  "ready_for_pickup",
-  "ready_to_ship",
-  "courier_assigned",
-  "courier_holding",
-  "in_delivery",
-  "confirmed",
-  "shipped",
-  "delivered",
-  "returned",
-  "cancelled",
-  "disputed",
+  ORDER_STATUS_PENDING,
+  ORDER_STATUS_ACCEPTED,
+  ORDER_STATUS_ASSEMBLING,
+  ORDER_STATUS_READY_FOR_PICKUP,
+  ORDER_STATUS_READY_TO_SHIP,
+  ORDER_STATUS_COURIER_ASSIGNED,
+  ORDER_STATUS_COURIER_HOLDING,
+  ORDER_STATUS_IN_DELIVERY,
+  ORDER_STATUS_CONFIRMED,
+  ORDER_STATUS_SHIPPED,
+  ORDER_STATUS_DELIVERED,
+  ORDER_STATUS_CANCELLED,
+  ORDER_STATUS_RETURNED,
+  ORDER_STATUS_DISPUTED,
 ];
 
 /**
@@ -53,10 +74,10 @@ export const ORDER_STATUSES = [
  * участники, и принимать их в теле запроса нельзя.
  */
 export const ORDER_SHIPMENT_ADVANCE_STATUSES = [
-  "accepted",
-  "assembling",
-  "ready_for_pickup",
-  "ready_to_ship",
+  ORDER_STATUS_ACCEPTED,
+  ORDER_STATUS_ASSEMBLING,
+  ORDER_STATUS_READY_FOR_PICKUP,
+  ORDER_STATUS_READY_TO_SHIP,
 ];
 export const ORDER_LINE_ITEM_QUANTITY_MIN = 1;
 export const ORDER_ITEMS_MAX = 100;

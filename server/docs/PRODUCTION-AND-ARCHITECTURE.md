@@ -32,21 +32,22 @@ Full-stack маркетплейс:
 
 ```
 molhaAptekaFullStackApp/
-├── client/          # фронт (npm run dev / npm run build)
-├── server/          # API (npm run start:dev)
-│   ├── index.js     # точка входа Express
-│   ├── models/      # Mongoose-схемы
-│   ├── controllers/ # бизнес-логика
-│   ├── routes/      # маршруты
-│   ├── validations/ # express-validator
-│   ├── middlewares/ # JWT, rate limit, multer
-│   ├── uploads/     # загруженные файлы (важно для прода!)
-│   └── scripts/     # миграции БД
-├── docs/deploy/     # пример nginx
-└── client/docs/     # связка клиент ↔ сервер
+├── contract/        # @molha/api-contract — Zod + общие enum/лимиты
+├── packages/        # shared-lib, shared-api, design-tokens
+├── client/          # Vite SPA (FSD)
+├── mobile/          # Expo SDK 54
+├── server/          # Express API
+│   ├── routes/      # createAsyncRouter + MW
+│   ├── validations/ # Zod из contract (не писать схемы тут)
+│   ├── controllers/ # thin → services
+│   ├── services/    # бизнес-логика по доменам
+│   ├── models/      # Mongoose
+│   ├── utils/       # legacy-хелперы; новое → services/<домен>/
+│   └── scripts/     # миграции, ops
+└── docs/            # оглавление docs/README.md
 ```
 
-**FSD на клиенте:** `entities/`, `pages/`, `widgets/`, `shared/`.
+**Эталон среза:** `seller-shelf`. Правила: корневые `CLAUDE.md` + `AGENTS.md`.
 
 ---
 

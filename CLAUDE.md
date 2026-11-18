@@ -2,7 +2,7 @@
 
 Продуктовые принципы и приоритеты — в `AGENTS.md` (грузится вместе с этим файлом).
 Здесь — **как устроен код** и как его менять, не сбивая архитектуру.
-Проверено по коду 24.09.2026. Если правило расходится с кодом — сначала перепроверь код.
+Проверено по коду 18.11.2026. Если правило расходится с кодом — сначала перепроверь код.
 
 ## Карта
 
@@ -18,7 +18,7 @@ Modular monolith. Один Express API + одна MongoDB (replica set `rs0`, н
 | `client/`                | Web SPA: React 19, Vite, React Router, TanStack Query | JSX, `checkJs` |
 | `mobile/`                | Expo SDK 54 / Expo Router, RN                         | TS             |
 
-Доки: `docs/ARCHITECTURE.md`, `docs/PROJECT_MAP.md`, `docs/DATA_MODEL.md`, `docs/API.md`, ADR в `docs/decisions/`.
+Доки (вход): `docs/README.md`. Карта: `docs/ARCHITECTURE.md`, `docs/PROJECT_MAP.md`, `docs/DATA_MODEL.md`, `docs/API.md`. ADR: `docs/decisions/`. Kill-switches: `docs/architecture/FEATURE-KILL-SWITCHES.md`.
 
 ## Backend: вертикальный срез (эталон — seller-shelf)
 
@@ -49,7 +49,7 @@ models/XModel.js               схема + индексы; экспорт че�
 - **zod молча срезает необъявленные поля** (и в ответе клиенту, и в body на сервере). Добавил поле в модель —
   добавь в схему, иначе «правка не работает».
 - Константы, общие для сервера и клиентов (статусы, лимиты, формулы цен/тарифов), — только тут, не копиями.
-  Статусы заказа исторически в 4 копиях — при правке менять все.
+  Статусы/способы оплаты заказа: литералы в `contract/src/order.js`; server и shared-lib **реэкспортируют**, не дублируют строки.
 
 ## Web client (`client/src`) — FSD-подобно
 

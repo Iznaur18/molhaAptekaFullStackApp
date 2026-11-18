@@ -19,14 +19,16 @@ export function auditStaffActionMW(req, res, next) {
       return;
     }
 
-    const routePath = req.route?.path ?? req.path;
-    const action = `${req.method.toUpperCase()} ${req.baseUrl}${routePath}`;
+    const actionPath =
+      staffAudit.actionPath ||
+      `${req.baseUrl ?? ""}${req.route?.path ?? req.path ?? ""}`;
+    const action = `${req.method.toUpperCase()} ${actionPath}`;
 
     void recordStaffAuditEntry({
       method: req.method,
       action,
       path: String(req.originalUrl).slice(0, STAFF_AUDIT_PATH_MAX_CHARS),
-      params: req.params ?? {},
+      params: staffAudit.params ?? req.params ?? {},
       body: req.body ?? null,
       actorUserId: req.userId,
       actorRole: staffAudit.role,

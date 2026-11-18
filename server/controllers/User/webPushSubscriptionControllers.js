@@ -1,34 +1,23 @@
-import { errorRes, successRes } from "../../services/http/index.js";
+import { successRes } from "../../services/http/index.js";
 import {
-  getWebPushVapidPublicKey,
-  isWebPushConfigured,
   registerWebPushSubscriptionForUser,
   removeWebPushSubscriptionForUser,
+  requireWebPushVapidPublicKey,
 } from "../../services/user/webPushNotifications.js";
 
-/** `GET /auth/me/web-push/vapid-public-key` — публичный VAPID для PushManager.subscribe. */
+/** `GET /auth/me/web-push/vapid-public-key` */
 export const getWebPushVapidPublicKeyController = async (_req, res) => {
-  if (!isWebPushConfigured()) {
-    return errorRes(res, 503, "Web Push не настроен на сервере");
-  }
-  return successRes(res, { publicKey: getWebPushVapidPublicKey() });
+  const data = requireWebPushVapidPublicKey();
+  return successRes(res, data);
 };
 
-/** `PUT /auth/me/web-push-subscription` — регистрация браузерной подписки. */
+/** `PUT /auth/me/web-push-subscription` */
 export const registerWebPushSubscriptionController = async (req, res) => {
-  try {
-    await registerWebPushSubscriptionForUser(req.userId, req.body);
-  } catch (registerError) {
-    return errorRes(
-      res,
-      400,
-      registerError instanceof Error ? registerError.message : "Невалидная подписка",
-    );
-  }
+  await registerWebPushSubscriptionForUser(req.userId, req.body);
   return successRes(res, { registered: true });
 };
 
-/** `DELETE /auth/me/web-push-subscription` — снятие подписки. */
+/** `DELETE /auth/me/web-push-subscription` */
 export const removeWebPushSubscriptionController = async (req, res) => {
   const endpoint = req.body?.endpoint;
   if (typeof endpoint === "string" && endpoint.trim()) {

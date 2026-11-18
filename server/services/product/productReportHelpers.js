@@ -11,6 +11,7 @@ import {
   PRODUCT_REPORT_STATUS_RESOLVED,
 } from "../../constants/productReportConstants.js";
 import { PRODUCT_MODERATION_REJECTED } from "../../constants/productModerationConstants.js";
+import { AppError } from "../../errors/AppError.js";
 import { ProductModel, ProductReportModel, UserModel } from "../../models/index.js";
 import { PRODUCT_SELLER_PUBLIC_SELECT } from "../../constants/productSellerPublicFields.js";
 import { attachProductSellerSnapshots } from "./attachProductSellerSnapshots.js";
@@ -54,12 +55,12 @@ export const resolvePendingReportsForProduct = async (
     PRODUCT_REPORT_RESOLUTION_REJECT,
   ]);
   if (!allowed.has(resolution)) {
-    throw new Error("INVALID_RESOLUTION");
+    throw new AppError(400, "Недопустимое действие");
   }
 
   const product = await ProductModel.findById(productId);
   if (!product) {
-    throw new Error("PRODUCT_NOT_FOUND");
+    throw new AppError(404, "Товар не найден");
   }
 
   const pendingReports = await ProductReportModel.find({
@@ -68,7 +69,7 @@ export const resolvePendingReportsForProduct = async (
   }).lean();
 
   if (pendingReports.length === 0) {
-    throw new Error("NO_PENDING_REPORTS");
+    throw new AppError(409, "Нет необработанных жалоб по этому товару");
   }
 
   const now = new Date();

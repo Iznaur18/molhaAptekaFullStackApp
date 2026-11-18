@@ -6,13 +6,19 @@ import {
   IN_APP_NOTIFICATION_MESSAGE_PREMIUM_EXPIRED,
   IN_APP_NOTIFICATION_MESSAGE_PREMIUM_EXPIRING_SOON,
   IN_APP_NOTIFICATION_MESSAGE_PREMIUM_REVOKED_BY_STAFF,
+  PREMIUM_ALREADY_ACTIVE_MESSAGE,
   PREMIUM_DURATION_CALENDAR_MONTHS,
   PREMIUM_EXPIRY_REMINDER_DAYS,
   PREMIUM_PRICE_POINTS,
+  PREMIUM_PURCHASE_SUCCESS_MESSAGE,
 } from "../../constants/premiumConstants.js";
 import { REFERRAL_SOURCE_KIND_PREMIUM } from "../../constants/referralConstants.js";
+import { AppError } from "../../errors/AppError.js";
 import { runInTransaction } from "../../utils/mongoTransaction.js";
-import { deductLoyaltyPoints } from "../loyalty/loyaltyPointsSpend.js";
+import {
+  deductLoyaltyPoints,
+  InsufficientLoyaltyPointsError,
+} from "../loyalty/loyaltyPointsSpend.js";
 import { runMoneyIdempotentMutation } from "../loyalty/runMoneyIdempotentMutation.js";
 import { logMoneyEvent } from "../loyalty/logMoneyEvent.js";
 import {
@@ -22,9 +28,9 @@ import {
 import { backgroundValueAfterPremiumChange } from "./userBackgroundValue.js";
 import { createUserInAppNotification } from "./userInAppNotifications.js";
 
-export class PremiumAlreadyActiveError extends Error {
+export class PremiumAlreadyActiveError extends AppError {
   constructor() {
-    super("Премиум уже активен");
+    super(409, PREMIUM_ALREADY_ACTIVE_MESSAGE);
     this.name = "PremiumAlreadyActiveError";
   }
 }
@@ -149,16 +155,75 @@ export const processPremiumCronTasks = async () => {
 };
 
 /**
+ * @param {{ userId: string }} args
+ */
+export const getMyPremiumStatus = async ({ userId }) => {
+  await syncPremiumExpiryForUser(userId);
+
+  const user = await UserModel.findById(userId)
+    .select("isPremiumUser premiumExpiresAt userLoyaltyPoints isBlockedUser")
+    .lean();
+
+  if (!user) {
+    throw new AppError(404, "Пользователь не найден");
+  }
+
+  const isActive = isPremiumActive(user);
+  const loyaltyPoints = Number(user.userLoyaltyPoints) || 0;
+
+  return {
+    isActive,
+    premiumExpiresAt: user.premiumExpiresAt ?? null,
+    canPurchase: !isActive && user.isBlockedUser !== true,
+    pricePoints: PREMIUM_PRICE_POINTS,
+    loyaltyPointsBalance: loyaltyPoints,
+  };
+};
+
+/**
+ * @param {{ userId: string; idempotencyKey: unknown }} args
+ */
+export const purchasePremium = async ({ userId, idempotencyKey }) => {
+  await syncPremiumExpiryForUser(userId);
+
+  try {
+    const result = await runMoneyIdempotentMutation({
+      scope: "premium_purchase",
+      actorUserId: userId,
+      idempotencyKey,
+      execute: () => purchasePremiumSubscriptionOnce(userId),
+    });
+
+    return {
+      message: PREMIUM_PURCHASE_SUCCESS_MESSAGE,
+      premiumExpiresAt: result.premiumExpiresAt,
+      loyaltyPointsBalance: result.loyaltyPointsBalance,
+      isActive: true,
+      duplicate: Boolean(result.duplicate),
+    };
+  } catch (error) {
+    if (error instanceof InsufficientLoyaltyPointsError) {
+      throw new AppError(
+        409,
+        `Недостаточно баллов. Нужно: ${error.required}, у вас: ${error.available}`,
+      );
+    }
+    throw error;
+  }
+};
+
+/**
  * @param {string} userId
  * @param {{ idempotencyKey: string }} options
  */
-export const purchasePremiumSubscription = async (userId, { idempotencyKey }) =>
-  runMoneyIdempotentMutation({
-    scope: "premium_purchase",
-    actorUserId: userId,
-    idempotencyKey,
-    execute: () => purchasePremiumSubscriptionOnce(userId),
-  });
+export const purchasePremiumSubscription = async (userId, { idempotencyKey }) => {
+  const data = await purchasePremium({ userId, idempotencyKey });
+  return {
+    loyaltyPointsBalance: data.loyaltyPointsBalance,
+    premiumExpiresAt: data.premiumExpiresAt,
+    duplicate: data.duplicate,
+  };
+};
 
 /**
  * @param {string} userId
@@ -169,10 +234,10 @@ async function purchasePremiumSubscriptionOnce(userId) {
     .lean();
 
   if (!user || user.isActiveUser === false) {
-    throw new Error("USER_NOT_FOUND");
+    throw new AppError(404, "Пользователь не найден");
   }
   if (user.isBlockedUser === true) {
-    throw new Error("USER_BLOCKED");
+    throw new AppError(403, "Аккаунт заблокирован");
   }
   if (isPremiumActive(user)) {
     throw new PremiumAlreadyActiveError();

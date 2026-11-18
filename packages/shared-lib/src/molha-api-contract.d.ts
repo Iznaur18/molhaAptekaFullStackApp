@@ -16,6 +16,27 @@ declare module "@molha/api-contract" {
   export const ORDER_FULFILLMENT_DELIVERY: string;
   export const PRODUCT_DELIVERY_CARRIER_SELLER: string;
 
+  export const ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY: string;
+  export const ORDER_PAYMENT_METHOD_CARD_PREPAID: string;
+  export const ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY: string;
+  export const ORDER_PAYMENT_METHODS: readonly string[];
+
+  export const ORDER_STATUS_PENDING: string;
+  export const ORDER_STATUS_ACCEPTED: string;
+  export const ORDER_STATUS_ASSEMBLING: string;
+  export const ORDER_STATUS_READY_FOR_PICKUP: string;
+  export const ORDER_STATUS_READY_TO_SHIP: string;
+  export const ORDER_STATUS_COURIER_ASSIGNED: string;
+  export const ORDER_STATUS_COURIER_HOLDING: string;
+  export const ORDER_STATUS_IN_DELIVERY: string;
+  export const ORDER_STATUS_CONFIRMED: string;
+  export const ORDER_STATUS_SHIPPED: string;
+  export const ORDER_STATUS_DELIVERED: string;
+  export const ORDER_STATUS_RETURNED: string;
+  export const ORDER_STATUS_CANCELLED: string;
+  export const ORDER_STATUS_DISPUTED: string;
+  export const ORDER_STATUSES: readonly string[];
+
   type ProductDeliveryCarrierSource =
     | {
         productDeliveryCarrier?: string | null;

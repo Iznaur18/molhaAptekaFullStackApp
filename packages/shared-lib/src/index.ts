@@ -5,6 +5,8 @@ export {
   resolveAuthContactChannel,
 } from "./emailAuthKillSwitch.js";
 export type { AuthContactChannel } from "./emailAuthKillSwitch.js";
+export { buildSpaContentSecurityPolicy } from "./spaContentSecurityPolicy.js";
+export type { SpaContentSecurityPolicyOptions } from "./spaContentSecurityPolicy.js";
 export {
   extractZodIssueUserMessage,
   formatApiErrorMessage,

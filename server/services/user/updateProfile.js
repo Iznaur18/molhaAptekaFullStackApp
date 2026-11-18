@@ -11,7 +11,11 @@ import {
   runProfileUpdateAfterSave,
   runProfileUpdateBeforeSave,
 } from "./runProfileUpdateSideEffects.js";
-import { EMPTY_PROFILE_UPDATE_MESSAGE } from "./updateProfileConstants.js";
+import {
+  EMPTY_PROFILE_UPDATE_MESSAGE,
+  PASSWORD_CHANGE_VIA_AUTH_MESSAGE,
+  PASSWORD_LIKE_PROFILE_FIELDS,
+} from "./updateProfileConstants.js";
 
 /**
  * @param {{
@@ -19,6 +23,7 @@ import { EMPTY_PROFILE_UPDATE_MESSAGE } from "./updateProfileConstants.js";
  *   targetUserId: string;
  *   body: Record<string, unknown>;
  *   verifiedDeliveryAddress?: unknown;
+ *   verifiedUserAddresses?: unknown;
  * }} input
  */
 export async function updateProfile({
@@ -26,14 +31,21 @@ export async function updateProfile({
   targetUserId,
   body,
   verifiedDeliveryAddress,
+  verifiedUserAddresses,
 }) {
+  if (PASSWORD_LIKE_PROFILE_FIELDS.some((field) => body?.[field] !== undefined)) {
+    throw new AppError(400, PASSWORD_CHANGE_VIA_AUTH_MESSAGE);
+  }
+
   const editorContext = await resolveProfileEditorContext(currentUserId, targetUserId);
   const { allowedFields, isCurrentUserOwner, isCurrentUserStaff } = editorContext;
 
-  const updateData = buildProfileUpdateData({
+  const updateData = await buildProfileUpdateData({
     body,
     allowedFields,
+    targetUserId,
     verifiedDeliveryAddress,
+    verifiedUserAddresses,
   });
 
   const { targetUserBeforeUpdate, wasPremium } = await assertProfileUpdateRules({
@@ -59,7 +71,7 @@ export async function updateProfile({
     event: "update_profile",
     actorUserId: currentUserId,
     targetUserId,
-    fields: Object.keys(updateData),
+    fields: Object.keys(mongoUpdate),
   });
 
   const selectFields =
@@ -86,5 +98,8 @@ export async function updateProfile({
     wasPremium,
   });
 
-  return userDataUpdated;
+  return {
+    user: userDataUpdated,
+    message: "Профиль успешно обновлен",
+  };
 }

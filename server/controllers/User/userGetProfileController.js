@@ -1,50 +1,11 @@
-import { UserModel } from "../../models/index.js";
-import { errorRes, successRes } from "../../services/http/index.js";
-import { USER_DATA } from "../../constants/constants.js";
-import { getOptionalViewerFromRequest } from "../../services/user/optionalViewerFromRequest.js";
-import { sanitizeUserProfileForViewer } from "../../services/user/userProfileVisibility.js";
-import { attachFollowFieldsToPublicProfile } from "../../services/user/userFollowHelpers.js";
-import { attachBlockFieldsToPublicProfile } from "../../services/user/userBlockHelpers.js";
-import { attachUserCommerceStatsToUser } from "../../services/user/attachUserListCommerceStats.js";
-import { attachWishlistCountToUser } from "../../services/user/userWishlistCount.js";
+import { successRes } from "../../services/http/index.js";
+import { getPublicUserProfile } from "../../services/user/getPublicUserProfile.js";
 
-/** Получение профиля другого пользователя по id. GET /user/:userId (публичный — без авторизации) */
+/** Получение профиля другого пользователя по id. GET /user/:userId (публичный) */
 export const userGetProfileController = async (req, res) => {
-  const { userIdClient } = req.params; // id юзера из URL (валидация выполняется в middleware userIdParamValidation)
-
-  const userIdServer = await UserModel.findById(userIdClient).select(USER_DATA).lean();
-
-  if (!userIdServer) {
-    return errorRes(res, 404, "Пользователь не найден");
-  }
-
-  const viewer = await getOptionalViewerFromRequest(req);
-
-  if (userIdServer.isBlockedUser) {
-    const isAdminViewer = viewer?.userRole === "admin" && !viewer.isBlockedUser;
-    if (!isAdminViewer) {
-      return errorRes(res, 404, "Пользователь не найден");
-    }
-  }
-
-  const publicUser = sanitizeUserProfileForViewer(userIdServer, {
-    viewer,
-    viewerId: viewer?._id ?? null,
+  const data = await getPublicUserProfile({
+    targetUserId: String(req.params.userIdClient),
+    req,
   });
-  if (!publicUser) {
-    return errorRes(res, 404, "Пользователь не найден");
-  }
-
-  const userWithFollow = await attachFollowFieldsToPublicProfile(publicUser, {
-    viewerId: viewer?._id ?? null,
-  });
-
-  const userWithBlock = await attachBlockFieldsToPublicProfile(userWithFollow, {
-    viewerId: viewer?._id ?? null,
-  });
-
-  const userWithCommerce = await attachUserCommerceStatsToUser(userWithBlock);
-  const userWithWishlistCount = await attachWishlistCountToUser(userWithCommerce);
-
-  return successRes(res, { user: userWithWishlistCount });
+  return successRes(res, data);
 };

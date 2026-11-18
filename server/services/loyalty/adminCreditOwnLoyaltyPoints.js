@@ -1,6 +1,25 @@
 import { AppError } from "../../errors/AppError.js";
+import { UserModel } from "../../models/index.js";
 import { creditLoyaltyPoints } from "./loyaltyPointsSpend.js";
 import { runMoneyIdempotentMutation } from "./runMoneyIdempotentMutation.js";
+
+/**
+ * @param {{ userId: string }} args
+ */
+export async function getMyLoyaltyPointsStatus({ userId }) {
+  const user = await UserModel.findById(userId)
+    .select("userLoyaltyPoints userLoyaltyPointsReserved")
+    .lean();
+
+  if (!user) {
+    throw new AppError(404, "Пользователь не найден");
+  }
+
+  return {
+    loyaltyPointsBalance: Number(user.userLoyaltyPoints) || 0,
+    loyaltyPointsReserved: Number(user.userLoyaltyPointsReserved) || 0,
+  };
+}
 
 /**
  * Бесплатное начисление баллов себе (только admin, проверка роли снаружи).

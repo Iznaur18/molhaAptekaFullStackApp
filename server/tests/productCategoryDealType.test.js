@@ -15,7 +15,7 @@ const { ProductModel, UserModel } = await import("../models/index.js");
 const { createProductCategoryAdminController, patchProductCategoryAdminController } =
   await import("../controllers/Product/productCategoryAdminControllers.js");
 const { filterCartItemsToPurchasableProducts } =
-  await import("../controllers/Cart/cartItemHelpers.js");
+  await import("../services/cart/cartItemHelpers.js");
 const { assertProductsPurchasableViaCart } =
   await import("../services/order/createOrder.js");
 const { toProductCategoryPublicPayload } =

@@ -13,8 +13,12 @@ import {
   EMAIL_TAKEN_MESSAGE,
 } from "../../constants/emailVerificationConstants.js";
 import { EMAIL_VERIFICATION_SUBJECT } from "../../constants/smtpConstants.js";
+import { AppError } from "../../errors/AppError.js";
 import { isSmtpConfigured, sendSmtpMail } from "../../utils/smtpMail.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
+
+const EMAIL_DELIVERY_UNAVAILABLE_MESSAGE =
+  "Не удалось отправить письмо. Попробуйте позже";
 
 const EMAIL_VERIFICATION_CODE_PATTERN = new RegExp(
   `^\\d{${EMAIL_VERIFICATION_CODE_LENGTH}}$`,
@@ -128,7 +132,7 @@ export const markUserEmailVerified = async (userId) => {
 export const verifyEmailByToken = async (rawToken) => {
   const token = String(rawToken ?? "").trim();
   if (!token) {
-    throw new Error(EMAIL_VERIFICATION_INVALID_TOKEN_MESSAGE);
+    throw new AppError(400, EMAIL_VERIFICATION_INVALID_TOKEN_MESSAGE);
   }
 
   // Этот путь — неаутентифицированный GET без счётчика попыток, поэтому
@@ -137,7 +141,7 @@ export const verifyEmailByToken = async (rawToken) => {
   // общем лимите 50k запросов/15 мин с IP брутфорсится за часы, и любой
   // ожидающий подтверждения email можно было подтвердить без доступа к почте.
   if (!EMAIL_VERIFICATION_LINK_TOKEN_PATTERN.test(token)) {
-    throw new Error(EMAIL_VERIFICATION_INVALID_TOKEN_MESSAGE);
+    throw new AppError(400, EMAIL_VERIFICATION_INVALID_TOKEN_MESSAGE);
   }
 
   const tokenHash = hashEmailVerificationSecret(token);
@@ -149,7 +153,7 @@ export const verifyEmailByToken = async (rawToken) => {
   }).select("_id isEmailVerified email");
 
   if (!user) {
-    throw new Error(EMAIL_VERIFICATION_INVALID_TOKEN_MESSAGE);
+    throw new AppError(400, EMAIL_VERIFICATION_INVALID_TOKEN_MESSAGE);
   }
 
   if (user.isEmailVerified === true) {
@@ -168,7 +172,7 @@ export const verifyEmailByToken = async (rawToken) => {
 export const verifyEmailByCodeForUser = async (userId, rawCode) => {
   const code = String(rawCode ?? "").trim();
   if (!EMAIL_VERIFICATION_CODE_PATTERN.test(code)) {
-    throw new Error(EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
+    throw new AppError(400, EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
   }
 
   const user = await UserModel.findById(userId).select(
@@ -176,7 +180,7 @@ export const verifyEmailByCodeForUser = async (userId, rawCode) => {
   );
 
   if (!user) {
-    throw new Error(EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
+    throw new AppError(400, EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
   }
 
   if (user.isEmailVerified === true) {
@@ -185,12 +189,12 @@ export const verifyEmailByCodeForUser = async (userId, rawCode) => {
   }
 
   if ((user.emailVerificationAttemptCount ?? 0) >= EMAIL_VERIFICATION_MAX_ATTEMPTS) {
-    throw new Error(EMAIL_VERIFICATION_ATTEMPTS_EXCEEDED_MESSAGE);
+    throw new AppError(400, EMAIL_VERIFICATION_ATTEMPTS_EXCEEDED_MESSAGE);
   }
 
   const now = new Date();
   if (!user.emailVerificationExpiresAt || user.emailVerificationExpiresAt <= now) {
-    throw new Error(EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
+    throw new AppError(400, EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
   }
 
   const codeHash = hashEmailVerificationSecret(code);
@@ -198,7 +202,7 @@ export const verifyEmailByCodeForUser = async (userId, rawCode) => {
     await UserModel.findByIdAndUpdate(userId, {
       $inc: { emailVerificationAttemptCount: 1 },
     });
-    throw new Error(EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
+    throw new AppError(400, EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
   }
 
   await markUserEmailVerified(userId);
@@ -213,7 +217,7 @@ export const deliverEmailVerification = async ({ email, userName, code }) => {
 
   if (!isSmtpConfigured()) {
     if (isProduction) {
-      throw new Error("EMAIL_DELIVERY_UNAVAILABLE");
+      throw new AppError(503, EMAIL_DELIVERY_UNAVAILABLE_MESSAGE);
     }
     logServerEvent("info", {
       event: "email_verify_dev_code",
@@ -240,7 +244,7 @@ export const deliverEmailVerification = async ({ email, userName, code }) => {
       error: error instanceof Error ? error.message : String(error),
     });
     if (isProduction) {
-      throw new Error("EMAIL_DELIVERY_UNAVAILABLE");
+      throw new AppError(503, EMAIL_DELIVERY_UNAVAILABLE_MESSAGE);
     }
     logServerEvent("info", { event: "email_verify_fallback_code", email, code });
   }
@@ -255,10 +259,10 @@ export const sendEmailVerificationForUser = async (userId) => {
     .lean();
 
   if (!user?.email) {
-    throw new Error("У пользователя нет email");
+    throw new AppError(400, "У пользователя нет email");
   }
   if (user.isEmailVerified === true) {
-    throw new Error(EMAIL_VERIFICATION_ALREADY_VERIFIED_MESSAGE);
+    throw new AppError(400, EMAIL_VERIFICATION_ALREADY_VERIFIED_MESSAGE);
   }
 
   const code = await issueEmailVerificationCode(userId);
@@ -282,21 +286,21 @@ export async function requestEmailBindForUser(userId, rawEmail) {
     .trim()
     .toLowerCase();
   if (!email) {
-    throw new Error(EMAIL_NOT_SET_MESSAGE);
+    throw new AppError(400, EMAIL_NOT_SET_MESSAGE);
   }
 
   const user = await UserModel.findById(userId).select(
     "email isEmailVerified userName",
   );
   if (!user) {
-    throw new Error(EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
+    throw new AppError(400, EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
   }
 
   const currentEmail = String(user.email ?? "")
     .trim()
     .toLowerCase();
   if (user.isEmailVerified === true && currentEmail === email) {
-    throw new Error(EMAIL_VERIFICATION_ALREADY_VERIFIED_MESSAGE);
+    throw new AppError(400, EMAIL_VERIFICATION_ALREADY_VERIFIED_MESSAGE);
   }
 
   const taken = await UserModel.findOne({
@@ -304,7 +308,7 @@ export async function requestEmailBindForUser(userId, rawEmail) {
     _id: { $ne: user._id },
   }).select("_id");
   if (taken) {
-    throw new Error(EMAIL_TAKEN_MESSAGE);
+    throw new AppError(400, EMAIL_TAKEN_MESSAGE);
   }
 
   const code = await issueEmailBindCode(user._id, email);
@@ -331,37 +335,37 @@ export async function requestEmailBindForUser(userId, rawEmail) {
 export async function confirmEmailBindForUser(userId, rawCode) {
   const code = String(rawCode ?? "").trim();
   if (!EMAIL_VERIFICATION_CODE_PATTERN.test(code)) {
-    throw new Error(EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
+    throw new AppError(400, EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
   }
 
   const user = await UserModel.findById(userId).select(
     "+emailVerificationTokenHash +emailVerificationExpiresAt +emailVerificationAttemptCount +pendingEmail email",
   );
   if (!user) {
-    throw new Error(EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
+    throw new AppError(400, EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
   }
 
   if ((user.emailVerificationAttemptCount ?? 0) >= EMAIL_VERIFICATION_MAX_ATTEMPTS) {
-    throw new Error(EMAIL_VERIFICATION_ATTEMPTS_EXCEEDED_MESSAGE);
+    throw new AppError(400, EMAIL_VERIFICATION_ATTEMPTS_EXCEEDED_MESSAGE);
   }
 
   const now = new Date();
   if (!user.emailVerificationExpiresAt || user.emailVerificationExpiresAt <= now) {
-    throw new Error(EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
+    throw new AppError(400, EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
   }
 
   const pending = String(user.pendingEmail ?? "")
     .trim()
     .toLowerCase();
   if (!pending) {
-    throw new Error(EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
+    throw new AppError(400, EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
   }
 
   if (user.emailVerificationTokenHash !== hashEmailVerificationSecret(code)) {
     await UserModel.findByIdAndUpdate(userId, {
       $inc: { emailVerificationAttemptCount: 1 },
     });
-    throw new Error(EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
+    throw new AppError(400, EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
   }
 
   const taken = await UserModel.findOne({
@@ -370,7 +374,7 @@ export async function confirmEmailBindForUser(userId, rawCode) {
   }).select("_id");
   if (taken) {
     await clearEmailVerificationToken(userId);
-    throw new Error(EMAIL_TAKEN_MESSAGE);
+    throw new AppError(400, EMAIL_TAKEN_MESSAGE);
   }
 
   await markUserEmailVerified(userId);

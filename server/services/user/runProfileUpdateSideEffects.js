@@ -1,5 +1,6 @@
 import { rejectPendingDataConfirmationForUser } from "./userDataConfirmationHelpers.js";
 import { cancelIntroAdCampaignsForAdvertiser } from "../intro-ad/introAdCampaignHelpers.js";
+import { bumpUserAuthTokenVersion } from "../auth/userAuthTokenVersion.js";
 import { isPremiumActive, notifyPremiumRevokedByStaff } from "./premiumAccess.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 
@@ -89,6 +90,18 @@ export async function runProfileUpdateAfterSave({
 
   if (!becameBlocked && !becameInactive) {
     return;
+  }
+
+  try {
+    await bumpUserAuthTokenVersion(String(targetUserId));
+  } catch (tokenVersionError) {
+    logServerEvent("error", {
+      event: "bumpuserauthtokenversion",
+      error:
+        tokenVersionError instanceof Error
+          ? tokenVersionError.message
+          : String(tokenVersionError),
+    });
   }
 
   try {

@@ -1,6 +1,7 @@
 import { UserModel } from "../models/index.js";
 import { canModerateProductsRole } from "../utils/productModeration.js";
 import { errorRes } from "../services/http/index.js";
+import { attachStaffAuditContext } from "./staffAuditContext.js";
 
 /**
  * Требует роль admin или moderator. После `checkAuthMW`.
@@ -17,7 +18,7 @@ export const checkProductModeratorMW = async (req, res, next) => {
     }
 
     req.userRole = user.userRole;
-    req.staffAudit = { role: user.userRole };
+    attachStaffAuditContext(req, user.userRole);
     return next();
   } catch (error) {
     return next(error);

@@ -10,10 +10,12 @@ const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollectio
 const { default: ProductCategoryModel } =
   await import("../models/ProductCategoryModel.js");
 const { ProductModel, UserModel } = await import("../models/index.js");
+const { AppError } = await import("../errors/AppError.js");
+const { errorRes } = await import("../services/http/index.js");
 const { createProductCategoryAdminController } =
   await import("../controllers/Product/productCategoryAdminControllers.js");
 
-/** Заглушка res: контроллер отвечает через successRes/errorRes. */
+/** Заглушка res: контроллер отвечает через successRes; AppError — как errorHandlerMW. */
 const captureResponse = () => {
   const captured = {};
   return {
@@ -35,7 +37,15 @@ const captureResponse = () => {
 /** @param {Record<string, unknown>} body */
 const createCategory = async (body) => {
   const { captured, res } = captureResponse();
-  await createProductCategoryAdminController({ body }, res);
+  try {
+    await createProductCategoryAdminController({ body }, res);
+  } catch (error) {
+    if (error instanceof AppError) {
+      errorRes(res, error.statusCode, error.message);
+    } else {
+      throw error;
+    }
+  }
   return captured;
 };
 

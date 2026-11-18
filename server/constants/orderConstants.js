@@ -1,20 +1,53 @@
-/** Способы оплаты заказа (enum в OrderModel и валидации). */
-export const ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY = "cashOnDelivery";
-export const ORDER_PAYMENT_METHOD_CARD_PREPAID = "cardPrepaid";
 /**
- * Перевод продавцу при получении.
- *
- * Отдельно от `cardPrepaid`: тот значит предоплату и зарезервирован под
- * будущий эквайринг. Здесь платформа денег не касается — покупатель
- * переводит напрямую на реквизиты продавца.
+ * Литералы статусов/оплаты — из `@molha/api-contract`.
+ * Здесь только серверные сообщения, лестница и производные списки.
+ * import (не `export … from`): имена нужны ниже в LADDER_RANK / PRE_SHIPMENT.
  */
-export const ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY = "cardOnDelivery";
-
-export const ORDER_PAYMENT_METHODS = [
+import {
   ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
   ORDER_PAYMENT_METHOD_CARD_PREPAID,
   ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY,
-];
+  ORDER_PAYMENT_METHODS,
+  ORDER_STATUS_PENDING,
+  ORDER_STATUS_ACCEPTED,
+  ORDER_STATUS_ASSEMBLING,
+  ORDER_STATUS_READY_FOR_PICKUP,
+  ORDER_STATUS_READY_TO_SHIP,
+  ORDER_STATUS_COURIER_ASSIGNED,
+  ORDER_STATUS_COURIER_HOLDING,
+  ORDER_STATUS_IN_DELIVERY,
+  ORDER_STATUS_CONFIRMED,
+  ORDER_STATUS_SHIPPED,
+  ORDER_STATUS_DELIVERED,
+  ORDER_STATUS_RETURNED,
+  ORDER_STATUS_CANCELLED,
+  ORDER_STATUS_DISPUTED,
+  ORDER_STATUSES,
+  ORDER_LINE_ITEM_QUANTITY_MIN,
+} from "@molha/api-contract";
+
+export {
+  ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
+  ORDER_PAYMENT_METHOD_CARD_PREPAID,
+  ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY,
+  ORDER_PAYMENT_METHODS,
+  ORDER_STATUS_PENDING,
+  ORDER_STATUS_ACCEPTED,
+  ORDER_STATUS_ASSEMBLING,
+  ORDER_STATUS_READY_FOR_PICKUP,
+  ORDER_STATUS_READY_TO_SHIP,
+  ORDER_STATUS_COURIER_ASSIGNED,
+  ORDER_STATUS_COURIER_HOLDING,
+  ORDER_STATUS_IN_DELIVERY,
+  ORDER_STATUS_CONFIRMED,
+  ORDER_STATUS_SHIPPED,
+  ORDER_STATUS_DELIVERED,
+  ORDER_STATUS_RETURNED,
+  ORDER_STATUS_CANCELLED,
+  ORDER_STATUS_DISPUTED,
+  ORDER_STATUSES,
+  ORDER_LINE_ITEM_QUANTITY_MIN,
+};
 
 /**
  * Наличные и курьеры Gitorg несовместимы.
@@ -28,63 +61,6 @@ export const COURIER_DELIVERY_CASH_FORBIDDEN_MESSAGE =
 
 export const SELLER_PAYOUT_REQUISITES_REQUIRED_MESSAGE =
   "У продавца не указаны реквизиты для перевода — оплата картой при получении невозможна";
-
-/** Жизненный цикл статуса заказа (enum в OrderModel и валидации). */
-export const ORDER_STATUS_PENDING = "pending";
-export const ORDER_STATUS_CONFIRMED = "confirmed";
-export const ORDER_STATUS_SHIPPED = "shipped";
-export const ORDER_STATUS_DELIVERED = "delivered";
-export const ORDER_STATUS_CANCELLED = "cancelled";
-
-/**
- * Ступени сборки, общие для самовывоза и доставки.
- *
- * До них покупатель между «В обработке» и «Отправлен» не видел ничего и не
- * понимал, взялся ли продавец за заказ вообще.
- */
-export const ORDER_STATUS_ACCEPTED = "accepted";
-export const ORDER_STATUS_ASSEMBLING = "assembling";
-
-/** Ступени курьера. `shipped` остаётся синонимом «в пути» у старых заказов. */
-export const ORDER_STATUS_COURIER_ASSIGNED = "courier_assigned";
-export const ORDER_STATUS_COURIER_HOLDING = "courier_holding";
-export const ORDER_STATUS_IN_DELIVERY = "in_delivery";
-
-/** Развилка лестниц: самовывоз ждут на точке, доставку — отгружают. */
-export const ORDER_STATUS_READY_FOR_PICKUP = "ready_for_pickup";
-export const ORDER_STATUS_READY_TO_SHIP = "ready_to_ship";
-/**
- * Товар уехал к покупателю и вернулся: отказ у двери, неудачное вручение,
- * возврат отправителю. Отличается от `cancelled` (отменён до отправки) —
- * иначе в статистике не видно, сколько заказов срывается на вручении.
- */
-export const ORDER_STATUS_RETURNED = "returned";
-
-/**
- * Товар вне контроля: курьер пропал, вручение сорвалось непонятно как.
- *
- * Не терминальный статус: сделка не закрыта, её разбирает модератор. Остаток
- * товара при этом на витрину не возвращается — иначе продадим то, что
- * неизвестно где.
- */
-export const ORDER_STATUS_DISPUTED = "disputed";
-
-export const ORDER_STATUSES = [
-  ORDER_STATUS_PENDING,
-  ORDER_STATUS_ACCEPTED,
-  ORDER_STATUS_ASSEMBLING,
-  ORDER_STATUS_READY_FOR_PICKUP,
-  ORDER_STATUS_READY_TO_SHIP,
-  ORDER_STATUS_COURIER_ASSIGNED,
-  ORDER_STATUS_COURIER_HOLDING,
-  ORDER_STATUS_IN_DELIVERY,
-  ORDER_STATUS_CONFIRMED,
-  ORDER_STATUS_SHIPPED,
-  ORDER_STATUS_DELIVERED,
-  ORDER_STATUS_CANCELLED,
-  ORDER_STATUS_RETURNED,
-  ORDER_STATUS_DISPUTED,
-];
 
 /**
  * Насколько статус продвинут по лестнице. Статус заказа — это статус самой
@@ -149,9 +125,6 @@ export const ORDER_PRE_SHIPMENT_STATUSES = Object.freeze([
   ORDER_STATUS_READY_FOR_PICKUP,
   ORDER_STATUS_READY_TO_SHIP,
 ]);
-
-/** Минимальное количество одной позиции заказа. */
-export const ORDER_LINE_ITEM_QUANTITY_MIN = 1;
 
 /** Версия схемы документа заказа для безопасных миграций. */
 export const ORDER_SCHEMA_VERSION = 3;
