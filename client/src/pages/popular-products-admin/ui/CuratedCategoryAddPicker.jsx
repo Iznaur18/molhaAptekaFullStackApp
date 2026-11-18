@@ -79,8 +79,7 @@ export function CuratedCategoryAddPicker({
   });
   const submittedUserSearchNormalized = submittedUserSearch.trim();
   const canFetchSubmittedUsers =
-    kind === "user" &&
-    submittedUserSearchNormalized.length >= USER_SEARCH_MIN_LENGTH;
+    kind === "user" && submittedUserSearchNormalized.length >= USER_SEARCH_MIN_LENGTH;
   const usersSearch = useUsersSearchQuery({
     search: submittedUserSearchNormalized,
     enabled: canFetchSubmittedUsers,

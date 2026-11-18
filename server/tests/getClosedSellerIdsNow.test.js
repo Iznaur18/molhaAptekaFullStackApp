@@ -89,9 +89,6 @@ describe("getClosedSellerIdsNow", () => {
     const withoutSelf = await getClosedSellerIdsNow({
       excludeUserId: String(closedSelf._id),
     });
-    assert.deepEqual(
-      withoutSelf.map(String),
-      [String(closedSeller._id)],
-    );
+    assert.deepEqual(withoutSelf.map(String), [String(closedSeller._id)]);
   });
 });

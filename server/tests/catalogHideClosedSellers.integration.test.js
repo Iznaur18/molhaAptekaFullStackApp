@@ -86,7 +86,10 @@ test("GET /product скрывает товары закрытого продав
   await verifyUserEmail("int-closed-cat@example.com");
   await UserModel.updateOne({ _id: closedSeller._id }, { $set: buildClosedNowHours() });
 
-  const { cookie: openSellerCookie } = await registerUserAndGetCookie(request, "open-cat");
+  const { cookie: openSellerCookie } = await registerUserAndGetCookie(
+    request,
+    "open-cat",
+  );
   await verifyUserEmail("int-open-cat@example.com");
 
   const { cookie: modCookie, user: modUser } = await registerUserAndGetCookie(

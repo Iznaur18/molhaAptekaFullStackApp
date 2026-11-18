@@ -510,7 +510,9 @@ export const assertCuratedCategoryListItemAddable = async (
   }
 
   if (kind === "user") {
-    const user = await UserModel.findById(refId).select("userName userAvatarUrl").lean();
+    const user = await UserModel.findById(refId)
+      .select("userName userAvatarUrl")
+      .lean();
     if (!user) {
       throw new AppError(404, "Пользователь не найден");
     }
@@ -579,7 +581,9 @@ export const buildCuratedCategoryListItemPreview = async (kind, refId) => {
   }
 
   if (kind === "user") {
-    const user = await UserModel.findById(refId).select("userName userAvatarUrl").lean();
+    const user = await UserModel.findById(refId)
+      .select("userName userAvatarUrl")
+      .lean();
     if (!user) {
       throw new AppError(404, "Пользователь не найден");
     }

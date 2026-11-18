@@ -101,7 +101,7 @@ describe("проверка перед созданием товара", () => {
     assert.deepEqual(result, { ok: true });
   });
 
-  it("с личным лимитом отказ называет его, а не общие 50 и 100", async () => {
+  it("с личным лимитом отказ называет его, а не общие 50 и 250", async () => {
     const seller = await createSeller({ sellerProductsLimitOverride: 3 });
     await seedProducts(seller._id, 3);
 
@@ -109,11 +109,12 @@ describe("проверка перед созданием товара", () => {
 
     assert.equal(result.ok, false);
     assert.match(result.message, /лимит товаров: 3/iu);
-    assert.doesNotMatch(result.message, /50|100/u);
+    assert.doesNotMatch(result.message, /50|250/u);
   });
 
   it("личный лимит выше общего действительно поднимает потолок", async () => {
-    const seller = await createSeller({ sellerProductsLimitOverride: 120 });
+    const override = SELLER_PRODUCTS_LIMIT_PREMIUM + 50;
+    const seller = await createSeller({ sellerProductsLimitOverride: override });
     await seedProducts(seller._id, SELLER_PRODUCTS_LIMIT_PREMIUM + 1);
 
     const result = await assertSellerCanCreateProduct(String(seller._id), seller);

@@ -9,10 +9,7 @@ import {
   pickCatalogExtraFilters,
 } from "@izibuy/shared-lib";
 
-import {
-  CATALOG_SORT_DEFAULT,
-  PRODUCT_CATEGORIES,
-} from "../model/productConstants.js";
+import { CATALOG_SORT_DEFAULT, PRODUCT_CATEGORIES } from "../model/productConstants.js";
 
 // Разбор фильтров окна общий с приложением — живёт в shared-lib.
 export {

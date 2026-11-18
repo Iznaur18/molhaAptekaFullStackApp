@@ -126,7 +126,6 @@
 }
 
 /* Крупнее превью только в карусели; sheet остаётся 2:1. */
-.curated-category-list-carousel
-  .curated-category-compact-card__image-wrap {
+.curated-category-list-carousel .curated-category-compact-card__image-wrap {
   aspect-ratio: 4 / 3;
 }

@@ -118,10 +118,7 @@ export const normalizeProductsQueryForAggregate = (productsQuery) => {
  * @param {import('express').Request['query']} query
  * @param {string} [defaultSort] каталог — `oldest`; «Мои товары» — `newest`
  */
-export const parseProductSortFromQuery = (
-  query,
-  defaultSort = PRODUCT_SORT_OLDEST,
-) => {
+export const parseProductSortFromQuery = (query, defaultSort = PRODUCT_SORT_OLDEST) => {
   const raw = query?.sort;
   if (typeof raw === "string" && PARSEABLE_CATALOG_SORTS.has(raw)) {
     return raw;
