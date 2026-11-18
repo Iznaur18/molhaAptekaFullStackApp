@@ -71,6 +71,9 @@ export const getProductPromotionBoostProductsController = async (req, res) => {
     userId: req.userId,
     queryRegionCode: req.query.regionCode,
   });
-  const result = await getProductPromotionBoostProducts({ viewerRegionCode });
+  const result = await getProductPromotionBoostProducts({
+    viewerRegionCode,
+    viewerUserId: req.userId ?? null,
+  });
   return successRes(res, result);
 };

@@ -3,7 +3,7 @@ import { API_CLIENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 
 export type HomeCuratedCategory = {
-  kind: "tree" | "personal";
+  kind: "tree" | "personal" | "user";
   refId: string;
   itemKey: string;
   label: string;

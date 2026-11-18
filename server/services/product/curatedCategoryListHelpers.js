@@ -128,9 +128,37 @@ const resolvePersonalCategoryFields = (row, listRegionCode, options = {}) => {
 };
 
 /**
+ * @param {import('mongoose').LeanDocument<import('../models/UserModel.js').default> | null | undefined} user
+ */
+const resolveUserCategoryFields = (user) => {
+  if (!user) {
+    return null;
+  }
+
+  const refId = String(user._id);
+  const nickname = String(user.userName ?? "").trim();
+  if (!nickname) {
+    return null;
+  }
+
+  return {
+    kind: "user",
+    refId,
+    itemKey: buildCuratedCategoryItemKey("user", refId),
+    label: nickname,
+    imageUrl:
+      typeof user.userAvatarUrl === "string" && user.userAvatarUrl.trim()
+        ? user.userAvatarUrl.trim()
+        : null,
+    sellerId: refId,
+  };
+};
+
+/**
  * @param {import('mongoose').LeanDocument<import('../models/CuratedCategoryListModel.js').default>} list
  * @param {Map<string, import('mongoose').LeanDocument<import('../models/ProductCategoryModel.js').default>>} categoriesById
  * @param {Map<string, import('mongoose').LeanDocument<import('../models/SellerPersonalCategoryModel.js').SellerPersonalCategoryModel>>} personalById
+ * @param {Map<string, import('mongoose').LeanDocument<import('../models/UserModel.js').default>>} usersById
  * @param {Map<string, import('mongoose').LeanDocument<import('../models/ProductCategoryDisplayModel.js').default>>} displaysById
  * @param {Map<string, import('mongoose').LeanDocument<import('../models/ProductCategoryDisplayModel.js').default>>} displaysBySlug
  * @param {{ requireActivePersonal?: boolean }} [options]
@@ -139,6 +167,7 @@ const resolveOrderedListCategoryItems = (
   list,
   categoriesById,
   personalById,
+  usersById,
   displaysById,
   displaysBySlug,
   options = {},
@@ -166,6 +195,14 @@ const resolveOrderedListCategoryItems = (
       if (fields) {
         resolved.push(fields);
       }
+      continue;
+    }
+
+    if (item.kind === "user") {
+      const fields = resolveUserCategoryFields(usersById.get(refId));
+      if (fields) {
+        resolved.push(fields);
+      }
     }
   }
 
@@ -178,6 +215,7 @@ const resolveOrderedListCategoryItems = (
 const collectCuratedCategoryRefIds = (lists) => {
   const treeIds = new Set();
   const personalIds = new Set();
+  const userIds = new Set();
 
   for (const list of lists) {
     for (const item of list.items ?? []) {
@@ -189,6 +227,8 @@ const collectCuratedCategoryRefIds = (lists) => {
         treeIds.add(refId);
       } else if (item.kind === "personal") {
         personalIds.add(refId);
+      } else if (item.kind === "user") {
+        userIds.add(refId);
       }
     }
   }
@@ -196,28 +236,36 @@ const collectCuratedCategoryRefIds = (lists) => {
   return {
     treeIds: [...treeIds],
     personalIds: [...personalIds],
+    userIds: [...userIds],
   };
 };
 
 /**
  * @param {string[]} treeIds
  * @param {string[]} personalIds
+ * @param {string[]} userIds
  */
-const fetchCuratedCategoryEntities = async (treeIds, personalIds) => {
-  const [categories, personalRows, displays] = await Promise.all([
+const fetchCuratedCategoryEntities = async (treeIds, personalIds, userIds) => {
+  const [categories, personalRows, users, displays] = await Promise.all([
     treeIds.length ? ProductCategoryModel.find({ _id: { $in: treeIds } }).lean() : [],
     personalIds.length
       ? SellerPersonalCategoryModel.find({ _id: { $in: personalIds } }).lean()
+      : [],
+    userIds.length
+      ? UserModel.find({ _id: { $in: userIds } })
+          .select("userName userAvatarUrl")
+          .lean()
       : [],
     ProductCategoryDisplayModel.find().lean(),
   ]);
 
   const categoriesById = new Map(categories.map((row) => [String(row._id), row]));
   const personalById = new Map(personalRows.map((row) => [String(row._id), row]));
+  const usersById = new Map(users.map((row) => [String(row._id), row]));
   const { byId: displaysById, bySlug: displaysBySlug } =
     buildCategoryDisplayMaps(displays);
 
-  return { categoriesById, personalById, displaysById, displaysBySlug };
+  return { categoriesById, personalById, usersById, displaysById, displaysBySlug };
 };
 
 /**
@@ -229,13 +277,14 @@ export const autopurgeCuratedCategoryList = async (list) => {
     return list;
   }
 
-  const { treeIds, personalIds } = collectCuratedCategoryRefIds([list]);
-  const { categoriesById, personalById, displaysById, displaysBySlug } =
-    await fetchCuratedCategoryEntities(treeIds, personalIds);
+  const { treeIds, personalIds, userIds } = collectCuratedCategoryRefIds([list]);
+  const { categoriesById, personalById, usersById, displaysById, displaysBySlug } =
+    await fetchCuratedCategoryEntities(treeIds, personalIds, userIds);
   const visibleItems = resolveOrderedListCategoryItems(
     list,
     categoriesById,
     personalById,
+    usersById,
     displaysById,
     displaysBySlug,
   );
@@ -359,9 +408,9 @@ export const buildHomeCuratedCategoryListsResponse = async (lists, options = {})
     options.viewerRegionCode,
   );
   const purgedLists = await autopurgeCuratedCategoryLists(regionLists);
-  const { treeIds, personalIds } = collectCuratedCategoryRefIds(purgedLists);
-  const { categoriesById, personalById, displaysById, displaysBySlug } =
-    await fetchCuratedCategoryEntities(treeIds, personalIds);
+  const { treeIds, personalIds, userIds } = collectCuratedCategoryRefIds(purgedLists);
+  const { categoriesById, personalById, usersById, displaysById, displaysBySlug } =
+    await fetchCuratedCategoryEntities(treeIds, personalIds, userIds);
 
   const payload = purgedLists
     .map((list) => {
@@ -369,6 +418,7 @@ export const buildHomeCuratedCategoryListsResponse = async (lists, options = {})
         list,
         categoriesById,
         personalById,
+        usersById,
         displaysById,
         displaysBySlug,
       );
@@ -387,11 +437,35 @@ export const buildHomeCuratedCategoryListsResponse = async (lists, options = {})
  */
 export const buildAdminCuratedCategoryListsResponse = async (lists) => {
   const purgedLists = await autopurgeCuratedCategoryLists(lists);
-  return purgedLists.map((list) => toCuratedCategoryListPayload(list));
+  const { treeIds, personalIds, userIds } = collectCuratedCategoryRefIds(purgedLists);
+  const { categoriesById, personalById, usersById, displaysById, displaysBySlug } =
+    await fetchCuratedCategoryEntities(treeIds, personalIds, userIds);
+
+  return purgedLists.map((list) => {
+    const base = toCuratedCategoryListPayload(list);
+    const resolved = resolveOrderedListCategoryItems(
+      list,
+      categoriesById,
+      personalById,
+      usersById,
+      displaysById,
+      displaysBySlug,
+      { requireActivePersonal: false },
+    );
+    const labelByKey = new Map(resolved.map((row) => [row.itemKey, row.label]));
+
+    return {
+      ...base,
+      items: base.items.map((item) => ({
+        ...item,
+        label: labelByKey.get(item.itemKey) ?? null,
+      })),
+    };
+  });
 };
 
 /**
- * @param {"tree" | "personal"} kind
+ * @param {"tree" | "personal" | "user"} kind
  * @param {string} refId
  * @param {string | null | undefined} listRegionCode
  */
@@ -435,11 +509,24 @@ export const assertCuratedCategoryListItemAddable = async (
     return row;
   }
 
+  if (kind === "user") {
+    const user = await UserModel.findById(refId)
+      .select("userName userAvatarUrl")
+      .lean();
+    if (!user) {
+      throw new AppError(404, "Пользователь не найден");
+    }
+    if (!String(user.userName ?? "").trim()) {
+      throw new AppError(400, "У пользователя нет никнейма");
+    }
+    return user;
+  }
+
   throw new AppError(400, "Некорректный kind");
 };
 
 /**
- * @param {"tree" | "personal"} kind
+ * @param {"tree" | "personal" | "user"} kind
  * @param {string} refId
  */
 export const buildCuratedCategoryListItemPreview = async (kind, refId) => {
@@ -490,6 +577,31 @@ export const buildCuratedCategoryListItemPreview = async (kind, refId) => {
       regionCode,
       regionLabel: formatCuratedRegionLabel(regionCode),
       catalogVisible: isActive,
+    };
+  }
+
+  if (kind === "user") {
+    const user = await UserModel.findById(refId)
+      .select("userName userAvatarUrl")
+      .lean();
+    if (!user) {
+      throw new AppError(404, "Пользователь не найден");
+    }
+
+    const fields = resolveUserCategoryFields(user);
+    if (!fields) {
+      throw new AppError(400, "У пользователя нет никнейма");
+    }
+
+    return {
+      kind,
+      refId,
+      label: fields.label,
+      imageUrl: fields.imageUrl,
+      categorySlug: null,
+      regionCode: null,
+      regionLabel: null,
+      catalogVisible: true,
     };
   }
 

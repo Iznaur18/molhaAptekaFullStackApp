@@ -199,6 +199,10 @@ export const usePremiumPageStyles = createThemedStyles((theme) => ({
     lineHeight: 20.2,
     color: theme.colors.danger,
   },
+  buyPointsButton: {
+    width: "100%",
+    backgroundColor: theme.colors.action,
+  },
   actions: {
     gap: 10,
   },

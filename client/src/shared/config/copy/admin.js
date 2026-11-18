@@ -1,6 +1,11 @@
 // Автосгенерировано из appUiCopy.js: домен «admin».
 // Реэкспортируется через ../appUiCopy.js — импортируй оттуда, как раньше.
 
+import {
+  SELLER_PRODUCTS_LIMIT_PREMIUM,
+  SELLER_PRODUCTS_LIMIT_REGULAR,
+} from "@molha/api-contract";
+
 import { COMMON_UI } from "./common.js";
 
 /** Экран списка пользователей */
@@ -52,8 +57,7 @@ export const ADMIN_EDIT_USER_UI = {
   LABEL_ROLE: "Роль",
   LABEL_DISCOUNT: "Скидка, %",
   LABEL_PRODUCTS_LIMIT: "Лимит товаров",
-  PRODUCTS_LIMIT_HINT:
-    "Пусто — как у всех: 50, с премиумом 100. Число — столько и разрешено. −1 — без ограничений.",
+  PRODUCTS_LIMIT_HINT: `Пусто — как у всех: ${SELLER_PRODUCTS_LIMIT_REGULAR}, с премиумом ${SELLER_PRODUCTS_LIMIT_PREMIUM}. Число — столько и разрешено. −1 — без ограничений.`,
   PRODUCTS_LIMIT_PLACEHOLDER: "как у всех",
   LABEL_LOYALTY_POINTS: "Баллы лояльности",
   LABEL_PREMIUM: "Премиум",
@@ -195,7 +199,7 @@ export const POPULAR_CATEGORIES_ADMIN_PAGE_UI = {
   TAB_PRODUCTS: "Товары",
   TAB_CATEGORIES: "Категории",
   TITLE: "Подборки на главной",
-  HINT: "Списки с заголовком, регионом и категориями (дерево или личные). На главной подборка видна только в своём регионе.",
+  HINT: "Списки с заголовком, регионом и категориями (дерево, личные или пользователь). На главной подборка видна только в своём регионе.",
   SEARCH_PLACEHOLDER: "Заголовок или refId…",
   LOAD_ERROR: "Не удалось загрузить списки категорий",
   CREATE_ERROR: "Не удалось создать список",
@@ -215,6 +219,7 @@ export const POPULAR_CATEGORIES_ADMIN_PAGE_UI = {
   CATEGORY_KIND_LABEL: "Тип категории",
   CATEGORY_KIND_TREE: "Из дерева",
   CATEGORY_KIND_PERSONAL: "Личная категория",
+  CATEGORY_KIND_USER: "Пользователь",
   CATEGORY_SEARCH_LABEL: "Поиск по названию",
   CATEGORY_SEARCH_PLACEHOLDER: "Например: витамины",
   CATEGORY_SEARCH_LOADING: "Ищем категории…",
@@ -226,6 +231,13 @@ export const POPULAR_CATEGORIES_ADMIN_PAGE_UI = {
   PERSONAL_CATEGORY_LOADING: "Загрузка…",
   PERSONAL_CATEGORY_LOAD_ERROR: "Не удалось загрузить личные категории",
   PERSONAL_CATEGORY_EMPTY: "Нет активных личных категорий в этом регионе",
+  USER_SEARCH_LABEL: "Поиск по никнейму",
+  USER_SEARCH_PLACEHOLDER: "Никнейм, минимум 3 символа",
+  USER_SEARCH_SUBMIT: "Найти",
+  USER_SEARCH_LOADING: "Ищем пользователей…",
+  USER_SEARCH_EMPTY: "Никого не найдено",
+  USER_SEARCH_TOO_SHORT: "Введите минимум 3 символа",
+  USER_SEARCH_HINT: "Введите ник и нажмите «Найти»",
   CATEGORY_REQUIRED: "Выберите категорию",
   ADD_CATEGORY: "Добавить категорию",
   REMOVE_CATEGORY: "Удалить",
@@ -239,6 +251,9 @@ export const POPULAR_CATEGORIES_ADMIN_PAGE_UI = {
   PREVIEW_REGION_LABEL: "Регион",
   PREVIEW_NOT_VISIBLE: "Категория недоступна в каталоге — добавить нельзя",
   PREVIEW_OK: "Можно добавить в эту подборку",
+  KIND_LABEL_TREE: "Дерево",
+  KIND_LABEL_PERSONAL: "Личная",
+  KIND_LABEL_USER: "Пользователь",
 };
 
 /** Админка: платформенная аналитика (KPI из primary aggregates) */

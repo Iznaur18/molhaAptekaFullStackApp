@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { PRODUCT_SORT_NEWEST } from "../constants/productCatalogSort.js";
+import {
+  PRODUCT_SORT_NEWEST,
+  PRODUCT_SORT_OLDEST,
+} from "../constants/productCatalogSort.js";
 import {
   buildCatalogPromotionSortBoostAddFieldsStage,
   buildCatalogPromotionSortStage,
@@ -38,6 +41,18 @@ describe("buildCatalogPromotionSortBoostAddFieldsStage", () => {
         _promotionSortTier: -1,
         _promotionSortActivatedAt: -1,
         createdAt: -1,
+      },
+    });
+  });
+
+  it("oldest sort: same promo keys, createdAt ascending", () => {
+    assert.deepEqual(buildCatalogPromotionSortStage(PRODUCT_SORT_OLDEST), {
+      $sort: {
+        _promotionGlobalTop: -1,
+        _promotionGlobalTopActivatedAt: -1,
+        _promotionSortTier: -1,
+        _promotionSortActivatedAt: -1,
+        createdAt: 1,
       },
     });
   });

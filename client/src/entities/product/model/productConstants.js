@@ -134,7 +134,10 @@ export const PRODUCTS_FETCH_PAGE_LIMIT = 100;
 export const CATALOG_PAGE_SIZE = 24;
 
 /** Query `sort` для GET /product — совпадает с `server/constants/productCatalogSort.js`. */
+export const CATALOG_SORT_OLDEST = "oldest";
 export const CATALOG_SORT_NEWEST = "newest";
+/** Дефолт главной без `?sort=` — как `CATALOG_FILTERS_DEFAULT_SORT` в shared-lib. */
+export const CATALOG_SORT_DEFAULT = CATALOG_SORT_OLDEST;
 export const CATALOG_SORT_VIEWS = "views";
 export const CATALOG_SORT_PURCHASES = "purchases";
 export const CATALOG_SORT_PREMIUM = "premium";
@@ -159,6 +162,7 @@ export const CATALOG_FILTER_NEAR = "__near__";
 export const CATALOG_FILTER_FLASH_SALE_ONLY = "__flash_sale_only__";
 
 export const CATALOG_SORT_OPTIONS = [
+  CATALOG_SORT_OLDEST,
   CATALOG_SORT_NEWEST,
   CATALOG_SORT_VIEWS,
   CATALOG_SORT_PURCHASES,
@@ -227,6 +231,7 @@ export const MY_PRODUCTS_MODERATION_FILTER_LABEL_RU = {
 
 /** @type {Record<string, string>} */
 export const CATALOG_SORT_LABEL_RU = {
+  [CATALOG_SORT_OLDEST]: "Сначала старые",
   [CATALOG_SORT_NEWEST]: "Новинки",
   [CATALOG_SORT_VIEWS]: "По просмотрам",
   [CATALOG_SORT_PURCHASES]: "Больше всего купили",

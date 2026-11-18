@@ -17,62 +17,66 @@
   }
 }
 
-/*
- * Название витрины — первая плитка в ряду, той же формы, что картинки.
- * Нажатие открывает весь список («Все»).
- */
-.curated-category-list-carousel__title-tile {
-  display: block;
-  width: 100%;
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-  border: none;
-  background: transparent;
-  font: inherit;
-  color: var(--iz-color-text);
-  text-align: left;
-  cursor: pointer;
-}
-
-/* Рамку и пропорции даёт image-wrap карточки; текст лежит поверх, как на картинке. */
-.curated-category-list-carousel__title-tile-body {
-  position: absolute;
-  inset: 0;
+.curated-category-list-carousel__header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 10px 12px;
-  text-align: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 10px;
+  padding: 0 12px;
+  min-width: 0;
 }
 
-.curated-category-list-carousel__title-tile-name {
-  display: -webkit-box;
+.curated-category-list-carousel__title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
   overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: clamp(0.85rem, 0.8rem + 0.25vw, 1rem);
   font-family: var(--iz-font-display);
   font-weight: 400;
   font-synthesis: none;
-  line-height: 1.15;
+  line-height: 1.2;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  overflow-wrap: anywhere;
+  color: var(--iz-color-text);
 }
 
-.curated-category-list-carousel__title-tile:focus-visible
-  .curated-category-compact-card__image-wrap {
+.curated-category-list-carousel__view-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: var(--iz-radius-pill, 999px);
+  background: var(--iz-color-bg);
+  color: var(--iz-color-text-secondary);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.curated-category-list-carousel__view-all:hover {
+  color: var(--iz-color-text);
+}
+
+.curated-category-list-carousel__view-all:focus-visible {
   outline: 2px solid var(--iz-color-text);
-  outline-offset: -2px;
+  outline-offset: 2px;
 }
 
 .curated-category-list-carousel__scroll {
-  --curated-visible-cards: 5;
+  --curated-visible-cards: 2.2;
   --curated-card-gap: 12px;
-  --curated-card-min-width: 172px;
-  --curated-card-max-width: 336px;
+  --curated-card-min-width: 200px;
+  --curated-card-max-width: 280px;
   --curated-scroll-pad-x: 12px;
   box-sizing: border-box;
   width: 100%;
@@ -119,4 +123,9 @@
     ),
     var(--curated-card-max-width)
   );
+}
+
+/* Крупнее превью только в карусели; sheet остаётся 2:1. */
+.curated-category-list-carousel .curated-category-compact-card__image-wrap {
+  aspect-ratio: 4 / 3;
 }

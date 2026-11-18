@@ -86,7 +86,7 @@ export async function reorderCuratedCategoryListsAdmin(orderedListIds) {
 
 /**
  * @param {string} listId
- * @param {"tree" | "personal"} kind
+ * @param {"tree" | "personal" | "user"} kind
  * @param {string} refId
  */
 export async function addCuratedCategoryListItemAdmin(listId, kind, refId) {

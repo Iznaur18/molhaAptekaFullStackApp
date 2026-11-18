@@ -1034,6 +1034,15 @@ UserSchema.index({
 // Индекс для поиска по дате последнего входа (для аналитики)
 UserSchema.index({ userLastLoginAt: -1 });
 
+/** Каталог: продавцы с графиком (скрытие закрытых). */
+UserSchema.index(
+  { userBusinessHoursEnabled: 1 },
+  {
+    name: "user_business_hours_enabled",
+    partialFilterExpression: { userBusinessHoursEnabled: true },
+  },
+);
+
 // Индекс для поиска премиум пользователей
 UserSchema.index({ isPremiumUser: 1 });
 UserSchema.index({ isPremiumUser: 1, premiumExpiresAt: 1 });

@@ -107,4 +107,42 @@ describe("CuratedCategoryCompactCard", () => {
 
     expect(screen.queryByText("Иван Петров")).toBeNull();
   });
+
+  it("user показывает никнейм и аватар-заглушку без своей картинки", () => {
+    const { container } = renderWithProviders(
+      <CuratedCategoryCompactCard
+        showDetails
+        category={{
+          kind: "user",
+          refId: "u1",
+          itemKey: "user:u1",
+          label: "nick_demo",
+          imageUrl: null,
+          sellerId: "u1",
+        }}
+        onOpen={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("nick_demo")).toBeTruthy();
+    expect(container.querySelector("img")).not.toBeNull();
+  });
+
+  it("user без showDetails не показывает ник в карусели", () => {
+    renderWithProviders(
+      <CuratedCategoryCompactCard
+        category={{
+          kind: "user",
+          refId: "u1",
+          itemKey: "user:u1",
+          label: "nick_home",
+          imageUrl: "https://cdn.example/a.jpg",
+          sellerId: "u1",
+        }}
+        onOpen={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByText("nick_home")).toBeNull();
+  });
 });

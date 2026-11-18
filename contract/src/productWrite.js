@@ -90,7 +90,7 @@ export const PRODUCT_RETURN_TERM_VALUE_MAX_CHARS = 200;
 
 /** Лимит активных товаров продавца. */
 export const SELLER_PRODUCTS_LIMIT_REGULAR = 50;
-export const SELLER_PRODUCTS_LIMIT_PREMIUM = 100;
+export const SELLER_PRODUCTS_LIMIT_PREMIUM = 250;
 export const SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE = `Достигнут лимит товаров: ${SELLER_PRODUCTS_LIMIT_REGULAR} для обычных пользователей, ${SELLER_PRODUCTS_LIMIT_PREMIUM} для премиум.`;
 
 /**

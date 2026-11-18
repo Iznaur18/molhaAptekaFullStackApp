@@ -46,12 +46,14 @@ paths:
         - in: query
           name: sort
           description: |
+            Без sort — oldest (главная). newest — явная лента новинок.
             premium / confirmed — устаревшие формы sellerPremium / sellerConfirmed.
             price_asc, price_desc, rating, discount — без буста продвижения и приоритета региона.
           schema:
             type: string
             enum:
               [
+                oldest,
                 newest,
                 views,
                 purchases,

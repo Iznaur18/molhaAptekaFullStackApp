@@ -165,6 +165,15 @@ export const PremiumPage = () => {
             </Text>
           </View>
 
+          <AppButton
+            label={PREMIUM_PAGE_UI.BUY_POINTS}
+            variant="primary"
+            style={styles.buyPointsButton}
+            onPress={() => {
+              router.push("/hub/loyalty-points");
+            }}
+          />
+
           {isActive ? (
             <View style={styles.statusBanner} accessibilityRole="text">
               <MaterialIcons

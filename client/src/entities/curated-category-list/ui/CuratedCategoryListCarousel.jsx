@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ArrowRight } from "lucide-react";
 
 import { CURATED_LIST_CAROUSEL_UI } from "../../../shared/config/appUiCopy.js";
 
@@ -43,28 +44,24 @@ export function CuratedCategoryListCarousel({ title, categories, onOpenCategory 
           "--curated-card-max-width": `${CURATED_CATEGORY_LIST_HOME_CARD_MAX_WIDTH_PX}px`,
         }}
       >
+        <div className="curated-category-list-carousel__header">
+          <h2 className="curated-category-list-carousel__title">{title}</h2>
+          <button
+            type="button"
+            className="curated-category-list-carousel__view-all"
+            aria-label={CURATED_LIST_CAROUSEL_UI.VIEW_ALL_ARIA(title)}
+            onClick={() => setIsViewAllOpen(true)}
+          >
+            {CURATED_LIST_CAROUSEL_UI.VIEW_ALL}
+            <ArrowRight size={14} aria-hidden />
+          </button>
+        </div>
         <div
           ref={scrollRef}
           className="curated-category-list-carousel__scroll"
           {...dragScrollProps}
         >
           <ul className="curated-category-list-carousel__track" role="list">
-            <li className="curated-category-list-carousel__item">
-              <button
-                type="button"
-                className="curated-category-list-carousel__title-tile"
-                aria-label={CURATED_LIST_CAROUSEL_UI.VIEW_ALL_ARIA(title)}
-                onClick={() => setIsViewAllOpen(true)}
-              >
-                <span className="curated-category-compact-card__image-wrap">
-                  <span className="curated-category-list-carousel__title-tile-body">
-                    <span className="curated-category-list-carousel__title-tile-name">
-                      {title}
-                    </span>
-                  </span>
-                </span>
-              </button>
-            </li>
             {categories.map((category) => (
               <li
                 key={category.itemKey}

@@ -2,7 +2,7 @@ import { apiClient } from "../../../shared/api/index.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
 /**
- * @param {"tree" | "personal"} kind
+ * @param {"tree" | "personal" | "user"} kind
  * @param {string} refId
  * @returns {Promise<import('../model/types.js').CuratedCategoryListItemPreviewFromApi>}
  */

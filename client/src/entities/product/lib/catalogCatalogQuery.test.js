@@ -34,7 +34,7 @@ describe("catalogCatalogQuery: фильтры окна", () => {
 
   it("drops invalid values and swaps a reversed price range", () => {
     expect(parse("priceMin=900&priceMax=100&ratingMin=2&sort=teleport")).toMatchObject({
-      sort: "newest",
+      sort: "oldest",
       priceMin: 100,
       priceMax: 900,
       ratingMin: null,
