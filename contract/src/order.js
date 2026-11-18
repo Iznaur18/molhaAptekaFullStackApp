@@ -7,10 +7,7 @@ import {
   yandexExpressOrderSelectionSchema,
 } from "./yandexDelivery.js";
 import { mongoIdSchema } from "./mongoId.js";
-import {
-  ADDRESS_FLAT_MAX_LENGTH,
-  ADDRESS_LINE_MAX_LENGTH,
-} from "./userFields.js";
+import { ADDRESS_FLAT_MAX_LENGTH, ADDRESS_LINE_MAX_LENGTH } from "./userFields.js";
 import {
   optionalLimitQuery,
   optionalPageQuery,
