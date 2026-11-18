@@ -75,8 +75,7 @@ export async function uploadImage({ file, uploaderId, purpose: purposeRaw }) {
 
   const purpose = resolveUploadPurpose(purposeRaw);
   const isCourierDocument = purpose === COURIER_DOCUMENT_UPLOAD_PURPOSE;
-  const wantPrivate =
-    purpose === PASSPORT_SELFIE_UPLOAD_PURPOSE || isCourierDocument;
+  const wantPrivate = purpose === PASSPORT_SELFIE_UPLOAD_PURPOSE || isCourierDocument;
 
   if (wantPrivate) {
     if (isCourierDocument) {
@@ -120,9 +119,7 @@ export async function uploadImage({ file, uploaderId, purpose: purposeRaw }) {
     logServerEvent("warn", {
       event: "uploadcontroller_compress",
       error:
-        compressError instanceof Error
-          ? compressError.message
-          : String(compressError),
+        compressError instanceof Error ? compressError.message : String(compressError),
     });
   }
 

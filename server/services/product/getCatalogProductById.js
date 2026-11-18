@@ -20,8 +20,7 @@ export async function getCatalogProductByIdForViewer({
   }
 
   const sellerId = String(product.productSeller?._id ?? product.productSeller ?? "");
-  const isSeller =
-    viewerUserId != null && sellerId !== "" && sellerId === viewerUserId;
+  const isSeller = viewerUserId != null && sellerId !== "" && sellerId === viewerUserId;
   const isApproved = product.productModerationStatus === PRODUCT_MODERATION_APPROVED;
 
   if (!isApproved && !isSeller) {

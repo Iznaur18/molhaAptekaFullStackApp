@@ -43,11 +43,7 @@ export async function getMyVoteForTarget({ voterUserId, targetUserId }) {
  *   userVoteValueClient: unknown;
  * }} args
  */
-export async function castUserVote({
-  voterUserId,
-  targetUserId,
-  userVoteValueClient,
-}) {
+export async function castUserVote({ voterUserId, targetUserId, userVoteValueClient }) {
   const targetOid = toObjectId(targetUserId);
   const voterOid = toObjectId(voterUserId);
   const userVoteValue = Math.round(Number(userVoteValueClient));

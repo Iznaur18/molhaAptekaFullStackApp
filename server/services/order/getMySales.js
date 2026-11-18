@@ -52,10 +52,7 @@ const resolveProductIdsFilter = (raw, sellerProductIds) => {
   }
 
   if (unique.length > MAX_PRODUCT_IDS_IN_FILTER) {
-    throw new AppError(
-      400,
-      `Не более ${MAX_PRODUCT_IDS_IN_FILTER} товаров в фильтре`,
-    );
+    throw new AppError(400, `Не более ${MAX_PRODUCT_IDS_IN_FILTER} товаров в фильтре`);
   }
   for (const id of unique) {
     if (!mongoose.isValidObjectId(id)) {

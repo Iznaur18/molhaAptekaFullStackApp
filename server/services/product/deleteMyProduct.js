@@ -2,10 +2,7 @@ import { AppError } from "../../errors/AppError.js";
 import { ProductModel } from "../../models/index.js";
 import { isUserAdmin } from "../access/adminUserGuard.js";
 import { deleteProductsCascade } from "./deleteProductsCascade.js";
-import {
-  hasProductOpenSales,
-  OPEN_SALES_BLOCK_MESSAGE,
-} from "./productOrderLocks.js";
+import { hasProductOpenSales, OPEN_SALES_BLOCK_MESSAGE } from "./productOrderLocks.js";
 
 /**
  * Удаление своего товара (любой статус модерации) или любого (admin).

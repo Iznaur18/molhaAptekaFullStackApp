@@ -9,7 +9,6 @@ import {
 import { mongoIdSchema } from "./mongoId.js";
 import {
   ADDRESS_FLAT_MAX_LENGTH,
-  ADDRESS_FLAT_TOO_LONG_MESSAGE,
   ADDRESS_LINE_MAX_LENGTH,
 } from "./userFields.js";
 import {

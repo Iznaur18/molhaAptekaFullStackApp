@@ -110,9 +110,7 @@ export const submitDataConfirmationRequest = async ({
 
   let passportSelfiePhotoUrl;
   try {
-    passportSelfiePhotoUrl = normalizePassportSelfiePhotoUrl(
-      passportSelfiePhotoUrlRaw,
-    );
+    passportSelfiePhotoUrl = normalizePassportSelfiePhotoUrl(passportSelfiePhotoUrlRaw);
   } catch (validationError) {
     if (validationError instanceof AppError) {
       throw validationError;

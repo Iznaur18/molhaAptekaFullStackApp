@@ -229,10 +229,7 @@ export async function approveProductModeration({ productId, requestId }) {
 /**
  * @param {{ productId: string; productModerationComment?: unknown }} args
  */
-export async function rejectProductModeration({
-  productId,
-  productModerationComment,
-}) {
+export async function rejectProductModeration({ productId, productModerationComment }) {
   const comment =
     productModerationComment == null
       ? ""

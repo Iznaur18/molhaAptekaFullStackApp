@@ -40,10 +40,7 @@ export const getPendingDataConfirmationRequestsController = async (_req, res) =>
 /**
  * `GET /user/data-confirmation-requests/pending/count`
  */
-export const getPendingDataConfirmationRequestsCountController = async (
-  _req,
-  res,
-) => {
+export const getPendingDataConfirmationRequestsCountController = async (_req, res) => {
   const data = await countPendingDataConfirmationRequests();
   return successRes(res, data);
 };

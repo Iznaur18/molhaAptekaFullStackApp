@@ -51,8 +51,7 @@ export async function getUserSellerProducts({
 
   const { page, limit } = parsePageLimit(query);
   const shelfId = query.shelfId != null ? String(query.shelfId).trim() : "";
-  const onecGroupId =
-    query.onecGroupId != null ? String(query.onecGroupId).trim() : "";
+  const onecGroupId = query.onecGroupId != null ? String(query.onecGroupId).trim() : "";
   const onecGroupIds = onecGroupId
     ? await resolveOneCGroupBranchIds(targetUserId, onecGroupId)
     : null;

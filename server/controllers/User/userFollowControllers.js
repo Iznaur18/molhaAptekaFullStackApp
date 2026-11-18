@@ -9,10 +9,7 @@ import {
  * `POST /user/:userIdClient/follow`
  */
 export const followUserController = async (req, res) => {
-  const data = await followUser(
-    String(req.userId),
-    String(req.params.userIdClient),
-  );
+  const data = await followUser(String(req.userId), String(req.params.userIdClient));
   return successRes(res, data);
 };
 
@@ -20,10 +17,7 @@ export const followUserController = async (req, res) => {
  * `DELETE /user/:userIdClient/follow`
  */
 export const unfollowUserController = async (req, res) => {
-  const data = await unfollowUser(
-    String(req.userId),
-    String(req.params.userIdClient),
-  );
+  const data = await unfollowUser(String(req.userId), String(req.params.userIdClient));
   return successRes(res, data);
 };
 

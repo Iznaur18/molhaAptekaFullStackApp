@@ -27,10 +27,12 @@ function sentryConnectOriginsFromDsn(dsn: string | undefined | null): string[] {
   }
 }
 
-function isPlausibleConfigured(options: {
-  plausibleScriptSrc?: string | null;
-  plausibleDomain?: string | null;
-} = {}): boolean {
+function isPlausibleConfigured(
+  options: {
+    plausibleScriptSrc?: string | null;
+    plausibleDomain?: string | null;
+  } = {},
+): boolean {
   const scriptSrc = String(
     options.plausibleScriptSrc ??
       (typeof process !== "undefined" ? process.env?.VITE_PLAUSIBLE_SCRIPT_SRC : "") ??
@@ -63,9 +65,7 @@ export function buildSpaContentSecurityPolicy(
   options: SpaContentSecurityPolicyOptions = {},
 ): string {
   const env = typeof process !== "undefined" ? process.env : undefined;
-  const frontendOrigin = parseHttpOrigin(
-    options.frontendOrigin ?? env?.FRONTEND_URL,
-  );
+  const frontendOrigin = parseHttpOrigin(options.frontendOrigin ?? env?.FRONTEND_URL);
   const mediaOrigin = parseHttpOrigin(
     options.mediaOrigin ?? env?.PUBLIC_UPLOAD_BASE_URL,
   );
@@ -100,9 +100,8 @@ export function buildSpaContentSecurityPolicy(
 
   if (isPlausibleConfigured(options)) {
     const scriptOrigin =
-      parseHttpOrigin(
-        options.plausibleScriptSrc ?? env?.VITE_PLAUSIBLE_SCRIPT_SRC,
-      ) ?? PLAUSIBLE_ORIGIN;
+      parseHttpOrigin(options.plausibleScriptSrc ?? env?.VITE_PLAUSIBLE_SCRIPT_SRC) ??
+      PLAUSIBLE_ORIGIN;
     scriptSources.add(scriptOrigin);
     connectSources.add(scriptOrigin);
   }

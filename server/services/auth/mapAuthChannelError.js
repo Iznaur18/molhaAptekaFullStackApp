@@ -53,7 +53,10 @@ export function throwMappedAuthChannelError(
  * @param {string} message
  */
 function mapSmsDeliveryMessage(error, message) {
-  if (!isSmsDeliveryFailure(message) && !isSmsDeliveryFailure(String(error?.message ?? ""))) {
+  if (
+    !isSmsDeliveryFailure(message) &&
+    !isSmsDeliveryFailure(String(error?.message ?? ""))
+  ) {
     return message;
   }
   const detail =

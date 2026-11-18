@@ -15,11 +15,7 @@ import { getUserRecentUniquePurchases } from "./userRecentPurchases.js";
  *   req: import('express').Request;
  * }} args
  */
-export async function getUserPurchasesForViewer({
-  viewerUserId,
-  targetUserId,
-  req,
-}) {
+export async function getUserPurchasesForViewer({ viewerUserId, targetUserId, req }) {
   if (!viewerUserId) {
     throw new AppError(401, "Требуется авторизация");
   }

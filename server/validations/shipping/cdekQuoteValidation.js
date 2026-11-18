@@ -27,9 +27,7 @@ export const cdekWaybillValidation = [
   validateBodyZod(cdekWaybillBodySchema),
 ];
 
-export const cdekWaybillParamsValidation = [
-  validateParamsZod(cdekOrderIdParamsSchema),
-];
+export const cdekWaybillParamsValidation = [validateParamsZod(cdekOrderIdParamsSchema)];
 
 export const cdekReceptionPointsValidation = [
   validateQueryZod(cdekReceptionPointsQuerySchema),

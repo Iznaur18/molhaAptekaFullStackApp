@@ -173,13 +173,10 @@ export async function unblockUser(blockerId, blockedId) {
  */
 export async function unblockUserForViewer({ viewerId, blockedId, asUserId }) {
   const viewer = await UserModel.findById(viewerId).select("userRole").lean();
-  const isModerator =
-    viewer?.userRole === "admin" || viewer?.userRole === "moderator";
+  const isModerator = viewer?.userRole === "admin" || viewer?.userRole === "moderator";
 
   const asUser =
-    asUserId != null && String(asUserId).trim() !== ""
-      ? String(asUserId).trim()
-      : "";
+    asUserId != null && String(asUserId).trim() !== "" ? String(asUserId).trim() : "";
   const blockerId = isModerator && asUser ? asUser : viewerId;
 
   if (blockerId !== viewerId && !isModerator) {

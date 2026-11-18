@@ -133,11 +133,7 @@ export async function patchProductCategoryDisplayBySlug({
  *   adminId: string;
  * }} args
  */
-export async function patchProductCategoryDisplayById({
-  categoryId,
-  body,
-  adminId,
-}) {
+export async function patchProductCategoryDisplayById({ categoryId, body, adminId }) {
   const categoryExists = await ProductCategoryModel.exists({ _id: categoryId });
   if (!categoryExists) {
     throw new AppError(404, "Категория не найдена");
