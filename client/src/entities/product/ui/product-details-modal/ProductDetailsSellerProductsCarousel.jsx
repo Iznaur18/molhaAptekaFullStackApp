@@ -38,9 +38,7 @@ export function ProductDetailsSellerProductsCarousel({
   const isSelf =
     currentUserId != null && String(currentUserId) === String(sellerId).trim();
   const isAdminViewer = isAdminRole(
-    /** @type {import('@izibuy/shared-lib').UserRole} */ (
-      currentUserRole ?? "user"
-    ),
+    /** @type {import('@izibuy/shared-lib').UserRole} */ (currentUserRole ?? "user"),
   );
   const productsQuery = useUserProfileProductsQuery({
     userId: sellerId,
