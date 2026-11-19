@@ -17,6 +17,8 @@ export const CURATED_PRODUCT_LIST_HOME_TITLE_PADDING_X = 4;
 export const CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_TOP = 0;
 export const CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_BOTTOM = 0;
 export const CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_HORIZONTAL = 12;
+/** Web `.curated-product-compact-card__price-wrap { min-height: 32px }` (border-box). */
+export const CURATED_PRODUCT_COMPACT_CARD_PRICE_MIN_HEIGHT = 32;
 
 /** Синхронизировано с CuratedProductListCarousel.css clamp() */
 export const resolveCuratedCompactCardWidth = (
@@ -33,3 +35,7 @@ export const resolveCuratedCompactCardWidth = (
     Math.max(CURATED_PRODUCT_LIST_HOME_CARD_MIN_WIDTH, fromVisible),
   );
 };
+
+/** image 1:1 + price row — высота трека HorizontalOverflowRow. */
+export const resolveCuratedCompactCardHeight = (cardWidth: number): number =>
+  cardWidth + CURATED_PRODUCT_COMPACT_CARD_PRICE_MIN_HEIGHT;

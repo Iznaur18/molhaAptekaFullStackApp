@@ -1,25 +1,26 @@
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 import type { UserStoryRing } from "@/entities/user-story/api/userStoryApi";
+import {
+  USER_STORY_STRIP_LAYOUT,
+  USER_STORY_STRIP_TRACK_HEIGHT,
+} from "@/entities/user-story/lib/userStoryStripLayout";
 import { CreateUserStoryModal } from "@/features/home-feed/ui/CreateUserStoryModal";
 import {
   StoryAddButton,
   StoryRingItem,
 } from "@/features/home-feed/ui/UserStoryStripItems";
 import { UserStoryViewerModal } from "@/features/home-feed/ui/UserStoryViewerModal";
-import { USER_STORY_STRIP_LAYOUT } from "@/entities/user-story/lib/userStoryStripLayout";
 import { HOME_FEED_UI } from "@/shared/config";
-import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
 import { useUserStoriesStripStyles } from "@/shared/theme/catalogProductStyles";
 import {
   AccountRequirementModal,
   useAccountRequirementModal,
 } from "@/shared/ui/AccountRequirementModal";
+import { HorizontalOverflowRow } from "@/shared/ui/HorizontalOverflowRow";
 import { SquircleView } from "@/shared/ui/SquircleView";
-
-const STORIES_WINDOW_SIZE = 5;
 
 type UserStoriesStripProps = {
   rings: UserStoryRing[];
@@ -75,18 +76,6 @@ export const UserStoriesStrip = ({
     setViewerAuthor(author);
   }, []);
 
-  const renderStoryRing = useCallback(
-    ({ item }: { item: UserStoryRing }) => (
-      <StoryRingItem ring={item} onOpen={handleOpenRing} />
-    ),
-    [handleOpenRing],
-  );
-
-  const listHeader = useMemo(
-    () => <StoryAddButton onPress={handleAddPress} />,
-    [handleAddPress],
-  );
-
   if (!showStrip && sortedRings.length === 0) {
     return null;
   }
@@ -99,20 +88,19 @@ export const UserStoriesStrip = ({
           radius={USER_STORY_STRIP_LAYOUT.scrollBorderRadius}
           style={styles.scrollWrapper}
         >
-          <FlatList
-            horizontal
-            {...nestedHorizontalScrollProps}
-            data={sortedRings}
-            keyExtractor={(item) => String(item.author._id)}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.scroll}
-            ListHeaderComponent={listHeader}
-            windowSize={STORIES_WINDOW_SIZE}
-            maxToRenderPerBatch={6}
-            initialNumToRender={8}
-            removeClippedSubviews
-            renderItem={renderStoryRing}
-          />
+          <HorizontalOverflowRow
+            height={USER_STORY_STRIP_TRACK_HEIGHT}
+            trackStyle={styles.scroll}
+          >
+            <StoryAddButton onPress={handleAddPress} />
+            {sortedRings.map((ring) => (
+              <StoryRingItem
+                key={String(ring.author._id)}
+                ring={ring}
+                onOpen={handleOpenRing}
+              />
+            ))}
+          </HorizontalOverflowRow>
         </SquircleView>
       </View>
 

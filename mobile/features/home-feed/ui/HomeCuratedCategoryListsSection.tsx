@@ -1,17 +1,20 @@
 import { useMemo } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 import type {
   HomeCuratedCategory,
   HomeCuratedCategoryList,
 } from "@/entities/curated-category-list/api/fetchHomeCuratedCategoryLists";
-import { resolveCuratedCategoryCompactCardWidth } from "@/entities/curated-category-list/lib/curatedCategoryListHomeLayout";
+import {
+  resolveCuratedCategoryCompactCardHeight,
+  resolveCuratedCategoryCompactCardWidth,
+} from "@/entities/curated-category-list/lib/curatedCategoryListHomeLayout";
 import { CuratedCategoryCompactCard } from "@/entities/curated-category-list/ui/CuratedCategoryCompactCard";
 import { CURATED_PRODUCT_LIST_HOME_SECTION_BORDER_RADIUS } from "@/entities/curated-product-list/lib/curatedProductListHomeLayout";
 import { HOME_FEED_UI } from "@/shared/config";
-import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useHomeCuratedListsStyles } from "@/shared/theme/catalogProductStyles";
+import { HorizontalOverflowRow } from "@/shared/ui/HorizontalOverflowRow";
 import { SquircleView } from "@/shared/ui/SquircleView";
 
 type HomeCuratedCategoryListsSectionProps = {
@@ -31,6 +34,11 @@ export const HomeCuratedCategoryListsSection = ({
     return resolveCuratedCategoryCompactCardWidth(scrollContainerWidth);
   }, [contentPaddingHorizontal, layoutWidth]);
 
+  const trackHeight = useMemo(
+    () => resolveCuratedCategoryCompactCardHeight(compactCardWidth),
+    [compactCardWidth],
+  );
+
   if (lists.length === 0) {
     return null;
   }
@@ -47,12 +55,7 @@ export const HomeCuratedCategoryListsSection = ({
             radius={CURATED_PRODUCT_LIST_HOME_SECTION_BORDER_RADIUS}
             style={styles.listBlock}
           >
-            <ScrollView
-              horizontal
-              {...nestedHorizontalScrollProps}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.row}
-            >
+            <HorizontalOverflowRow height={trackHeight} trackStyle={styles.row}>
               {list.categories.map((category) => (
                 <CuratedCategoryCompactCard
                   key={category.itemKey}
@@ -61,7 +64,7 @@ export const HomeCuratedCategoryListsSection = ({
                   onOpen={onOpenCategory}
                 />
               ))}
-            </ScrollView>
+            </HorizontalOverflowRow>
           </SquircleView>
         </View>
       ))}
