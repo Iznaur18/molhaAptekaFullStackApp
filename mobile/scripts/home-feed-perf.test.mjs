@@ -94,11 +94,15 @@ test("home feed opens sheet on first content ready for immediate scroll", () => 
   assert.match(transition, /applyScrollEnabledFromMode/);
 });
 
-test("user stories strip uses horizontal FlatList virtualization", () => {
+test("user stories strip uses fixed-height HorizontalOverflowRow (no RN stretch)", () => {
   const strip = readMobileFile("features/home-feed/ui/UserStoriesStrip.tsx");
+  const layout = readMobileFile("entities/user-story/lib/userStoryStripLayout.ts");
 
-  assert.match(strip, /FlatList/);
-  assert.match(strip, /windowSize=\{STORIES_WINDOW_SIZE\}/);
+  // FlatList+flexGrow тянул ленту на весь экран в Expo Go / RN Web.
+  assert.match(strip, /HorizontalOverflowRow/);
+  assert.match(strip, /USER_STORY_STRIP_TRACK_HEIGHT/);
   assert.match(strip, /StoryRingItem/);
-  assert.doesNotMatch(strip, /sortedRings\.map/);
+  assert.match(strip, /sortedRings\.map/);
+  assert.doesNotMatch(strip, /FlatList/);
+  assert.match(layout, /USER_STORY_STRIP_TRACK_HEIGHT/);
 });

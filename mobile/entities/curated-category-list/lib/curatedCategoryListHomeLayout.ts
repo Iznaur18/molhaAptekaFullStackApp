@@ -35,3 +35,8 @@ export const resolveCuratedCategoryCompactCardWidth = (
     Math.max(CURATED_CATEGORY_LIST_HOME_CARD_MIN_WIDTH, fromVisible),
   );
 };
+
+/** Превью 2:1 — высота трека HorizontalOverflowRow. */
+export const resolveCuratedCategoryCompactCardHeight = (
+  cardWidth: number,
+): number => cardWidth / CURATED_CATEGORY_LIST_HOME_CARD_WIDTH_SCALE;

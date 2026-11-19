@@ -26,7 +26,21 @@ export const USER_STORY_STRIP_LAYOUT = {
   countPaddingHorizontal: 5,
   countFontSize: 12,
   avatarFallbackFontSize: 22,
+  /** lineHeight лейбла — фиксируем, иначе track height плавает. */
+  labelLineHeight: 15,
 } as const;
 
 export const USER_STORY_STRIP_INNER_SIZE =
   USER_STORY_STRIP_LAYOUT.ringSize - USER_STORY_STRIP_LAYOUT.ringPadding * 2;
+
+/**
+ * Высота горизонтального трека сториз.
+ * Без жёсткой высоты RN Web/Expo Go тянет FlatList/ScrollView на весь экран
+ * (`flexGrow: 1` + `Image` 100%).
+ */
+export const USER_STORY_STRIP_TRACK_HEIGHT =
+  USER_STORY_STRIP_LAYOUT.scrollPaddingTop +
+  USER_STORY_STRIP_LAYOUT.ringSize +
+  USER_STORY_STRIP_LAYOUT.itemContentGap +
+  USER_STORY_STRIP_LAYOUT.labelLineHeight +
+  USER_STORY_STRIP_LAYOUT.scrollPaddingBottom;

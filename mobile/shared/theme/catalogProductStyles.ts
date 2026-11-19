@@ -42,6 +42,7 @@ import {
   HOME_FEED_DISPLAY_TITLE,
 } from "@/shared/theme/displayTypography";
 import {
+  CURATED_PRODUCT_COMPACT_CARD_PRICE_MIN_HEIGHT,
   CURATED_PRODUCT_LIST_HOME_CARD_GAP,
   CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_BOTTOM,
   CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_HORIZONTAL,
@@ -3781,6 +3782,8 @@ export const useCuratedProductCompactCardStyles = createThemedStyles((theme) => 
   const C = resolveCuratedCompactCardColors(theme.colors);
   return {
     card: {
+      flexGrow: 0,
+      flexShrink: 0,
       borderWidth: 1,
       borderColor: C.border,
       borderRadius: 16,
@@ -3788,6 +3791,7 @@ export const useCuratedProductCompactCardStyles = createThemedStyles((theme) => 
       backgroundColor: "transparent",
     },
     imageWrap: {
+      width: "100%",
       aspectRatio: 1,
       backgroundColor: C.imageBg,
       alignItems: "center",
@@ -3795,15 +3799,14 @@ export const useCuratedProductCompactCardStyles = createThemedStyles((theme) => 
       overflow: "hidden",
     },
     image: {
-      width: "100%",
-      height: "100%",
+      ...StyleSheet.absoluteFillObject,
     },
     imageFallback: {
       fontSize: 13.5,
       color: C.imageFallbackText,
     },
     priceWrap: {
-      minHeight: 32,
+      minHeight: CURATED_PRODUCT_COMPACT_CARD_PRICE_MIN_HEIGHT,
       paddingHorizontal: 8,
       paddingVertical: 6,
       justifyContent: "center",
@@ -3822,6 +3825,8 @@ export const useCuratedCategoryCompactCardStyles = createThemedStyles((theme) =>
   const C = resolveCuratedCompactCardColors(theme.colors);
   return {
     card: {
+      flexGrow: 0,
+      flexShrink: 0,
       borderWidth: 1,
       borderColor: C.border,
       borderRadius: 16,
@@ -3829,6 +3834,7 @@ export const useCuratedCategoryCompactCardStyles = createThemedStyles((theme) =>
       backgroundColor: "transparent",
     },
     imageWrap: {
+      width: "100%",
       aspectRatio: 2,
       backgroundColor: C.imageBg,
       alignItems: "center",
@@ -3836,8 +3842,7 @@ export const useCuratedCategoryCompactCardStyles = createThemedStyles((theme) =>
       overflow: "hidden",
     },
     image: {
-      width: "100%",
-      height: "100%",
+      ...StyleSheet.absoluteFillObject,
     },
   };
 });
@@ -3915,8 +3920,9 @@ export const useUserStoriesStripStyles = createThemedStyles((theme) => ({
   },
   scroll: {
     flexDirection: "row",
-    flexGrow: 1,
-    alignItems: "center",
+    flexGrow: 0,
+    flexShrink: 0,
+    alignItems: "flex-start",
     paddingLeft: USER_STORY_STRIP_LAYOUT.scrollPaddingLeft,
     paddingRight: USER_STORY_STRIP_LAYOUT.scrollPaddingRight,
     paddingTop: USER_STORY_STRIP_LAYOUT.scrollPaddingTop,
@@ -3924,6 +3930,8 @@ export const useUserStoriesStripStyles = createThemedStyles((theme) => ({
     gap: USER_STORY_STRIP_LAYOUT.itemGap,
   },
   item: {
+    flex: 0,
+    flexGrow: 0,
     flexShrink: 0,
     width: USER_STORY_STRIP_LAYOUT.itemWidth,
     alignItems: "center",
@@ -4000,6 +4008,7 @@ export const useUserStoriesStripStyles = createThemedStyles((theme) => ({
   label: {
     width: "100%",
     fontSize: USER_STORY_STRIP_LAYOUT.labelFontSize,
+    lineHeight: USER_STORY_STRIP_LAYOUT.labelLineHeight,
     color: theme.colors.textSecondary,
     maxWidth: USER_STORY_STRIP_LAYOUT.itemWidth,
     textAlign: "center",
