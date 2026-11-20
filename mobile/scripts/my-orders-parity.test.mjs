@@ -89,10 +89,7 @@ test("my orders overview active tile uses action colors like web", () => {
     styles,
     /overviewTileActive:[\s\S]*borderColor:\s*theme\.colors\.action[\s\S]*backgroundColor:\s*theme\.colors\.actionSoft/,
   );
-  assert.doesNotMatch(
-    styles,
-    /overviewTileActive:[\s\S]*theme\.colors\.success/,
-  );
+  assert.doesNotMatch(styles, /overviewTileActive:[\s\S]*theme\.colors\.success/);
 });
 
 test("my orders guest CTA matches cart centered + AppButton", () => {
@@ -102,7 +99,10 @@ test("my orders guest CTA matches cart centered + AppButton", () => {
   assert.match(page, /AppButton/);
   assert.match(page, /AUTH_UI\.LOGIN_BUTTON/);
   assert.doesNotMatch(page, /styles\.buttonText/);
-  assert.match(styles, /hint:[\s\S]*fontSize:\s*16[\s\S]*marginBottom:\s*theme\.spacing\[4\]/);
+  assert.match(
+    styles,
+    /hint:[\s\S]*fontSize:\s*16[\s\S]*marginBottom:\s*theme\.spacing\[4\]/,
+  );
 });
 
 test("buyer compact order-card matches web pad/gap/details-fold", () => {
