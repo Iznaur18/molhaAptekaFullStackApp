@@ -54,7 +54,7 @@ test("profile thumb lists match web purchases/products blocks", () => {
   const chrome = readMobileFile("shared/theme/profileChromeStyles.ts");
 
   assert.match(products, /UserProfileThumbSection/);
-  assert.match(products, /useUserProfileProductsAllPagesQuery/);
+  assert.match(products, /useUserProfileProductsQuery/);
   assert.match(products, /enabled: true/);
   assert.match(products, /profile-scroll/);
   assert.doesNotMatch(products, /SHOW_MORE/);

@@ -36,18 +36,22 @@ test("profile adaptive layout matches web /me breakpoints", () => {
   assert.match(hook, /MY_PROFILE_DRAWER_LAYOUT_MAX_PX/);
 
   assert.match(layout, /MY_PROFILE_LAYOUT_GAP = 16/);
+  assert.match(layout, /MY_PROFILE_SECTION_GAP = 6/);
   assert.match(layout, /MY_PROFILE_MAIN_GAP = 12/);
   assert.match(layout, /MY_PROFILE_SHELL_PAD_X = 16/);
   assert.match(layout, /scrollPaddingTop: 0/);
   assert.match(layout, /resolveProfileHubMainReservedWidth/);
   assert.match(layout, /MY_PRODUCTS_PAGE_LAYOUT/);
   assert.match(layout, /stackGap: MY_PROFILE_MAIN_GAP/);
+  assert.match(layout, /mainGap: MY_PROFILE_SECTION_GAP/);
 
   assert.match(styles, /gap: MY_PROFILE_LAYOUT_GAP/);
   assert.match(styles, /shellPad:/);
   assert.match(styles, /paddingHorizontal: MY_PROFILE_SHELL_PAD_X/);
 
-  assert.match(shell, /styles\.shellPad/);
+  assert.match(shell, /contentPaddingHorizontal/);
+  assert.match(shell, /paddingHorizontal: contentPaddingHorizontal/);
+  assert.doesNotMatch(shell, /styles\.shellPad/);
   assert.match(shell, /centeredContentStyle/);
   assert.match(shell, /pageScrollContent/);
   assert.match(shell, /sidebarInner/);

@@ -325,7 +325,7 @@ export const ADD_TO_CART_UI = {
 
 export const CART_PAGE_UI = {
   TITLE: "Корзина",
-  EMPTY: "Корзина пуста",
+  EMPTY: "Корзина пуста.",
   LOADING: "Загрузка корзины…",
   PRODUCTS_LOAD_ERROR: "Не удалось загрузить товары в корзине",
   TOTAL_LABEL: "Итого",
@@ -350,7 +350,7 @@ export const CART_PAGE_UI = {
     `Выбрано ${selected} из ${total}`,
   CLEAR_ALL: "Очистить корзину",
   GO_TO_CATALOG: "Перейти в каталог",
-  AUTH_REQUIRED: "Войдите, чтобы пользоваться корзиной",
+  AUTH_REQUIRED: "Войдите, чтобы оформить заказ.",
   AUTH_LOGIN: "Войти",
   PRODUCT_DELETED_OR_HIDDEN: "Товар недоступен",
   LINE_OWN_PRODUCT: "Ваш товар",
@@ -973,6 +973,14 @@ export const CURATED_PRODUCT_COMPACT_CARD_UI = {
   OPEN_ARIA: (name?: string) => `Открыть товар ${name ?? ""}`.trim(),
 } as const;
 
+/** Паритет client `CURATED_LIST_CAROUSEL_UI` — кнопка «Все» + sheet. */
+export const CURATED_LIST_CAROUSEL_UI = {
+  VIEW_ALL: "Все",
+  VIEW_ALL_ARIA: (listTitle: string) => `Все из подборки «${listTitle}»`,
+  SHEET_CLOSE_ARIA: "Закрыть подборку",
+  SHEET_ARIA: "Подборка",
+} as const;
+
 export const HOME_FEED_UI = {
   CURATED_SECTION_ARIA: "Подборки товаров",
   CURATED_CATEGORIES_SECTION_ARIA: "Подборки категорий",
@@ -980,7 +988,6 @@ export const HOME_FEED_UI = {
   RAFFLES_SECTION_ARIA: "Розыгрыши",
   SHOW_RAFFLES: "Открыть розыгрыш",
   HIDE_RAFFLES: "Скрыть розыгрыш",
-  STORIES_SECTION_TITLE: "История",
   STORIES_SECTION_ARIA: "Сторисы",
 } as const;
 

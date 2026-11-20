@@ -63,7 +63,6 @@ import {
 } from "@/features/product-detail/ui/ProductSimilarTab";
 import { ProductDetailsSkeleton } from "@/features/product-detail/ui/ProductDetailsSkeleton";
 import { ProductPromotionModal } from "@/features/product-promotion/ui/ProductPromotionModal";
-import { SquircleView } from "@/shared/ui/SquircleView";
 import { useProductPromotionManageSupport } from "@/features/product-promotion/model/useProductPromotionManageSupport";
 import { ReportProductModal } from "@/features/product-report/ui/ReportProductModal";
 import {
@@ -83,10 +82,7 @@ import { formatApiErrorMessage } from "@/shared/lib";
 import { useVisualViewportKeyboardBottomInset } from "@/shared/lib/useVisualViewportKeyboardBottomInset";
 import { useProductDetailPageLayout } from "@/shared/model/useProductDetailPageLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
-import {
-  PRODUCT_DETAIL_PURCHASE_DOCK_TOP_RADIUS,
-  useProductDetailScreenStyles,
-} from "@/shared/theme/catalogProductStyles";
+import { useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";
 import { AppButton } from "@/shared/ui/AppButton";
 import { ScreenErrorState } from "@/shared/ui/ScreenStates";
 
@@ -971,10 +967,9 @@ export default function ProductDetailScreen() {
         </KeyboardAvoidingView>
 
         {showMobilePurchaseDock && keyboardBottomInset === 0 ? (
-          <SquircleView
-            radius={PRODUCT_DETAIL_PURCHASE_DOCK_TOP_RADIUS}
-            outerStyle={styles.purchaseDock}
+          <View
             style={[
+              styles.purchaseDock,
               styles.purchaseDockInner,
               { paddingBottom: Math.max(insets.bottom, 10.4) },
             ]}
@@ -990,15 +985,21 @@ export default function ProductDetailScreen() {
               showOwnProductPurchaseButton={showOwnProductPurchaseButton}
               sellerClosedPurchaseLabel={sellerClosedLabel}
               variant="dock"
+              onBack={() => {
+                if (router.canGoBack()) {
+                  router.back();
+                } else {
+                  router.replace("/(tabs)");
+                }
+              }}
             />
-          </SquircleView>
+          </View>
         ) : null}
 
         {showMobileDealDock && keyboardBottomInset === 0 ? (
-          <SquircleView
-            radius={PRODUCT_DETAIL_PURCHASE_DOCK_TOP_RADIUS}
-            outerStyle={styles.purchaseDock}
+          <View
             style={[
+              styles.purchaseDock,
               styles.purchaseDockInner,
               { paddingBottom: Math.max(insets.bottom, 10.4) },
             ]}
@@ -1008,7 +1009,7 @@ export default function ProductDetailScreen() {
               isOwnProduct={false}
               variant="dock"
             />
-          </SquircleView>
+          </View>
         ) : null}
 
         {showInstallmentDock && installmentDock && keyboardBottomInset === 0 ? (

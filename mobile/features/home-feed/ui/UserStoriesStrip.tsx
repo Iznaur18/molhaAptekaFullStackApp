@@ -1,12 +1,9 @@
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 import type { UserStoryRing } from "@/entities/user-story/api/userStoryApi";
-import {
-  USER_STORY_STRIP_LAYOUT,
-  USER_STORY_STRIP_TRACK_HEIGHT,
-} from "@/entities/user-story/lib/userStoryStripLayout";
+import { USER_STORY_STRIP_TRACK_HEIGHT } from "@/entities/user-story/lib/userStoryStripLayout";
 import { CreateUserStoryModal } from "@/features/home-feed/ui/CreateUserStoryModal";
 import {
   StoryAddButton,
@@ -20,7 +17,6 @@ import {
   useAccountRequirementModal,
 } from "@/shared/ui/AccountRequirementModal";
 import { HorizontalOverflowRow } from "@/shared/ui/HorizontalOverflowRow";
-import { SquircleView } from "@/shared/ui/SquircleView";
 
 type UserStoriesStripProps = {
   rings: UserStoryRing[];
@@ -83,25 +79,20 @@ export const UserStoriesStrip = ({
   return (
     <>
       <View style={styles.root} accessibilityLabel={HOME_FEED_UI.STORIES_SECTION_ARIA}>
-        <Text style={styles.title}>{HOME_FEED_UI.STORIES_SECTION_TITLE}</Text>
-        <SquircleView
-          radius={USER_STORY_STRIP_LAYOUT.scrollBorderRadius}
-          style={styles.scrollWrapper}
+        {/* Web `.user-stories-strip`: без заголовка и без карточки-подложки. */}
+        <HorizontalOverflowRow
+          height={USER_STORY_STRIP_TRACK_HEIGHT}
+          trackStyle={styles.scroll}
         >
-          <HorizontalOverflowRow
-            height={USER_STORY_STRIP_TRACK_HEIGHT}
-            trackStyle={styles.scroll}
-          >
-            <StoryAddButton onPress={handleAddPress} />
-            {sortedRings.map((ring) => (
-              <StoryRingItem
-                key={String(ring.author._id)}
-                ring={ring}
-                onOpen={handleOpenRing}
-              />
-            ))}
-          </HorizontalOverflowRow>
-        </SquircleView>
+          <StoryAddButton onPress={handleAddPress} />
+          {sortedRings.map((ring) => (
+            <StoryRingItem
+              key={String(ring.author._id)}
+              ring={ring}
+              onOpen={handleOpenRing}
+            />
+          ))}
+        </HorizontalOverflowRow>
       </View>
 
       {viewerAuthor != null ? (

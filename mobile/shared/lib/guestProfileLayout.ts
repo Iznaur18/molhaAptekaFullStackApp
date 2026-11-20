@@ -24,9 +24,19 @@ export const MY_PROFILE_PHONE_LAYOUT_MAX_PX = 640;
 export const MY_PROFILE_SIDEBAR_WIDTH = 260;
 /** `.my-profile-page__layout { gap: 1rem }` */
 export const MY_PROFILE_LAYOUT_GAP = 16;
-/** `.my-profile-page__main { gap: 0.75rem }` */
+/**
+ * web `--my-profile-section-gap` — overview `__main` / `__body` / `user-profile-info`.
+ * Live DOM ≤640: 6px.
+ */
+export const MY_PROFILE_SECTION_GAP = 6;
+/**
+ * web my-products / catalog sections `gap: 0.75rem` (не section-gap overview).
+ */
 export const MY_PROFILE_MAIN_GAP = 12;
-/** Как web app-shell `--app-shell-content-inline-padding` / `--iz-space-4` */
+/**
+ * wide (>667) shell gutter = `--iz-space-4`.
+ * Phone ≤640 — `SCREEN_CONTENT_INLINE_PADDING_PHONE` (8) через `useScreenLayout`.
+ */
 export const MY_PROFILE_SHELL_PAD_X = 16;
 
 /** Sidebar + gap — вычитаем из layoutWidth при расчёте сетки в hub main (>900). */
@@ -34,23 +44,25 @@ export const resolveProfileHubMainReservedWidth = (isDrawerLayout: boolean): num
   isDrawerLayout ? 0 : MY_PROFILE_SIDEBAR_WIDTH + MY_PROFILE_LAYOUT_GAP;
 
 /**
- * Паритет client `MyProfilePage.css` + `UserProfileInfoPanel.css` overview.
- * RN не схлопывает margin — только эффективные gaps как на web.
+ * Паритет client `MyProfilePage.css` overview ≤640 (live DOM).
+ * Spacing между banner / quick / info / sections = `--my-profile-section-gap` (6).
  */
 export const PROFILE_OVERVIEW_LAYOUT = {
   /** web `--iz-space-1` */
   shareRowGap: 4,
   /**
-   * web: banner `margin-bottom: 1rem` + share `margin-top: 0.5rem` → collapse 1rem.
-   * На RN один отступ после баннера.
+   * web `.my-profile-page__body .user-details-modal__banner { margin-bottom: 0 }`
+   * + body `gap: 6` — отступ даёт parent gap, не margin.
    */
-  shareRowMarginTop: 16,
+  shareRowMarginTop: 0,
   /** web `height: 2.125rem` */
   notificationsBtnHeight: 34,
-  /** web `.user-profile-info { margin-top: 0.75rem }` */
-  infoMarginTop: 12,
-  /** web `.user-profile-info { gap: 1rem }` */
-  infoSectionsGap: 16,
+  /** web storefront `gap: 0.4rem` */
+  storefrontBtnGap: 6.4,
+  /** web `.my-profile-page__body > .user-profile-info { margin-top: 0 }` */
+  infoMarginTop: 0,
+  /** web body > info `gap: var(--my-profile-section-gap)` */
+  infoSectionsGap: MY_PROFILE_SECTION_GAP,
   /** web `--user-profile-section-radius: 24px` */
   infoSectionRadius: 24,
   footerGap: 12,
@@ -61,7 +73,7 @@ export const PROFILE_OVERVIEW_LAYOUT = {
   sectionToggleBorderWidth: 2,
   sectionToggleIconSize: 36,
   sectionToggleIconRadius: 10,
-  mainGap: MY_PROFILE_MAIN_GAP,
+  mainGap: MY_PROFILE_SECTION_GAP,
   scrollPaddingTop: 0,
 } as const;
 

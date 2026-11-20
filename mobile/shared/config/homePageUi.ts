@@ -7,7 +7,7 @@ export const HOME_PAGE_UI = {
   CATALOG_HOME_SECTION_SELLERS_SEARCH_PLACEHOLDER: "Поиск продавца по названию…",
   CATALOG_HOME_SECTION_SELLERS_SEARCH_ARIA: "Поиск продавцов на главной",
   CATALOG_HOME_SECTION_SELLERS_SEARCH_EMPTY: "Никого не нашли по запросу",
-  CATALOG_HOME_SECTION_CATEGORIES: "Категории",
+  CATALOG_HOME_SECTION_CATEGORIES: "Каталог",
   CATALOG_HOME_SECTION_CATEGORIES_EMPTY: "Здесь пока нет категорий",
   CATALOG_HOME_SECTION_LOAD_ERROR: "Не удалось загрузить раздел",
   BREADCRUMB_CATALOG: "Каталог",

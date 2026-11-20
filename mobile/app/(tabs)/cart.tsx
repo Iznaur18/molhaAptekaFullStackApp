@@ -58,7 +58,6 @@ import { CheckoutSheetModal } from "@/features/checkout/ui/CheckoutSheetModal";
 import { orderQueryKeys, priceOfferQueryKeys } from "@/shared/api";
 import {
   API_CLIENT_UI,
-  AUTH_UI,
   CART_AUCTION_UI,
   CART_PAGE_UI,
   CHECKOUT_FORM_UI,
@@ -604,7 +603,7 @@ export default function CartScreen() {
       <View style={styles.centered}>
         <Text style={styles.message}>{CART_PAGE_UI.AUTH_REQUIRED}</Text>
         <AppButton
-          label={AUTH_UI.LOGIN_BUTTON}
+          label={CART_PAGE_UI.AUTH_LOGIN}
           variant="primary"
           onPress={() => router.push("/(auth)/login")}
         />

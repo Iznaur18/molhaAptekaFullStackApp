@@ -29,8 +29,8 @@ export const PROFILE_BANNER_HEIGHT = PROFILE_AVATAR_SIZE * 3;
 /** `--modal-profile-banner-radius: 24px` (обычный radius, не squircle). */
 export const PROFILE_BANNER_RADIUS = 24;
 /**
- * web banner `margin-bottom: 1rem` схлопывается с share `margin-top`.
- * На RN отступ после баннера — только `PROFILE_OVERVIEW_LAYOUT.shareRowMarginTop`.
+ * web `.my-profile-page__body .user-details-modal__banner { margin-bottom: 0 }`.
+ * Отступ banner→quick даёт overview `gap: O.mainGap` (section-gap 6).
  */
 export const PROFILE_BANNER_MARGIN_BOTTOM = 0;
 /** Карточки info/share — тот же 24, что и web surface. */
@@ -78,7 +78,7 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
     minWidth: 0,
     backgroundColor: theme.colors.bg,
   },
-  /** Контент колонки overview: gap как web `__main { gap: 0.75rem }` между siblings. */
+  /** Контент колонки overview: gap как web `__main { gap: var(--my-profile-section-gap) }`. */
   mainColumnContent: {
     flexGrow: 1,
     width: "100%",
@@ -209,14 +209,14 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
 export const useProfileOverviewSectionStyles = createThemedStyles((theme) => ({
   root: {
     width: "100%",
-    gap: 0,
+    gap: O.mainGap,
   },
   quickActions: {
     flexDirection: "row",
     alignItems: "stretch",
     gap: O.shareRowGap,
-    marginTop: O.infoMarginTop,
-    marginBottom: O.infoMarginTop,
+    marginTop: 0,
+    marginBottom: 0,
     width: "100%",
   },
   storefrontBtn: {
@@ -226,8 +226,8 @@ export const useProfileOverviewSectionStyles = createThemedStyles((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
-    borderRadius: theme.radius.button,
+    gap: O.storefrontBtnGap,
+    borderRadius: theme.radius.input,
     borderWidth: 1,
     borderColor: theme.colors.action,
     backgroundColor: theme.colors.actionSurface,
