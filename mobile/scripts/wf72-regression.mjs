@@ -251,7 +251,7 @@ const HUB_TAB_BAR_CHECKS = [
 const PROFILE_NAV_CHROME_CHECKS = [
   {
     file: "../packages/shared-lib/src/profileNavTones.ts",
-    mustInclude: ['overview: "indigo"', "resolveProfileNavSectionTone"],
+    mustInclude: ['overview: "blue"', "resolveProfileNavSectionTone"],
   },
   {
     file: "features/profile-hub/lib/enrichProfileNavItem.ts",
@@ -287,7 +287,7 @@ const SCREEN_LAYOUT_CHECKS = [
       "SCREEN_PRODUCT_GRID_2_COL_MAX_WIDTH",
       "SCREEN_PRODUCT_GRID_4_COL_MIN_WIDTH",
       "PRODUCT_GRID_COLUMNS_COMPACT",
-      "PRODUCT_GRID_GAP = 6",
+      "PRODUCT_GRID_GAP = 8",
       "resolveLayoutContentWidth",
       "resolveScreenWidthTier",
     ],
@@ -396,12 +396,16 @@ const PRODUCT_PREVIEW_VIDEO_CHECKS = [
   {
     file: "entities/product/ui/ProductCard.tsx",
     mustInclude: [
-      "ProductCardMediaSlide",
+      "ProductMediaSlideContent",
       "styles.imagePressable",
       "styles.contentPressable",
       "useProductCardMediaState",
     ],
     mustNotInclude: ['from "@/entities/product/ui/ProductCardMedia"'],
+  },
+  {
+    file: "entities/product/ui/ProductCardBanner.tsx",
+    mustInclude: ["ProductCardMediaSlide", "useProductCardMediaState"],
   },
   {
     file: "entities/product/ui/ProductMediaSlideContent.tsx",
@@ -448,7 +452,7 @@ const STORY_MEDIA_WIRING_CHECKS = [
     mustInclude: ["pickUserProfilePhotoUrl"],
   },
   {
-    file: "features/home-feed/ui/UserStoriesStrip.tsx",
+    file: "features/home-feed/ui/UserStoryStripItems.tsx",
     mustInclude: ["resolveUserStoryAvatarUrl"],
   },
   {
@@ -504,7 +508,7 @@ const PREVIEW_VIDEO_MIME_CASES = [
 const BUYER_UI_WIRING_CHECKS = [
   {
     file: "entities/product/ui/ProductCard.tsx",
-    mustInclude: ['pathname: "/product/[id]"', "ProductCardMediaSlide"],
+    mustInclude: ['pathname: "/product/[id]"', "ProductMediaSlideContent"],
   },
   {
     file: "features/product-detail/ui/ProductDetailPurchaseActions.tsx",
