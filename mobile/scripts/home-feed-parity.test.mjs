@@ -107,42 +107,87 @@ test("home feed sections share one vertical gap constant", () => {
   );
 });
 
-test("stories strip section title matches curated list title chrome", () => {
+test("stories strip matches web: no title, no card chrome", () => {
   const strip = readMobileFile("features/home-feed/ui/UserStoriesStrip.tsx");
   const styles = readMobileFile("shared/theme/catalogProductStyles.ts");
+  const layout = readMobileFile("entities/user-story/lib/userStoryStripLayout.ts");
   const display = readMobileFile("shared/theme/displayTypography.ts");
-  const copy = readMobileFile("shared/config/appUiCopy.ts");
+  const homePageUi = readMobileFile("shared/config/homePageUi.ts");
+  const webCatalog = readFileSync(
+    join(MOBILE_ROOT, "../client/src/shared/config/copy/catalog.js"),
+    "utf8",
+  );
   const curatedStylesBlock =
     styles.match(/export const useHomeCuratedListsStyles[\s\S]*?}\)\);/)?.[0] ?? "";
   const storiesStylesBlock =
     styles.match(/export const useUserStoriesStripStyles[\s\S]*?}\)\);/)?.[0] ?? "";
   const curatedTitle = curatedStylesBlock.match(/title:\s*\{([^}]*)\}/)?.[1] ?? "";
-  const storiesTitle = storiesStylesBlock.match(/title:\s*\{([^}]*)\}/)?.[1] ?? "";
 
-  assert.match(copy, /STORIES_SECTION_TITLE: "История"/);
-  assert.match(strip, /HOME_FEED_UI\.STORIES_SECTION_TITLE/);
-  assert.match(strip, /styles\.title/);
-  assert.match(strip, /styles\.title[\s\S]*SquircleView[\s\S]*styles\.scrollWrapper/);
+  assert.match(strip, /HorizontalOverflowRow/);
+  assert.match(strip, /USER_STORY_STRIP_TRACK_HEIGHT/);
+  assert.doesNotMatch(strip, /STORIES_SECTION_TITLE/);
+  assert.doesNotMatch(strip, /SquircleView/);
+  assert.doesNotMatch(storiesStylesBlock, /scrollWrapper/);
+  assert.doesNotMatch(storiesStylesBlock, /title:/);
+  assert.match(layout, /scrollPaddingBottom: 6/);
+  assert.match(layout, /scrollPaddingLeft: 2/);
+  assert.match(layout, /blockPaddingHorizontal: 0/);
   assert.match(display, /DISPLAY_FONT_FAMILY = "Intro"/);
   assert.match(display, /textTransform: "uppercase"/);
-  assert.match(storiesTitle, /HOME_FEED_DISPLAY_TITLE/);
   assert.match(curatedTitle, /HOME_FEED_DISPLAY_TITLE/);
+  assert.match(curatedTitle, /CURATED_PRODUCT_LIST_HOME_TITLE_MARGIN_BOTTOM/);
   assert.match(styles, /CATALOG_BROWSER_DISPLAY_TITLE/);
+  assert.match(homePageUi, /CATALOG_HOME_SECTION_CATEGORIES: "Каталог"/);
+  assert.match(webCatalog, /CATALOG_HOME_SECTION_CATEGORIES: "Каталог"/);
 
   const curatedSection = readMobileFile(
     "features/home-feed/ui/HomeCuratedListsSection.tsx",
   );
   assert.match(
     curatedSection,
-    /styles\.title[\s\S]*SquircleView[\s\S]*styles\.listBlock/,
+    /SquircleView[\s\S]*styles\.listBlock[\s\S]*headerStyles\.header/,
   );
+  assert.match(curatedSection, /CURATED_LIST_CAROUSEL_UI\.VIEW_ALL/);
+  assert.match(curatedSection, /CuratedListViewAllSheet/);
   const curatedCategories = readMobileFile(
     "features/home-feed/ui/HomeCuratedCategoryListsSection.tsx",
   );
   assert.match(
     curatedCategories,
-    /styles\.title[\s\S]*SquircleView[\s\S]*styles\.listBlock/,
+    /SquircleView[\s\S]*styles\.listBlock[\s\S]*headerStyles\.header/,
   );
+  assert.match(curatedCategories, /CuratedListViewAllSheet/);
+});
+
+test("curated view-all sheet mirrors web copy and layout tokens", () => {
+  const copy = readMobileFile("shared/config/appUiCopy.ts");
+  const sheet = readMobileFile(
+    "entities/curated-product-list/ui/CuratedListViewAllSheet.tsx",
+  );
+  const layout = readMobileFile(
+    "entities/curated-product-list/lib/curatedListViewAllSheetLayout.ts",
+  );
+  const webCopy = readFileSync(
+    join(MOBILE_ROOT, "../client/src/shared/config/copy/catalog.js"),
+    "utf8",
+  );
+
+  assert.match(copy, /CURATED_LIST_CAROUSEL_UI/);
+  assert.match(copy, /VIEW_ALL: "Все"/);
+  assert.match(copy, /SHEET_CLOSE_ARIA: "Закрыть подборку"/);
+  assert.match(webCopy, /VIEW_ALL: "Все"/);
+  assert.match(sheet, /useWholesalePriceSheetAnimation/);
+  assert.match(sheet, /ModalSheetGradientBackdrop/);
+  assert.match(sheet, /resolveCuratedSheetProductCardWidth/);
+  assert.match(layout, /borderTopRadius: 32/);
+  assert.match(layout, /maxHeightRatio: 0\.85/);
+  assert.match(layout, /productCardMinWidth: CURATED_PRODUCT_LIST_HOME_CARD_MIN_WIDTH/);
+});
+
+test("tab bar home icon uses lucide House (Home removed in RN package)", () => {
+  const tabBar = readMobileFile("shared/ui/MobileBottomTabBar.tsx");
+  assert.match(tabBar, /lucide-react-native\/icons\/house/);
+  assert.doesNotMatch(tabBar, /lucide-react-native\/icons\/home"/);
 });
 
 test("raffle section opens /raffle/:id from reveal button (web parity)", () => {
@@ -215,6 +260,6 @@ test("create story modal matches web animation and layout tokens", () => {
   assert.doesNotMatch(strip, /isCreateOpen \?/);
 
   assert.match(chrome, /borderTopLeftRadius: L\.borderRadius/);
-  assert.match(chrome, /backgroundColor: L\.backdropScrim/);
+  assert.match(chrome, /MODAL_BACKDROP_SCRIM/);
   assert.match(chrome, /maxWidth: L\.maxWidthWide/);
 });

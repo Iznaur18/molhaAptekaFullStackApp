@@ -53,12 +53,19 @@ const DesktopShellScroll = ({
   mainContentStyle,
 }: DesktopShellScrollProps) => {
   const styles = useProfileScreenStyles();
-  const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { centeredContentStyle, contentPaddingBottom, contentPaddingHorizontal } =
+    useScreenLayout();
   const { handleOuterScroll } = useProfileAccountScroll();
 
   return (
     <SafeAreaView edges={["top"]} style={styles.safeArea}>
-      <View style={[styles.safeArea, centeredContentStyle, styles.shellPad]}>
+      <View
+        style={[
+          styles.safeArea,
+          centeredContentStyle,
+          { paddingHorizontal: contentPaddingHorizontal },
+        ]}
+      >
         <ScrollView
           ref={scrollRef}
           style={styles.safeArea}
@@ -95,7 +102,8 @@ export const ProfileAccountShell = ({
 }: ProfileAccountShellProps) => {
   const router = useRouter();
   const styles = useProfileScreenStyles();
-  const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { centeredContentStyle, contentPaddingBottom, contentPaddingHorizontal } =
+    useScreenLayout();
   const { isDrawerLayout } = useProfileAdaptiveLayout();
 
   const handleOverviewPress = () => {
@@ -124,7 +132,13 @@ export const ProfileAccountShell = ({
       return (
         <ProfileAccountScrollProvider outerScrollOwns={false}>
           <SafeAreaView edges={["top"]} style={styles.safeArea}>
-            <View style={[styles.safeArea, centeredContentStyle, styles.shellPad]}>
+            <View
+              style={[
+                styles.safeArea,
+                centeredContentStyle,
+                { paddingHorizontal: contentPaddingHorizontal },
+              ]}
+            >
               <ScrollView
                 ref={scrollRef}
                 style={styles.safeArea}

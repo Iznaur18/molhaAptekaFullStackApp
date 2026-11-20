@@ -23,13 +23,19 @@ const orderCardHeaderBadgeBase = {
 
 export const useOrderCardStyles = createThemedStyles((theme) => ({
   card: {
-    padding: 14,
+    padding: 16,
     marginBottom: theme.spacing[3],
+    gap: 10.4,
     borderRadius: ORDER_CARD_RADIUS,
     backgroundColor: theme.colors.surface,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
     borderLeftWidth: StyleSheet.hairlineWidth,
+  },
+  /** web `.order-card--compact` live: pad 14 gap 8 r20. */
+  cardCompact: {
+    padding: 14,
+    gap: 8,
   },
   cardAttention: {
     borderLeftWidth: 3,
@@ -53,6 +59,12 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     alignItems: "flex-start",
     marginBottom: theme.spacing[2],
     gap: theme.spacing[2],
+  },
+  /** web `.order-card--compact .order-card__header` gap 0.5rem, no bottom border. */
+  headerCompact: {
+    marginBottom: 0,
+    gap: 8,
+    alignItems: "flex-start",
   },
   headerBadges: {
     flex: 1,
@@ -347,20 +359,27 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     color: theme.colors.textSecondary,
     fontWeight: "600",
   },
+  /** web `.order-card__details-fold` — muted surface box r14. */
   detailsFold: {
-    marginTop: theme.spacing[2],
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: theme.colors.border,
-    paddingTop: theme.spacing[2],
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    borderRadius: 14,
+    backgroundColor: theme.colors.surfaceMuted,
+    overflow: "hidden",
   },
+  /** web `.order-card__details-fold-summary` pad 0.28/0.55rem fs 0.8rem. */
   detailsFoldSummary: {
-    fontSize: 13,
+    fontSize: 12.8,
     fontWeight: "600",
-    color: theme.colors.link,
+    lineHeight: 19.2,
+    color: theme.colors.textSecondary,
+    paddingVertical: 4.48,
+    paddingHorizontal: 8.8,
   },
   detailsFoldBody: {
-    marginTop: theme.spacing[2],
-    gap: 4,
+    gap: 7.2,
+    paddingHorizontal: 8.8,
+    paddingBottom: 8.8,
   },
   itemExtras: {
     marginTop: theme.spacing[2],

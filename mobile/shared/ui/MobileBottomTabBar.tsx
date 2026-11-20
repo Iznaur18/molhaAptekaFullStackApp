@@ -1,5 +1,6 @@
 import { isDimColorScheme } from "@izibuy/design-tokens";
-import Home from "lucide-react-native/icons/home";
+/** Lucide RN ≥0.469: `Home` удалён → `House` (тот же глиф, что web `Home`). */
+import Home from "lucide-react-native/icons/house";
 import LayoutGrid from "lucide-react-native/icons/layout-grid";
 import Plus from "lucide-react-native/icons/plus";
 import ShoppingCart from "lucide-react-native/icons/shopping-cart";

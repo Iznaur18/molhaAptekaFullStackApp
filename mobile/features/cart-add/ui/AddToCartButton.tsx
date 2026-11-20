@@ -24,8 +24,9 @@ type AddToCartButtonProps = {
   productId: string;
   product?: unknown;
   /**
-   * `card` — карточка главного экрана: компактная кнопка, гость видит «В корзину».
-   * `banner` — баннер в ленте: кнопка по ширине надписи с тележкой.
+   * `card` — карточка главной: компактная, гость «В корзину» (текст+a11y).
+   * `banner` — баннер ленты: ширина надписи + тележка, гость «В корзину».
+   * `detailDock` / default — гость «Войти, чтобы купить» (= web detail).
    */
   variant?: "default" | "detailDock" | "card" | "banner";
 };
@@ -134,15 +135,22 @@ export const AddToCartButton = ({
   );
 
   if (!isAuthorized) {
+    // Карточка/баннер главной: как web `guestLabel={ADD}` — видимый текст и a11y
+    // «В корзину», тап → login. Dock/default: «Войти, чтобы купить» (= web detail).
     if (isBanner) {
       return renderBannerButton(handleLogin, {
-        accessibilityLabel: ADD_TO_CART_UI.LOGIN_TO_ADD,
+        accessibilityLabel: ADD_TO_CART_UI.ADD,
       });
     }
 
     if (isDetailDock) {
       return (
-        <Pressable style={styles.detailDockPressable} onPress={handleLogin}>
+        <Pressable
+          style={styles.detailDockPressable}
+          onPress={handleLogin}
+          accessibilityRole="button"
+          accessibilityLabel={ADD_TO_CART_UI.LOGIN_TO_ADD}
+        >
           <SquircleView
             radius={PRODUCT_DETAIL_DOCK_CTA_BORDER_RADIUS}
             style={styles.detailDockLoginButton}
@@ -161,7 +169,7 @@ export const AddToCartButton = ({
           style={styles.addButtonPressable}
           onPress={handleLogin}
           accessibilityRole="button"
-          accessibilityLabel={ADD_TO_CART_UI.LOGIN_TO_ADD}
+          accessibilityLabel={ADD_TO_CART_UI.ADD}
         >
           <SquircleView
             radius={ADD_TO_CART_BUTTON_LAYOUT.borderRadius}
@@ -176,7 +184,12 @@ export const AddToCartButton = ({
     }
 
     return (
-      <Pressable style={styles.loginButtonPressable} onPress={handleLogin}>
+      <Pressable
+        style={styles.loginButtonPressable}
+        onPress={handleLogin}
+        accessibilityRole="button"
+        accessibilityLabel={ADD_TO_CART_UI.LOGIN_TO_ADD}
+      >
         <SquircleView
           radius={ADD_TO_CART_BUTTON_LAYOUT.borderRadius}
           style={styles.loginButton}

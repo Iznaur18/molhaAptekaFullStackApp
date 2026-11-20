@@ -4,7 +4,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { z } from "zod";
-import { AppState, Linking, Pressable, Text, View } from "react-native";
+import { AppState, Linking, Text, View } from "react-native";
+import { AppButton } from "@/shared/ui/AppButton";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
@@ -479,9 +480,11 @@ export const MyOrdersPage = () => {
     return (
       <View style={styles.centered}>
         <Text style={styles.hint}>{MY_ORDERS_PAGE_UI.AUTH_REQUIRED}</Text>
-        <Pressable style={styles.button} onPress={() => router.push("/(auth)/login")}>
-          <Text style={styles.buttonText}>{AUTH_UI.LOGIN_BUTTON}</Text>
-        </Pressable>
+        <AppButton
+          label={AUTH_UI.LOGIN_BUTTON}
+          variant="primary"
+          onPress={() => router.push("/(auth)/login")}
+        />
       </View>
     );
   }

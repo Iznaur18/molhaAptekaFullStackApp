@@ -20,11 +20,14 @@ type CuratedProductCompactCardProps = {
     productPrice?: unknown;
   };
   width: number;
+  /** Sheet / внешний хендлер; иначе `router.push(/product/:id)`. */
+  onOpen?: () => void;
 };
 
 export const CuratedProductCompactCard = ({
   product,
   width,
+  onOpen,
 }: CuratedProductCompactCardProps) => {
   const router = useRouter();
   const styles = useCuratedProductCompactCardStyles();
@@ -36,6 +39,10 @@ export const CuratedProductCompactCard = ({
   const productName = String(product.productName ?? "").trim();
 
   const handleOpen = () => {
+    if (onOpen) {
+      onOpen();
+      return;
+    }
     router.push(`/product/${product._id}` as never);
   };
 

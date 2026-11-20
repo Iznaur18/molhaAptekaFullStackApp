@@ -1,4 +1,4 @@
-import { Pressable, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { resolveCheckoutPaymentMethodOptions } from "@izibuy/shared-lib";
 
 import {
@@ -59,7 +59,12 @@ export const CheckoutPaymentMethodPicker = ({
   return (
     <View style={styles.root}>
       <Text style={styles.legend}>{legend}</Text>
-      <View style={styles.row} accessibilityRole="radiogroup">
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.row}
+        accessibilityRole="radiogroup"
+      >
         {orderedMethods.map((method) => {
           const isSelectable = availableMethods.includes(method);
           const isSelected = value === method;
@@ -119,7 +124,7 @@ export const CheckoutPaymentMethodPicker = ({
             </Pressable>
           );
         })}
-      </View>
+      </ScrollView>
     </View>
   );
 };

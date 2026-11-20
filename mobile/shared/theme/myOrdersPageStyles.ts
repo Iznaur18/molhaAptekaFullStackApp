@@ -118,29 +118,19 @@ export const useMyOrdersPageStyles = createThemedStyles((theme) => ({
     color: theme.colors.textSecondary,
     paddingVertical: 8,
   },
+  /** Guest: как web/cart `.cart-page--centered` + message (live ≤640). */
   centered: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     padding: theme.spacing[6],
-    gap: theme.spacing[4],
   },
   hint: {
-    fontSize: 15,
+    fontSize: 16,
+    lineHeight: 24,
     textAlign: "center",
-    lineHeight: 22,
     color: theme.colors.textMuted,
-  },
-  button: {
-    borderRadius: 16,
-    paddingVertical: theme.spacing[3],
-    paddingHorizontal: theme.spacing[6],
-    backgroundColor: theme.colors.action,
-  },
-  buttonText: {
-    color: theme.colors.onContrast,
-    fontSize: 15,
-    fontWeight: "600",
+    marginBottom: theme.spacing[4],
   },
   overview: {
     flexDirection: "row",
@@ -162,9 +152,10 @@ export const useMyOrdersPageStyles = createThemedStyles((theme) => ({
   overviewTileStatic: {
     opacity: 1,
   },
+  /** web `.my-orders-overview__tile_active` — action/actionSoft (live ≤640). */
   overviewTileActive: {
-    borderColor: theme.colors.success,
-    backgroundColor: theme.colors.successSurface,
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.actionSoft,
   },
   overviewTileAttention: {
     borderColor: "rgba(217, 119, 6, 0.45)",

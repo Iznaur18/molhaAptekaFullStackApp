@@ -500,37 +500,40 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
   fulfillmentOptionHintActive: {
     color: "rgba(255,255,255,0.85)",
   },
+  /** web cart `.checkout-form__fulfillment-section` live: pad 14/16 gap 12 r16. */
   fulfillmentSection: {
-    gap: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    gap: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     borderWidth: 1,
-    borderRadius: 14,
+    borderRadius: 16,
     ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
   fulfillmentSectionPickup: {
-    borderColor: theme.colors.action,
+    borderColor: `${theme.colors.action}2E`,
     backgroundColor: theme.colors.actionSoft,
   },
+  /** web cart: delivery tint = pickup (action 5% / border 18%). */
   fulfillmentSectionDelivery: {
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surfaceMuted,
+    borderColor: `${theme.colors.action}2E`,
+    backgroundColor: theme.colors.actionSoft,
   },
   fulfillmentSectionOff: {
     opacity: 0.55,
-    paddingVertical: 10,
+    paddingVertical: 12,
   },
+  /** web `.checkout-form__fulfillment-section-head` gap 0.35rem 0.65rem. */
   fulfillmentSectionHead: {
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "center",
-    gap: 6,
+    gap: 5.6,
   },
   fulfillmentSectionBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
+    paddingHorizontal: 8.8,
+    paddingVertical: 2.88,
     borderRadius: 999,
-    fontSize: 11,
+    fontSize: 10.88,
     fontWeight: "700",
     letterSpacing: 0.4,
     textTransform: "uppercase",
@@ -541,7 +544,7 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     color: theme.colors.action,
   },
   fulfillmentSectionBadgeDelivery: {
-    backgroundColor: theme.colors.surface,
+    backgroundColor: `${theme.colors.ink}17`,
     color: theme.colors.textSecondary,
   },
   fulfillmentSectionTitle: {
@@ -550,7 +553,7 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     color: theme.colors.textSecondary,
   },
   fulfillmentSectionBody: {
-    gap: 10,
+    gap: 12,
   },
   fulfillmentSplit: {
     height: 0,
@@ -676,12 +679,13 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     color: theme.colors.success,
     fontSize: 14,
   },
+  /** web `.cart-page__checkout-cta` / `--iz-radius-button: 10px`. */
   submitSpacer: {
     alignSelf: "stretch",
     marginTop: theme.spacing[4],
     minHeight: 52,
     paddingVertical: 14,
-    borderRadius: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.borderRadius,
+    borderRadius: 10,
     shadowColor: theme.colors.action,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.22,
@@ -694,32 +698,38 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
 }));
 
 export const useCheckoutPaymentMethodPickerStyles = createThemedStyles((theme) => ({
+  /** web cart `.cart-fulfillment__payment .checkout-payment-method-picker { margin-top: 0 }`. */
   root: {
     gap: 10,
-    marginTop: theme.spacing[2],
+    marginTop: 0,
   },
   legend: {
     fontSize: 14,
     fontWeight: "600",
     color: theme.colors.textSecondary,
   },
+  /** web `.checkout-payment-method-picker__scroll` gap 8. */
   row: {
     flexDirection: "row",
-    flexWrap: "wrap",
+    flexWrap: "nowrap",
     gap: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.gap,
+    paddingVertical: 0,
   },
+  /** web `.checkout-payment-method-picker__card` live: pad 8/12 minH 52 r12. */
   card: {
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 0,
+    flexGrow: 0,
+    flexShrink: 0,
+    width: "auto",
     minWidth: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.minWidth,
+    maxWidth: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.maxWidth,
     minHeight: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.minHeight,
     borderRadius: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.borderRadius,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    paddingHorizontal: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.paddingHorizontal,
+    paddingVertical: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.paddingVertical,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.unselectedBorderWidth,
+    backgroundColor: theme.colors.surface,
   },
   cardSelected: {
     backgroundColor: theme.colors.surface,

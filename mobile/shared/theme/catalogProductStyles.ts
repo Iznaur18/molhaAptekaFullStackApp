@@ -50,6 +50,7 @@ import {
   CURATED_PRODUCT_LIST_HOME_SECTION_MARGIN_BOTTOM,
   CURATED_PRODUCT_LIST_HOME_SECTION_PADDING_HORIZONTAL,
   CURATED_PRODUCT_LIST_HOME_SECTION_PADDING_VERTICAL,
+  CURATED_PRODUCT_LIST_HOME_TITLE_MARGIN_BOTTOM,
 } from "@/entities/curated-product-list/lib/curatedProductListHomeLayout";
 import {
   USER_STORY_STRIP_INNER_SIZE,
@@ -1362,23 +1363,17 @@ const PRODUCT_DETAILS_GAP = 12;
 const DETAIL_SPEC_PADDING_H = 16;
 const DETAIL_DOCK_SCROLL_PADDING = PRODUCT_DETAIL_DOCK_SCROLL_PADDING;
 
-/** Верхние / все углы purchase-dock (сквиркл). */
-export const PRODUCT_DETAIL_PURCHASE_DOCK_TOP_RADIUS = 20;
+/**
+ * Паритет web `.product-details-page__docked-footer` — full-bleed, без squircle.
+ * Радиус оставлен 0 для skeleton/legacy импортов.
+ */
+export const PRODUCT_DETAIL_PURCHASE_DOCK_TOP_RADIUS = 0;
 
-/** Отступ плавающего purchase-dock от краёв колонки (углы читаются на bg). */
-export const PRODUCT_DETAIL_PURCHASE_DOCK_INSET = 12;
+/** Full-bleed как web dock (не плавающий inset). */
+export const PRODUCT_DETAIL_PURCHASE_DOCK_INSET = 0;
 
-/** Нижний inset: на ~10% высоты dock ближе к низу экрана, чем боковые. */
-const PRODUCT_DETAIL_PURCHASE_DOCK_APPROX_HEIGHT = 140;
-const PRODUCT_DETAIL_PURCHASE_DOCK_LOWER_RATIO = 0.1;
-export const PRODUCT_DETAIL_PURCHASE_DOCK_BOTTOM_INSET = Math.max(
-  0,
-  PRODUCT_DETAIL_PURCHASE_DOCK_INSET -
-    Math.round(
-      PRODUCT_DETAIL_PURCHASE_DOCK_APPROX_HEIGHT *
-        PRODUCT_DETAIL_PURCHASE_DOCK_LOWER_RATIO,
-    ),
-);
+/** Нижний inset surface = 0; safe-area — через paddingBottom dock. */
+export const PRODUCT_DETAIL_PURCHASE_DOCK_BOTTOM_INSET = 0;
 
 /** Parity: client ProductDetailsModalFields.css `.product-details-modal__stats-grid` */
 const PRODUCT_DETAILS_STAT_GRID_GAP = 2;
@@ -2674,10 +2669,13 @@ export const useProductDetailScreenStyles = createThemedStyles((theme) => ({
     shadowRadius: 0,
     shadowOffset: { width: 0, height: 0 },
   },
+  /** Паритет web dock pad `0.55rem / space-3 / 0.65rem` + border-top. */
   purchaseDockInner: {
     paddingTop: 8.8,
     paddingHorizontal: 12,
     paddingBottom: 10.4,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: theme.colors.border,
     backgroundColor: theme.colors.surface,
   },
   installmentDock: {
@@ -2694,7 +2692,7 @@ export const useProductDetailScreenStyles = createThemedStyles((theme) => ({
   },
   installmentDockButton: {
     minHeight: 48,
-    borderRadius: 11.2,
+    borderRadius: 20,
   },
 }));
 
@@ -3040,15 +3038,38 @@ export const useProductDetailPurchaseActionsStyles = createThemedStyles((theme) 
     flexWrap: "wrap",
     gap: 7.2,
   },
+  /** Паритет `.product-details-modal__price-actions--with-back` gap 0.45rem. */
   dockRoot: {
+    flexDirection: "row",
+    alignItems: "stretch",
     gap: 7.2,
   },
   inlineRoot: {
     width: "100%",
     minWidth: 0,
   },
+  /** Паритет `.product-details-modal__price-actions-back`. */
+  dockBackButton: {
+    flexShrink: 0,
+    minWidth: 88,
+    minHeight: 48,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 20,
+    backgroundColor: theme.colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  dockBackButtonText: {
+    color: theme.colors.text,
+    fontSize: 16.3,
+    fontWeight: "600",
+  },
   cartSlot: {
-    width: "100%",
+    flex: 1,
+    minWidth: 0,
   },
 }));
 
@@ -3870,10 +3891,11 @@ export const useHomeCuratedListsStyles = createThemedStyles((theme) => ({
     letterSpacing: HOME_FEED_DISPLAY_TITLE.letterSpacing,
     textTransform: HOME_FEED_DISPLAY_TITLE.textTransform,
     color: theme.colors.text,
-    marginTop: HOME_FEED_DISPLAY_TITLE.marginTop,
-    marginBottom: HOME_FEED_DISPLAY_TITLE.marginBottom,
-    paddingLeft: HOME_FEED_DISPLAY_TITLE.paddingLeft,
-    paddingRight: HOME_FEED_DISPLAY_TITLE.paddingRight,
+    /* Web header: margin 0 0 10px; padding 0 12px */
+    marginTop: 0,
+    marginBottom: CURATED_PRODUCT_LIST_HOME_TITLE_MARGIN_BOTTOM,
+    paddingLeft: CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_HORIZONTAL,
+    paddingRight: CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_HORIZONTAL,
   },
   row: {
     paddingTop: CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_TOP,
@@ -3897,26 +3919,6 @@ export const useUserStoriesStripStyles = createThemedStyles((theme) => ({
     marginBottom: USER_STORY_STRIP_LAYOUT.marginBottom,
     paddingTop: USER_STORY_STRIP_LAYOUT.paddingTop,
     paddingBottom: USER_STORY_STRIP_LAYOUT.paddingBottom,
-  },
-  scrollWrapper: {
-    paddingHorizontal: USER_STORY_STRIP_LAYOUT.blockPaddingHorizontal,
-    paddingVertical: USER_STORY_STRIP_LAYOUT.blockPaddingVertical,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
-  },
-  title: {
-    fontFamily: HOME_FEED_DISPLAY_TITLE.fontFamily,
-    fontSize: HOME_FEED_DISPLAY_TITLE.fontSize,
-    fontWeight: HOME_FEED_DISPLAY_TITLE.fontWeight,
-    lineHeight: HOME_FEED_DISPLAY_TITLE.lineHeight,
-    letterSpacing: HOME_FEED_DISPLAY_TITLE.letterSpacing,
-    textTransform: HOME_FEED_DISPLAY_TITLE.textTransform,
-    color: theme.colors.text,
-    marginTop: HOME_FEED_DISPLAY_TITLE.marginTop,
-    marginBottom: HOME_FEED_DISPLAY_TITLE.marginBottom,
-    paddingLeft: HOME_FEED_DISPLAY_TITLE.paddingLeft,
-    paddingRight: HOME_FEED_DISPLAY_TITLE.paddingRight,
   },
   scroll: {
     flexDirection: "row",

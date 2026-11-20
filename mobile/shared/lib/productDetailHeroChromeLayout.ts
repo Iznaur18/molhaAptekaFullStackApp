@@ -2,13 +2,16 @@ import type { IzTheme } from "@izibuy/design-tokens";
 
 type ThemeColors = IzTheme["colors"];
 
-/** Паритет `ProductMediaGalleryReadonly.css` + `ProductDetailsPage.css` (page). */
+/**
+ * Паритет web ≤640 (`ProductDetailsModalMobile.css`):
+ * back 2.5rem, inset/gap 0.65rem / 0.5rem; actions 32px.
+ */
 export const PRODUCT_DETAIL_HERO_CHROME = {
-  backSize: 36,
+  backSize: 40,
   actionSize: 32,
   iconSize: 20,
   inset: 10.4,
-  actionsGap: 7.2,
+  actionsGap: 8,
   actionRadius: 20,
   actionPadding: 6,
   surfaceMix: 0.55,

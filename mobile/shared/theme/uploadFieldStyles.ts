@@ -188,8 +188,8 @@ export const useProductPhotoGridStyles = createThemedStyles((theme) => ({
 /** Совпадает с --iz-color-warning-amber в designTokens.css */
 export const PRODUCT_DETAIL_DOCK_WARNING_AMBER = semanticColors.warning;
 
-/** Squircle radius для CTA в product-detail dock */
-export const PRODUCT_DETAIL_DOCK_CTA_BORDER_RADIUS = 11.2;
+/** Паритет web dock CTA `border-radius: 1.25rem` (squircle). */
+export const PRODUCT_DETAIL_DOCK_CTA_BORDER_RADIUS = 20;
 
 export const useAddToCartButtonStyles = createThemedStyles((theme) => ({
   addButtonPressable: {

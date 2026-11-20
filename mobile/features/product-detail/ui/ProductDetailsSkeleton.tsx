@@ -5,7 +5,6 @@ import { MY_ORDERS_PAGE_UI } from "@/shared/config";
 import {
   PRODUCT_DETAIL_PURCHASE_DOCK_BOTTOM_INSET,
   PRODUCT_DETAIL_PURCHASE_DOCK_INSET,
-  PRODUCT_DETAIL_PURCHASE_DOCK_TOP_RADIUS,
 } from "@/shared/theme/catalogProductStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
@@ -84,11 +83,13 @@ const useStyles = createThemedStyles((theme) => ({
     paddingTop: 8.8,
     paddingHorizontal: 12,
     paddingBottom: 10.4,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: theme.colors.border,
     backgroundColor: theme.colors.surface,
   },
   cta: {
     height: 48,
-    borderRadius: 11.2,
+    borderRadius: 20,
     backgroundColor: theme.colors.surfaceMuted,
   },
 }));
@@ -126,14 +127,16 @@ export const ProductDetailsSkeleton = () => {
         </View>
       </SkeletonShimmer>
 
-      <SquircleView
-        radius={PRODUCT_DETAIL_PURCHASE_DOCK_TOP_RADIUS}
-        outerStyle={styles.dock}
-        style={[styles.dockInner, { paddingBottom: Math.max(insets.bottom, 10.4) }]}
+      <View
+        style={[
+          styles.dock,
+          styles.dockInner,
+          { paddingBottom: Math.max(insets.bottom, 10.4) },
+        ]}
         importantForAccessibility="no-hide-descendants"
       >
         <View style={styles.cta} />
-      </SquircleView>
+      </View>
     </View>
   );
 };

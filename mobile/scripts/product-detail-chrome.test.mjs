@@ -401,7 +401,7 @@ test("product detail dock CTA uses AddToCartButton only", () => {
   assert.doesNotMatch(purchaseActions, /shortcutsRow/);
   assert.match(addToCart, /SquircleView/);
   assert.match(addToCart, /PRODUCT_DETAIL_DOCK_CTA_BORDER_RADIUS/);
-  assert.match(cartStyles, /PRODUCT_DETAIL_DOCK_CTA_BORDER_RADIUS = 11\.2/);
+  assert.match(cartStyles, /PRODUCT_DETAIL_DOCK_CTA_BORDER_RADIUS = 20/);
   assert.match(cartStyles, /detailOutOfStockButton:/);
   assert.match(cartStyles, /backgroundColor: theme\.colors\.surfaceMuted/);
   assert.match(cartStyles, /ADD_TO_CART_BUTTON_LAYOUT/);

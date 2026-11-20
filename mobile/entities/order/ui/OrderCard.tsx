@@ -800,8 +800,15 @@ export const OrderCard = ({
   };
 
   return (
-    <View style={[styles.card, needsAttention ? styles.cardAttention : null, style]}>
-      <View style={styles.header}>
+    <View
+      style={[
+        styles.card,
+        compact ? styles.cardCompact : null,
+        needsAttention ? styles.cardAttention : null,
+        style,
+      ]}
+    >
+      <View style={[styles.header, compact ? styles.headerCompact : null]}>
         <View style={styles.headerMain}>
           <View style={styles.headerBadges}>
             <Text

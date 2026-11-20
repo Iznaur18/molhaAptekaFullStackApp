@@ -51,10 +51,11 @@ export const useCartFulfillmentSectionStyles = createThemedStyles((theme) => ({
     lineHeight: 17.5,
     overflow: "hidden",
   },
+  /** web `--cart-fulfillment-card-gap: 6px` + `.cart-fulfillment__dock` pad/r. */
   dock: {
     gap: 10,
     marginHorizontal: 12,
-    marginTop: 8,
+    marginTop: 6,
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderWidth: StyleSheet.hairlineWidth,
@@ -153,11 +154,15 @@ export const useCartFulfillmentSectionStyles = createThemedStyles((theme) => ({
   },
   /** Форма оформления между товарами и итогом (web `checkoutBeforeDock`). */
   checkoutForm: {
-    marginTop: 8,
+    marginTop: 6,
   },
-  /** Поля формы — в одну линию с итогом (у дока свои 12 px по бокам). */
+  /**
+   * Поля формы — gutter 12 как dock; gap 6 = web
+   * `.cart-fulfillment__details .checkout-form__fields`.
+   */
   checkoutFormFields: {
     marginHorizontal: 12,
+    gap: 6,
   },
   checkoutLegal: {
     fontSize: 12,
@@ -288,6 +293,7 @@ export const useCartSellerListStyles = createThemedStyles((theme) => ({
     lineHeight: 17.5,
     overflow: "hidden",
   },
+  /** web `.cart-page__back-to-sellers` — gap 4, padY 6, fs 0.9rem. */
   backRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -296,10 +302,9 @@ export const useCartSellerListStyles = createThemedStyles((theme) => ({
     marginHorizontal: 12,
     marginBottom: 10,
     paddingVertical: 6,
-    paddingRight: 8,
   },
   backText: {
-    fontSize: 15,
+    fontSize: 14.4,
     fontWeight: "600",
     color: theme.colors.text,
   },

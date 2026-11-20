@@ -44,9 +44,18 @@ test("кнопка только на главной: «В корзину», со
   assert.match(action, /state\.showDealButton/);
   assert.match(action, /product\.productIsAvailable === false/);
 
-  // Гость видит «В корзину», а не «Войти, чтобы купить».
+  // Гость на карточке/баннере: текст и a11y «В корзину» (web guestLabel=ADD).
+  // Dock/default: «Войти, чтобы купить» (= web product detail).
   const cart = read("features/cart-add/ui/AddToCartButton.tsx");
-  assert.match(cart, /if \(isCard\) \{[\s\S]*?ADD_TO_CART_UI\.ADD/);
+  assert.match(
+    cart,
+    /if \(isCard\) \{[\s\S]*?accessibilityLabel=\{ADD_TO_CART_UI\.ADD\}[\s\S]*?ADD_TO_CART_UI\.ADD/,
+  );
+  assert.match(
+    cart,
+    /if \(isBanner\) \{[\s\S]*?accessibilityLabel: ADD_TO_CART_UI\.ADD/,
+  );
+  assert.match(cart, /if \(isDetailDock\) \{[\s\S]*?ADD_TO_CART_UI\.LOGIN_TO_ADD/);
 
   // В карточке ленты у заявки нет телефона — одна кнопка.
   const deal = read("entities/deal-request/ui/ProductDealActions.tsx");
