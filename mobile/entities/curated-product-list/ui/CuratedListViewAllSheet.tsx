@@ -128,7 +128,9 @@ export const CuratedListViewAllSheet = ({
                 {title}
               </Text>
               {showProducts && contentWidth > 0 ? (
-                <View style={[styles.grid, { gap: L.productCardGap, marginTop: L.bodyGap }]}>
+                <View
+                  style={[styles.grid, { gap: L.productCardGap, marginTop: L.bodyGap }]}
+                >
                   {products.map((product) => (
                     <View
                       key={product._id}

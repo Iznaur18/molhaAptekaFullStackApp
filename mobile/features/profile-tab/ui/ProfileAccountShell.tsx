@@ -53,11 +53,8 @@ const DesktopShellScroll = ({
   mainContentStyle,
 }: DesktopShellScrollProps) => {
   const styles = useProfileScreenStyles();
-  const {
-    centeredContentStyle,
-    contentPaddingBottom,
-    contentPaddingHorizontal,
-  } = useScreenLayout();
+  const { centeredContentStyle, contentPaddingBottom, contentPaddingHorizontal } =
+    useScreenLayout();
   const { handleOuterScroll } = useProfileAccountScroll();
 
   return (
@@ -105,11 +102,8 @@ export const ProfileAccountShell = ({
 }: ProfileAccountShellProps) => {
   const router = useRouter();
   const styles = useProfileScreenStyles();
-  const {
-    centeredContentStyle,
-    contentPaddingBottom,
-    contentPaddingHorizontal,
-  } = useScreenLayout();
+  const { centeredContentStyle, contentPaddingBottom, contentPaddingHorizontal } =
+    useScreenLayout();
   const { isDrawerLayout } = useProfileAdaptiveLayout();
 
   const handleOverviewPress = () => {

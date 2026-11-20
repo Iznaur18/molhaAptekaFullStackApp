@@ -42,9 +42,7 @@ export const CURATED_LIST_VIEW_ALL_SHEET_LAYOUT = {
 } as const;
 
 /** auto-fill minmax(min, 1fr) с cap max — как CSS grid sheet. */
-export const resolveCuratedSheetProductCardWidth = (
-  containerWidth: number,
-): number => {
+export const resolveCuratedSheetProductCardWidth = (containerWidth: number): number => {
   const gap = CURATED_LIST_VIEW_ALL_SHEET_LAYOUT.productCardGap;
   const min = CURATED_LIST_VIEW_ALL_SHEET_LAYOUT.productCardMinWidth;
   const max = CURATED_LIST_VIEW_ALL_SHEET_LAYOUT.productCardMaxWidth;

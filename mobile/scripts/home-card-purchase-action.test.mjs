@@ -55,10 +55,7 @@ test("кнопка только на главной: «В корзину», со
     cart,
     /if \(isBanner\) \{[\s\S]*?accessibilityLabel: ADD_TO_CART_UI\.ADD/,
   );
-  assert.match(
-    cart,
-    /if \(isDetailDock\) \{[\s\S]*?ADD_TO_CART_UI\.LOGIN_TO_ADD/,
-  );
+  assert.match(cart, /if \(isDetailDock\) \{[\s\S]*?ADD_TO_CART_UI\.LOGIN_TO_ADD/);
 
   // В карточке ленты у заявки нет телефона — одна кнопка.
   const deal = read("entities/deal-request/ui/ProductDealActions.tsx");

@@ -71,9 +71,7 @@ export const ProductDetailPurchaseActions = ({
       );
     }
     if (outOfStock) {
-      return (
-        <BlockedPurchaseButton label={outOfStockLabel} variant={buttonVariant} />
-      );
+      return <BlockedPurchaseButton label={outOfStockLabel} variant={buttonVariant} />;
     }
     if (showSellerClosedPurchaseButton) {
       return (
