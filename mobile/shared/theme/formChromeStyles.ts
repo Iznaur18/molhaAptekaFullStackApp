@@ -4,7 +4,6 @@ import { CHECKOUT_FORM_INPUT_LAYOUT as CF_INPUT } from "@/features/checkout/lib/
 import { CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT } from "@/entities/order/lib/checkoutPaymentMethodCardTheme";
 import { AUTH_PAGE_LAYOUT as A } from "@/shared/lib/authPageLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 
 export const MODAL_BACKDROP_SCRIM = "rgba(0,0,0,0.45)";
 
@@ -841,7 +840,7 @@ export const useAddressSuggestStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useBottomSheetFormStyles = createThemedStyles((theme) => ({
+export const useBottomSheetFormStyles = createThemedStyles((theme, layout) => ({
   backdrop: {
     flex: 1,
     backgroundColor: "transparent",
@@ -1005,7 +1004,7 @@ export const useBottomSheetFormStyles = createThemedStyles((theme) => ({
   emailVerifySheetHost: {
     flex: 1,
     justifyContent: "flex-end",
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
   },
   emailVerifySheetAnimated: {
     width: "100%",

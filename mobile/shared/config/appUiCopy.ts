@@ -60,6 +60,8 @@ export const API_CLIENT_UI = {
   CREATE_PRODUCT_FALLBACK: "Не удалось создать товар",
   FETCH_CATEGORY_ROOTS_FALLBACK: "Не удалось загрузить категории",
   FETCH_PRODUCT_PROMOTION_TARIFFS_FALLBACK: "Не удалось загрузить тарифы продвижения",
+  FETCH_PRODUCT_PROMOTION_BOOST_PRODUCTS_FALLBACK:
+    "Не удалось загрузить товары с продвижением",
   REQUEST_PRODUCT_PROMOTION_FALLBACK: "Не удалось оформить продвижение",
   PATCH_MY_PRODUCT_FALLBACK: "Не удалось сохранить товар",
   DELETE_MY_PRODUCT_FALLBACK: "Не удалось удалить товар",
@@ -1436,13 +1438,6 @@ export const USER_SAVED_ADDRESSES_UI = {
   },
 } as const;
 
-export const CATALOG_FILTER_UI = {
-  SEARCH_PLACEHOLDER: "Поиск товара по названию…",
-  ALL_CATEGORIES: "Все",
-  ALL_IN_CATEGORY: "Вся категория",
-  CLEAR_SEARCH: "Очистить",
-} as const;
-
 /** Паритет web `PRODUCT_SEARCH_INPUT_UI`. */
 export const PRODUCT_SEARCH_INPUT_UI = {
   PLACEHOLDER: "Поиск товара по названию…",
@@ -1571,6 +1566,11 @@ export const MY_ORDERS_PAGE_UI = {
   EMPTY_BY_FILTER: "По выбранному статусу покупок нет.",
   AUTH_REQUIRED: "Войдите, чтобы видеть покупки",
   LOYALTY_POINTS_EARNED: (points: number) => `+${points} баллов лояльности`,
+  DETAIL_TITLE: "Заказ",
+  DETAIL_LOADING: "Загрузка заказа…",
+  DETAIL_NOT_FOUND: "Заказ не найден или недоступен",
+  DETAIL_BACK_TO_LIST: "К покупкам",
+  OPEN_ORDER_DETAIL_ARIA: "Открыть заказ",
 } as const;
 
 export const EMAIL_VERIFICATION_UI = {

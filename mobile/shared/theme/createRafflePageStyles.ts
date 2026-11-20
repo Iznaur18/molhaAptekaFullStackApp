@@ -1,10 +1,9 @@
 import { StyleSheet } from "react-native";
 
 import { MODAL_BACKDROP_SCRIM } from "@/shared/theme/formChromeStyles";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
+export const useCreateRafflePageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
@@ -15,7 +14,7 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
   },
   content: {
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 12,
     backgroundColor: theme.colors.bg,
   },
@@ -325,7 +324,7 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     backgroundColor: theme.colors.bg,
   },
   state: {

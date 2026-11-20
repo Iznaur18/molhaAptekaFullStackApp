@@ -7,11 +7,10 @@ import {
   PRODUCT_DETAIL_PURCHASE_DOCK_INSET,
 } from "@/shared/theme/catalogProductStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { SkeletonShimmer } from "@/shared/ui/SkeletonShimmer";
 import { SquircleView } from "@/shared/ui/SquircleView";
 
-const useStyles = createThemedStyles((theme) => ({
+const useStyles = createThemedStyles((theme, layout) => ({
   screen: {
     flex: 1,
     backgroundColor: theme.colors.surface,
@@ -33,7 +32,7 @@ const useStyles = createThemedStyles((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 4,
     paddingBottom: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
@@ -50,7 +49,7 @@ const useStyles = createThemedStyles((theme) => ({
     width: 52,
   },
   rest: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     gap: 12,
   },
   line: {

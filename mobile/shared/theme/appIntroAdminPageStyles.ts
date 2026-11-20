@@ -1,9 +1,8 @@
 import { StyleSheet } from "react-native";
 
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-export const useAppIntroAdminPageStyles = createThemedStyles((theme) => ({
+export const useAppIntroAdminPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     backgroundColor: theme.colors.bg,
@@ -13,7 +12,7 @@ export const useAppIntroAdminPageStyles = createThemedStyles((theme) => ({
   },
   content: {
     gap: 16,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 12,
     maxWidth: 672,
     width: "100%",

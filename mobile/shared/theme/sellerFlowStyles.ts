@@ -4,7 +4,6 @@ import { SELLER_PRODUCTS_PAGE_LAYOUT as L } from "@/features/seller-products-pag
 import { MY_PRODUCTS_PAGE_LAYOUT } from "@/shared/lib/guestProfileLayout";
 import { MEDIA_OVERLAY_SCRIM } from "@/shared/theme/catalogProductStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 
 export const useAppIntroSplashStyles = createThemedStyles((theme) => ({
   overlay: {
@@ -574,7 +573,7 @@ export const useProductEditorScreenStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useMyProductsPageStyles = createThemedStyles((theme) => ({
+export const useMyProductsPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
@@ -585,7 +584,7 @@ export const useMyProductsPageStyles = createThemedStyles((theme) => ({
     minHeight: 0,
   },
   list: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     flexGrow: 1,
   },
   /** Desktop hub: shell уже даёт pad; gutter 0 как web `--my-profile-shell-content-gutter: 0`. */
@@ -663,7 +662,7 @@ export const useMyProductsPageStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useSellerProductsPageStyles = createThemedStyles((theme) => ({
+export const useSellerProductsPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     backgroundColor: theme.colors.bg,
@@ -677,7 +676,7 @@ export const useSellerProductsPageStyles = createThemedStyles((theme) => ({
     minWidth: 0,
   },
   list: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 0,
     flexGrow: 1,
     width: "100%",
@@ -903,7 +902,7 @@ export const useSellerProfileQuickStatsStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
+export const useInstallmentProgramModalStyles = createThemedStyles((theme, layout) => ({
   embeddedRoot: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 30,
@@ -926,7 +925,7 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
     alignItems: "flex-start",
     justifyContent: "space-between",
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 16,
     paddingBottom: 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
@@ -1104,7 +1103,7 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
   },
   footer: {
     flexShrink: 0,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingVertical: 12,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: theme.colors.border,

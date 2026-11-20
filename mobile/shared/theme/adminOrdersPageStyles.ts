@@ -1,14 +1,13 @@
 import { StyleSheet } from "react-native";
 
 import { ADMIN_ORDERS_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const CHIP_GAP = 5.6;
 const CHIP_PADDING_VERTICAL = 3.5;
 const CHIP_PADDING_HORIZONTAL = 8.8;
 
-export const useAdminOrdersPageStyles = createThemedStyles((theme) => ({
+export const useAdminOrdersPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
@@ -19,7 +18,7 @@ export const useAdminOrdersPageStyles = createThemedStyles((theme) => ({
     minHeight: 0,
   },
   list: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     flexGrow: 1,
   },
   listInAccountShell: {
@@ -95,7 +94,7 @@ export const useAdminOrdersPageStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     backgroundColor: theme.colors.bg,
   },
 }));

@@ -19,6 +19,7 @@ export const HOME_ROUTE = "/(tabs)";
 /** Разделы, которых на мобилке нет: пусть лучше вернётся null, чем заглушка. */
 const WEB_ONLY_PATHS = new Set([
   "/profile/onec-integration",
+  "/profile/delivery-payment",
   "/staff-audit-log-admin",
   "/broadcast-notifications-admin",
   "/admin-analytics",
@@ -118,6 +119,8 @@ const DYNAMIC_SEGMENT_ROUTES: { pattern: RegExp; build: (id: string) => string }
   { pattern: /^\/raffle\/([^/?#]+)$/i, build: (id) => `/raffle/${id}` },
   { pattern: /^\/seller\/([^/?#]+)$/i, build: (id) => `/seller/${id}` },
   { pattern: /^\/hub\/([^/?#]+)$/i, build: (id) => `/hub/${id}` },
+  { pattern: /^\/orders\/([^/?#]+)$/i, build: (id) => `/orders/${id}` },
+  { pattern: /^\/my-orders\/([^/?#]+)$/i, build: (id) => `/orders/${id}` },
 ];
 
 export const normalizeWebPath = (rawPath: string): string => {
@@ -166,8 +169,9 @@ export const resolveWebPathToMobileRoute = (rawPath: string): string | null => {
     }
   }
 
-  // Вложенные пути раздела схлопываем к самому разделу: `/orders/64f…` — это
-  // всё ещё «Мои заказы», отдельного экрана заказа на мобилке нет.
+  // Вложенные пути раздела схлопываем к самому разделу
+  // (`/notifications/64f…` → список). `/orders/:id` и `/my-orders/:id`
+  // уже разобраны выше как динамические.
   const firstSegment = lower.split("/")[1];
   if (firstSegment) {
     const sectionRoute = STATIC_PATH_ROUTES[`/${firstSegment}`];

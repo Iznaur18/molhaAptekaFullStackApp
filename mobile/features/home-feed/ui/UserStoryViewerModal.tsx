@@ -194,7 +194,12 @@ export const UserStoryViewerModal = ({
       return;
     }
     onClose();
-    router.push(`/seller/${authorKey}`);
+    // Паритет web `useHomeSellerModal.handleSellerNameClick`: свой → my-products, чужой → `/user/:id`.
+    if (isOwn) {
+      router.push("/hub/my-products");
+      return;
+    }
+    router.push(`/user/${authorKey}`);
   };
 
   const handleDelete = async () => {

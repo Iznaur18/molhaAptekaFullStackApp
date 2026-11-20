@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { test } from "node:test";
@@ -39,6 +39,37 @@ test("catalog screen uses breadcrumb instead of category chips", () => {
   assert.match(display, /DISPLAY_FONT_FAMILY = "Intro"/);
   const layout = readFile(MOBILE_ROOT, "app/_layout.tsx");
   assert.match(layout, /IntroDemo-BlackCAPS\.otf/);
+});
+
+test("orphan catalog chips/searchbar removed (live path: search row + filters sheet)", () => {
+  const orphans = [
+    "features/catalog-filter/ui/CatalogCategoryChips.tsx",
+    "features/catalog-filter/ui/CatalogSubcategoryChips.tsx",
+    "features/catalog-filter/ui/CatalogSearchBar.tsx",
+  ];
+  for (const rel of orphans) {
+    assert.equal(existsSync(join(MOBILE_ROOT, rel)), false, `${rel} ещё жив`);
+  }
+
+  const styles = readFile(MOBILE_ROOT, "shared/theme/catalogProductStyles.ts");
+  assert.doesNotMatch(styles, /useCatalogFilterChipStyles/);
+  assert.doesNotMatch(styles, /useCatalogSearchBarStyles/);
+  assert.doesNotMatch(styles, /useCatalogSubcategoryChipStyles/);
+
+  const index = readFile(MOBILE_ROOT, "app/(tabs)/index.tsx");
+  const searchRow = readFile(
+    MOBILE_ROOT,
+    "features/home-feed/ui/HomeCatalogSearchRow.tsx",
+  );
+  assert.match(index, /HomeCatalogSearchRow/);
+  assert.match(index, /HomeCatalogFiltersSheet/);
+  assert.doesNotMatch(index, /CatalogSearchBar/);
+  assert.doesNotMatch(searchRow, /CatalogSearchBar/);
+
+  const copy = readFile(MOBILE_ROOT, "shared/config/appUiCopy.ts");
+  const barrel = readFile(MOBILE_ROOT, "shared/config/index.ts");
+  assert.doesNotMatch(copy, /export const CATALOG_FILTER_UI/);
+  assert.doesNotMatch(barrel, /CATALOG_FILTER_UI/);
 });
 
 test("catalog breadcrumb label resolves feed sort like web", () => {

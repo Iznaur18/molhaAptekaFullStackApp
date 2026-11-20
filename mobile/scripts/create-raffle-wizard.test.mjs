@@ -54,7 +54,7 @@ test("create raffle wizard: 3 steps + per-step validate (mobile)", () => {
 test("create raffle wizard: create-mode only on web modal", () => {
   const webModal = read(CLIENT, "src/entities/raffle/ui/CreateRaffleModal.jsx");
   const webWizard = read(CLIENT, "src/entities/raffle/lib/createRaffleWizard.js");
-  const webCopy = read(CLIENT, "src/shared/config/appUiCopy.js");
+  const webCopy = read(CLIENT, "src/shared/config/copy/product-create.js");
 
   assert.match(webWizard, /CREATE_RAFFLE_WIZARD_STEPS/);
   assert.match(webWizard, /validateCreateRaffleFormStep/);
@@ -105,7 +105,7 @@ test("create raffle: block notice + withdraw pending on step 1", () => {
   const webModal = read(CLIENT, "src/entities/raffle/ui/CreateRaffleModal.jsx");
   const webDelete = read(CLIENT, "src/entities/raffle/api/deleteMyRaffle.js");
   const mobileCopy = read(ROOT, "shared/config/appUiCopy.ts");
-  const webCopy = read(CLIENT, "src/shared/config/appUiCopy.js");
+  const webCopy = read(CLIENT, "src/shared/config/copy/product-create.js");
 
   assert.match(mobileNotice, /pending_staff/);
   assert.match(mobileNotice, /canWithdraw: true/);

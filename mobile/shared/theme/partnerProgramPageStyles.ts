@@ -2,9 +2,8 @@ import { StyleSheet } from "react-native";
 
 import { PROFILE_ACCOUNT_STACK_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 
-export const usePartnerProgramPageStyles = createThemedStyles((theme) => ({
+export const usePartnerProgramPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
@@ -15,7 +14,7 @@ export const usePartnerProgramPageStyles = createThemedStyles((theme) => ({
   },
   content: {
     gap: L.stackGap,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 12,
   },
   contentInAccountShell: {
@@ -162,7 +161,7 @@ export const usePartnerProgramPageStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     backgroundColor: theme.colors.bg,
   },
   hint: {

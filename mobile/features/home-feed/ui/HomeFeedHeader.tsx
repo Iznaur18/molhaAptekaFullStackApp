@@ -1,7 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { memo, useCallback } from "react";
+import { Text } from "react-native";
 
 import { useHomeCuratedProductListsQuery } from "@/entities/curated-product-list/model/useHomeCuratedProductListsQuery";
+import { useProductPromotionBoostProductsQuery } from "@/entities/product/model/useProductPromotionBoostProductsQuery";
+import { BoostProductsHomeSection } from "@/entities/product/ui/BoostProductsHomeSection";
 import { useFeaturedRafflesQuery } from "@/entities/raffle/model/useFeaturedRafflesQuery";
 import { useViewerRegion } from "@/entities/region/model/ViewerRegionProvider";
 import { useUserStoriesFeedQuery } from "@/entities/user-story/model/useUserStoriesFeedQuery";
@@ -11,6 +14,9 @@ import { HomeCuratedListsSectionSkeleton } from "@/features/home-feed/ui/HomeCur
 import { HomeFeaturedRafflesSection } from "@/features/home-feed/ui/HomeFeaturedRafflesSection";
 import { UserStoriesStrip } from "@/features/home-feed/ui/UserStoriesStrip";
 import { userStoriesQueryKeys } from "@/shared/api";
+import { API_CLIENT_UI } from "@/shared/config";
+import { formatApiErrorMessage } from "@/shared/lib";
+import { useBoostProductsHomeSectionStyles } from "@/shared/theme/boostProductsHomeStyles";
 
 type HomeFeedHeaderProps = {
   enabled: boolean;
@@ -20,9 +26,15 @@ type HomeFeedHeaderProps = {
 export const HomeFeedHeader = memo(
   ({ enabled, showCuratedLists }: HomeFeedHeaderProps) => {
     const queryClient = useQueryClient();
+    const boostStyles = useBoostProductsHomeSectionStyles();
     const { viewerRegionCode } = useViewerRegion();
     const sessionQuery = useAuthSessionQuery();
     const storiesQuery = useUserStoriesFeedQuery(enabled);
+    const showBoostProductsRow = enabled && showCuratedLists;
+    const boostProductsQuery = useProductPromotionBoostProductsQuery({
+      enabled: showBoostProductsRow,
+      regionCode: viewerRegionCode ?? "",
+    });
     const curatedQuery = useHomeCuratedProductListsQuery({
       enabled: enabled && showCuratedLists,
       regionCode: viewerRegionCode,
@@ -45,6 +57,14 @@ export const HomeFeedHeader = memo(
       return null;
     }
 
+    const boostErrorMessage =
+      showBoostProductsRow && boostProductsQuery.isError
+        ? formatApiErrorMessage(
+            boostProductsQuery.error,
+            API_CLIENT_UI.FETCH_PRODUCT_PROMOTION_BOOST_PRODUCTS_FALLBACK,
+          )
+        : null;
+
     return (
       <>
         <HomeFeaturedRafflesSection raffles={rafflesQuery.data ?? []} />
@@ -56,6 +76,12 @@ export const HomeFeedHeader = memo(
           currentUserId={currentUserId}
           onPublished={handleStoriesChanged}
         />
+        {boostErrorMessage ? (
+          <Text style={boostStyles.error}>{boostErrorMessage}</Text>
+        ) : null}
+        {showBoostProductsRow ? (
+          <BoostProductsHomeSection products={boostProductsQuery.data ?? []} />
+        ) : null}
         {showCuratedLists ? (
           curatedQuery.isPending ? (
             <HomeCuratedListsSectionSkeleton />

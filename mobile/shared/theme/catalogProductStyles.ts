@@ -68,15 +68,12 @@ import {
 } from "@/shared/lib/productDetailHeroChromeLayout";
 import { mixHexColors } from "@/shared/lib/mixHexColors";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
-import {
-  SCREEN_CONTENT_PADDING_BOTTOM,
-  SCREEN_CONTENT_PADDING_HORIZONTAL,
-} from "@/shared/theme/screenContentLayout";
+import { SCREEN_CONTENT_PADDING_BOTTOM } from "@/shared/theme/screenContentLayout";
 
 export const MEDIA_OVERLAY_SCRIM = "rgba(0,0,0,0.55)";
 export const MEDIA_NAV_SCRIM = "rgba(0,0,0,0.45)";
 
-export const useFeedScreenStyles = createThemedStyles((theme) => ({
+export const useFeedScreenStyles = createThemedStyles((theme, layout) => ({
   flex: {
     flex: 1,
     backgroundColor: theme.colors.bg,
@@ -170,7 +167,7 @@ export const useFeedScreenStyles = createThemedStyles((theme) => ({
     padding: theme.spacing[6],
   },
   listContent: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
     flexGrow: 1,
   },
@@ -250,112 +247,6 @@ export const useCatalogBreadcrumbStyles = createThemedStyles((theme) => ({
     ...catalogBreadcrumbTitleBase,
     color: theme.colors.text,
     marginTop: HOME_CATALOG_SECTION_TITLE_MARGIN_TOP,
-  },
-}));
-
-export const useCatalogFilterChipStyles = createThemedStyles((theme) => ({
-  wrap: {
-    paddingVertical: theme.spacing[2],
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
-  },
-  row: {
-    gap: theme.spacing[2],
-  },
-  chip: {
-    paddingHorizontal: 14,
-    paddingVertical: theme.spacing[2],
-    borderRadius: theme.radius.pill,
-    backgroundColor: theme.colors.surfaceMuted,
-  },
-  chipActive: {
-    backgroundColor: theme.colors.nearBlack,
-  },
-  chipOutline: {
-    backgroundColor: theme.colors.surface,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-  },
-  chipText: {
-    fontSize: 14,
-    color: theme.colors.textSecondary,
-  },
-  chipTextActive: {
-    color: theme.colors.onContrast,
-    fontWeight: "600",
-  },
-}));
-
-export const useCatalogSearchBarStyles = createThemedStyles((theme) => ({
-  wrap: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: theme.spacing[3],
-    paddingVertical: theme.spacing[2],
-    gap: theme.spacing[2],
-    backgroundColor: theme.colors.surface,
-  },
-  wrapEmbedded: {
-    flex: 1,
-    minWidth: 0,
-    paddingHorizontal: 0,
-    paddingVertical: 0,
-    backgroundColor: "transparent",
-  },
-  input: {
-    flex: 1,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    borderRadius: theme.radius.button,
-    paddingHorizontal: theme.spacing[3],
-    paddingVertical: 10,
-    fontSize: 16,
-    backgroundColor: theme.colors.surfaceMuted,
-    color: theme.colors.text,
-  },
-  inputEmbedded: {
-    fontSize: 13,
-    paddingVertical: 8,
-    backgroundColor: theme.colors.surface,
-  },
-  clear: {
-    paddingHorizontal: theme.spacing[1],
-  },
-  clearText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: theme.colors.link,
-  },
-}));
-
-export const useCatalogSubcategoryChipStyles = createThemedStyles((theme) => ({
-  wrap: {
-    paddingBottom: theme.spacing[2],
-    backgroundColor: theme.colors.surface,
-  },
-  row: {
-    gap: theme.spacing[2],
-  },
-  chip: {
-    paddingHorizontal: theme.spacing[3],
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: theme.colors.surfaceMuted,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  chipActive: {
-    backgroundColor: theme.colors.nearBlack,
-    borderColor: theme.colors.nearBlack,
-  },
-  chipText: {
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-  },
-  chipTextActive: {
-    color: theme.colors.onContrast,
-    fontWeight: "600",
   },
 }));
 
@@ -3686,7 +3577,7 @@ export const useProductDetailTabStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useCartScreenStyles = createThemedStyles((theme) => ({
+export const useCartScreenStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     backgroundColor: theme.colors.bg,
@@ -3728,7 +3619,7 @@ export const useCartScreenStyles = createThemedStyles((theme) => ({
   },
   stickyFooterInner: {
     paddingTop: 18,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingBottom: 16,
     gap: 10,
   },
@@ -4017,7 +3908,7 @@ export const useUserStoriesStripStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useCatalogBrowserPageStyles = createThemedStyles((theme) => ({
+export const useCatalogBrowserPageStyles = createThemedStyles((theme, layout) => ({
   // Фон во всю ширину — под центрированным контентом на планшетах.
   scroll: {
     backgroundColor: theme.colors.bg,
@@ -4029,16 +3920,16 @@ export const useCatalogBrowserPageStyles = createThemedStyles((theme) => ({
   },
   container: {
     width: "100%",
-    padding: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    padding: layout.contentPaddingHorizontal,
     paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
     // Без gap: отступы секций = web `.catalog-feed-tiles` / `__categories`.
     backgroundColor: theme.colors.bg,
   },
 }));
 
-export const useCatalogSubcategoryPickerStyles = createThemedStyles((theme) => ({
+export const useCatalogSubcategoryPickerStyles = createThemedStyles((theme, layout) => ({
   container: {
-    padding: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    padding: layout.contentPaddingHorizontal,
     paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
     gap: 16,
     backgroundColor: theme.colors.bg,

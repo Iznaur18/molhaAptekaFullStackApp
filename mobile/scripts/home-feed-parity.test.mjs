@@ -64,7 +64,41 @@ test("home catalog screen wires home-feed refresh", () => {
   assert.match(index, /isHomeCuratedProductListsVisible/);
   assert.match(header, /showCuratedLists/);
   assert.match(invalidate, /siteHeaderBannerQueryKeys/);
+  assert.match(invalidate, /productPromotionQueryKeys/);
   assert.doesNotMatch(header, /CatalogCityFilterBanner/);
+});
+
+test("home boost row mirrors web gate and stack order", () => {
+  const header = readMobileFile("features/home-feed/ui/HomeFeedHeader.tsx");
+  const section = readMobileFile("entities/product/ui/BoostProductsHomeSection.tsx");
+  const query = readMobileFile(
+    "entities/product/model/useProductPromotionBoostProductsQuery.ts",
+  );
+  const keys = readMobileFile("entities/product/model/productPromotionQueryKeys.ts");
+  const fetch = readMobileFile(
+    "entities/product/api/fetchProductPromotionBoostProducts.ts",
+  );
+  const homePageUi = readMobileFile("shared/config/homePageUi.ts");
+  const webCatalog = readFileSync(
+    join(MOBILE_ROOT, "../client/src/shared/config/copy/catalog.js"),
+    "utf8",
+  );
+
+  assert.match(header, /useProductPromotionBoostProductsQuery/);
+  assert.match(header, /BoostProductsHomeSection/);
+  assert.match(header, /showBoostProductsRow = enabled && showCuratedLists/);
+  assert.match(
+    header,
+    /UserStoriesStrip[\s\S]*BoostProductsHomeSection[\s\S]*HomeCuratedListsSection/,
+  );
+  assert.match(section, /products\.length === 0/);
+  assert.match(section, /CuratedListViewAllSheet/);
+  assert.match(section, /BoostProductMiniCard/);
+  assert.match(query, /staleTime: BOOST_PRODUCTS_STALE_TIME_MS/);
+  assert.match(keys, /boost-products/);
+  assert.match(fetch, /\/product\/promotions\/boost-products/);
+  assert.match(homePageUi, /CATALOG_HOME_SECTION_BOOST_PRODUCTS: "Буст продвижение"/);
+  assert.match(webCatalog, /CATALOG_HOME_SECTION_BOOST_PRODUCTS: "Буст продвижение"/);
 });
 
 test("home feed sections share one vertical gap constant", () => {

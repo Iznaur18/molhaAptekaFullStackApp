@@ -1,7 +1,6 @@
 import { StyleSheet } from "react-native";
 
 import { MY_SALES_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const TOOLBAR_PADDING_VERTICAL = 10.4;
@@ -9,14 +8,14 @@ const TOOLBAR_PADDING_HORIZONTAL = 12;
 const TOOLBAR_RADIUS = 10.4;
 const TOOLBAR_GAP = 8;
 
-export const useInstallmentDisputesPageStyles = createThemedStyles((theme) => ({
+export const useInstallmentDisputesPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
     backgroundColor: theme.colors.bg,
   },
   scroll: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 12,
     gap: L.stackGap,
   },
@@ -68,7 +67,7 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     backgroundColor: theme.colors.bg,
   },
   card: {

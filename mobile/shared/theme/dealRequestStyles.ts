@@ -3,7 +3,6 @@ import { Platform, StyleSheet } from "react-native";
 import { PRODUCT_CARD_MOBILE_CATALOG_LAYOUT } from "@/entities/product/lib/productCardMobileCatalogLayout";
 import { PROFILE_ACCOUNT_STACK_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 
 /** Чипы дня/часа/минут — паритет полей даты и времени web `DealRequestSheet`. */
 export const useDealRequestTimePickerStyles = createThemedStyles((theme) => ({
@@ -208,7 +207,7 @@ export const useProductDealActionsStyles = createThemedStyles((theme) => ({
 }));
 
 /** Карточка заявки и раздел «Заявки» — паритет web `DealRequestCard.css`. */
-export const useDealRequestsPageStyles = createThemedStyles((theme) => ({
+export const useDealRequestsPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
@@ -219,7 +218,7 @@ export const useDealRequestsPageStyles = createThemedStyles((theme) => ({
   },
   content: {
     gap: L.stackGap,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 12,
   },
   contentInAccountShell: {
@@ -231,7 +230,7 @@ export const useDealRequestsPageStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     backgroundColor: theme.colors.bg,
   },
   root: {

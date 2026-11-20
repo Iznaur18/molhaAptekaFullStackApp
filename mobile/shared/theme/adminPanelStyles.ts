@@ -1,11 +1,10 @@
 import { StyleSheet } from "react-native";
 
 import { ADMIN_PANEL_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { semanticColors } from "@/shared/theme/semanticColors";
 
-export const useAdminPanelStyles = createThemedStyles((theme) => ({
+export const useAdminPanelStyles = createThemedStyles((theme, layout) => ({
   root: {
     gap: L.stackGap,
     paddingBottom: 4,
@@ -363,7 +362,7 @@ export const useAdminPanelStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.bg,
   },
   pageList: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 12,
     gap: L.listGap,
     flexGrow: 1,

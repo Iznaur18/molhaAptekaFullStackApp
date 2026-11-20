@@ -17,7 +17,7 @@ flowchart LR
 | 1. Каталог | `/(tabs)/index`, `/(tabs)/catalog` → browser | `useCatalogProductsInfiniteQuery` → `fetchCatalogProductsPage` (`GET /product`) |
 | 2. Карточка | `/product/[id]` | `useCatalogProductQuery` → `fetchCatalogProductById` (`GET /product/:id/catalog`) |
 | 3. Корзина | `/(tabs)/cart` | `AddToCartButton` → `useCartActions` → `replaceMyCart` (`PUT /cart`) |
-| 4. Заказ | `/(tabs)/cart` checkout → `/orders` | `createOrder` (`POST /order`) → `router.replace("/orders")` |
+| 4. Заказ | `/(tabs)/cart` checkout → `/orders`; деталь `/orders/[id]` | `createOrder` (`POST /order`) → `router.replace("/orders")`; deep link `/orders/:id` |
 | 5. Профиль | `/(tabs)/profile`, `/profile/edit` | `useAuthSessionQuery` → `fetchAuthMe` (`GET /auth/me`) |
 
 Deep link на товар: `gitorg://product/<id>` → `/product/[id]` (см. `parseAppDeepLink`).
@@ -63,7 +63,7 @@ Env (опционально):
 - [ ] `/(tabs)/catalog` → tile → фильтр на ленте
 - [ ] `/product/[id]` — media, dock «В корзину», stepper qty
 - [ ] `/(tabs)/cart` — строки, итого, адрес, оплата → submit
-- [ ] `/orders` — новый заказ в списке, tap на товар → карточка
+- [ ] `/orders` — новый заказ в списке; tap шапки → `/orders/[id]`; tap товар → карточка
 - [ ] `/(tabs)/profile` — overview, pull-to-refresh session
 - [ ] `/profile/edit` — сохранить поля, аватар upload
 

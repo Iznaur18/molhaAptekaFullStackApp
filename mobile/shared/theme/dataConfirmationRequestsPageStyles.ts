@@ -1,19 +1,18 @@
 import { StyleSheet } from "react-native";
 
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const SELFIE_MAX_WIDTH = 288;
 const SELFIE_MAX_HEIGHT = 224;
 
-export const useDataConfirmationRequestsPageStyles = createThemedStyles((theme) => ({
+export const useDataConfirmationRequestsPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
     backgroundColor: theme.colors.bg,
   },
   scroll: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 12,
     gap: 12,
   },
@@ -33,7 +32,7 @@ export const useDataConfirmationRequestsPageStyles = createThemedStyles((theme) 
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     backgroundColor: theme.colors.bg,
   },
   card: {

@@ -11,10 +11,7 @@ import {
 import { PRODUCT_DETAILS_SELLER_PRODUCTS_CAROUSEL_LAYOUT as SPC } from "@/entities/product/lib/productDetailsSellerProductsCarouselLayout";
 import { PROFILE_CONTENT_MAX_WIDTH_PHONE } from "@/shared/lib/screenBreakpoints";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
-import {
-  SCREEN_CONTENT_PADDING_BOTTOM,
-  SCREEN_CONTENT_PADDING_HORIZONTAL,
-} from "@/shared/theme/screenContentLayout";
+import { SCREEN_CONTENT_PADDING_BOTTOM } from "@/shared/theme/screenContentLayout";
 
 /** @deprecated используйте resolveProfileContentMaxWidth / useScreenLayout */
 export const PROFILE_CONTENT_MAX_WIDTH = PROFILE_CONTENT_MAX_WIDTH_PHONE;
@@ -867,14 +864,14 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useUserDetailsPageStyles = createThemedStyles((theme) => ({
+export const useUserDetailsPageStyles = createThemedStyles((theme, layout) => ({
   screen: {
     flex: 1,
     backgroundColor: theme.colors.bg,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: theme.spacing[3],
     paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
     gap: theme.spacing[2],

@@ -1,10 +1,9 @@
 import { StyleSheet } from "react-native";
 
 import { PROFILE_ACCOUNT_STACK_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-export const useLoyaltyPointsPageStyles = createThemedStyles((theme) => ({
+export const useLoyaltyPointsPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
@@ -15,7 +14,7 @@ export const useLoyaltyPointsPageStyles = createThemedStyles((theme) => ({
   },
   content: {
     gap: L.stackGap,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 12,
   },
   contentInAccountShell: {
@@ -188,7 +187,7 @@ export const useLoyaltyPointsPageStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     backgroundColor: theme.colors.bg,
   },
   hint: {

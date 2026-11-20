@@ -59,6 +59,44 @@ test("поля по краям — 8 на телефоне, 12 в полосе 6
   assert.equal(resolveScreenContentInlinePadding(1280), 16);
 });
 
+test("page styles вне ленты берут gutter из layout.contentPaddingHorizontal", () => {
+  // gap-todo E: статичный SCREEN_CONTENT_PADDING_HORIZONTAL (=8) в StyleSheet
+  // не масштабировался на 641+; createThemedStyles уже отдаёт layout.
+  const pageStyleFiles = [
+    "shared/theme/myOrdersPageStyles.ts",
+    "shared/theme/wishlistPageStyles.ts",
+    "shared/theme/subscriptionsPageStyles.ts",
+    "shared/theme/premiumPageStyles.ts",
+    "shared/theme/auctionPageStyles.ts",
+    "shared/theme/safeDealPageStyles.ts",
+    "shared/theme/loyaltyPointsPageStyles.ts",
+    "shared/theme/partnerProgramPageStyles.ts",
+    "shared/theme/advertisingPageStyles.ts",
+    "shared/theme/dataConfirmationPageStyles.ts",
+    "shared/theme/mySalesPageStyles.ts",
+    "shared/theme/usersPageStyles.ts",
+    "shared/theme/catalogProductStyles.ts",
+    "features/product-detail/ui/ProductDetailsSkeleton.tsx",
+  ];
+  for (const rel of pageStyleFiles) {
+    const source = readMobileFile(rel);
+    assert.match(
+      source,
+      /layout\.contentPaddingHorizontal/,
+      `${rel}: нет layout.contentPaddingHorizontal`,
+    );
+    assert.doesNotMatch(
+      source,
+      /padding(?:Horizontal)?:\s*SCREEN_CONTENT_PADDING_HORIZONTAL/,
+      `${rel}: остался статичный page gutter`,
+    );
+  }
+
+  const themed = readMobileFile("shared/theme/createThemedStyles.ts");
+  assert.match(themed, /contentPaddingHorizontal/);
+  assert.match(themed, /useScreenLayout/);
+});
+
 test("карточка каталога: мобильный padding до 1023, десктоп 0.55/0.75/0.65", () => {
   const layout = readMobileFile(
     "entities/product/lib/productCardMobileCatalogLayout.ts",

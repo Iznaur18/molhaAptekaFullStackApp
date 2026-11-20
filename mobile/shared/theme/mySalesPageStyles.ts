@@ -1,7 +1,6 @@
 import { StyleSheet } from "react-native";
 
 import { MY_SALES_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const CHIP_PADDING_VERTICAL = 4;
@@ -9,7 +8,7 @@ const CHIP_PADDING_HORIZONTAL = 8;
 const OVERVIEW_TILE_RADIUS = 16;
 const SEARCH_RADIUS = 12;
 
-export const useMySalesPageStyles = createThemedStyles((theme) => ({
+export const useMySalesPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
@@ -20,7 +19,7 @@ export const useMySalesPageStyles = createThemedStyles((theme) => ({
     minHeight: 0,
   },
   list: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     flexGrow: 1,
   },
   /** Desktop hub: shell уже даёт pad; gutter 0 как web `.my-sales-page`. */

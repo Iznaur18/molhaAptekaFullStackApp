@@ -104,6 +104,7 @@ function RootLayoutNav() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="product/[id]" />
+        <Stack.Screen name="orders/[id]" />
         <Stack.Screen name="profile" />
         <Stack.Screen name="notifications/index" />
         <Stack.Screen name="catalog-browser" />

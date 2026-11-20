@@ -1,7 +1,6 @@
 import { StyleSheet } from "react-native";
 
 import { AUCTION_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const SECTION_GAP = 4;
@@ -14,7 +13,7 @@ const OVERVIEW_TILE_RADIUS = 16;
 const THUMB_SIZE = 52;
 const THUMB_RADIUS = 14;
 
-export const useAuctionPageStyles = createThemedStyles((theme) => ({
+export const useAuctionPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
@@ -25,7 +24,7 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
     minHeight: 0,
   },
   list: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     flexGrow: 1,
   },
   /** Desktop hub: shell уже даёт pad; gutter 0 как web `.auction-page`. */
@@ -114,7 +113,7 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
   },
   hint: {
     fontSize: 16,

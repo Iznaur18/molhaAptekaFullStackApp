@@ -1,15 +1,13 @@
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-export const useSellerPersonalCategoryModerationPageStyles = createThemedStyles(
-  (theme) => ({
+export const useSellerPersonalCategoryModerationPageStyles = createThemedStyles((theme, layout) => ({
     container: {
       flex: 1,
       minHeight: 0,
       backgroundColor: theme.colors.bg,
     },
     scroll: {
-      paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+      paddingHorizontal: layout.contentPaddingHorizontal,
       paddingTop: 12,
       gap: 16,
     },
@@ -40,7 +38,7 @@ export const useSellerPersonalCategoryModerationPageStyles = createThemedStyles(
       alignItems: "center",
       justifyContent: "center",
       gap: 12,
-      paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+      paddingHorizontal: layout.contentPaddingHorizontal,
       backgroundColor: theme.colors.bg,
     },
   }),

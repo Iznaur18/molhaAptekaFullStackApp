@@ -1,18 +1,17 @@
 import { StyleSheet } from "react-native";
 
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const THUMB_SIZE = 72;
 
-export const useRafflesStaffPageStyles = createThemedStyles((theme) => ({
+export const useRafflesStaffPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
     backgroundColor: theme.colors.bg,
   },
   scroll: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 12,
     gap: 12,
   },
@@ -150,7 +149,7 @@ export const useRafflesStaffPageStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     backgroundColor: theme.colors.bg,
   },
 }));

@@ -1,19 +1,18 @@
 import { StyleSheet } from "react-native";
 
 import { WISHLIST_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const PRODUCT_IMAGE_THUMB_SIDE = 64;
 
-export const useWishlistPageStyles = createThemedStyles((theme) => ({
+export const useWishlistPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
     backgroundColor: theme.colors.bg,
   },
   listContent: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 12,
     flexGrow: 1,
   },
@@ -93,7 +92,7 @@ export const useWishlistPageStyles = createThemedStyles((theme) => ({
   emptyRoot: {
     flex: 1,
     paddingTop: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
   },
   emptyInAccountShell: {
     paddingTop: 0,
@@ -117,7 +116,7 @@ export const useWishlistPageStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     backgroundColor: theme.colors.bg,
   },
   hint: {

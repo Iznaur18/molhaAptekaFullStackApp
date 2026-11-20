@@ -1,9 +1,8 @@
 import { PROFILE_ACCOUNT_STACK_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 
 /** Раздел «Безопасная сделка» — паритет web `SafeDealPage.css`. */
-export const useSafeDealPageStyles = createThemedStyles((theme) => ({
+export const useSafeDealPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
@@ -14,7 +13,7 @@ export const useSafeDealPageStyles = createThemedStyles((theme) => ({
   },
   content: {
     gap: L.stackGap,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 12,
   },
   contentInAccountShell: {
@@ -26,7 +25,7 @@ export const useSafeDealPageStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     backgroundColor: theme.colors.bg,
   },
   root: {
