@@ -763,7 +763,7 @@ export default function CartScreen() {
                     submitSuccess={submitState.success}
                     isDisabled={!canCheckoutActive}
                     showHeading={false}
-                    fieldsStyle={fulfillmentStyles.checkoutFormFields}
+                    fulfillmentCardsLayout
                     onSubmit={handleCheckoutSubmit}
                     renderFooter={(footer) => (
                       <CartCheckoutDock

@@ -160,6 +160,11 @@ type CheckoutFormProps = {
   showHeading?: boolean;
   pinSubmitToBottom?: boolean;
   /**
+   * Path Г: cart shell как web portals —
+   * method-card → details → payment (без RN portals, только Views).
+   */
+  fulfillmentCardsLayout?: boolean;
+  /**
    * Форма на странице корзины: своей кнопки, сообщений и цены доставки не
    * рисует — всё уходит в итог, который рисует этот рендер.
    */
@@ -207,6 +212,7 @@ export const CheckoutForm = ({
   isDisabled = false,
   showHeading = true,
   pinSubmitToBottom = false,
+  fulfillmentCardsLayout = false,
   renderFooter,
   fieldsStyle,
   onSubmit,
@@ -589,87 +595,83 @@ export const CheckoutForm = ({
       />
     ) : null;
 
-  return (
-    <View style={[checkoutStyles.form, pinSubmitToBottom && checkoutStyles.formPinned]}>
-      <View style={[checkoutStyles.fields, fieldsStyle]}>
-        {showHeading ? (
-          <Text style={checkoutStyles.heading}>{CHECKOUT_FORM_UI.HEADING}</Text>
-        ) : null}
-
-        <Text style={checkoutStyles.fieldLabel}>
-          {CHECKOUT_FORM_UI.LABEL_FULFILLMENT}
-        </Text>
-        <View style={checkoutStyles.fulfillmentRow}>
-          <Pressable
-            disabled={isDisabled || isSubmitting}
-            accessibilityState={{
-              disabled: !pickupSelectable || isDisabled || isSubmitting,
-              checked: isPickup,
-            }}
-            onPress={() => {
-              if (!pickupSelectable) {
-                Alert.alert(
-                  CHECKOUT_FORM_UI.FULFILLMENT_PICKUP,
-                  pickupOptionHint || CHECKOUT_FORM_UI.FULFILLMENT_PICKUP_UNAVAILABLE,
-                );
-                return;
-              }
-              setLocalError("");
-              setFulfillmentMethod(ORDER_FULFILLMENT_PICKUP);
-            }}
+  const fulfillmentMethodBlock = (
+    <>
+      <Text style={checkoutStyles.fieldLabel}>
+        {CHECKOUT_FORM_UI.LABEL_FULFILLMENT}
+      </Text>
+      <View style={checkoutStyles.fulfillmentRow}>
+        <Pressable
+          disabled={isDisabled || isSubmitting}
+          accessibilityState={{
+            disabled: !pickupSelectable || isDisabled || isSubmitting,
+            checked: isPickup,
+          }}
+          onPress={() => {
+            if (!pickupSelectable) {
+              Alert.alert(
+                CHECKOUT_FORM_UI.FULFILLMENT_PICKUP,
+                pickupOptionHint || CHECKOUT_FORM_UI.FULFILLMENT_PICKUP_UNAVAILABLE,
+              );
+              return;
+            }
+            setLocalError("");
+            setFulfillmentMethod(ORDER_FULFILLMENT_PICKUP);
+          }}
+          style={[
+            checkoutStyles.fulfillmentOption,
+            isPickup && checkoutStyles.fulfillmentOptionActive,
+            !pickupSelectable && checkoutStyles.fulfillmentOptionDisabled,
+          ]}
+        >
+          <Text
             style={[
-              checkoutStyles.fulfillmentOption,
-              isPickup && checkoutStyles.fulfillmentOptionActive,
-              !pickupSelectable && checkoutStyles.fulfillmentOptionDisabled,
+              checkoutStyles.fulfillmentOptionText,
+              isPickup && checkoutStyles.fulfillmentOptionTextActive,
+              !pickupSelectable && checkoutStyles.fulfillmentOptionTextDisabled,
             ]}
           >
-            <Text
-              style={[
-                checkoutStyles.fulfillmentOptionText,
-                isPickup && checkoutStyles.fulfillmentOptionTextActive,
-                !pickupSelectable && checkoutStyles.fulfillmentOptionTextDisabled,
-              ]}
-            >
-              {CHECKOUT_FORM_UI.FULFILLMENT_PICKUP}
-            </Text>
-          </Pressable>
-          <Pressable
-            disabled={isDisabled || isSubmitting}
-            accessibilityState={{
-              disabled: !deliverySelectable || isDisabled || isSubmitting,
-              checked: !isPickup,
-            }}
-            onPress={() => {
-              if (!deliverySelectable) {
-                Alert.alert(
-                  CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY,
-                  deliveryOptionHint ||
-                    CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY_UNAVAILABLE,
-                );
-                return;
-              }
-              setLocalError("");
-              setFulfillmentMethod(ORDER_FULFILLMENT_DELIVERY);
-            }}
+            {CHECKOUT_FORM_UI.FULFILLMENT_PICKUP}
+          </Text>
+        </Pressable>
+        <Pressable
+          disabled={isDisabled || isSubmitting}
+          accessibilityState={{
+            disabled: !deliverySelectable || isDisabled || isSubmitting,
+            checked: !isPickup,
+          }}
+          onPress={() => {
+            if (!deliverySelectable) {
+              Alert.alert(
+                CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY,
+                deliveryOptionHint || CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY_UNAVAILABLE,
+              );
+              return;
+            }
+            setLocalError("");
+            setFulfillmentMethod(ORDER_FULFILLMENT_DELIVERY);
+          }}
+          style={[
+            checkoutStyles.fulfillmentOption,
+            !isPickup && checkoutStyles.fulfillmentOptionActive,
+            !deliverySelectable && checkoutStyles.fulfillmentOptionDisabled,
+          ]}
+        >
+          <Text
             style={[
-              checkoutStyles.fulfillmentOption,
-              !isPickup && checkoutStyles.fulfillmentOptionActive,
-              !deliverySelectable && checkoutStyles.fulfillmentOptionDisabled,
+              checkoutStyles.fulfillmentOptionText,
+              !isPickup && checkoutStyles.fulfillmentOptionTextActive,
+              !deliverySelectable && checkoutStyles.fulfillmentOptionTextDisabled,
             ]}
           >
-            <Text
-              style={[
-                checkoutStyles.fulfillmentOptionText,
-                !isPickup && checkoutStyles.fulfillmentOptionTextActive,
-                !deliverySelectable && checkoutStyles.fulfillmentOptionTextDisabled,
-              ]}
-            >
-              {CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY}
-            </Text>
-          </Pressable>
-        </View>
+            {CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY}
+          </Text>
+        </Pressable>
+      </View>
+    </>
+  );
 
-        {isPickup ? (
+  const fulfillmentDetailsBlock = isPickup ? (
           <View
             style={[
               checkoutStyles.fulfillmentSection,
@@ -896,23 +898,63 @@ export const CheckoutForm = ({
               {renderFooter ? null : renderSellerDeliveryCost(false)}
             </View>
           </View>
+  );
+
+  const paymentMethodBlock =
+    paidWithLoyaltyPoints && isPickup ? null : (
+      <CheckoutPaymentMethodPicker
+        value={paymentMethod}
+        onChange={setPaymentMethod}
+        disabled={isDisabled || isSubmitting}
+        cardPrepaidAvailable={cardPrepaidAvailable}
+        allowedMethods={effectiveAllowedPaymentMethods}
+        legend={
+          paidWithLoyaltyPoints
+            ? CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD_DELIVERY
+            : CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD
+        }
+      />
+    );
+
+  return (
+    <View style={[checkoutStyles.form, pinSubmitToBottom && checkoutStyles.formPinned]}>
+      <View
+        style={[
+          fulfillmentCardsLayout
+            ? checkoutStyles.fulfillmentCardsFields
+            : checkoutStyles.fields,
+          fieldsStyle,
+        ]}
+      >
+        {showHeading ? (
+          <Text style={checkoutStyles.heading}>{CHECKOUT_FORM_UI.HEADING}</Text>
+        ) : null}
+
+        {fulfillmentCardsLayout ? (
+          <View style={checkoutStyles.fulfillmentMethodCard}>
+            {fulfillmentMethodBlock}
+          </View>
+        ) : (
+          fulfillmentMethodBlock
         )}
 
-        {/* Товар за баллы: при самовывозе рублями платить нечего — выбора нет. */}
-        {paidWithLoyaltyPoints && isPickup ? null : (
-          <CheckoutPaymentMethodPicker
-            value={paymentMethod}
-            onChange={setPaymentMethod}
-            disabled={isDisabled || isSubmitting}
-            cardPrepaidAvailable={cardPrepaidAvailable}
-            allowedMethods={effectiveAllowedPaymentMethods}
-            legend={
-              paidWithLoyaltyPoints
-                ? CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD_DELIVERY
-                : CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD
-            }
-          />
+        {fulfillmentCardsLayout ? (
+          <View style={checkoutStyles.fulfillmentDetailsCard}>
+            {fulfillmentDetailsBlock}
+          </View>
+        ) : (
+          fulfillmentDetailsBlock
         )}
+
+        {paymentMethodBlock ? (
+          fulfillmentCardsLayout ? (
+            <View style={checkoutStyles.fulfillmentPaymentCard}>
+              {paymentMethodBlock}
+            </View>
+          ) : (
+            paymentMethodBlock
+          )
+        ) : null}
 
         {!renderFooter && displayError ? (
           <Text style={checkoutStyles.feedbackError}>{displayError}</Text>

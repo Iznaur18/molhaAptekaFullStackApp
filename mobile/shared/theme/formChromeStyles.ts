@@ -426,6 +426,44 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
   fields: {
     gap: 14,
   },
+  /** web `.cart-fulfillment` card stack gap (`--cart-fulfillment-card-gap: 6px`). */
+  fulfillmentCardsFields: {
+    gap: 6,
+  },
+  /**
+   * web `.cart-fulfillment__method-card` / `__payment`:
+   * margin 6/12, pad 14/16, r16, elevated + ink 8% border.
+   */
+  fulfillmentMethodCard: {
+    marginHorizontal: 12,
+    marginTop: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    gap: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 16,
+    borderColor: `${theme.colors.ink}14`,
+    backgroundColor: theme.colors.surfaceElevated,
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+  },
+  /** web `.cart-fulfillment__details` — gutter only; section paints the card. */
+  fulfillmentDetailsCard: {
+    marginHorizontal: 12,
+    marginTop: 6,
+    gap: 6,
+  },
+  fulfillmentPaymentCard: {
+    marginHorizontal: 12,
+    marginTop: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    gap: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 16,
+    borderColor: `${theme.colors.ink}14`,
+    backgroundColor: theme.colors.surfaceElevated,
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+  },
   heading: {
     fontSize: 17,
     fontWeight: "700",

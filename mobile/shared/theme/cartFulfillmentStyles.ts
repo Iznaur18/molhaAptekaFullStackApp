@@ -157,8 +157,8 @@ export const useCartFulfillmentSectionStyles = createThemedStyles((theme) => ({
     marginTop: 6,
   },
   /**
-   * Поля формы — gutter 12 как dock; gap 6 = web
-   * `.cart-fulfillment__details .checkout-form__fields`.
+   * Legacy flat fields (sheet / non-card). Cart path Г uses
+   * `fulfillmentCardsLayout` shells in `formChromeStyles` instead.
    */
   checkoutFormFields: {
     marginHorizontal: 12,
