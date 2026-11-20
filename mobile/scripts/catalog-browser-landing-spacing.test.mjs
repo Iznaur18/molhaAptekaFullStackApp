@@ -47,4 +47,6 @@ test("catalog browser landing section gaps match web CSS", () => {
   assert.match(grid, /sectionFeed/);
   assert.match(page, /variant="feed"/);
   assert.match(page, /variant="categories"/);
+  assert.doesNotMatch(page, /personalCategoryTiles/);
+  assert.doesNotMatch(page, /SELLER_PERSONAL_CATEGORY_PAGE_UI/);
 });

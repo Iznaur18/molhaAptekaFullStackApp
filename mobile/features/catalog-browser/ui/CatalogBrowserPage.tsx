@@ -13,8 +13,6 @@ import {
 import { useProductCatalogFeedTileDisplaysQuery } from "@/entities/product-category-display/model/useProductCatalogFeedTileDisplaysQuery";
 import { useProductCategoryDisplaysQuery } from "@/entities/product-category-display/model/useProductCategoryDisplaysQuery";
 import { useProductCategoryRootsQuery } from "@/entities/product-category-tree/model/useProductCategoryRootsQuery";
-import { useViewerRegion } from "@/entities/region/model/ViewerRegionProvider";
-import { useSellerPersonalCategoryCatalogTilesQuery } from "@/entities/seller-personal-category/model/useSellerPersonalCategoryCatalogTilesQuery";
 import type { CatalogListFilters } from "@/entities/product/model/catalogListFilters";
 import { buildQueryForCatalogFeedTile } from "@/features/catalog-browser/model/buildQueryForCatalogFeedTile";
 import { setPendingCatalogFilters } from "@/features/catalog-browser/model/pendingCatalogFilters";
@@ -26,11 +24,7 @@ import { EditCategoryDisplayModal } from "@/features/catalog-browser/ui/EditCate
 import { EditCategoryNodeDisplayModal } from "@/features/catalog-browser/ui/EditCategoryNodeDisplayModal";
 import { EditFeedTileDisplayModal } from "@/features/catalog-browser/ui/EditFeedTileDisplayModal";
 import { useCatalogSubcategoryPicker } from "@/features/catalog-browser/model/useCatalogSubcategoryPicker";
-import {
-  CATALOG_BROWSER_UI,
-  PRODUCT_CATEGORY_DISPLAY_UI,
-  SELLER_PERSONAL_CATEGORY_PAGE_UI,
-} from "@/shared/config";
+import { CATALOG_BROWSER_UI, PRODUCT_CATEGORY_DISPLAY_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useCatalogBrowserPageStyles } from "@/shared/theme/catalogProductStyles";
@@ -49,14 +43,10 @@ export const CatalogBrowserPage = () => {
   const { contentPaddingTop, centeredContentStyle } = useScreenLayout();
   const { isAdmin, isAuthorized } = useUserAccess();
   const sessionQuery = useAuthSessionQuery();
-  const { viewerRegionCode } = useViewerRegion();
 
   const categoryDisplaysQuery = useProductCategoryDisplaysQuery();
   const feedTileDisplaysQuery = useProductCatalogFeedTileDisplaysQuery();
   const categoryRootsQuery = useProductCategoryRootsQuery();
-  const personalCategoryTilesQuery = useSellerPersonalCategoryCatalogTilesQuery({
-    regionCode: viewerRegionCode,
-  });
 
   const [editingCategorySlug, setEditingCategorySlug] = useState<string | null>(null);
   const [editingFeedTileKey, setEditingFeedTileKey] = useState<string | null>(null);
@@ -68,7 +58,6 @@ export const CatalogBrowserPage = () => {
   const categoryDisplays = categoryDisplaysQuery.data ?? [];
   const feedTileDisplays = feedTileDisplaysQuery.data ?? [];
   const categoryRoots = categoryRootsQuery.data ?? [];
-  const personalCategoryTiles = personalCategoryTilesQuery.data ?? [];
 
   const feedTiles = useMemo(
     () => buildResolvedCatalogFeedTileDisplays(feedTileDisplays),
@@ -84,14 +73,12 @@ export const CatalogBrowserPage = () => {
   const isLoading =
     categoryDisplaysQuery.isPending ||
     feedTileDisplaysQuery.isPending ||
-    categoryRootsQuery.isPending ||
-    personalCategoryTilesQuery.isPending;
+    categoryRootsQuery.isPending;
 
   const queryError =
     categoryDisplaysQuery.error ??
     feedTileDisplaysQuery.error ??
-    categoryRootsQuery.error ??
-    personalCategoryTilesQuery.error;
+    categoryRootsQuery.error;
 
   const subcategoryPicker = useCatalogSubcategoryPicker({
     categoryRoots,
@@ -157,16 +144,11 @@ export const CatalogBrowserPage = () => {
   const resolveCategoryTileKey = (item: (typeof categoryItems)[number]) =>
     String(item.categoryId ?? item.categorySlug);
 
-  const handlePersonalCategoryPress = (campaignId: string) => {
-    openCatalogWithFilters({ sellerPersonalCategoryId: campaignId });
-  };
-
   const handleRefreshDisplays = () => {
     void Promise.all([
       categoryDisplaysQuery.refetch(),
       feedTileDisplaysQuery.refetch(),
       categoryRootsQuery.refetch(),
-      personalCategoryTilesQuery.refetch(),
     ]);
   };
 
@@ -243,25 +225,6 @@ export const CatalogBrowserPage = () => {
               />
             ))}
           </CatalogBrowserTilesGrid>
-
-          {personalCategoryTiles.length > 0 ? (
-            <CatalogBrowserTilesGrid
-              title={SELLER_PERSONAL_CATEGORY_PAGE_UI.TILES_SECTION_TITLE}
-              gap={gridLayout.gap}
-              variant="categories"
-            >
-              {personalCategoryTiles.map((tile) => (
-                <CatalogBrowserTileCard
-                  key={tile._id}
-                  label={tile.labelRu}
-                  imageUrl={tile.imageUrl}
-                  placeholderImageUrl={PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE}
-                  {...tileLayoutProps}
-                  onPress={() => handlePersonalCategoryPress(tile._id)}
-                />
-              ))}
-            </CatalogBrowserTilesGrid>
-          ) : null}
 
           <CatalogBrowserTilesGrid
             title={PRODUCT_CATEGORY_DISPLAY_UI.CATEGORIES_SECTION_TITLE}

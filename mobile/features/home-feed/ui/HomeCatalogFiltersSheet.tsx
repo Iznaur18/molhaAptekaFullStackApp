@@ -13,7 +13,6 @@ import {
   type CatalogFiltersDraft,
   type CatalogFiltersFlagKey,
 } from "@izibuy/shared-lib";
-import { useRouter } from "expo-router";
 import { useMemo, useState, type ReactNode } from "react";
 import {
   Modal,
@@ -146,12 +145,6 @@ const useHomeCatalogFiltersSheetStyles = createThemedStyles((theme) => ({
     fontSize: 15,
     fontWeight: "700",
     color: theme.colors.text,
-  },
-  rulesLink: {
-    alignSelf: "flex-start",
-    fontSize: 13,
-    color: theme.colors.textMuted,
-    textDecorationLine: "underline",
   },
   chips: {
     flexDirection: "row",
@@ -363,7 +356,6 @@ function HomeCatalogFiltersSheetContent({
   onClose,
   onApply,
 }: HomeCatalogFiltersSheetContentProps) {
-  const router = useRouter();
   const [draft, setDraft] = useState<CatalogFiltersDraft>(() =>
     homeCatalogFeedFiltersToDraft(appliedFilters),
   );
@@ -398,11 +390,6 @@ function HomeCatalogFiltersSheetContent({
   const handleApply = () => {
     onApply(homeCatalogFeedFiltersFromDraft(draft, appliedFilters));
     onClose();
-  };
-
-  const handleOpenRankingRules = () => {
-    onClose();
-    router.push("/legal/ranking");
   };
 
   const renderFlag = (key: CatalogFiltersFlagKey) => (
@@ -462,17 +449,6 @@ function HomeCatalogFiltersSheetContent({
         <CatalogFiltersSection
           styles={styles}
           title={HOME_PAGE_UI.CATALOG_FILTERS_SHEET_SORT}
-          after={
-            <Pressable
-              onPress={handleOpenRankingRules}
-              accessibilityRole="link"
-              hitSlop={6}
-            >
-              <Text style={styles.rulesLink}>
-                {HOME_PAGE_UI.CATALOG_FILTERS_SHEET_RANKING_RULES}
-              </Text>
-            </Pressable>
-          }
         >
           {CATALOG_FILTERS_SHEET_SORTS.map((sort) => (
             <CatalogFilterChip
@@ -609,13 +585,11 @@ function CatalogFiltersSection({
   styles,
   title,
   before = null,
-  after = null,
   children,
 }: {
   styles: HomeCatalogFiltersSheetStyles;
   title: string;
   before?: ReactNode;
-  after?: ReactNode;
   children: ReactNode;
 }) {
   return (
@@ -625,7 +599,6 @@ function CatalogFiltersSection({
       </Text>
       {before}
       <View style={styles.chips}>{children}</View>
-      {after}
     </View>
   );
 }

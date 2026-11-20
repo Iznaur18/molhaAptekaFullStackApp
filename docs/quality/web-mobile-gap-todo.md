@@ -16,6 +16,18 @@
 | 2 | Розыгрыши и личные категории открывали чужую модерацию | **А.** Прямой адрес открывает свой экран. Пункт меню остаётся один: intro (как на сайте). |
 | 3 | С чего начать визуал | **А.** Сначала нижняя панель, потом шапка. |
 
+## Решения catalog path v1 (20.11.2026, «дефолты ок»)
+
+| # | Вопрос | Решение |
+| - | ------ | ------- |
+| 1 | Scope | Browser landing + drill→home + residual home + filters dig |
+| 2 | Personal tiles на `/(tabs)/catalog` | **А.** Убрать (как web landing); личные — вкладка «Продавцы» на home |
+| 3 | Drill | **А.** → `/(tabs)` + pending filters |
+| 4 | Boost-ряд на home | **А.** SKIP v1 |
+| 5 | Filters sheet | **А.** Dig parity (убрать mobile-only ranking link) |
+| 6 | Staff edit modals на browser | **А.** Не трогать |
+| 7 | DoD | Static parity tests + `regression:wf72` |
+
 Карточка товара, чекаут и часть экранов профиля уже закрыты `mobile/scripts/*-parity.test.mjs`.
 
 ---
@@ -94,3 +106,4 @@
 
 1. Статичный gutter 8px на экранах вне ленты (последний открытый пункт E).
 2. Блок A и экран заказа — только по отдельной команде.
+3. **SKIP (catalog path v1):** `BoostProductsHomeSection` / `useProductPromotionBoostProductsQuery` на mobile home. Web: `AppShellCatalogSection` `showBoostProductsRow`.
