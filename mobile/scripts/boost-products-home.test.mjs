@@ -34,4 +34,25 @@ test("boost mini-card keeps price overlay + wishlist", () => {
   assert.match(mini, /priceWrap/);
   assert.match(styles, /priceWrap:[\s\S]*position: "absolute"/);
   assert.match(styles, /wishlistSlot:[\s\S]*position: "absolute"/);
+  assert.doesNotMatch(styles, /^\s*error:/m);
+});
+
+test("boost error UI uses InlineErrorBanner like web", () => {
+  const header = readMobileFile("features/home-feed/ui/HomeFeedHeader.tsx");
+  const banner = readMobileFile("shared/ui/InlineErrorBanner.tsx");
+  const layout = readMobileFile("shared/lib/inlineErrorBannerLayout.ts");
+  const webCss = readFileSync(
+    join(MOBILE_ROOT, "../client/src/shared/ui/InlineErrorBanner/InlineErrorBanner.css"),
+    "utf8",
+  );
+
+  assert.match(header, /InlineErrorBanner/);
+  assert.match(banner, /accessibilityRole="alert"/);
+  assert.match(banner, /inline-error-banner|INLINE_ERROR_BANNER_LAYOUT|mark/);
+  assert.match(layout, /gap: 10\.4/);
+  assert.match(layout, /marginBottom: 12/);
+  assert.match(layout, /radius: 10\.4/);
+  assert.match(webCss, /gap:\s*0\.65rem/);
+  assert.match(webCss, /margin:\s*0 0 0\.75rem/);
+  assert.match(webCss, /border-radius:\s*0\.65rem/);
 });

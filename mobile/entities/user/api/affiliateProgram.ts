@@ -1,7 +1,24 @@
 import { apiClient } from "@/shared/api";
 import { API_CLIENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
-import { myAffiliateEarningsDataSchema } from "@molha/api-contract";
+import {
+  myAffiliateEarningsDataSchema,
+  myAffiliateSalesDataSchema,
+} from "@molha/api-contract";
+
+export async function fetchMyAffiliateSales() {
+  try {
+    const { data } = await apiClient.get("/user/me/affiliate/sales");
+    if (!data?.success) {
+      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
+    }
+    return myAffiliateSalesDataSchema.parse(data.data);
+  } catch (error) {
+    throw new Error(
+      formatApiErrorMessage(error, "Не удалось загрузить продажи через партнёров"),
+    );
+  }
+}
 
 export async function fetchMyAffiliateEarnings() {
   try {

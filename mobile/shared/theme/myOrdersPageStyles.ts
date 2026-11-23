@@ -110,12 +110,16 @@ export const useMyOrdersPageStyles = createThemedStyles((theme, layout) => ({
     fontSize: 15.2,
     lineHeight: 21,
   },
+  emptyWrap: {
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 8,
+  },
   emptyState: {
     fontSize: 14.7,
     lineHeight: 21,
     textAlign: "center",
     color: theme.colors.textSecondary,
-    paddingVertical: 8,
   },
   /** Guest: как web/cart `.cart-page--centered` + message (live ≤640). */
   centered: {

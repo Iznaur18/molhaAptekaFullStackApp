@@ -36,7 +36,7 @@ test("catalog screen uses breadcrumb instead of category chips", () => {
   assert.match(webCss, /catalog-categories-browser__breadcrumb/);
 
   const display = readFile(MOBILE_ROOT, "shared/theme/displayTypography.ts");
-  assert.match(display, /DISPLAY_FONT_FAMILY = "Intro"/);
+  assert.match(display, /DISPLAY_FONT_FAMILY = izTypography\.fontFamilyDisplay/);
   const layout = readFile(MOBILE_ROOT, "app/_layout.tsx");
   assert.match(layout, /IntroDemo-BlackCAPS\.otf/);
 });

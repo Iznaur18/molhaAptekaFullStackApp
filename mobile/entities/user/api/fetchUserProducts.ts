@@ -12,6 +12,7 @@ type FetchUserProductsParams = {
   page?: number;
   limit?: number;
   shelfId?: string | null;
+  onecGroupId?: string | null;
 };
 
 export const fetchUserProducts = async (
@@ -22,6 +23,8 @@ export const fetchUserProducts = async (
     const page = params.page ?? 1;
     const limit = params.limit ?? USER_PROFILE_PRODUCTS_PAGE_SIZE;
     const shelfId = params.shelfId != null ? String(params.shelfId).trim() : "";
+    const onecGroupId =
+      params.onecGroupId != null ? String(params.onecGroupId).trim() : "";
 
     const { data } = await apiClient.get(
       `/user/${encodeURIComponent(userId)}/products`,
@@ -30,6 +33,7 @@ export const fetchUserProducts = async (
           page,
           limit,
           ...(shelfId ? { shelfId } : {}),
+          ...(onecGroupId ? { onecGroupId } : {}),
         },
       },
     );

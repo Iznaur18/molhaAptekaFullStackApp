@@ -87,6 +87,11 @@ test("home boost row mirrors web gate and stack order", () => {
   assert.match(header, /useProductPromotionBoostProductsQuery/);
   assert.match(header, /BoostProductsHomeSection/);
   assert.match(header, /showBoostProductsRow = enabled && showCuratedLists/);
+  assert.match(header, /InlineErrorBanner/);
+  assert.match(
+    header,
+    /boostErrorMessage[\s\S]*InlineErrorBanner[\s\S]*BoostProductsHomeSection/,
+  );
   assert.match(
     header,
     /UserStoriesStrip[\s\S]*BoostProductsHomeSection[\s\S]*HomeCuratedListsSection/,
@@ -133,8 +138,9 @@ test("home feed sections share one vertical gap constant", () => {
   assert.doesNotMatch(raffle, /marginTop: HOME_FEED_SECTION_GAP/);
 
   const display = readMobileFile("shared/theme/displayTypography.ts");
-  assert.match(display, /marginTop: 11/);
-  assert.match(display, /marginBottom: 6/);
+  assert.match(display, /marginTop: 8/);
+  assert.match(display, /marginBottom: 16/);
+  assert.match(display, /HOME_CATALOG_SECTION_TITLE_MARGIN_TOP = 16/);
   assert.match(
     catalogStyles,
     /homeFeedSearchHeader:[\s\S]*marginBottom: HOME_FEED_SECTION_GAP/,
@@ -163,10 +169,12 @@ test("stories strip matches web: no title, no card chrome", () => {
   assert.doesNotMatch(strip, /SquircleView/);
   assert.doesNotMatch(storiesStylesBlock, /scrollWrapper/);
   assert.doesNotMatch(storiesStylesBlock, /title:/);
+  assert.match(storiesStylesBlock, /ringAdd:[\s\S]*actionSoft/);
+  assert.match(storiesStylesBlock, /plus:[\s\S]*color: theme\.colors\.action/);
   assert.match(layout, /scrollPaddingBottom: 6/);
   assert.match(layout, /scrollPaddingLeft: 2/);
   assert.match(layout, /blockPaddingHorizontal: 0/);
-  assert.match(display, /DISPLAY_FONT_FAMILY = "Intro"/);
+  assert.match(display, /DISPLAY_FONT_FAMILY = izTypography\.fontFamilyDisplay/);
   assert.match(display, /textTransform: "uppercase"/);
   assert.match(curatedTitle, /HOME_FEED_DISPLAY_TITLE/);
   assert.match(curatedTitle, /CURATED_PRODUCT_LIST_HOME_TITLE_MARGIN_BOTTOM/);
@@ -237,7 +245,9 @@ test("raffle section opens /raffle/:id from reveal button (web parity)", () => {
   );
 
   assert.match(styles, /revealButton/);
-  assert.match(styles, /theme\.colors\.action/);
+  assert.match(styles, /revealLabel/);
+  assert.match(styles, /revealChevron/);
+  assert.match(styles, /RAFFLE_REVEAL_BUTTON_BORDER_RADIUS = 999/);
   assert.match(section, /HomeFeaturedRafflesRevealButton/);
   assert.match(section, /router\.push\(`\/raffle\/\$\{/);
   assert.doesNotMatch(section, /HomeFeaturedRaffleModal/);
@@ -245,8 +255,15 @@ test("raffle section opens /raffle/:id from reveal button (web parity)", () => {
   assert.doesNotMatch(section, /isExpanded/);
   assert.doesNotMatch(section, /RaffleFeaturedCarousel/);
   assert.match(reveal, /HOME_FEED_UI\.SHOW_RAFFLES/);
+  assert.match(reveal, /lucide-react-native\/icons\/gift/);
+  assert.match(reveal, /lucide-react-native\/icons\/chevron-right/);
+  assert.match(reveal, /RaffleRevealButtonGradient/);
   assert.doesNotMatch(reveal, /HIDE_RAFFLES/);
   assert.doesNotMatch(reveal, /RainbowFlowBackdrop/);
+  assert.doesNotMatch(
+    styles,
+    /revealButton:\s*\{[^}]*backgroundColor:\s*theme\.colors\.action/s,
+  );
   assert.match(page, /RafflePrizeMedia/);
   assert.match(page, /blurBackground/);
   assert.match(page, /contentFit="contain"/);
@@ -296,4 +313,39 @@ test("create story modal matches web animation and layout tokens", () => {
   assert.match(chrome, /borderTopLeftRadius: L\.borderRadius/);
   assert.match(chrome, /MODAL_BACKDROP_SCRIM/);
   assert.match(chrome, /maxWidth: L\.maxWidthWide/);
+});
+
+test("home section tabs + sellers search colors match web tokens", () => {
+  const styles = readMobileFile("shared/theme/homeFeedSectionTabStyles.ts");
+  const webTabs = readFileSync(
+    join(MOBILE_ROOT, "../client/src/shared/styles/displayFont.css"),
+    "utf8",
+  );
+  const webSearch = readFileSync(
+    join(MOBILE_ROOT, "../client/src/shared/ui/SearchInput/SearchInput.css"),
+    "utf8",
+  );
+
+  assert.match(webTabs, /\.home-feed-section-tab[\s\S]*color:\s*var\(--iz-color-text-secondary\)/);
+  assert.match(styles, /tabLabel:[\s\S]*color:\s*theme\.colors\.textSecondary/);
+  assert.doesNotMatch(
+    styles,
+    /tabLabel:[\s\S]*color:\s*theme\.colors\.textMuted/,
+  );
+
+  assert.match(webSearch, /\.search-input__field[\s\S]*background:\s*var\(--iz-color-surface\)/);
+  assert.match(webSearch, /\.search-input__field[\s\S]*border:\s*1px solid var\(--iz-color-border\)/);
+  assert.match(styles, /searchInput:[\s\S]*backgroundColor:\s*theme\.colors\.surface/);
+  assert.match(styles, /searchInput:[\s\S]*borderColor:\s*theme\.colors\.border/);
+  assert.match(styles, /paddingVertical:\s*8\.8/);
+  assert.match(styles, /fontSize:\s*15\.2/);
+  assert.match(styles, /searchInputFocused/);
+  assert.doesNotMatch(styles, /searchInput:[\s\S]*minHeight:\s*44/);
+  assert.doesNotMatch(styles, /backgroundColor:\s*`\$\{theme\.colors\.text\}12`/);
+
+  assert.match(webTabs, /\.home-feed-section-tabs[\s\S]*gap:\s*0\.6rem/);
+  assert.match(webTabs, /\.home-feed-section-tab[\s\S]*padding:\s*0\.5rem 1rem/);
+  assert.match(styles, /row:[\s\S]*gap:\s*9\.6/);
+  assert.match(styles, /tab:[\s\S]*paddingHorizontal:\s*16/);
+  assert.match(styles, /tabLabel:[\s\S]*fontSize:\s*15\.2/);
 });

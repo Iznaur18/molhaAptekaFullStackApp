@@ -23,8 +23,9 @@ export const AUTH_PAGE_LAYOUT = {
   backRadius: 10,
   channelGap: 8,
   channelBtnRadius: 8,
-  channelBtnPaddingY: 7,
-  channelBtnPaddingX: 10,
+  /** Web `.auth-page__channel-btn { padding: 0.45rem 0.65rem }` → 7.2 / 10.4 */
+  channelBtnPaddingY: 7.2,
+  channelBtnPaddingX: 10.4,
   channelBtnFontSize: 14,
   linkFontSize: 14,
   errorFontSize: 14,

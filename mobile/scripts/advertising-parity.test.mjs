@@ -61,6 +61,19 @@ test("advertising ui copy matches web page", () => {
   assert.match(copy, /RAFFLE_ADVERTISING_PAGE_UI/);
 });
 
+test("advertising page has ads and games tabs", () => {
+  const page = readMobileFile("features/advertising-page/ui/AdvertisingPage.tsx");
+  const copy = readMobileFile("shared/config/appUiCopy.ts");
+
+  assert.match(page, /ModalSectionTabs/);
+  assert.match(page, /TAB_GAMES/);
+  assert.match(page, /LuckyBoxAdvertisingSection/);
+  assert.match(page, /FortuneWheelAdvertisingSection/);
+  assert.match(copy, /LUCKY_BOX_ADVERTISING_UI/);
+  assert.match(copy, /FORTUNE_WHEEL_ADVERTISING_UI/);
+  assert.match(copy, /TAB_ADS: "Продвижение"/);
+});
+
 test("raffle advertising section is wired on advertising page", () => {
   const page = readMobileFile("features/advertising-page/ui/AdvertisingPage.tsx");
   const section = readMobileFile(

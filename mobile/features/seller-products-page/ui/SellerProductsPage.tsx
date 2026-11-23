@@ -11,8 +11,10 @@ import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuer
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { SellerFortuneWheelGame } from "@/entities/seller-fortune-wheel/ui/SellerFortuneWheelGame";
 import { SellerLuckyBoxGame } from "@/entities/seller-lucky-box/ui/SellerLuckyBoxGame";
+import { buildOneCShelfRows } from "@/entities/seller-shelf/lib/buildOneCShelfRows";
 import { fetchPublicSellerShelves } from "@/entities/seller-shelf/api/sellerShelfApi";
 import { sellerShelfQueryKeys } from "@/entities/seller-shelf/model/sellerShelfQueryKeys";
+import { usePublicSellerOneCShelvesQuery } from "@/entities/seller-shelf/model/usePublicSellerOneCShelvesQuery";
 import { userProfileQueryKeys } from "@/entities/user/model/userProfileQueryKeys";
 import { useSellerProductsInfiniteQuery } from "@/entities/user/model/useSellerProductsInfiniteQuery";
 import { useUserProfileQuery } from "@/entities/user/model/useUserProfileQuery";
@@ -67,6 +69,10 @@ export const SellerProductsPage = () => {
   const isSessionReady = !sessionQuery.isPending;
 
   const [selectedShelfId, setSelectedShelfId] = useState<string | null>(null);
+  /** Путь по категориям 1С: [корень, подкатегория, …] — паритет web. */
+  const [onecPath, setOnecPath] = useState<string[]>([]);
+  const selectedOnecGroupId =
+    onecPath.length > 0 ? onecPath[onecPath.length - 1] : null;
 
   const profileQuery = useUserProfileQuery({
     userId: sellerId,
@@ -77,14 +83,20 @@ export const SellerProductsPage = () => {
     queryFn: () => fetchPublicSellerShelves(sellerId),
     enabled: isSessionReady && sellerId.length > 0,
   });
+  const onecShelvesQuery = usePublicSellerOneCShelvesQuery({
+    sellerId,
+    enabled: isSessionReady && sellerId.length > 0,
+  });
   const catalogQuery = useSellerProductsInfiniteQuery({
     sellerId,
     enabled: isSessionReady && sellerId.length > 0,
     shelfId: selectedShelfId,
+    onecGroupId: selectedOnecGroupId,
   });
 
   useEffect(() => {
     setSelectedShelfId(null);
+    setOnecPath([]);
   }, [sellerId]);
 
   const seller = profileQuery.data as Record<string, unknown> | undefined;
@@ -179,6 +191,13 @@ export const SellerProductsPage = () => {
   );
 
   const shelves = shelvesQuery.data?.shelves ?? [];
+  const onecShelves = onecShelvesQuery.data ?? [];
+  const onecRows = useMemo(
+    () => buildOneCShelfRows(onecShelves, onecPath),
+    [onecShelves, onecPath],
+  );
+  const hasShelfFilters = shelves.length > 0 || onecShelves.length > 0;
+  const isAllShelvesActive = selectedShelfId == null && onecPath.length === 0;
 
   if (!sellerId) {
     return (
@@ -345,7 +364,7 @@ export const SellerProductsPage = () => {
                     />
                   </View>
 
-                  {shelves.length > 0 ? (
+                  {hasShelfFilters ? (
                     <ScrollView
                       horizontal
                       showsHorizontalScrollIndicator={false}
@@ -354,18 +373,21 @@ export const SellerProductsPage = () => {
                       accessibilityLabel={SELLER_PRODUCTS_PAGE_UI.SHELF_FILTER_ARIA}
                     >
                       <Pressable
-                        onPress={() => setSelectedShelfId(null)}
+                        onPress={() => {
+                          setSelectedShelfId(null);
+                          setOnecPath([]);
+                        }}
                         style={[
                           styles.shelfChip,
-                          selectedShelfId == null ? styles.shelfChipActive : null,
+                          isAllShelvesActive ? styles.shelfChipActive : null,
                         ]}
                         accessibilityRole="button"
-                        accessibilityState={{ selected: selectedShelfId == null }}
+                        accessibilityState={{ selected: isAllShelvesActive }}
                       >
                         <Text
                           style={[
                             styles.shelfChipText,
-                            selectedShelfId == null ? styles.shelfChipTextActive : null,
+                            isAllShelvesActive ? styles.shelfChipTextActive : null,
                           ]}
                         >
                           {SELLER_PRODUCTS_PAGE_UI.SHELF_FILTER_ALL}
@@ -376,7 +398,37 @@ export const SellerProductsPage = () => {
                         return (
                           <Pressable
                             key={shelf._id}
-                            onPress={() => setSelectedShelfId(shelf._id)}
+                            onPress={() => {
+                              setSelectedShelfId(shelf._id);
+                              setOnecPath([]);
+                            }}
+                            style={[
+                              styles.shelfChip,
+                              active ? styles.shelfChipActive : null,
+                            ]}
+                            accessibilityRole="button"
+                            accessibilityState={{ selected: active }}
+                          >
+                            <Text
+                              style={[
+                                styles.shelfChipText,
+                                active ? styles.shelfChipTextActive : null,
+                              ]}
+                            >
+                              {shelf.name}
+                            </Text>
+                          </Pressable>
+                        );
+                      })}
+                      {onecShelves.map((shelf) => {
+                        const active = onecPath[0] === shelf.id;
+                        return (
+                          <Pressable
+                            key={`onec-${shelf.id}`}
+                            onPress={() => {
+                              setSelectedShelfId(null);
+                              setOnecPath(onecPath[0] === shelf.id ? [] : [shelf.id]);
+                            }}
                             style={[
                               styles.shelfChip,
                               active ? styles.shelfChipActive : null,
@@ -397,6 +449,72 @@ export const SellerProductsPage = () => {
                       })}
                     </ScrollView>
                   ) : null}
+
+                  {onecRows.slice(1).map((row) => {
+                    const allActive = onecPath.length === row.level;
+                    return (
+                      <ScrollView
+                        key={`onec-level-${row.level}`}
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={[
+                          styles.shelvesRow,
+                          styles.shelvesRowNested,
+                        ]}
+                        accessibilityRole="toolbar"
+                        accessibilityLabel={row.parentName || undefined}
+                      >
+                        <Pressable
+                          onPress={() => setOnecPath(onecPath.slice(0, row.level))}
+                          style={[
+                            styles.shelfChip,
+                            allActive ? styles.shelfChipActive : null,
+                          ]}
+                          accessibilityRole="button"
+                          accessibilityState={{ selected: allActive }}
+                        >
+                          <Text
+                            style={[
+                              styles.shelfChipText,
+                              allActive ? styles.shelfChipTextActive : null,
+                            ]}
+                          >
+                            {SELLER_PRODUCTS_PAGE_UI.SHELF_FILTER_ALL}
+                          </Text>
+                        </Pressable>
+                        {row.items.map((item) => {
+                          const active = onecPath[row.level] === item.id;
+                          return (
+                            <Pressable
+                              key={item.id}
+                              onPress={() =>
+                                setOnecPath(
+                                  onecPath[row.level] === item.id
+                                    ? onecPath.slice(0, row.level)
+                                    : [...onecPath.slice(0, row.level), item.id],
+                                )
+                              }
+                              style={[
+                                styles.shelfChip,
+                                active ? styles.shelfChipActive : null,
+                              ]}
+                              accessibilityRole="button"
+                              accessibilityState={{ selected: active }}
+                            >
+                              <Text
+                                style={[
+                                  styles.shelfChipText,
+                                  active ? styles.shelfChipTextActive : null,
+                                ]}
+                              >
+                                {item.name}
+                              </Text>
+                            </Pressable>
+                          );
+                        })}
+                      </ScrollView>
+                    );
+                  })}
                 </>
               ) : null}
             </View>

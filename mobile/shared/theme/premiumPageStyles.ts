@@ -1,6 +1,10 @@
 import { StyleSheet } from "react-native";
 
 import { PROFILE_ACCOUNT_STACK_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
+import {
+  PROFILE_LIST_HERO_CHROME as HERO,
+  PROFILE_LIST_HERO_NO_SHADOW,
+} from "@/shared/lib/profileListHeroChrome";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 export const usePremiumPageStyles = createThemedStyles((theme, layout) => ({
@@ -27,15 +31,11 @@ export const usePremiumPageStyles = createThemedStyles((theme, layout) => ({
   heroCard: {
     flexDirection: "row",
     alignItems: "flex-start",
-    gap: 14,
-    padding: 20,
-    borderRadius: 18,
+    gap: HERO.gap,
+    padding: HERO.padding,
+    borderRadius: HERO.radiusDefault,
     backgroundColor: theme.colors.warning,
-    shadowColor: theme.colors.ink,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.16,
-    shadowRadius: 14,
-    elevation: 5,
+    ...PROFILE_LIST_HERO_NO_SHADOW,
   },
   heroTextBlock: {
     flex: 1,
@@ -43,10 +43,10 @@ export const usePremiumPageStyles = createThemedStyles((theme, layout) => ({
     gap: 2,
   },
   heroCaption: {
-    fontSize: 12,
+    fontSize: HERO.captionFontSize,
     fontWeight: "700",
     textTransform: "uppercase",
-    letterSpacing: 0.8,
+    letterSpacing: HERO.captionLetterSpacing,
     color: theme.colors.onContrast,
     opacity: 0.72,
   },
@@ -56,9 +56,9 @@ export const usePremiumPageStyles = createThemedStyles((theme, layout) => ({
     gap: 6,
   },
   heroValue: {
-    fontSize: 34,
-    fontWeight: "800",
-    letterSpacing: -0.5,
+    fontSize: HERO.valueFontSize,
+    fontWeight: HERO.valueFontWeight,
+    letterSpacing: HERO.valueLetterSpacing,
     color: theme.colors.onContrast,
     fontVariant: ["tabular-nums"],
   },
@@ -76,14 +76,15 @@ export const usePremiumPageStyles = createThemedStyles((theme, layout) => ({
     opacity: 0.8,
   },
   heroIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: HERO.iconSize,
+    height: HERO.iconSize,
+    borderRadius: HERO.iconSize / 2,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: theme.colors.surface,
   },
   benefitsCard: {
+    /** Web `.premium-page__benefits-card { gap: 0.75rem }` → 12. */
     gap: 12,
     padding: 16,
     borderRadius: 14,
@@ -208,6 +209,10 @@ export const usePremiumPageStyles = createThemedStyles((theme, layout) => ({
   submitButton: {
     width: "100%",
     backgroundColor: theme.colors.warning,
+  },
+  /** Web `.premium-page__submit:disabled { opacity: 0.65 }` (не AppButton 0.55). */
+  submitButtonDisabled: {
+    opacity: 0.65,
   },
   centered: {
     flex: 1,

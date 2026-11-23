@@ -7,7 +7,10 @@ import { fetchProductCategoryChildren } from "@/entities/product-category-tree/a
 import { findCategoryRootIdForLegacySlug } from "@/entities/product-category-tree/lib/findCategoryRootIdForLegacySlug";
 import type { CatalogListFilters } from "@/entities/product/model/catalogListFilters";
 import { CATALOG_SORT_NEWEST } from "@/entities/product/model/productConstants";
-import { API_CLIENT_UI } from "@/shared/config";
+import {
+  API_CLIENT_UI,
+  IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED,
+} from "@/shared/config";
 import { categoryTreeQueryKeys } from "@/shared/api";
 
 export type CatalogSubcategoryPickerTrailStep = {
@@ -60,7 +63,8 @@ export const useCatalogSubcategoryPicker = ({
   const isResolvingLandingCategoryRef = useRef(false);
   const isResolvingPickerCategoryRef = useRef(false);
 
-  const isCatalogSubcategoryPickerActive = pickerTrail.length > 0;
+  const isCatalogSubcategoryPickerActive =
+    IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED && pickerTrail.length > 0;
 
   const clearPickerTrail = useCallback(() => {
     setPickerTrail([]);
@@ -115,8 +119,32 @@ export const useCatalogSubcategoryPicker = ({
     setPickerLoadError(message);
   }, []);
 
+  const navigateWithLegacyCategorySlug = useCallback(
+    (categorySlug: string) => {
+      onNavigateToProducts({
+        productCategory: categorySlug,
+        sort: CATALOG_SORT_NEWEST,
+        followingOnly: false,
+        auctionOnly: false,
+        installmentOnly: false,
+        saleOnly: false,
+        rentalOnly: false,
+        affiliateOnly: false,
+        wholesaleOnly: false,
+        originalOnly: false,
+        near: false,
+      });
+    },
+    [onNavigateToProducts],
+  );
+
   const handleCatalogCategoryGridClick = useCallback(
     async (item: ResolvedProductCategoryDisplay) => {
+      if (!IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED) {
+        navigateWithLegacyCategorySlug(item.categorySlug);
+        return;
+      }
+
       if (isResolvingLandingCategoryRef.current) {
         return;
       }
@@ -126,19 +154,7 @@ export const useCatalogSubcategoryPicker = ({
         findCategoryRootIdForLegacySlug(categoryRoots, item.categorySlug);
 
       if (!rootId) {
-        onNavigateToProducts({
-          productCategory: item.categorySlug,
-          sort: CATALOG_SORT_NEWEST,
-          followingOnly: false,
-          auctionOnly: false,
-          installmentOnly: false,
-          saleOnly: false,
-          rentalOnly: false,
-          affiliateOnly: false,
-          wholesaleOnly: false,
-          originalOnly: false,
-          near: false,
-        });
+        navigateWithLegacyCategorySlug(item.categorySlug);
         return;
       }
 
@@ -166,7 +182,7 @@ export const useCatalogSubcategoryPicker = ({
       categoryRoots,
       fetchCategoryChildren,
       navigateToCategoryProducts,
-      onNavigateToProducts,
+      navigateWithLegacyCategorySlug,
       openPickerForCategory,
       reportChildrenLoadError,
     ],

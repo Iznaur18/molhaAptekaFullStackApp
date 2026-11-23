@@ -1,6 +1,10 @@
 import { StyleSheet } from "react-native";
 
 import { PROFILE_ACCOUNT_STACK_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
+import {
+  PROFILE_LIST_HERO_CHROME as HERO,
+  PROFILE_LIST_HERO_NO_SHADOW,
+} from "@/shared/lib/profileListHeroChrome";
 import { cancelButtonStyleBlock } from "@/shared/theme/cancelButtonChromeStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
@@ -28,15 +32,11 @@ export const useAdvertisingPageStyles = createThemedStyles((theme, layout) => ({
   heroCard: {
     flexDirection: "row",
     alignItems: "flex-start",
-    gap: 14,
-    padding: 20,
-    borderRadius: 20,
+    gap: HERO.gap,
+    padding: HERO.padding,
+    borderRadius: HERO.radiusAdvertising,
     backgroundColor: theme.colors.infoDeep,
-    shadowColor: theme.colors.ink,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.16,
-    shadowRadius: 14,
-    elevation: 5,
+    ...PROFILE_LIST_HERO_NO_SHADOW,
   },
   heroTextBlock: {
     flex: 1,
@@ -44,10 +44,10 @@ export const useAdvertisingPageStyles = createThemedStyles((theme, layout) => ({
     gap: 2,
   },
   heroCaption: {
-    fontSize: 12,
+    fontSize: HERO.captionFontSize,
     fontWeight: "700",
     textTransform: "uppercase",
-    letterSpacing: 0.8,
+    letterSpacing: HERO.captionLetterSpacing,
     color: theme.colors.onContrast,
     opacity: 0.72,
   },
@@ -57,9 +57,9 @@ export const useAdvertisingPageStyles = createThemedStyles((theme, layout) => ({
     gap: 6,
   },
   heroValue: {
-    fontSize: 34,
-    fontWeight: "800",
-    letterSpacing: -0.5,
+    fontSize: HERO.valueFontSize,
+    fontWeight: HERO.valueFontWeight,
+    letterSpacing: HERO.valueLetterSpacing,
     color: theme.colors.onContrast,
     fontVariant: ["tabular-nums"],
   },
@@ -77,9 +77,9 @@ export const useAdvertisingPageStyles = createThemedStyles((theme, layout) => ({
     opacity: 0.8,
   },
   heroIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: HERO.iconSize,
+    height: HERO.iconSize,
+    borderRadius: HERO.iconSize / 2,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "rgba(255, 255, 255, 0.16)",
@@ -216,6 +216,10 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
     fontWeight: "700",
     color: theme.colors.ink,
     fontVariant: ["tabular-nums"],
+  },
+  metaList: {
+    fontWeight: "600",
+    color: theme.colors.textMuted,
   },
   statusPanel: {
     gap: 8.8,

@@ -1,4 +1,4 @@
-/** Daily return streak → скидка на услуги площадки (web v1). */
+/** Daily return streak → скидка на услуги площадки (web + mobile). */
 
 export const PROMO_RETURN_STREAK_TIME_ZONE = "Europe/Moscow";
 

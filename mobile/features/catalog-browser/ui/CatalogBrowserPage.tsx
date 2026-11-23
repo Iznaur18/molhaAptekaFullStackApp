@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { Alert, ScrollView, View } from "react-native";
+import { Alert, ScrollView, Text, View } from "react-native";
 
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { userHasCatalogNearGeo } from "@/entities/product/lib/userHasCatalogNearGeo";
@@ -24,11 +24,17 @@ import { EditCategoryDisplayModal } from "@/features/catalog-browser/ui/EditCate
 import { EditCategoryNodeDisplayModal } from "@/features/catalog-browser/ui/EditCategoryNodeDisplayModal";
 import { EditFeedTileDisplayModal } from "@/features/catalog-browser/ui/EditFeedTileDisplayModal";
 import { useCatalogSubcategoryPicker } from "@/features/catalog-browser/model/useCatalogSubcategoryPicker";
-import { CATALOG_BROWSER_UI, PRODUCT_CATEGORY_DISPLAY_UI } from "@/shared/config";
+import {
+  API_CLIENT_UI,
+  CATALOG_BROWSER_UI,
+  PRODUCT_CATEGORY_DISPLAY_UI,
+} from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useCatalogBrowserPageStyles } from "@/shared/theme/catalogProductStyles";
+import { AppButton } from "@/shared/ui/AppButton";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 export const CatalogBrowserPage = () => {
   const router = useRouter();
@@ -152,14 +158,24 @@ export const CatalogBrowserPage = () => {
     ]);
   };
 
+  const isRefreshing =
+    categoryDisplaysQuery.isRefetching ||
+    feedTileDisplaysQuery.isRefetching ||
+    categoryRootsQuery.isRefetching;
+
+  const isCatalogEmpty = feedTiles.length === 0 && categoryItems.length === 0;
+
   if (isLoading) {
-    return <ScreenLoadingState message={CATALOG_BROWSER_UI.LOADING} />;
+    return <ScreenLoadingState message={PRODUCT_CATEGORY_DISPLAY_UI.LOADING} />;
   }
 
   if (queryError) {
     return (
       <ScreenErrorState
-        message={formatApiErrorMessage(queryError, CATALOG_BROWSER_UI.ERROR)}
+        message={formatApiErrorMessage(
+          queryError,
+          API_CLIENT_UI.FETCH_CATEGORY_DISPLAYS_FALLBACK,
+        )}
         onRetry={handleRefreshDisplays}
       />
     );
@@ -195,7 +211,16 @@ export const CatalogBrowserPage = () => {
 
   return (
     <>
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <ThemedRefreshControl
+            refreshing={isRefreshing}
+            onRefresh={handleRefreshDisplays}
+          />
+        }
+      >
         <View
           style={[
             styles.container,
@@ -203,55 +228,72 @@ export const CatalogBrowserPage = () => {
             { paddingTop: contentPaddingTop + 16 },
           ]}
         >
-          <CatalogBrowserTilesGrid
-            title={PRODUCT_CATEGORY_DISPLAY_UI.FEED_SECTION_TITLE}
-            accessibilityLabel={PRODUCT_CATEGORY_DISPLAY_UI.FEED_GRID_ARIA}
-            gap={gridLayout.gap}
-            variant="feed"
-          >
-            {feedTiles.map((item) => (
-              <CatalogBrowserTileCard
-                key={item.tileKey}
-                label={item.label}
-                imageUrl={item.imageUrl}
-                placeholderImageUrl={PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE}
-                {...tileLayoutProps}
+          {isCatalogEmpty ? (
+            <View style={styles.emptyWrap}>
+              <Text style={styles.emptyText}>{CATALOG_BROWSER_UI.EMPTY}</Text>
+              <AppButton
+                label={CATALOG_BROWSER_UI.EMPTY_GO_HOME}
+                variant="primary"
+                onPress={() => router.replace("/(tabs)")}
+              />
+            </View>
+          ) : (
+            <>
+              <CatalogBrowserTilesGrid
+                title={PRODUCT_CATEGORY_DISPLAY_UI.FEED_SECTION_TITLE}
+                accessibilityLabel={PRODUCT_CATEGORY_DISPLAY_UI.FEED_GRID_ARIA}
+                gap={gridLayout.gap}
                 variant="feed"
-                onPress={() => handleFeedTilePress(item.tileKey)}
-                onEditPress={
-                  isAdmin ? () => setEditingFeedTileKey(item.tileKey) : undefined
-                }
-                editAriaLabel={PRODUCT_CATEGORY_DISPLAY_UI.FEED_EDIT_ARIA(item.label)}
-              />
-            ))}
-          </CatalogBrowserTilesGrid>
+              >
+                {feedTiles.map((item) => (
+                  <CatalogBrowserTileCard
+                    key={item.tileKey}
+                    label={item.label}
+                    imageUrl={item.imageUrl}
+                    placeholderImageUrl={PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE}
+                    {...tileLayoutProps}
+                    variant="feed"
+                    onPress={() => handleFeedTilePress(item.tileKey)}
+                    onEditPress={
+                      isAdmin ? () => setEditingFeedTileKey(item.tileKey) : undefined
+                    }
+                    editAriaLabel={PRODUCT_CATEGORY_DISPLAY_UI.FEED_EDIT_ARIA(
+                      item.label,
+                    )}
+                  />
+                ))}
+              </CatalogBrowserTilesGrid>
 
-          <CatalogBrowserTilesGrid
-            title={PRODUCT_CATEGORY_DISPLAY_UI.CATEGORIES_SECTION_TITLE}
-            accessibilityLabel={PRODUCT_CATEGORY_DISPLAY_UI.GRID_ARIA}
-            gap={gridLayout.gap}
-            variant="categories"
-          >
-            {categoryItems.map((item) => (
-              <CatalogBrowserTileCard
-                key={item.categorySlug}
-                label={item.label}
-                imageUrl={item.imageUrl}
-                placeholderImageUrl={PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE}
-                {...tileLayoutProps}
-                disabled={subcategoryPicker.resolvingLandingCategoryKey != null}
-                pending={
-                  subcategoryPicker.resolvingLandingCategoryKey ===
-                  resolveCategoryTileKey(item)
-                }
-                onPress={() => handleCategoryPress(item)}
-                onEditPress={
-                  isAdmin ? () => setEditingCategorySlug(item.categorySlug) : undefined
-                }
-                editAriaLabel={PRODUCT_CATEGORY_DISPLAY_UI.EDIT_ARIA(item.label)}
-              />
-            ))}
-          </CatalogBrowserTilesGrid>
+              <CatalogBrowserTilesGrid
+                title={PRODUCT_CATEGORY_DISPLAY_UI.CATEGORIES_SECTION_TITLE}
+                accessibilityLabel={PRODUCT_CATEGORY_DISPLAY_UI.GRID_ARIA}
+                gap={gridLayout.gap}
+                variant="categories"
+              >
+                {categoryItems.map((item) => (
+                  <CatalogBrowserTileCard
+                    key={item.categorySlug}
+                    label={item.label}
+                    imageUrl={item.imageUrl}
+                    placeholderImageUrl={PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE}
+                    {...tileLayoutProps}
+                    disabled={subcategoryPicker.resolvingLandingCategoryKey != null}
+                    pending={
+                      subcategoryPicker.resolvingLandingCategoryKey ===
+                      resolveCategoryTileKey(item)
+                    }
+                    onPress={() => handleCategoryPress(item)}
+                    onEditPress={
+                      isAdmin
+                        ? () => setEditingCategorySlug(item.categorySlug)
+                        : undefined
+                    }
+                    editAriaLabel={PRODUCT_CATEGORY_DISPLAY_UI.EDIT_ARIA(item.label)}
+                  />
+                ))}
+              </CatalogBrowserTilesGrid>
+            </>
+          )}
         </View>
       </ScrollView>
 

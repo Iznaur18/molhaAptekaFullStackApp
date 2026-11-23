@@ -7,7 +7,9 @@ import { Pressable, Text, View } from "react-native";
 import { useMyIntroAdCampaignQuery } from "@/entities/intro-ad/model/useMyIntroAdCampaignQuery";
 import { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyaltyPointsStatusQuery";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
+import { FortuneWheelAdvertisingSection } from "@/features/advertising-page/ui/FortuneWheelAdvertisingSection";
 import { IntroAdAdvertisingSection } from "@/features/advertising-page/ui/IntroAdAdvertisingSection";
+import { LuckyBoxAdvertisingSection } from "@/features/advertising-page/ui/LuckyBoxAdvertisingSection";
 import { PersonalCategoryAdvertisingSection } from "@/features/advertising-page/ui/PersonalCategoryAdvertisingSection";
 import { RaffleAdvertisingSection } from "@/features/advertising-page/ui/RaffleAdvertisingSection";
 import { SiteHeaderBannerAdvertisingSection } from "@/features/advertising-page/ui/SiteHeaderBannerAdvertisingSection";
@@ -26,6 +28,7 @@ import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayou
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useAdvertisingPageStyles } from "@/shared/theme/advertisingPageStyles";
+import { ModalSectionTabs } from "@/shared/ui/ModalSectionTabs";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 export const AdvertisingPage = () => {
@@ -39,6 +42,7 @@ export const AdvertisingPage = () => {
   const loyaltyQuery = useMyLoyaltyPointsStatusQuery(isAuthorized);
   const campaignQuery = useMyIntroAdCampaignQuery(isAuthorized);
   const [navSheetVisible, setNavSheetVisible] = useState(false);
+  const [activeTab, setActiveTab] = useState<"ads" | "games">("ads");
 
   useFocusEffect(
     useCallback(() => {
@@ -122,12 +126,32 @@ export const AdvertisingPage = () => {
             </View>
           </View>
 
-          <View style={styles.cards}>
-            <IntroAdAdvertisingSection loyaltyBalance={loyaltyBalance} />
-            <PersonalCategoryAdvertisingSection loyaltyBalance={loyaltyBalance} />
-            <SiteHeaderBannerAdvertisingSection loyaltyBalance={loyaltyBalance} />
-            <RaffleAdvertisingSection loyaltyBalance={loyaltyBalance} />
-          </View>
+          <ModalSectionTabs
+            variant="segment"
+            tabs={[
+              { id: "ads", label: ADVERTISING_PAGE_UI.TAB_ADS },
+              { id: "games", label: ADVERTISING_PAGE_UI.TAB_GAMES },
+            ]}
+            activeTabId={activeTab}
+            onTabChange={(tabId) => setActiveTab(tabId as "ads" | "games")}
+            ariaLabel={ADVERTISING_PAGE_UI.TABS_ARIA}
+          />
+
+          {activeTab === "ads" ? (
+            <View style={styles.cards}>
+              <IntroAdAdvertisingSection loyaltyBalance={loyaltyBalance} />
+              <PersonalCategoryAdvertisingSection loyaltyBalance={loyaltyBalance} />
+              <SiteHeaderBannerAdvertisingSection loyaltyBalance={loyaltyBalance} />
+              <RaffleAdvertisingSection loyaltyBalance={loyaltyBalance} />
+            </View>
+          ) : null}
+
+          {activeTab === "games" ? (
+            <View style={styles.cards}>
+              <LuckyBoxAdvertisingSection />
+              <FortuneWheelAdvertisingSection />
+            </View>
+          ) : null}
         </View>
       </ProfileAccountScrollBody>
 

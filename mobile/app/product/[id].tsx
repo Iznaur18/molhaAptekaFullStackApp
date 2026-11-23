@@ -61,10 +61,12 @@ import {
   isProductSimilarScrollNearEnd,
   ProductSimilarTab,
 } from "@/features/product-detail/ui/ProductSimilarTab";
+import { ProductDetailsPageEnterShell } from "@/features/product-detail/ui/ProductDetailsPageEnterShell";
 import { ProductDetailsSkeleton } from "@/features/product-detail/ui/ProductDetailsSkeleton";
 import { ProductPromotionModal } from "@/features/product-promotion/ui/ProductPromotionModal";
 import { useProductPromotionManageSupport } from "@/features/product-promotion/model/useProductPromotionManageSupport";
 import { ReportProductModal } from "@/features/product-report/ui/ReportProductModal";
+import { invalidatePromoReturnStreak } from "@/entities/promo-return-streak/model/usePromoReturnStreak";
 import {
   catalogQueryKeys,
   loyaltyPointsQueryKeys,
@@ -447,6 +449,7 @@ export default function ProductDetailScreen() {
         productQuery.refetch(),
         queryClient.invalidateQueries({ queryKey: loyaltyPointsQueryKeys.status() }),
         queryClient.invalidateQueries({ queryKey: catalogQueryKeys.all }),
+        invalidatePromoReturnStreak(queryClient),
       ]);
       handleClosePromotionModal();
       Alert.alert(result.message ?? PRODUCT_PROMOTION_UI.SUCCESS_DEFAULT);
@@ -815,6 +818,7 @@ export default function ProductDetailScreen() {
     ) : null;
 
   return (
+    <ProductDetailsPageEnterShell>
     <View
       style={[styles.screen, { paddingTop: insets.top }, pageLayout.pageShellStyle]}
     >
@@ -1143,5 +1147,6 @@ export default function ProductDetailScreen() {
         onInstallmentProgramSaved={handleInstallmentProgramSaved}
       />
     </View>
+    </ProductDetailsPageEnterShell>
   );
 }

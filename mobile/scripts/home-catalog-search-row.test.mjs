@@ -63,7 +63,8 @@ test("home catalog header panel matches web mobile-split chrome", () => {
     layout,
     /HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE =\s*\n\s*HOME_CATALOG_HEADER_SEARCH_INPUT_MIN_HEIGHT/,
   );
-  assert.match(layout, /HOME_CATALOG_HEADER_SEARCH_INPUT_BORDER_RADIUS = 999/);
+  assert.match(layout, /HOME_CATALOG_HEADER_SEARCH_INPUT_BORDER_RADIUS = 14/);
+  assert.match(layout, /HOME_CATALOG_HEADER_SEARCH_INPUT_FONT_SIZE = 15\.2/);
   assert.doesNotMatch(searchRow, /marginHorizontal/);
   assert.match(layout, /HOME_CATALOG_HEADER_PANEL_BLUR_RADIUS = 18/);
   assert.match(layout, /HOME_CATALOG_HEADER_BOTTOM_MARGIN = 0/);

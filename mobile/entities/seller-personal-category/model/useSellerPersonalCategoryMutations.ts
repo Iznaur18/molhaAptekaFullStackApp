@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { invalidatePromoReturnStreak } from "@/entities/promo-return-streak/model/usePromoReturnStreak";
 import { loyaltyPointsQueryKeys, sellerPersonalCategoryQueryKeys } from "@/shared/api";
 
 import {
@@ -10,7 +11,15 @@ import {
 export const useSellerPersonalCategoryMutations = () => {
   const queryClient = useQueryClient();
 
-  const invalidate = () => {
+  const invalidateAfterSubmit = () => {
+    void queryClient.invalidateQueries({
+      queryKey: sellerPersonalCategoryQueryKeys.myCampaign(),
+    });
+    void queryClient.invalidateQueries({ queryKey: loyaltyPointsQueryKeys.all });
+    void invalidatePromoReturnStreak(queryClient);
+  };
+
+  const invalidateAfterCancel = () => {
     void queryClient.invalidateQueries({
       queryKey: sellerPersonalCategoryQueryKeys.myCampaign(),
     });
@@ -19,12 +28,12 @@ export const useSellerPersonalCategoryMutations = () => {
 
   const submitMutation = useMutation({
     mutationFn: submitSellerPersonalCategoryCampaign,
-    onSuccess: invalidate,
+    onSuccess: invalidateAfterSubmit,
   });
 
   const cancelMutation = useMutation({
     mutationFn: cancelSellerPersonalCategoryCampaign,
-    onSuccess: invalidate,
+    onSuccess: invalidateAfterCancel,
   });
 
   return { submitMutation, cancelMutation };

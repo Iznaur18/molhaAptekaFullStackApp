@@ -41,6 +41,8 @@ type CategoryNode = {
   legacyProductCategory?: string | null;
   /** Ключи характеристик, заданные админом категории. */
   defaultCharacteristicKeys?: string[];
+  /** Итоговый тип сделки (goods/viewing/service). */
+  dealType?: string;
 };
 
 type TrailItem = {
@@ -55,6 +57,7 @@ export type CreateProductCategoryPickerProps = {
     categoryId: string,
     label: string,
     defaultCharacteristicKeys: string[],
+    dealType?: string,
   ) => void;
 };
 
@@ -68,6 +71,7 @@ const normalizeNode = (raw: Record<string, unknown>): CategoryNode => ({
   defaultCharacteristicKeys: Array.isArray(raw.defaultCharacteristicKeys)
     ? raw.defaultCharacteristicKeys.map(String)
     : [],
+  dealType: typeof raw.dealType === "string" ? raw.dealType : undefined,
 });
 
 const buildFullPath = (pathLabelRu: string[], labelRu: string): string[] =>
@@ -182,8 +186,9 @@ export const CreateProductCategoryPicker = ({
     categoryId: string,
     fullLabel: string,
     defaultCharacteristicKeys: string[] = [],
+    dealType?: string,
   ) => {
-    onSelect(categoryId, fullLabel, defaultCharacteristicKeys);
+    onSelect(categoryId, fullLabel, defaultCharacteristicKeys, dealType);
     closeSheet();
   };
 
@@ -193,6 +198,7 @@ export const CreateProductCategoryPicker = ({
         node.id,
         [...trail.map((t) => t.labelRu), node.labelRu].join(" › "),
         node.defaultCharacteristicKeys ?? [],
+        node.dealType,
       );
       return;
     }
@@ -300,6 +306,7 @@ export const CreateProductCategoryPicker = ({
                           result.id,
                           fullPath.join(" › "),
                           result.defaultCharacteristicKeys ?? [],
+                          result.dealType,
                         )
                       }
                     >

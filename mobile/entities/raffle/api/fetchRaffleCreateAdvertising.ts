@@ -4,6 +4,10 @@ import { formatApiErrorMessage } from "@/shared/lib";
 
 export type RaffleCreateAdvertisingStatus = {
   pricePoints: number;
+  /** List до streak; если нет — равен pricePoints. */
+  listPricePoints?: number;
+  /** Активный % после claim; 0 если скидки нет. */
+  discountPercent?: number;
   hasPaidUnlock: boolean;
   hasOpenRaffle: boolean;
   canPay: boolean;

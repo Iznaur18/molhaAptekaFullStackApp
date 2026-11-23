@@ -255,19 +255,21 @@ export const useDealRequestsPageStyles = createThemedStyles((theme, layout) => (
     lineHeight: 20,
     color: theme.colors.textMuted,
   },
+  /** web `.deal-requests-page__list { gap: 0.75rem }` */
   list: {
     gap: 12,
   },
+  /** web `.deal-request-card` pad 1rem, r 1.125rem, gap 0.6rem */
   card: {
-    gap: 10,
-    padding: 14,
-    borderRadius: 14,
+    gap: 9.6,
+    padding: 16,
+    borderRadius: 18,
     borderWidth: 1,
     borderColor: theme.colors.border,
     backgroundColor: theme.colors.surface,
   },
   cardClosed: {
-    opacity: 0.75,
+    backgroundColor: theme.colors.surfaceMuted,
   },
   head: {
     flexDirection: "row",
@@ -276,7 +278,7 @@ export const useDealRequestsPageStyles = createThemedStyles((theme, layout) => (
     gap: 8,
   },
   kind: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: "700",
     letterSpacing: 0.4,
     textTransform: "uppercase",

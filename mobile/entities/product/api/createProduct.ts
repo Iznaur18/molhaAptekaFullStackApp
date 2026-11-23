@@ -1,9 +1,19 @@
-import { createProductBodySchema } from "@molha/api-contract";
+import {
+  createProductBodySchema,
+  productDealTermsFieldsShape,
+  productShippingFieldsShape,
+} from "@molha/api-contract";
 import type { z } from "zod";
 
 import { apiClient, parseCreateProductData } from "@/shared/api";
 import { API_CLIENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+
+/** Паритет web createProduct PASSTHROUGH_FIELDS. */
+const PASSTHROUGH_FIELDS = [
+  ...Object.keys(productDealTermsFieldsShape),
+  ...Object.keys(productShippingFieldsShape),
+] as const;
 
 /**
  * `z.input`, а не `z.infer`: схему парсит сама `createProduct` ниже, поэтому
@@ -47,6 +57,11 @@ export const createProduct = async (body: CreateProductBody) => {
     const previewVideoUrl = String(parsedBody.productPreviewVideoUrl ?? "").trim();
     if (previewVideoUrl) {
       payload.productPreviewVideoUrl = previewVideoUrl;
+    }
+
+    const instagramPostUrl = String(parsedBody.productInstagramPostUrl ?? "").trim();
+    if (instagramPostUrl) {
+      payload.productInstagramPostUrl = instagramPostUrl;
     }
 
     const saleRegion = String(parsedBody.productRegionCode ?? "").trim();
@@ -99,6 +114,13 @@ export const createProduct = async (body: CreateProductBody) => {
     }
     payload.productDeliveryEnabled = parsedBody.productDeliveryEnabled === true;
     payload.productPickupEnabled = parsedBody.productPickupEnabled !== false;
+
+    for (const field of PASSTHROUGH_FIELDS) {
+      const value = (parsedBody as Record<string, unknown>)[field];
+      if (value !== undefined) {
+        payload[field] = value;
+      }
+    }
 
     const { data } = await apiClient.post("/product", payload);
     const parsed = parseCreateProductData(data);

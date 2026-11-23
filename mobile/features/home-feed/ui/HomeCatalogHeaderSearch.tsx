@@ -1,6 +1,7 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { TextInput, View } from "react-native";
 import { CATALOG_SEARCH_QUERY_MAX_LENGTH } from "@molha/api-contract";
+import { useState } from "react";
+import { TextInput, View } from "react-native";
 
 import { PRODUCT_SEARCH_INPUT_UI } from "@/shared/config";
 import { HOME_CATALOG_HEADER_SEARCH_ICON_SIZE } from "@/shared/lib/homeCatalogHeaderLayout";
@@ -20,6 +21,7 @@ export const HomeCatalogHeaderSearch = ({
 }: HomeCatalogHeaderSearchProps) => {
   const styles = useHomeCatalogHeaderStyles();
   const theme = useAppTheme();
+  const [focused, setFocused] = useState(false);
 
   return (
     <View style={styles.searchWrap}>
@@ -31,10 +33,12 @@ export const HomeCatalogHeaderSearch = ({
         pointerEvents="none"
       />
       <TextInput
-        style={styles.searchInput}
+        style={[styles.searchInput, focused && styles.searchInputFocused]}
         value={value}
         onChangeText={onChange}
         onSubmitEditing={onSubmit}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
         returnKeyType="search"
         placeholder={PRODUCT_SEARCH_INPUT_UI.PLACEHOLDER}
         placeholderTextColor={theme.colors.textMuted}

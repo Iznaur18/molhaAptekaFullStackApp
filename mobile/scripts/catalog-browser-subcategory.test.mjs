@@ -20,6 +20,7 @@ test("catalog browser opens subcategory picker before leaf category products", (
   const tiles = readMobileFile(
     "entities/product-category-display/lib/buildCatalogSubcategoryPickerTiles.ts",
   );
+  const flags = readMobileFile("shared/config/featureFlags.ts");
 
   assert.match(page, /CatalogSubcategoryPicker/);
   assert.match(page, /useCatalogSubcategoryPicker/);
@@ -28,8 +29,16 @@ test("catalog browser opens subcategory picker before leaf category products", (
   assert.match(hook, /fetchCategoryChildren/);
   assert.match(hook, /categoryId/);
   assert.match(hook, /openPickerForCategory/);
+  assert.match(hook, /IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED/);
+  assert.match(hook, /navigateWithLegacyCategorySlug/);
+  assert.match(
+    flags,
+    /EXPO_PUBLIC_FF_CATALOG_BROWSER_SUBCATEGORY_FILTER/,
+  );
   assert.match(page, /EditCategoryNodeDisplayModal/);
   assert.match(page, /editingCategoryNode/);
+  assert.match(page, /PRODUCT_CATEGORY_DISPLAY_UI\.LOADING/);
+  assert.match(page, /FETCH_CATEGORY_DISPLAYS_FALLBACK/);
   assert.match(picker, /onEditCategoryPress/);
   assert.match(picker, /isAdmin/);
   assert.match(picker, /SUBCATEGORY_NODE_EDIT_ARIA/);

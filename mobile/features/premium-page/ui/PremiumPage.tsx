@@ -237,7 +237,10 @@ export const PremiumPage = () => {
                   isSubmitting ? PREMIUM_PAGE_UI.SUBMIT_PENDING : PREMIUM_PAGE_UI.SUBMIT
                 }
                 variant="primary"
-                style={styles.submitButton}
+                style={[
+                  styles.submitButton,
+                  (isSubmitting || !hasEnoughPoints) && styles.submitButtonDisabled,
+                ]}
                 disabled={isSubmitting || !hasEnoughPoints}
                 onPress={() => {
                   void handlePurchase();

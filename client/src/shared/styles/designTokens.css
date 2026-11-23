@@ -326,7 +326,8 @@
 
   --iz-radius-sm: 8px;
   --iz-radius-md: 12px;
-  --iz-radius-lg: calc(14px * 1.2);
+  /* Целое 17px — паритет packages/design-tokens izRadius.lg (было calc(14px*1.2)≈16.8) */
+  --iz-radius-lg: 17px;
   --iz-radius-pill: 999px;
   --iz-radius-button: 10px;
   --iz-radius-input: 0.5rem;
@@ -434,9 +435,8 @@
   --iz-transition-base: 150ms ease;
 
   /**
-   * Затемнение под модалкой. В мобиле это КОНСТАНТА `MODAL_BACKDROP_SCRIM`
-   * (`rgba(0,0,0,0.45)` в modalChromeStyles.ts) — она не меняется вместе с темой,
-   * поэтому здесь тоже не токен-производная, а фиксированное значение.
+   * Затемнение под модалкой. Канон: `izModalBackdropScrim` / `izModalBackdropScrimCss`
+   * в packages/design-tokens/src/scrim.ts — не зависит от темы.
    */
   --iz-color-modal-scrim: rgb(0 0 0 / 45%);
 

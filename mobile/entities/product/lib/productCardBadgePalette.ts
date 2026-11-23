@@ -9,6 +9,13 @@ type ThemeColors = IzTheme["colors"];
 export const resolveProductPriceDisplayOldColor = (c: ThemeColors) =>
   mixHexColors(c.text, c.surface, 0.52);
 
+/**
+ * Product details page/modal: `color-mix(in srgb, currentColor 45%, transparent)`.
+ * current ≈ action (`__current`); opaque stand-in на surface.
+ */
+export const resolveProductDetailPriceOldColor = (c: ThemeColors) =>
+  mixHexColors(c.action, c.surface, 0.45);
+
 /** Синхронизировано с client ProductPriceDisplay.css + ProductCardMobileCatalog.css */
 export const resolveProductCardBadgeColors = (c: ThemeColors) =>
   ({

@@ -439,7 +439,7 @@ npx eas submit --platform ios
 ### Навигация и рост
 
 - [x] Deep links: `gitorg://` + https prefixes, `parseAppDeepLink`, intent filters / associatedDomains (client)
-- [ ] Universal/App Links verify на проде: `apple-app-site-association`, `.well-known/assetlinks.json` (сервер/CDN)
+- [x] Universal/App Links files v1: `client/public/.well-known/` + nginx `^~ /.well-known/` (placeholders Team ID / SHA256; live verify после деплоя + credentials)
 - [x] Push: `expo-notifications` + `PUT/DELETE /auth/me/push-token` + Expo Push API при in-app notify
 - [x] Cold-start / tap routing из push (`useRemotePushRegistration`)
 
@@ -950,14 +950,15 @@ WF + WS закрыты. Статус (dig 21.11.2026):
 | Приоритет | Задача | Статус |
 |-----------|--------|--------|
 | P0 | Samsung manual smoke § WF-7.2 | **ОТЛОЖЕН** (чеклисты `- [ ]`) |
-| P0 | `eas build --profile preview` | open (`eas.json` + `build:preview:android` есть) |
-| P1 | Universal/App Links: AASA + `assetlinks.json` | open (client config готов; server/CDN файлов нет) |
+| P0 | `eas build --profile preview` | ✅ APK 21.11.2026 — [build 22699959](https://expo.dev/accounts/iznaur18/projects/izibuy/builds/22699959-cc4b-42bd-8c77-40fc7b65b825); slug EAS=`izibuy` |
+| P1 | Universal/App Links: AASA + `assetlinks.json` | ✅ scaffold в репо + nginx; placeholders; live verify после деплоя |
 | — | Remote push (MP-5) | ✅ done |
 | — | GDPR delete account | ✅ done (mobile + web UI) |
 
-Следующие срезы — по одному + discovery. Не смешивать с SKIP п.10 (seller services nav / partner sales / raffle CTA visual).
+Гайд links: `mobile/docs/UNIVERSAL-APP-LINKS.md`. Preview EAS: `mobile/docs/EAS-DEV-BUILD.md` § Preview.  
+SKIP п.10 (seller services nav / partner sales / raffle CTA visual) — не трогать без отдельного запроса.
 
 *WF ✅ · WS-0…WS-6 ✅ — стилевой слой mobile завершён.*
 
 
-*Последнее обновление: 21.11.2026.*
+*Последнее обновление: 21.11.2026 (P0/P1 scaffold).*

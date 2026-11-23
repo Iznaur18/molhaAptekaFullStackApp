@@ -46,6 +46,7 @@ export const API_CLIENT_UI = {
   FETCH_WISHLIST_FALLBACK: "Не удалось загрузить список желаний",
   REPLACE_WISHLIST_FALLBACK: "Не удалось сохранить список желаний",
   FETCH_MY_FOLLOWING_FALLBACK: "Не удалось загрузить подписки",
+  FETCH_MY_FOLLOWERS_FALLBACK: "Не удалось загрузить подписчиков",
   UNFOLLOW_USER_FALLBACK: "Не удалось отписаться",
   BLOCK_USER_FALLBACK: "Не удалось заблокировать пользователя",
   UNBLOCK_USER_FALLBACK: "Не удалось разблокировать пользователя",
@@ -339,6 +340,11 @@ export const CART_PAGE_UI = {
   DELIVERY_FEE_LABEL: "Доставка",
   DELIVERY_FEE_VALUE: "Индивидуальная плата при получении",
   WHOLESALE_LINE_BADGE: "Опт",
+  /** Бейдж строки корзины с товаром-призом из игр продавца. */
+  PRIZE_LINE_BADGE: "🎁 Приз",
+  /** Подсказка под строкой: часть единиц бесплатна как приз. */
+  PRIZE_LINE_HINT: (freeUnits: number) =>
+    `${freeUnits} шт бесплатно — приз из игры продавца`,
   DISCOUNT_AMOUNT: (formatted: string) => `−${formatted}`,
   PURCHASABLE_TOTAL_LABEL: "К оформлению",
   FULL_TOTAL_HINT: "Итого в корзине",
@@ -743,6 +749,9 @@ export const PRODUCT_PROMOTION_UI = {
   SUMMARY_DURATION: "Срок действия",
   TOTAL_LABEL: "К оплате",
   TOTAL_RUB: (amountRub: number) => `${amountRub} руб.`,
+  STREAK_DISCOUNT_BADGE: (percent: number) => `Скидка за возвращение −${percent}%`,
+  STREAK_LIST_PRICE: (listAmount: number, unit: string) =>
+    `Без скидки: ${listAmount} ${unit}`,
   TARIFF_DURATION: (durationHours: number) => `${durationHours} ч.`,
   SUBMIT_POINTS: "Оплатить",
   SUBMIT_PENDING: "Отправка…",
@@ -957,6 +966,28 @@ export const MOBILE_BOTTOM_NAV_UI = {
   TAB_CART_ARIA: "Корзина",
   TAB_PROFILE: "Профиль",
   TAB_PROFILE_ARIA: "Профиль",
+} as const;
+
+/** Паритет client `copy/promo-return-streak.js`. */
+export const PROMO_RETURN_STREAK_DOCK_UI = {
+  TITLE: "Скидка за возвращение",
+  EYEBROW: "День",
+  DAY: (day: number, maxDay: number) => `День ${day} из ${maxDay}`,
+  DAY_BOLD: (day: number, maxDay: number) => `${day} / ${maxDay}`,
+  DAY_TICK: (day: number) => `Д${day}`,
+  DISCOUNT: (percent: number) => `−${percent}%`,
+  TOMORROW: (percent: number) => `Завтра −${percent}%`,
+  CLAIM: "Забрать",
+  CLAIM_ARIA: "Забрать скидку за возвращение",
+  CLAIM_PENDING: "…",
+  CLAIMED: "Скидка активна сегодня",
+  CLAIMED_SHORT: "Активна",
+  USED: "Использована",
+  USED_HINT: "Завтра снова день 1",
+  HINT: "Продвижение, баннер, каталог, розыгрыш",
+  DESCRIPTION:
+    "Заходите каждый день, забирайте скидку и тратьте на продвижение, баннер, каталог или розыгрыш.",
+  ERROR_FALLBACK: "Не удалось забрать скидку",
 } as const;
 
 export const HEADER_USERS_BUTTON_UI = {
@@ -1564,6 +1595,7 @@ export const MY_ORDERS_PAGE_UI = {
   PRODUCT_DETAILS_LOADING: "Открываем карточку товара…",
   EMPTY: "У вас пока нет покупок.",
   EMPTY_BY_FILTER: "По выбранному статусу покупок нет.",
+  EMPTY_GO_CATALOG: "Перейти в каталог",
   AUTH_REQUIRED: "Войдите, чтобы видеть покупки",
   LOYALTY_POINTS_EARNED: (points: number) => `+${points} баллов лояльности`,
   DETAIL_TITLE: "Заказ",
@@ -2049,15 +2081,24 @@ export const WISHLIST_TOGGLE_UI = {
 } as const;
 
 export const SUBSCRIPTIONS_PAGE_UI = {
-  LOADING: "Загрузка подписок…",
+  LOADING: "Загрузка…",
   EMPTY: "Вы ни на кого не подписаны. Найдите продавцов в разделе «Пользователи».",
+  EMPTY_FOLLOWERS: "Пока никто на вас не подписан.",
   FETCH_FALLBACK: "Не удалось загрузить подписки",
+  FETCH_FOLLOWERS_FALLBACK: "Не удалось загрузить подписчиков",
+  RETRY: "Повторить",
   LOGIN_HINT: "Войдите, чтобы видеть список подписок.",
   LOGIN_BUTTON: "Войти",
+  TAB_FOLLOWING: "Подписки",
+  TAB_FOLLOWERS: "Подписчики",
+  TABS_ARIA: "Подписки и подписчики",
   HERO_CAPTION: "Подписки",
+  HERO_CAPTION_FOLLOWERS: "Подписчики",
   HERO_UNIT_FORMS: ["продавец", "продавца", "продавцов"],
+  HERO_UNIT_FORMS_FOLLOWERS: ["подписчик", "подписчика", "подписчиков"],
   HERO_INFO:
     "Продавцы, за которыми вы следите. Их товары — в фильтре «Подписки» на главной.",
+  HERO_INFO_FOLLOWERS: "Пользователи, которые подписались на вас.",
 } as const;
 
 export const USER_FOLLOW_BUTTON_UI = {
@@ -2082,6 +2123,8 @@ export const CATALOG_BROWSER_UI = {
   CATEGORIES_SECTION: "Категории",
   LOADING: "Загрузка…",
   ERROR: "Не удалось загрузить каталог",
+  EMPTY: "Подборки и категории пока недоступны.",
+  EMPTY_GO_HOME: "К ленте товаров",
   LOGIN_FOR_FOLLOWING: "Войдите, чтобы смотреть товары продавцов из подписок",
   LOGIN_FOR_NEAR: "Войдите, чтобы смотреть товары рядом",
   NEAR_ADDRESS_REQUIRED: "Укажите адрес в профиле, чтобы смотреть товары рядом",
@@ -2257,6 +2300,14 @@ export const CREATE_PRODUCT_UI = {
   WIZARD_STEP_ORIGINALITY_MANAGE_SUBTITLE:
     "Подтвердите, что продаёте официальный товар",
   WIZARD_STEP_RETURNS_SUBTITLE: "Есть ли возврат и какие условия",
+  WIZARD_STEP_OF: (current: number, total: number) => `Шаг ${current} из ${total}`,
+  WIZARD_PROGRESS_ARIA: "Прогресс создания товара",
+  WIZARD_MEDIA_INSTAGRAM_TITLE: "Ссылка из Instagram",
+  WIZARD_MEDIA_INSTAGRAM_OPTIONAL_TAG: "(необязательно)",
+  WIZARD_MEDIA_INSTAGRAM_LABEL: "Ссылка на пост Instagram",
+  WIZARD_MEDIA_INSTAGRAM_PLACEHOLDER: "https://www.instagram.com/p/…",
+  ERROR_INSTAGRAM_POST_URL:
+    "Укажите ссылку на пост Instagram: /p/, /reel/ или /tv/",
   LABEL_PRICE: "Цена, ₽",
   LABEL_OLD_PRICE: "Старая цена, ₽",
   HINT_OLD_PRICE: "Старая цена покажет скидку, если она выше текущей.",
@@ -2471,12 +2522,104 @@ export const ADVERTISING_PAGE_UI = {
   HERO_CAPTION: "Реклама · баланс",
   /** @param {number} balance */
   BALANCE: (balance: number) => `${balance} баллов`,
+  BALANCE_LABEL: "Баланс",
+  TABS_ARIA: "Разделы рекламы",
+  TAB_ADS: "Продвижение",
+  TAB_GAMES: "Игры",
   LOADING: "Загрузка…",
   LOGIN_HINT: "Войдите, чтобы управлять рекламой.",
   LOGIN_BUTTON: "Войти",
   INTRO_SECTION: "Intro-ролик",
   PERSONAL_CATEGORY_SECTION: "Личная категория",
   NO_CAMPAIGN: "Активной заявки нет",
+} as const;
+
+/** Карточка настройки в разделе «Реклама» */
+export const LUCKY_BOX_ADVERTISING_UI = {
+  CARD_TITLE: "Коробки удачи",
+  CARD_BADGE: "игра",
+  LOADING: "Загрузка…",
+  FETCH_FALLBACK: "Не удалось загрузить настройки «Коробок удачи»",
+  SAVE_FALLBACK: "Не удалось сохранить настройки",
+  SAVE_SUCCESS: "Настройки сохранены",
+  DESCRIPTION:
+    "Покупатель раз в день открывает до двух коробок на вашей витрине: вторая попытка даётся, если первая оказалась пустой. В призовых — скидка, которую вы задаёте ниже; в остальных — пусто. Скидка применяется автоматически при оформлении заказа.",
+  ENABLED_LABEL: "Игра включена на витрине",
+  PRIZES_COUNT_LABEL: "Количество призов",
+  PRIZE_TITLE: (index: number) => `Приз ${index + 1}`,
+  PRIZE_TOGGLE_ARIA: (index: number) => `Приз ${index + 1}: включить или выключить`,
+  DISCOUNT_LABEL: "Скидка, %",
+  DURATION_LABEL: "Действует, часов",
+  DISCOUNT_HINT: "от 1 до 90",
+  DURATION_HINT: "от 1 до 24",
+  PRIZE_PRODUCT_LABEL: "ID товара-приза",
+  PRIZE_PRODUCT_PLACEHOLDER: "например, 6af37f11c74c503a1b4267ef",
+  PRIZE_PRODUCT_HINT:
+    "если указан — призом будет этот товар (бесплатно), а не скидка; товар должен быть вашим",
+  SAVE: "Сохранить",
+  SAVING: "Сохраняем…",
+  STATS: (plays: number, wins: number) =>
+    `Открыто коробок: ${plays}, призов выиграно: ${wins}`,
+  BUILDER_HINT:
+    "Нажмите на коробку, чтобы сделать её призовой или пустой — так, как увидит покупатель.",
+  BUILDER_PALETTE_LABEL: "Скидка в выбранной коробке:",
+  BUILDER_SELECT_BOX: "Сначала выберите коробку выше",
+  BUILDER_EMPTY_CHIP: "пусто",
+  BUILDER_NOTE:
+    "Скидка действует 24 часа. Срок действия и товар-приз — в расширенной настройке.",
+  MODE_ADVANCED: "Расширенная настройка",
+  MODE_BUILDER: "Вернуться к конструктору",
+  BUILDER_BOX_PRIZE_ARIA: (index: number, discount: number) =>
+    `Коробка ${index + 1}: призовая, скидка ${discount}%`,
+  BUILDER_BOX_EMPTY_ARIA: (index: number) =>
+    `Коробка ${index + 1}: пустая, нажмите, чтобы сделать призовой`,
+  BUILDER_PRIZE_FACE_LABEL: "скидка",
+  BUILDER_EMPTY_FACE_LABEL: "пусто",
+} as const;
+
+/** Карточка настройки в разделе «Реклама» */
+export const FORTUNE_WHEEL_ADVERTISING_UI = {
+  CARD_TITLE: "Колесо фортуны",
+  CARD_BADGE: "игра",
+  LOADING: "Загрузка…",
+  FETCH_FALLBACK: "Не удалось загрузить настройки «Колеса фортуны»",
+  SAVE_FALLBACK: "Не удалось сохранить настройки",
+  SAVE_SUCCESS: "Настройки сохранены",
+  DESCRIPTION:
+    "Покупатель раз в день крутит колесо на вашей витрине и выигрывает скидку из выпавшей секции — или «пусто». Вы задаёте секции, шанс выпадения каждой и размер скидки. Скидка применяется автоматически при оформлении заказа.",
+  ENABLED_LABEL: "Игра включена на витрине",
+  SECTORS_COUNT_LABEL: "Количество секций",
+  SECTOR_TITLE: (index: number) => `Секция ${index + 1}`,
+  SECTOR_TOGGLE_ARIA: (index: number) => `Секция ${index + 1}: приз или «пусто»`,
+  DISCOUNT_LABEL: "Скидка, %",
+  DURATION_LABEL: "Действует, часов",
+  CHANCE_LABEL: "Шанс, %",
+  DISCOUNT_HINT: "от 1 до 90",
+  DURATION_HINT: "от 1 до 24",
+  CHANCE_HINT: "сумма шансов всех секций — ровно 100",
+  PRIZE_PRODUCT_LABEL: "ID товара-приза",
+  PRIZE_PRODUCT_PLACEHOLDER: "например, 6af37f11c74c503a1b4267ef",
+  PRIZE_PRODUCT_HINT:
+    "если указан — призом будет этот товар (бесплатно), а не скидка; товар должен быть вашим",
+  CHANCE_TOTAL_OK: (total: number) => `Сумма шансов: ${total}% — всё сходится`,
+  CHANCE_TOTAL_ERROR: (total: number) => `Сумма шансов: ${total}% — нужно ровно 100%`,
+  SAVE: "Сохранить",
+  SAVING: "Сохраняем…",
+  STATS: (spins: number, wins: number) =>
+    `Крутили колесо: ${spins}, призов выиграно: ${wins}`,
+  BUILDER_HINT:
+    "Нажмите на секцию колеса и выберите её приз — шансы пересчитаются сами.",
+  BUILDER_PALETTE_LABEL: (index: number) => `Секция ${index + 1} — приз:`,
+  BUILDER_SELECT_SECTOR: "Сначала выберите секцию на колесе",
+  BUILDER_EMPTY_CHIP: "пусто",
+  BUILDER_ADD_SECTOR: "+ Добавить секцию",
+  BUILDER_REMOVE_SECTOR: "Удалить секцию",
+  BUILDER_CHANCE_INFO: (percent: number) =>
+    `Каждая секция выпадает с шансом ~${percent}% — сумма всегда 100%`,
+  BUILDER_NOTE:
+    "Скидка действует 24 часа. Свои шансы, сроки и товар-приз — в расширенной настройке.",
+  MODE_ADVANCED: "Расширенная настройка",
+  MODE_BUILDER: "Вернуться к конструктору",
 } as const;
 
 export const RAFFLE_ADVERTISING_PAGE_UI = {
@@ -2807,9 +2950,14 @@ export const LOYALTY_POINTS_PAGE_UI = {
   PURCHASE_AMOUNT_MIN: (min: number) => `Минимум ${min} ₽`,
   PURCHASE_AMOUNT_MAX: (max: number) => `Не больше ${max} ₽`,
   BUY: "Купить",
-  COMING_SOON: "Пополнение картой и по QR — скоро.",
+  COMING_SOON: "Пополнение по СБП — скоро.",
+  PAY_REDIRECT: "Открываем страницу оплаты…",
+  PAY_ERROR: "Не удалось начать оплату",
+  PAY_PENDING: "Ждём подтверждения оплаты от банка…",
+  PAY_SUCCESS: (points: number) => `Оплата прошла — начислено ${points} баллов.`,
+  PAY_CANCELED: "Оплата не прошла. Деньги не списаны, можно попробовать снова.",
   COMING_SOON_AMOUNT: (rub: number, points: number) =>
-    `Пополнение на ${rub} ₽ (${points} баллов) картой и по QR — скоро.`,
+    `Пополнение на ${rub} ₽ (${points} баллов) по СБП — скоро.`,
   ADMIN_FREE_SECTION: "Бесплатное пополнение (admin)",
   ADMIN_FREE_AMOUNT_LABEL: "Сумма, баллы",
   ADMIN_FREE_AMOUNT_HINT: "Начислить на свой баланс без оплаты.",
@@ -2853,6 +3001,32 @@ export const PARTNER_PROGRAM_PAGE_UI = {
   COL_DATE: "Регистрация",
   COL_SPEND: "Траты",
   COL_CASHBACK: "Кэшбэк",
+  TABS_ARIA: "Разделы партнёрской программы",
+  TAB_REFERRALS: "Ваши рефералы",
+  TAB_EARNINGS: "Начисления за приведённых",
+  TAB_SALES: "Продажи через партнёров",
+} as const;
+
+/** Вкладка «Продажи через партнёров» — взгляд продавца */
+export const AFFILIATE_SALES_UI = {
+  TITLE: "Продажи через партнёров",
+  HINT: "Заказы ваших товаров, в которых покупателя привёл партнёр по ссылке объявления.",
+  LOADING: "Загрузка…",
+  LOAD_ERROR: "Не удалось загрузить продажи через партнёров",
+  EMPTY:
+    "Пока нет продаж через партнёров — включите партнёрку на объявлении, чтобы ими делились.",
+  PARTNER: "Привёл",
+  BUYER: "Купил",
+  NAME_FALLBACK: "—",
+  PERCENT: "Процент",
+  AMOUNT: "Выплата партнёру",
+  DATE: "Заказ от",
+  STATUS: {
+    pending: "Выплата после подтверждения",
+    paid: "Выплачено",
+    skipped_no_program: "Партнёрка была выключена",
+    skipped_antifraud: "Выплата отклонена",
+  },
 } as const;
 
 export const AFFILIATE_LISTINGS_PAGE_UI = {
@@ -3499,6 +3673,16 @@ export const PRODUCT_DEAL_ACTIONS_UI = {
   OPEN_REQUESTS: "Мои заявки",
 } as const;
 
+/** Условия услуги на шаге «Цена» (паритет web `PRODUCT_DEAL_TERMS_UI`). */
+export const PRODUCT_DEAL_TERMS_UI = {
+  SECTION_TITLE: { service: "Условия услуги" } as const,
+  PRICE_MODE_LABEL: "Как показать цену",
+  PRICE_UNIT_LABEL: "За что цена",
+  PRICE_NEGOTIABLE_HINT:
+    "Покупатель увидит «Договорная». Число из поля цены никому не показывается — итог вы назовёте, принимая заявку.",
+  LOCATIONS_LABEL: "Где оказываете услугу",
+} as const;
+
 /** Раздел «Заявки» в профиле (паритет web `DEAL_REQUESTS_PAGE_UI`). */
 export const DEAL_REQUESTS_PAGE_UI = {
   TITLE: "Заявки",
@@ -3662,6 +3846,7 @@ export const SAFE_DEAL_BADGE_UI = {
  */
 export const LUCKY_BOX_SECTION_UI = {
   TITLE: "Коробки удачи",
+  CART_LINE_LABEL: "Коробки удачи",
   SUBTITLE: (prizesCount: number) => {
     const word = { 1: "одна", 2: "две", 3: "три", 4: "четыре" }[
       prizesCount as 1 | 2 | 3 | 4
@@ -3704,6 +3889,7 @@ export const LUCKY_BOX_SECTION_UI = {
  */
 export const FORTUNE_WHEEL_SECTION_UI = {
   TITLE: "Колесо фортуны",
+  CART_LINE_LABEL: "Колесо фортуны",
   SUBTITLE: "Один спин в день — какая скидка выпадет сегодня?",
   BUTTON_HINT: "Испытайте удачу",
   SPIN: "Крутить",

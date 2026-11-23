@@ -43,7 +43,11 @@ test("лесенка ширин совпадает с web --app-shell-max-width"
 
 test("поля по краям — 8 на телефоне, 12 в полосе 667, 16 шире", () => {
   const layout = readMobileFile("shared/theme/screenContentLayout.ts");
-  assert.match(layout, /SCREEN_CONTENT_PADDING_HORIZONTAL = 8;/);
+  assert.match(
+    layout,
+    /SCREEN_CONTENT_PADDING_HORIZONTAL\s*=\s*izLayout\.contentPaddingHorizontalPhone/,
+  );
+  assert.equal(SCREEN_CONTENT_MAX_WIDTH_SMALL_TABLET, 520);
   assert.match(layout, /resolveScreenContentInlinePadding\(width\)/);
   const tokens = readRepoFile("client/src/shared/styles/designTokens.css");
   assert.match(tokens, /--iz-space-4: 1rem;/);

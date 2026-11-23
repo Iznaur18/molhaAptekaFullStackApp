@@ -29,7 +29,8 @@ test("forgot-password screen matches web AuthPage layout", () => {
   assert.match(styles, /textDecorationLine: "underline"/);
 
   assert.match(forgot, /styles\.column/);
-  assert.match(forgot, /channelBtn/);
+  assert.match(forgot, /AuthContactChannelToggle/);
+  assert.match(styles, /channelBtn:/);
   assert.match(forgot, /ScreenBackButton/);
   assert.match(forgot, /AUTH_PAGE_LAYOUT/);
   assert.match(forgot, /LayoutAnimation/);
@@ -41,5 +42,6 @@ test("forgot-password screen matches web AuthPage layout", () => {
   assert.match(copy, /FORGOT_CHANNEL_ARIA:\s*"Способ восстановления"/);
   assert.match(webForgot, /auth-page__column/);
   assert.match(webForgot, /Способ восстановления/);
-  assert.match(webForgot, /auth-page__channel-btn/);
+  assert.match(webForgot, /AuthContactChannelToggle/);
+  assert.match(webCss, /auth-page__channel-btn/);
 });

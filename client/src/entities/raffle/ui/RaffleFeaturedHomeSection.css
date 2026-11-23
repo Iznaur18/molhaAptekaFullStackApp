@@ -8,10 +8,8 @@
 }
 
 /**
- * Web-макет главной (ноябрь 2026): градиентная «таблетка» с подарком слева
- * и шевроном справа. На mobile — сплошная заливка
- * (mobile/shared/theme/raffleFeaturedStyles.ts → revealButton), паритет
- * намеренно разведён: макет относится к web-главной.
+ * Градиентная «таблетка» с Gift слева и ChevronRight справа.
+ * Mobile: `HomeFeaturedRafflesRevealButton` + `RaffleRevealButtonGradient`.
  */
 .raffle-featured-home-section__reveal {
   box-sizing: border-box;

@@ -1,9 +1,14 @@
 export const sellerProductsQueryKeys = {
   all: ["user", "seller-products"] as const,
-  list: (sellerId: string, shelfId: string | null = null) =>
+  list: (
+    sellerId: string,
+    shelfId: string | null = null,
+    onecGroupId: string | null = null,
+  ) =>
     [
       ...sellerProductsQueryKeys.all,
       sellerId,
       shelfId ? String(shelfId) : "all",
+      onecGroupId ? String(onecGroupId) : "all",
     ] as const,
 };

@@ -1,31 +1,34 @@
-import { StyleSheet } from "react-native";
+import { useMemo } from "react";
+import { StyleSheet, useWindowDimensions } from "react-native";
 
 import { resolveProductCardBadgeColors } from "@/entities/product/lib/productCardBadgePalette";
+import {
+  PRODUCT_COMPACT_CARD_LAYOUT as L,
+  resolveProductCompactCardThumbSize,
+} from "@/entities/product/lib/productCompactCardLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const THUMB_SIZE = 88;
-const THUMB_RADIUS = 16;
-
-export const useProductCompactCardStyles = createThemedStyles((theme) => {
+const useProductCompactCardBaseStyles = createThemedStyles((theme) => {
   const BC = resolveProductCardBadgeColors(theme.colors);
   return {
     card: {
-      gap: 10,
-      padding: 12,
-      borderRadius: 20,
+      gap: L.cardGap,
+      paddingVertical: L.paddingVertical,
+      paddingHorizontal: L.paddingHorizontal,
+      borderRadius: L.cardRadius,
       backgroundColor: theme.colors.surface,
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: theme.colors.border,
     },
     topRow: {
       flexDirection: "row",
-      gap: 12,
+      gap: L.topRowGap,
       alignItems: "flex-start",
     },
     thumbWrap: {
-      width: THUMB_SIZE,
-      height: THUMB_SIZE,
-      borderRadius: THUMB_RADIUS,
+      width: L.thumbSize,
+      height: L.thumbSize,
+      borderRadius: L.thumbRadius,
       overflow: "hidden",
       backgroundColor: theme.colors.surfaceMuted,
       position: "relative",
@@ -262,6 +265,27 @@ export const useProductCompactCardStyles = createThemedStyles((theme) => {
     },
   };
 });
+
+/** Паритет web `.product-card--list`: thumb 112 / 96@≤640. */
+export const useProductCompactCardStyles = () => {
+  const base = useProductCompactCardBaseStyles();
+  const { width } = useWindowDimensions();
+  const thumbSize = resolveProductCompactCardThumbSize(width);
+
+  return useMemo(() => {
+    if (thumbSize === L.thumbSize) {
+      return base;
+    }
+    return {
+      ...base,
+      thumbWrap: {
+        ...base.thumbWrap,
+        width: thumbSize,
+        height: thumbSize,
+      },
+    };
+  }, [base, thumbSize]);
+};
 
 /** @deprecated use useProductCompactCardStyles */
 export const useProductModerationQueueCardStyles = useProductCompactCardStyles;

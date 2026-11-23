@@ -614,12 +614,13 @@ export const useModalSectionTabsStyles = createThemedStyles((theme) => ({
   rowInHeader: {
     paddingTop: 6,
   },
+  /** Web `.modal-section-tabs__tab`: pad 0.4/0.85rem, font 0.875rem/500. */
   tab: {
-    paddingVertical: 8,
-    paddingHorizontal: 14,
+    paddingVertical: 6.4,
+    paddingHorizontal: 13.6,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.focusRing,
     backgroundColor: theme.colors.surface,
   },
   tabActive: {
@@ -1200,7 +1201,7 @@ export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
     opacity: 0.85,
   },
   buttonDisabled: {
-    opacity: 0.6,
+    opacity: theme.interaction.disabledOpacity,
   },
 }));
 
@@ -1215,7 +1216,7 @@ export const useAccountRequirementModalStyles = createThemedStyles((theme) => ({
     padding: 20,
     gap: theme.spacing[3],
     backgroundColor: theme.colors.surface,
-    maxHeight: "90%",
+    maxHeight: "88%",
   },
   scrollContent: {
     gap: theme.spacing[2],

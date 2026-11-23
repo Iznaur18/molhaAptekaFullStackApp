@@ -24,11 +24,13 @@ Deep link на товар: `gitorg://product/<id>` → `/product/[id]` (см. `p
 
 ## DoD на каждый экран
 
-- **load** — `ScreenLoadingState` / spinner
+- **load** — `ScreenLoadingState` / spinner; на home/product допустим **skeleton** (`CatalogGridSkeleton` / `ProductDetailsSkeleton`)
 - **error** — `ScreenErrorState` + retry
-- **empty** — копирайт + CTA (пустая корзина → каталог)
+- **empty** — копирайт + CTA (пустая корзина / заказы → каталог; пустой catalog browser → лента)
 - **guard** — гость: корзина/оформление → login; свой товар не в корзину
 - **actions** — add to cart, checkout, edit profile
+- **press** — ключевые CTA: `AppButton` / `PressableScale` (`izInteraction` spring ≈ `--iz-transition-press` 180ms)
+- **refresh** — `ThemedRefreshControl` (`tint` = `theme.colors.action`)
 
 ## Автоматика (ПК)
 

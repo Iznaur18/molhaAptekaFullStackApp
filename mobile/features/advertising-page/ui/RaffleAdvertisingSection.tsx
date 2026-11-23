@@ -74,6 +74,8 @@ export const RaffleAdvertisingSection = ({
 
   const status = statusQuery.data;
   const pricePoints = status?.pricePoints ?? 3_000;
+  const listPricePoints = status?.listPricePoints ?? pricePoints;
+  const discountPercent = status?.discountPercent ?? 0;
   const raffle = status?.raffle ?? null;
   const hasOpenRaffle = status?.hasOpenRaffle === true;
   const canOpenForm = status?.canOpenForm === true;
@@ -82,6 +84,7 @@ export const RaffleAdvertisingSection = ({
   const insufficientPoints =
     !hasOpenRaffle && !canOpenForm && loyaltyBalance < pricePoints;
   const blockReason = status?.blockReason;
+  const showListPrice = discountPercent > 0 && listPricePoints > pricePoints;
 
   return (
     <View style={[styles.card, styles.cardCategory]}>
@@ -97,6 +100,9 @@ export const RaffleAdvertisingSection = ({
           <Text style={styles.metaLabel}>{RAFFLE_ADVERTISING_PAGE_UI.COST_LABEL}</Text>
           <Text style={styles.metaValue}>
             {RAFFLE_ADVERTISING_PAGE_UI.PRICE(pricePoints)}
+            {showListPrice ? (
+              <Text style={styles.metaList}>{` (было ${listPricePoints})`}</Text>
+            ) : null}
           </Text>
         </View>
         <View style={styles.metaItem}>

@@ -521,7 +521,7 @@ export const useProfileHubMenuStyles = createThemedStyles((theme) => ({
     gap: S.navGap,
   },
   heading: {
-    fontSize: 18,
+    fontSize: S.titleFontSize,
     fontWeight: "800",
     letterSpacing: -0.3,
     textAlign: "center",

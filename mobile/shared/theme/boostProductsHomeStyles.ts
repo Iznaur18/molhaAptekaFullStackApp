@@ -71,16 +71,6 @@ export const useBoostProductsHomeSectionStyles = createThemedStyles((theme) => (
     gap: 10,
     alignItems: "flex-start",
   },
-  error: {
-    marginBottom: 0,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 12,
-    backgroundColor: theme.colors.dangerSurface,
-    color: theme.colors.danger,
-    fontSize: 14,
-    lineHeight: 20,
-  },
 }));
 
 export const useBoostProductMiniCardStyles = createThemedStyles((theme) => ({

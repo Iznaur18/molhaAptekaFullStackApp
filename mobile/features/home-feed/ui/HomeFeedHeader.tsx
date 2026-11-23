@@ -1,6 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { memo, useCallback } from "react";
-import { Text } from "react-native";
 
 import { useHomeCuratedProductListsQuery } from "@/entities/curated-product-list/model/useHomeCuratedProductListsQuery";
 import { useProductPromotionBoostProductsQuery } from "@/entities/product/model/useProductPromotionBoostProductsQuery";
@@ -16,7 +15,7 @@ import { UserStoriesStrip } from "@/features/home-feed/ui/UserStoriesStrip";
 import { userStoriesQueryKeys } from "@/shared/api";
 import { API_CLIENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
-import { useBoostProductsHomeSectionStyles } from "@/shared/theme/boostProductsHomeStyles";
+import { InlineErrorBanner } from "@/shared/ui/InlineErrorBanner";
 
 type HomeFeedHeaderProps = {
   enabled: boolean;
@@ -26,7 +25,6 @@ type HomeFeedHeaderProps = {
 export const HomeFeedHeader = memo(
   ({ enabled, showCuratedLists }: HomeFeedHeaderProps) => {
     const queryClient = useQueryClient();
-    const boostStyles = useBoostProductsHomeSectionStyles();
     const { viewerRegionCode } = useViewerRegion();
     const sessionQuery = useAuthSessionQuery();
     const storiesQuery = useUserStoriesFeedQuery(enabled);
@@ -77,7 +75,7 @@ export const HomeFeedHeader = memo(
           onPublished={handleStoriesChanged}
         />
         {boostErrorMessage ? (
-          <Text style={boostStyles.error}>{boostErrorMessage}</Text>
+          <InlineErrorBanner>{boostErrorMessage}</InlineErrorBanner>
         ) : null}
         {showBoostProductsRow ? (
           <BoostProductsHomeSection products={boostProductsQuery.data ?? []} />

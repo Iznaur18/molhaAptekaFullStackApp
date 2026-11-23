@@ -11,6 +11,7 @@ import {
   resolveProductCardBadgeColors,
   resolveProductCardBannerChrome,
   resolveProductCardImageBadgeOverlay,
+  resolveProductDetailPriceOldColor,
 } from "@/entities/product/lib/productCardBadgePalette";
 import { PRODUCT_DETAILS_FEATURE_CARD_LAYOUT as FC } from "@/entities/product/lib/productDetailsFeatureCardLayout";
 import { PRODUCT_DETAILS_CONTENT_SWITCHER_LAYOUT as CS } from "@/entities/product/lib/productDetailsContentSwitcherLayout";
@@ -234,7 +235,7 @@ export const useCatalogBreadcrumbStyles = createThemedStyles((theme) => ({
   toolbarCompactTop: {
     paddingTop: 0,
     marginTop: -HOME_CATALOG_SECTION_TITLE_COMPACT_PULL_UP,
-    // Web `.home-feed-section-title { margin-bottom: 0.4rem }` — только на title.
+    // Web `.home-feed-section-title { margin: 1rem 0 }` — marginBottom на title.
     marginBottom: 0,
   },
   // Паритет web `.home-feed-section-title`
@@ -259,7 +260,7 @@ export const useProductCardStyles = createThemedStyles((theme) => {
       position: "relative",
       margin: 3,
       paddingBottom: 7,
-      borderRadius: 16,
+      borderRadius: theme.radius.cardLg,
       backgroundColor: theme.colors.surface,
       shadowColor: soft.shadowColor,
       shadowOffset: { width: 0, height: soft.shadowOffsetY },
@@ -267,6 +268,8 @@ export const useProductCardStyles = createThemedStyles((theme) => {
       shadowRadius: soft.shadowRadius,
       elevation: soft.elevation,
       overflow: "hidden",
+      ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+      ...(Platform.OS === "web" ? ({ cornerShape: "squircle" } as const) : null),
     },
     cardCatalogGrid: {
       flexGrow: 0,
@@ -719,6 +722,7 @@ export const useListPageFilterBarStyles = createThemedStyles((theme) => ({
     lineHeight: 16,
     color: theme.colors.textSecondary,
   },
+  /** Web ListPageFilterBar: pad 8 30 8 12, minH 33, r 14, font 13/600. */
   control: {
     minHeight: 33,
     borderWidth: 1,
@@ -726,7 +730,8 @@ export const useListPageFilterBarStyles = createThemedStyles((theme) => ({
     borderRadius: 14,
     backgroundColor: theme.colors.surface,
     paddingVertical: 8,
-    paddingHorizontal: 12,
+    paddingLeft: 12,
+    paddingRight: 30,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -1171,16 +1176,18 @@ export const useProductPriceStyles = createThemedStyles((theme) => {
     detailOld: {
       fontSize: 16,
       fontWeight: "600",
-      color: BC.priceOld,
+      // Web details: color-mix(currentColor 45%) ≈ action@45% на surface
+      color: resolveProductDetailPriceOldColor(theme.colors),
       textDecorationLine: "line-through",
     },
     detailRoot: {
       flexDirection: "row",
       flexWrap: "wrap",
       alignItems: "center",
-      gap: 6,
-      rowGap: 6,
-      columnGap: 9,
+      /** Web page/modal `gap: 0.35rem 0.55rem` */
+      gap: 5.6,
+      rowGap: 5.6,
+      columnGap: 8.8,
     },
     detailDiscountBadge: {
       paddingHorizontal: BDETAIL.paddingHorizontal,
@@ -3632,11 +3639,12 @@ export const useCartScreenStyles = createThemedStyles((theme, layout) => ({
     backgroundColor: theme.colors.action,
   },
   stickyFooterShadow: {
+    // Web dual: 0 4/8 @6% + 0 16/36 @12% — на RN один слой ≈ глубокий.
     shadowColor: theme.colors.ink,
-    shadowOpacity: 0.14,
+    shadowOpacity: 0.12,
     shadowRadius: 18,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 14,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 16,
   },
   footerTopRow: {
     flexDirection: "row",
@@ -3647,7 +3655,8 @@ export const useCartScreenStyles = createThemedStyles((theme, layout) => ({
   footerTotalBlock: {
     flex: 1,
     minWidth: 0,
-    gap: 2,
+    /** Web `.cart-page__dock-total { gap: 6px }` */
+    gap: 6,
   },
   footerTotalLabel: {
     fontSize: 13,
@@ -3686,7 +3695,7 @@ export const useCartScreenStyles = createThemedStyles((theme, layout) => ({
     textAlign: "center",
   },
   buttonDisabled: {
-    opacity: 0.6,
+    opacity: theme.interaction.disabledOpacity,
   },
 }));
 
@@ -3823,7 +3832,6 @@ export const useUserStoriesStripStyles = createThemedStyles((theme) => ({
     gap: USER_STORY_STRIP_LAYOUT.itemGap,
   },
   item: {
-    flex: 0,
     flexGrow: 0,
     flexShrink: 0,
     width: USER_STORY_STRIP_LAYOUT.itemWidth,
@@ -3843,19 +3851,27 @@ export const useUserStoriesStripStyles = createThemedStyles((theme) => ({
   ringViewed: {
     backgroundColor: theme.colors.textMuted,
   },
+  /** Web `.user-stories-strip__ring_add` — soft + border, не solid action. */
   ringAdd: {
     width: USER_STORY_STRIP_LAYOUT.ringSize,
     height: USER_STORY_STRIP_LAYOUT.ringSize,
     borderRadius: USER_STORY_STRIP_LAYOUT.ringSize / 2,
     padding: USER_STORY_STRIP_LAYOUT.ringPadding,
-    backgroundColor: theme.colors.action,
+    backgroundColor: theme.colors.actionSoft,
+    borderWidth: 1,
+    borderColor: theme.colors.actionBorder,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: theme.colors.action,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.14,
+    shadowRadius: 12,
+    elevation: 2,
   },
   plus: {
     fontSize: USER_STORY_STRIP_LAYOUT.plusFontSize,
-    fontWeight: "400",
-    color: theme.colors.onContrast,
+    fontWeight: "300",
+    color: theme.colors.action,
     lineHeight: USER_STORY_STRIP_LAYOUT.plusFontSize,
   },
   avatar: {
@@ -3924,6 +3940,18 @@ export const useCatalogBrowserPageStyles = createThemedStyles((theme, layout) =>
     paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
     // Без gap: отступы секций = web `.catalog-feed-tiles` / `__categories`.
     backgroundColor: theme.colors.bg,
+  },
+  emptyWrap: {
+    alignItems: "center",
+    gap: 14,
+    paddingVertical: 32,
+    paddingHorizontal: 16,
+  },
+  emptyText: {
+    fontSize: 15,
+    lineHeight: 22,
+    textAlign: "center",
+    color: theme.colors.textSecondary,
   },
 }));
 
@@ -3996,18 +4024,21 @@ export const useCatalogBrowserSectionStyles = createThemedStyles((theme) => ({
     marginBottom: 0,
     paddingTop: CATALOG_BROWSER_LANDING_LAYOUT.categoriesPaddingTop,
   },
-  sectionTitle: {
+  sectionTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: CATALOG_BROWSER_LANDING_LAYOUT.titleGap,
     marginTop: CATALOG_BROWSER_LANDING_LAYOUT.titleMarginTop,
     marginBottom: CATALOG_BROWSER_LANDING_LAYOUT.titleMarginBottom,
+  },
+  sectionTitle: {
+    flexShrink: 1,
     fontFamily: CATALOG_BROWSER_DISPLAY_TITLE.fontFamily,
     fontSize: CATALOG_BROWSER_DISPLAY_TITLE.fontSize,
     fontWeight: CATALOG_BROWSER_DISPLAY_TITLE.fontWeight,
     letterSpacing: CATALOG_BROWSER_DISPLAY_TITLE.letterSpacing,
     lineHeight: CATALOG_BROWSER_DISPLAY_TITLE.lineHeight,
     color: theme.colors.ink,
-    paddingLeft: 12,
-    borderLeftWidth: CATALOG_BROWSER_LANDING_LAYOUT.titleAccentWidth,
-    borderLeftColor: theme.colors.action,
   },
   sectionTitleCategories: {
     // Web `.catalog-browser-landing__categories-title` clamp mid ≈ 18–20.

@@ -1,7 +1,7 @@
 import { Sentry } from "@/shared/lib/initMobileSentry";
 import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { isDimColorScheme } from "@izibuy/design-tokens";
+import { isDimColorScheme, resolvePageBackground } from "@izibuy/design-tokens";
 import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack, usePathname } from "expo-router";
@@ -74,12 +74,13 @@ function RootLayoutNav() {
     const timer = setTimeout(releaseColdStartSplash, COLD_START_SPLASH_MAX_WAIT_MS);
     return () => clearTimeout(timer);
   }, []);
+  const pageBackground = resolvePageBackground(colorScheme, theme);
   const navigationTheme = isDimColorScheme(colorScheme)
     ? {
         ...DarkTheme,
         colors: {
           ...DarkTheme.colors,
-          background: theme.colors.bg,
+          background: pageBackground,
           card: theme.colors.surface,
           text: theme.colors.text,
           border: theme.colors.border,
@@ -90,7 +91,7 @@ function RootLayoutNav() {
         ...DefaultTheme,
         colors: {
           ...DefaultTheme.colors,
-          background: theme.colors.bg,
+          background: pageBackground,
           card: theme.colors.surface,
           text: theme.colors.text,
           border: theme.colors.border,

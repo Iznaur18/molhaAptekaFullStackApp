@@ -14,7 +14,10 @@ const modalShell = read("shared/ui/ProductModalShell.tsx");
 assert.match(editScreen, /ProductWizardScreen mode="edit"/);
 assert.match(wizardScreen, /ProductModalShell/);
 assert.match(wizardScreen, /CREATE_PRODUCT_UI\.EDIT_TITLE/);
-assert.match(wizardScreen, /ШАГ \$\{stepIndex \+ 1\} ИЗ \$\{steps\.length\}/);
+assert.match(wizardScreen, /WIZARD_STEP_OF\(stepIndex \+ 1, steps\.length\)/);
+assert.match(wizardScreen, /resolveProductWizardStepIds/);
+assert.match(wizardScreen, /CreateProductDealTermsFields/);
+assert.match(wizardScreen, /CreateProductWizardInstagramLinkCard/);
 assert.match(modalShell, /MODAL_BACKDROP_SCRIM|useProductModalShellStyles/);
 assert.match(wizardScreen, /fullScreen/);
 

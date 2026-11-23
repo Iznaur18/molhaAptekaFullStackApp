@@ -15,7 +15,7 @@ const CATALOG_BROWSER_GRID_GAP = 6;
 // Mirror of catalogBrowserGridConstants.ts
 const resolveCatalogBrowserGridColumns = (screenWidth) => {
   if (screenWidth >= 900) return 6;
-  if (screenWidth >= 640) return 4;
+  if (screenWidth >= 641) return 4;
   return 3;
 };
 
@@ -48,6 +48,26 @@ test("catalog browser grid: 3 columns at iPhone 16 Pro Max width", () => {
 
   assert.equal(layout.columns, 3);
   assert.ok(layout.rowWidth <= layout.contentWidth);
+});
+
+test("catalog browser grid breakpoints match web CatalogCategoriesGrid.css", () => {
+  const constants = readRepoFile(
+    "mobile/features/catalog-browser/lib/catalogBrowserGridConstants.ts",
+  );
+  const webCss = readRepoFile(
+    "client/src/entities/product-category-display/ui/CatalogCategoriesGrid.css",
+  );
+
+  assert.match(webCss, /--catalog-categories-grid-gap:\s*0\.375rem/);
+  assert.match(webCss, /--catalog-categories-grid-radius:\s*0\.75rem/);
+  assert.match(webCss, /@media \(min-width: 641px\)/);
+  assert.match(webCss, /@media \(min-width: 900px\)/);
+  assert.match(constants, /CATALOG_BROWSER_TILE_BREAKPOINT_4_COL = 641/);
+  assert.match(constants, /CATALOG_BROWSER_TILE_BREAKPOINT_6_COL = 900/);
+  assert.match(constants, /CATALOG_BROWSER_TILE_GAP_PX = 6/);
+  assert.equal(resolveCatalogBrowserGridColumns(640), 3);
+  assert.equal(resolveCatalogBrowserGridColumns(641), 4);
+  assert.equal(resolveCatalogBrowserGridColumns(900), 6);
 });
 
 test("catalog browser tile card uses fluid width on web", () => {

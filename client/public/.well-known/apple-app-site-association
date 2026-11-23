@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "XXXXXXXXXX.ru.gitorg.app",
+        "paths": ["*"]
+      }
+    ]
+  }
+}

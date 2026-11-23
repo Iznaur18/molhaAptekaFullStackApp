@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, Text, TextInput, View } from "react-native";
 
+import { applyPromoReturnStreakDiscount } from "@/entities/promo-return-streak/lib/promoReturnStreakPricing";
+import { useActivePromoReturnStreakDiscountPercent } from "@/entities/promo-return-streak/model/useActivePromoReturnStreakDiscountPercent";
 import {
   buildSubmitSiteHeaderBannerCampaignBody,
   createSiteHeaderBannerCampaignFormState,
@@ -44,7 +46,12 @@ export const SiteHeaderBannerAdvertisingSection = ({
   const [feedback, setFeedback] = useState("");
 
   const campaign = campaignQuery.data?.campaign ?? null;
-  const pricePoints = campaignQuery.data?.pricePoints ?? 7_000;
+  const pricePointsList = campaignQuery.data?.pricePoints ?? 7_000;
+  const streakDiscountPercent = useActivePromoReturnStreakDiscountPercent();
+  const pricePoints = useMemo(
+    () => applyPromoReturnStreakDiscount(pricePointsList, streakDiscountPercent),
+    [pricePointsList, streakDiscountPercent],
+  );
   const durationDays = campaignQuery.data?.durationDays ?? 7;
   const paidSlotLimit = campaignQuery.data?.paidSlotLimit ?? 200;
   const activePaidSlots = campaignQuery.data?.activePaidSlots ?? 0;
@@ -163,7 +170,12 @@ export const SiteHeaderBannerAdvertisingSection = ({
       <View style={styles.meta}>
         <View style={styles.metaItem}>
           <Text style={styles.metaLabel}>Стоимость</Text>
-          <Text style={styles.metaValue}>{pricePoints} баллов</Text>
+          <Text style={styles.metaValue}>
+            {pricePoints} баллов
+            {streakDiscountPercent > 0 ? (
+              <Text style={styles.metaList}>{` (было ${pricePointsList})`}</Text>
+            ) : null}
+          </Text>
         </View>
         <View style={styles.metaItem}>
           <Text style={styles.metaLabel}>Срок</Text>

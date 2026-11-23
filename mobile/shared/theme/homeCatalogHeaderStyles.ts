@@ -1,3 +1,4 @@
+import { izShadows } from "@izibuy/design-tokens";
 import { Platform, StyleSheet, type ViewStyle } from "react-native";
 
 import {
@@ -115,6 +116,12 @@ export const useHomeCatalogHeaderStyles = createThemedStyles((theme) => ({
     shadowOpacity: 0.06,
     shadowRadius: 14,
     elevation: 2,
+  },
+  /** Web `.search-input__field:focus` — border action + focus ring. */
+  searchInputFocused: {
+    borderColor: theme.colors.action,
+    shadowColor: theme.colors.action,
+    ...izShadows.inputFocus,
   },
   usersNavPill: {
     position: "relative",

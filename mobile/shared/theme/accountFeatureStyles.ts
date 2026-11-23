@@ -492,16 +492,18 @@ export const useNotificationsPageStyles = createThemedStyles((theme) => ({
     flex: 1,
     color: theme.colors.textMuted,
   },
+  /** web `.notifications-page__clear` pad 0.4/0.85rem, r 0.5rem */
   clearButton: {
     borderWidth: 1,
-    borderRadius: theme.radius.button,
-    paddingVertical: theme.spacing[2],
-    paddingHorizontal: 14,
-    borderColor: theme.colors.borderStrong,
+    borderRadius: theme.radius.sm,
+    paddingVertical: 6.4,
+    paddingHorizontal: 13.6,
+    borderColor: theme.colors.actionBorder,
+    backgroundColor: "transparent",
   },
   clearText: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "500",
     color: theme.colors.action,
   },
   errorBanner: {
@@ -567,24 +569,27 @@ export const useNotificationsPageStyles = createThemedStyles((theme) => ({
     fontSize: 16,
     fontWeight: "600",
   },
+  /** web `.notifications-page__list { gap: 0.5rem }` */
   list: {
     padding: theme.spacing[4],
-    gap: 10,
+    gap: 8,
   },
+  /** web item-btn pad 0.75×0.85rem, r 0.5rem, action-soft */
   item: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 10,
-    padding: 14,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderRadius: theme.radius.sm,
+    paddingVertical: 12,
+    paddingHorizontal: 13.6,
+    borderColor: theme.colors.infoSoft,
+    backgroundColor: theme.colors.actionSoft,
   },
   itemStatic: {
     opacity: 0.85,
   },
   message: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: theme.colors.text,
+    fontSize: 14,
+    lineHeight: 20,
+    color: theme.colors.infoDeep,
   },
   createdAt: {
     marginTop: 6,

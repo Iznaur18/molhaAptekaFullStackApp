@@ -80,3 +80,74 @@ export async function playLuckyBox(
     throw new Error(formatApiErrorMessage(error, "Не удалось открыть коробку"));
   }
 }
+
+/** Активный выигрыш покупателя для корзины (скидка или товар-приз). */
+export type MyLuckyBoxWin = {
+  sellerId?: string | null;
+  discountPercent?: number | null;
+  prizeProductId?: string | null;
+  prizeProductName?: string | null;
+};
+
+export type LuckyBoxConfigPrize = {
+  discountPercent?: number;
+  durationHours?: number;
+  prizeProductId?: string | null;
+  enabled?: boolean;
+};
+
+export type MyLuckyBoxConfig = {
+  enabled?: boolean;
+  prizes?: LuckyBoxConfigPrize[];
+  playsTotal?: number;
+  winsTotal?: number;
+};
+
+export type PutMyLuckyBoxConfigBody = {
+  enabled: boolean;
+  prizes: Array<{
+    discountPercent: number;
+    durationHours: number;
+    prizeProductId?: string | null;
+    enabled: boolean;
+  }>;
+};
+
+/** Паритет web `fetchMyLuckyBoxConfig`. */
+export async function fetchMyLuckyBoxConfig(): Promise<MyLuckyBoxConfig | null> {
+  try {
+    const { data } = await apiClient.get("/seller-lucky-box/me/config");
+    return (data?.data?.config as MyLuckyBoxConfig | undefined) ?? null;
+  } catch (error) {
+    throw new Error(
+      formatApiErrorMessage(error, "Не удалось загрузить настройки игры"),
+    );
+  }
+}
+
+/** Паритет web `putMyLuckyBoxConfig`. */
+export async function putMyLuckyBoxConfig(
+  body: PutMyLuckyBoxConfigBody,
+): Promise<MyLuckyBoxConfig | null> {
+  try {
+    const { data } = await apiClient.put("/seller-lucky-box/me/config", body);
+    return (data?.data?.config as MyLuckyBoxConfig | undefined) ?? null;
+  } catch (error) {
+    throw new Error(
+      formatApiErrorMessage(error, "Не удалось сохранить настройки игры"),
+    );
+  }
+}
+
+/** Паритет web `fetchMyLuckyBoxWins`. */
+export async function fetchMyLuckyBoxWins(): Promise<MyLuckyBoxWin[]> {
+  try {
+    const { data } = await apiClient.get("/seller-lucky-box/me/wins");
+    const wins = data?.data?.wins;
+    return Array.isArray(wins) ? (wins as MyLuckyBoxWin[]) : [];
+  } catch (error) {
+    throw new Error(
+      formatApiErrorMessage(error, "Не удалось загрузить выигрыши"),
+    );
+  }
+}

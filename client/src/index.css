@@ -102,8 +102,8 @@ body {
   overflow-x: clip;
 }
 
-/* Схема «Пользовательский»: фон страницы #fafafc. Только веб: токен --iz-color-bg
-   общий с приложением и не меняется, перекрываем сам фон страницы. */
+/* Схема «Пользовательский»: page canvas ≠ --iz-color-bg (#DEDEDE).
+   Канон: packages/design-tokens izPageBgCustom; mobile: resolvePageBackground. */
 :root[data-theme="custom"] {
   --iz-page-bg-custom: #fafafc;
   background-color: var(--iz-page-bg-custom);

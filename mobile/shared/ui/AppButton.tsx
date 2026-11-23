@@ -1,3 +1,4 @@
+import { izInteraction } from "@izibuy/design-tokens";
 import {
   Pressable,
   Text,
@@ -28,6 +29,11 @@ type AppButtonProps = Omit<PressableProps, "style"> & {
   variant?: AppButtonVariant;
   style?: StyleProp<ViewStyle>;
 };
+
+const PRESS_SPRING = {
+  damping: izInteraction.pressSpringDamping,
+  stiffness: izInteraction.pressSpringStiffness,
+} as const;
 
 const useStyles = createThemedStyles((theme) => ({
   base: {
@@ -63,8 +69,8 @@ const useStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.nearBlack,
   },
   label: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   labelOnPrimary: {
     color: theme.colors.onContrast,
@@ -85,7 +91,7 @@ const useStyles = createThemedStyles((theme) => ({
     color: theme.colors.nearBlack,
   },
   disabled: {
-    opacity: 0.55,
+    opacity: theme.interaction.disabledOpacity,
   },
 }));
 
@@ -137,11 +143,11 @@ export const AppButton = ({
         style={[styles.base, variantStyle, disabled && styles.disabled, style]}
         disabled={disabled}
         onPressIn={(e) => {
-          scale.value = withSpring(0.96, { damping: 18, stiffness: 350 });
+          scale.value = withSpring(izInteraction.pressedScale, PRESS_SPRING);
           onPressIn?.(e);
         }}
         onPressOut={(e) => {
-          scale.value = withSpring(1, { damping: 18, stiffness: 350 });
+          scale.value = withSpring(1, PRESS_SPRING);
           onPressOut?.(e);
         }}
         {...pressableProps}

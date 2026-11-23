@@ -191,9 +191,18 @@ export const MyOrdersPage = () => {
         </Text>
       ) : null}
       {totalVisible === 0 ? (
-        <Text style={styles.emptyState} accessibilityRole="text">
-          {emptyMessage}
-        </Text>
+        <View style={styles.emptyWrap}>
+          <Text style={styles.emptyState} accessibilityRole="text">
+            {emptyMessage}
+          </Text>
+          {totalAll === 0 ? (
+            <AppButton
+              label={MY_ORDERS_PAGE_UI.EMPTY_GO_CATALOG}
+              variant="primary"
+              onPress={() => router.push("/(tabs)/catalog")}
+            />
+          ) : null}
+        </View>
       ) : null}
     </View>
   );

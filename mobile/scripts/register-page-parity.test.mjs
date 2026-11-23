@@ -29,7 +29,8 @@ test("register screen matches web AuthPage layout", () => {
   assert.match(styles, /textDecorationLine: "underline"/);
 
   assert.match(register, /styles\.column/);
-  assert.match(register, /channelBtn/);
+  assert.match(register, /AuthContactChannelToggle/);
+  assert.match(styles, /channelBtn:/);
   assert.match(register, /ScreenBackButton/);
   assert.match(register, /AUTH_PAGE_LAYOUT/);
   assert.match(register, /LayoutAnimation/);
@@ -42,6 +43,7 @@ test("register screen matches web AuthPage layout", () => {
   assert.match(copy, /REGISTER_CHANNEL_ARIA:\s*"Способ регистрации"/);
   assert.match(webRegister, /auth-page__column/);
   assert.match(webRegister, /Способ регистрации/);
-  assert.match(webRegister, /auth-page__channel-btn/);
+  assert.match(webRegister, /AuthContactChannelToggle/);
+  assert.match(webCss, /auth-page__channel-btn/);
   assert.match(webRegister, /navigate\("\/me"/);
 });

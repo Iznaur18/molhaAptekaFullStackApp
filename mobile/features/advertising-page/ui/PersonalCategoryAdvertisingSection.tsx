@@ -2,6 +2,8 @@ import { useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, Text, TextInput, View } from "react-native";
 import { DEFAULT_VIEWER_REGION_CODE, isRuRegionCode } from "@molha/api-contract";
 
+import { applyPromoReturnStreakDiscount } from "@/entities/promo-return-streak/lib/promoReturnStreakPricing";
+import { useActivePromoReturnStreakDiscountPercent } from "@/entities/promo-return-streak/model/useActivePromoReturnStreakDiscountPercent";
 import { RuRegionSelect } from "@/entities/region/ui/RuRegionSelect";
 import { useMySellerPersonalCategoryCampaignQuery } from "@/entities/seller-personal-category/model/useMySellerPersonalCategoryCampaignQuery";
 import { useSellerPersonalCategoryMutations } from "@/entities/seller-personal-category/model/useSellerPersonalCategoryMutations";
@@ -42,7 +44,12 @@ export const PersonalCategoryAdvertisingSection = ({
     () => durations.find((item) => item.code === tariffCode) ?? durations[0] ?? null,
     [durations, tariffCode],
   );
-  const pricePoints = selectedDuration?.pricePoints ?? 0;
+  const listPricePoints = selectedDuration?.pricePoints ?? 0;
+  const streakDiscountPercent = useActivePromoReturnStreakDiscountPercent();
+  const pricePoints = useMemo(
+    () => applyPromoReturnStreakDiscount(listPricePoints, streakDiscountPercent),
+    [listPricePoints, streakDiscountPercent],
+  );
 
   const campaign = campaignQuery.data?.campaign ?? null;
   const canCancel = campaign?.status === "pending";
@@ -143,7 +150,12 @@ export const PersonalCategoryAdvertisingSection = ({
         <View style={styles.meta}>
           <View style={styles.metaItem}>
             <Text style={styles.metaLabel}>Стоимость</Text>
-            <Text style={styles.metaValue}>{pricePoints} баллов</Text>
+            <Text style={styles.metaValue}>
+              {pricePoints} баллов
+              {streakDiscountPercent > 0 ? (
+                <Text style={styles.metaList}>{` (было ${listPricePoints})`}</Text>
+              ) : null}
+            </Text>
           </View>
           <View style={styles.metaItem}>
             <Text style={styles.metaLabel}>Срок</Text>
@@ -230,6 +242,10 @@ export const PersonalCategoryAdvertisingSection = ({
               <View style={styles.tariffs}>
                 {durations.map((item) => {
                   const isSelected = tariffCode === item.code;
+                  const chargePoints = applyPromoReturnStreakDiscount(
+                    item.pricePoints,
+                    streakDiscountPercent,
+                  );
                   return (
                     <Pressable
                       key={item.code}
@@ -237,7 +253,12 @@ export const PersonalCategoryAdvertisingSection = ({
                       onPress={() => setTariffCode(item.code)}
                     >
                       <Text style={styles.tariffTitle}>{item.title}</Text>
-                      <Text style={styles.tariffPrice}>{item.pricePoints} баллов</Text>
+                      <Text style={styles.tariffPrice}>
+                        {chargePoints} баллов
+                        {streakDiscountPercent > 0
+                          ? ` (было ${item.pricePoints})`
+                          : ""}
+                      </Text>
                     </Pressable>
                   );
                 })}

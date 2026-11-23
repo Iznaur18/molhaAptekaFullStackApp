@@ -49,7 +49,7 @@ test("my orders page mirrors web toolbar and compact buyer order card", () => {
   assert.match(page, /onProductClick/);
   assert.match(page, /onConfirmDelivered/);
   assert.match(page, /loyaltyFlash/);
-  assert.match(page, /myActionCount/);
+  assert.match(page, /attentionCount/);
   assert.match(page, /ATTENTION_FILTER_HINT/);
   assert.doesNotMatch(page, /useOrdersScreenStyles/);
 

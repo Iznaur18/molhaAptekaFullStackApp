@@ -86,9 +86,32 @@ npm run start:dev
 
 ## Preview / Production
 
+### Preview Android (P0)
+
+Профиль `preview` в `eas.json`: internal APK, `EXPO_PUBLIC_API_URL=http://192.168.100.58:4444` (LAN этого стенда).
+
+`app.json` → `"slug": "izibuy"` (должен совпадать с EAS projectId; display name остаётся Gitorg).
+
+```powershell
+cd mobile
+npx eas-cli whoami
+$env:EAS_BUILD_AUTOCOMMIT = "1"   # если dirty tree
+npm run build:preview:android -- --non-interactive
+```
+
+Последний успешный preview (21.11.2026):
+
+https://expo.dev/accounts/iznaur18/projects/izibuy/builds/22699959-cc4b-42bd-8c77-40fc7b65b825
+
+После установки APK:
+
+1. SHA-256 keystore → `client/public/.well-known/assetlinks.json` (`npx eas-cli credentials -p android`, см. `UNIVERSAL-APP-LINKS.md`).
+2. Live App Links verify — только после деплоя well-known на `gitorg.ru`.
+
+### Production
+
 ```bash
-npm run build:preview:android
 npm run build:production
 ```
 
-Prod: задать `EXPO_PUBLIC_API_URL` и `EXPO_PUBLIC_UPLOAD_BASE_URL` на HTTPS в EAS secrets, не LAN.
+Prod: задать `EXPO_PUBLIC_API_URL` и `EXPO_PUBLIC_UPLOAD_BASE_URL` на HTTPS в EAS secrets / `eas.json` production, не LAN.

@@ -1,4 +1,10 @@
-import { isRuRegionCode } from "@molha/api-contract";
+import {
+  isRuRegionCode,
+  normalizeCategoryDealType,
+  normalizeProductServiceLocations,
+  normalizeProductServicePriceMode,
+  normalizeProductServicePriceUnit,
+} from "@molha/api-contract";
 
 import { mapProductCharacteristicsToRows } from "@/entities/product/lib/productCharacteristicRows";
 import {
@@ -26,9 +32,14 @@ export type CopiedProductWizardForm = {
   characteristicsAutoAppliedForCategoryId: string | null;
   imageUrls: string[];
   productPreviewVideoUrl: string;
+  productInstagramPostUrl: string;
   productCategoryId: string | null;
   productCategoryLabel: string;
   productCategory: string;
+  categoryDealType: string;
+  productServicePriceMode: string;
+  productServicePriceUnit: string;
+  productServiceLocations: string[];
   productRegionCode: string;
   productPickupAddress: string;
   productPickupLat: number | null;
@@ -95,11 +106,24 @@ export const createProductWizardFormFromCopiedProduct = (
     characteristicsAutoAppliedForCategoryId: null,
     imageUrls: resolveProductImageUrls(product),
     productPreviewVideoUrl: String(product.productPreviewVideoUrl ?? "").trim(),
+    productInstagramPostUrl: String(product.productInstagramPostUrl ?? "").trim(),
     productCategoryId: categoryId,
     productCategoryLabel: String(
       product.categoryBreadcrumbRu ?? product.productCategoryLabelRu ?? "",
     ).trim(),
     productCategory: String(product.productCategory ?? DEFAULT_PRODUCT_CATEGORY),
+    categoryDealType: normalizeCategoryDealType(
+      product.productDealType ?? product.categoryDealType,
+    ),
+    productServicePriceMode: normalizeProductServicePriceMode(
+      product.productServicePriceMode,
+    ),
+    productServicePriceUnit: normalizeProductServicePriceUnit(
+      product.productServicePriceUnit,
+    ),
+    productServiceLocations: normalizeProductServiceLocations(
+      product.productServiceLocations,
+    ),
     productRegionCode: isRuRegionCode(regionRaw) ? regionRaw : "",
     // Точки самовывоза не копируются: у копии свой набор адресов продавца.
     productPickupLocations: [],

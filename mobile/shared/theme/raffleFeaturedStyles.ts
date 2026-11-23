@@ -38,7 +38,8 @@ const MENU_GAP_INLINE = 4;
 /** @deprecated Секция без внешней обёртки — оставлено для совместимости импортов. */
 export const RAFFLE_SECTION_CARD_BORDER_RADIUS = 36;
 
-export const RAFFLE_REVEAL_BUTTON_BORDER_RADIUS = 16;
+/** Web `--iz-radius-pill` на `.raffle-featured-home-section__reveal`. */
+export const RAFFLE_REVEAL_BUTTON_BORDER_RADIUS = 999;
 
 export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
   root: {
@@ -465,18 +466,25 @@ export const useRaffleFeaturedSectionStyles = createThemedStyles((theme) => ({
     width: "100%",
   },
   revealButton: {
+    position: "relative",
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",
     paddingVertical: 14,
     paddingHorizontal: 16,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.action,
   },
   revealButtonPressed: {
     opacity: 0.92,
+  },
+  revealLabel: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  revealChevron: {
+    position: "absolute",
+    right: 16,
   },
   revealButtonText: {
     fontSize: 15,

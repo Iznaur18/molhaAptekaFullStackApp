@@ -150,29 +150,19 @@ export const useMySalesPageStyles = createThemedStyles((theme, layout) => ({
     color: theme.colors.textSecondary,
     paddingVertical: 8,
   },
+  /** Guest: как orders/cart centered + AppButton. */
   centered: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     padding: theme.spacing[6],
-    gap: theme.spacing[4],
   },
   hint: {
-    fontSize: 15,
+    fontSize: 16,
+    lineHeight: 24,
     textAlign: "center",
-    lineHeight: 22,
     color: theme.colors.textMuted,
-  },
-  button: {
-    borderRadius: 16,
-    paddingVertical: theme.spacing[3],
-    paddingHorizontal: theme.spacing[6],
-    backgroundColor: theme.colors.action,
-  },
-  buttonText: {
-    color: theme.colors.onContrast,
-    fontSize: 15,
-    fontWeight: "600",
+    marginBottom: theme.spacing[4],
   },
   overview: {
     flexDirection: "row",

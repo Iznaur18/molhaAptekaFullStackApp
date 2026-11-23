@@ -20,6 +20,33 @@ export type MyFollowingResponse = {
   };
 };
 
+export const fetchMyFollowers = async ({
+  page = 1,
+  limit = 50,
+}: {
+  page?: number;
+  limit?: number;
+} = {}): Promise<MyFollowingResponse> => {
+  try {
+    const { data } = await apiClient.get("/user/me/followers", {
+      params: { page, limit },
+    });
+
+    if (!data?.success || !data.data) {
+      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
+    }
+
+    return {
+      users: data.data.users ?? [],
+      pagination: data.data.pagination,
+    };
+  } catch (error) {
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.FETCH_MY_FOLLOWERS_FALLBACK),
+    );
+  }
+};
+
 export const fetchMyFollowing = async ({
   page = 1,
   limit = 50,

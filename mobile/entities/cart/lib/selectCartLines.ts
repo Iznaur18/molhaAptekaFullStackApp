@@ -31,6 +31,7 @@ type CatalogProduct = {
   productPointsSaleEnabled?: boolean | null;
   productPointsPrice?: number | null;
   productPointsPerBuyerLimit?: number | null;
+  productSeller?: { _id?: unknown } | null;
 };
 
 export type AppliedPromo = {
@@ -57,6 +58,8 @@ export type CartLine = {
   promoCode: string | null;
   isPromoApplied: boolean;
   buyNFreeUnits: number;
+  /** Бесплатные единицы-приз из игр продавца. */
+  prizeFreeUnits: number;
   /** Товар продаётся за баллы: рублёвые суммы строки — 0. */
   isPointsSale: boolean;
   pointsUnitPrice: number;
@@ -72,6 +75,7 @@ export const selectCartLines = (
     | Map<string, BuyNFreeProgressRow> = {},
   /** Тик из useCartFlashSalePriceTick — по нему гасим истёкшую горящую скидку. */
   nowMs: number = Date.now(),
+  prizeFreeUnitsByProductId: Record<string, number> | Map<string, number> = {},
 ): { lines: CartLine[]; total: number } => {
   const productById = new Map(
     products.map((product) => [String(product._id), product]),
@@ -91,6 +95,20 @@ export const selectCartLines = (
   ) {
     for (const [productId, row] of Object.entries(buyNFreeProgressByProductId)) {
       progressByProductId.set(String(productId), row);
+    }
+  }
+
+  const prizeUnitsByProductId = new Map<string, number>();
+  if (prizeFreeUnitsByProductId instanceof Map) {
+    for (const [productId, units] of prizeFreeUnitsByProductId.entries()) {
+      prizeUnitsByProductId.set(String(productId), units);
+    }
+  } else if (
+    prizeFreeUnitsByProductId &&
+    typeof prizeFreeUnitsByProductId === "object"
+  ) {
+    for (const [productId, units] of Object.entries(prizeFreeUnitsByProductId)) {
+      prizeUnitsByProductId.set(String(productId), units);
     }
   }
 
@@ -117,6 +135,7 @@ export const selectCartLines = (
         promoCode: null,
         isPromoApplied: false,
         buyNFreeUnits: 0,
+        prizeFreeUnits: 0,
         isPointsSale: true,
         pointsUnitPrice,
         pointsLineTotal: pointsUnitPrice * qty,
@@ -140,6 +159,10 @@ export const selectCartLines = (
       freeClaimPending: progress?.freeClaimPending,
       quantity: qty,
     });
+    const prizeFreeUnits = Math.min(
+      Math.max(0, Math.floor(Number(prizeUnitsByProductId.get(productId)) || 0)),
+      qty,
+    );
     const offer = resolveProductWholesaleOffer(product);
     const isWholesaleApplied = offer != null && qty >= offer.minQty;
     const wholesaleSavings = isWholesaleApplied
@@ -157,7 +180,7 @@ export const selectCartLines = (
       lineTotal: resolveBuyNFreeLineTotal({
         unitPrice,
         quantity: qty,
-        freeUnits: buyNFreeUnits,
+        freeUnits: Math.min(buyNFreeUnits + prizeFreeUnits, qty),
       }),
       isMissing: product == null,
       isWholesaleApplied,
@@ -166,6 +189,7 @@ export const selectCartLines = (
       promoCode: isPromoApplied ? String(promo?.code ?? "") : null,
       isPromoApplied,
       buyNFreeUnits,
+      prizeFreeUnits,
       isPointsSale: false,
       pointsUnitPrice: 0,
       pointsLineTotal: 0,

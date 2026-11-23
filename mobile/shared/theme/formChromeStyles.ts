@@ -1,11 +1,14 @@
 import { Platform, StyleSheet } from "react-native";
 
+import { izModalBackdropScrim } from "@izibuy/design-tokens";
+
 import { CHECKOUT_FORM_INPUT_LAYOUT as CF_INPUT } from "@/features/checkout/lib/checkoutFormInputLayout";
 import { CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT } from "@/entities/order/lib/checkoutPaymentMethodCardTheme";
 import { AUTH_PAGE_LAYOUT as A } from "@/shared/lib/authPageLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-export const MODAL_BACKDROP_SCRIM = "rgba(0,0,0,0.45)";
+/** @deprecated import `izModalBackdropScrim` from `@izibuy/design-tokens` */
+export const MODAL_BACKDROP_SCRIM = izModalBackdropScrim;
 
 export const EMAIL_VERIFY_MODAL_CORNER_RADIUS = 36;
 
@@ -15,90 +18,7 @@ export const PASSWORD_TOGGLE_ICON_SIZE = A.passwordToggleSize;
 /** Паритет web `--checkout-sheet-height: 70%` в CheckoutSheetModal.css. */
 export const CHECKOUT_SHEET_HEIGHT_PERCENT = 70;
 
-export const useAuthFormStyles = createThemedStyles((theme) => ({
-  flex: {
-    flex: 1,
-    backgroundColor: theme.colors.bg,
-  },
-  container: {
-    flexGrow: 1,
-    padding: theme.spacing[6],
-    paddingTop: theme.spacing[8],
-    justifyContent: "flex-start",
-  },
-  card: {
-    borderRadius: theme.radius.lg,
-    overflow: "hidden",
-    backgroundColor: theme.colors.surface,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    shadowColor: theme.colors.ink,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.12,
-    shadowRadius: 14,
-    elevation: 5,
-  },
-  heroZone: {
-    backgroundColor: theme.colors.primary,
-    paddingHorizontal: theme.spacing[6],
-    paddingVertical: theme.spacing[6],
-  },
-  formZone: {
-    backgroundColor: theme.colors.surface,
-    paddingHorizontal: theme.spacing[6],
-    paddingTop: theme.spacing[6],
-    paddingBottom: theme.spacing[2],
-  },
-  backButton: {
-    alignSelf: "flex-start",
-    paddingVertical: theme.spacing[1],
-    marginBottom: theme.spacing[2],
-  },
-  backButtonText: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: theme.colors.link,
-  },
-  actionsZone: {
-    backgroundColor: theme.colors.actionSoft,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: theme.colors.actionBorder,
-    paddingHorizontal: theme.spacing[6],
-    paddingVertical: theme.spacing[5],
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: theme.colors.onContrast,
-  },
-  subtitle: {
-    marginTop: theme.spacing[1],
-    fontSize: 14,
-    lineHeight: 20,
-    color: theme.colors.onContrast,
-    opacity: 0.78,
-  },
-  authActions: {
-    gap: theme.spacing[3],
-  },
-  authButton: {
-    width: "100%",
-  },
-  authSecondaryButton: {
-    backgroundColor: theme.colors.surface,
-    borderColor: theme.colors.borderStrong,
-  },
-  authInput: {
-    backgroundColor: theme.colors.surfaceMuted,
-    borderColor: theme.colors.borderStrong,
-  },
-  link: {
-    marginTop: theme.spacing[5],
-    textAlign: "center",
-    color: theme.colors.link,
-    fontSize: 15,
-  },
-}));
+/** Канон auth — `useLoginScreenStyles` (+ AUTH_PAGE_LAYOUT). */
 
 export const useLoginScreenStyles = createThemedStyles((theme) => ({
   flex: {

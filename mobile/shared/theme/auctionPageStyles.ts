@@ -4,14 +4,21 @@ import { AUCTION_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const SECTION_GAP = 4;
-const ROW_GAP = 8;
-const ROW_PADDING = 8;
-const ROW_RADIUS = 20;
+/** web `.auction-dashboard-row { gap: 0.65rem }` */
+const ROW_GAP = 10.4;
+/** web `.auction-dashboard-row { padding: 0.75rem }` */
+const ROW_PADDING = 12;
+/** web `.auction-dashboard-row { border-radius: 18px }` */
+const ROW_RADIUS = 18;
 const VIEW_CHIP_PADDING_VERTICAL = 4;
 const VIEW_CHIP_PADDING_HORIZONTAL = 8;
 const OVERVIEW_TILE_RADIUS = 16;
+/** web `.auction-dashboard-row__thumb` 3.25rem / r12 */
 const THUMB_SIZE = 52;
-const THUMB_RADIUS = 14;
+const THUMB_RADIUS = 12;
+/** web `.auction-dashboard-row__btn { border-radius: 12px; min-height: 2.5rem }` */
+const DECISION_BTN_RADIUS = 12;
+const DECISION_BTN_MIN_HEIGHT = 40;
 
 export const useAuctionPageStyles = createThemedStyles((theme, layout) => ({
   container: {
@@ -144,9 +151,10 @@ export const useAuctionPageStyles = createThemedStyles((theme, layout) => ({
     borderColor: theme.colors.border,
     backgroundColor: theme.colors.surface,
   },
+  /** web `.auction-page__chip_active` — soft warning, не solid fill. */
   viewChipActive: {
-    borderColor: theme.colors.warning,
-    backgroundColor: theme.colors.warning,
+    borderColor: "rgba(217, 119, 6, 0.42)",
+    backgroundColor: theme.colors.warningSurface,
   },
   viewChipText: {
     fontSize: 14.4,
@@ -155,7 +163,7 @@ export const useAuctionPageStyles = createThemedStyles((theme, layout) => ({
     color: theme.colors.textSecondary,
   },
   viewChipTextActive: {
-    color: theme.colors.onContrast,
+    color: theme.colors.warningText,
   },
   overview: {
     flexDirection: "row",
@@ -207,20 +215,13 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
     gap: ROW_GAP,
     padding: ROW_PADDING,
     borderWidth: StyleSheet.hairlineWidth,
-    borderLeftWidth: 3,
     borderRadius: ROW_RADIUS,
     borderColor: theme.colors.border,
-    borderLeftColor: theme.colors.border,
     backgroundColor: theme.colors.surface,
-    shadowColor: theme.colors.ink,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 0,
-    elevation: 1,
   },
+  /** web `.auction-dashboard-row_attention` — warning border, без left strip. */
   rowAttention: {
-    borderLeftColor: theme.colors.warning,
-    shadowOpacity: 0.1,
+    borderColor: "rgba(217, 119, 6, 0.6)",
   },
   headLine: {
     flexDirection: "row",
@@ -425,25 +426,26 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
   },
   decision: {
     flexDirection: "row",
-    gap: 7.2,
+    gap: 8,
   },
   decisionBtn: {
     flex: 1,
     minWidth: 0,
-    minHeight: 40.8,
+    minHeight: DECISION_BTN_MIN_HEIGHT,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 8.8,
-    paddingHorizontal: 10.4,
-    borderRadius: 14,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: DECISION_BTN_RADIUS,
     borderWidth: StyleSheet.hairlineWidth,
   },
   decisionBtnAccept: {
     borderColor: "transparent",
     backgroundColor: theme.colors.success,
   },
+  /** web `.auction-dashboard-row__btn_secondary` — reject = secondary, не danger. */
   decisionBtnReject: {
-    borderColor: "rgba(180, 35, 24, 0.7)",
+    borderColor: theme.colors.borderStrong,
     backgroundColor: theme.colors.surface,
   },
   decisionBtnTextAccept: {
@@ -455,7 +457,7 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
   decisionBtnTextReject: {
     fontSize: 14.08,
     fontWeight: "700",
-    color: theme.colors.danger,
+    color: theme.colors.textSecondary,
     textAlign: "center",
   },
   cta: {

@@ -111,7 +111,7 @@ export const useSellerFormStyles = createThemedStyles((theme) => ({
     minHeight: 48,
   },
   submitDisabled: {
-    opacity: 0.6,
+    opacity: theme.interaction.disabledOpacity,
   },
   submitText: {
     fontSize: 15,
@@ -566,10 +566,10 @@ export const useProductEditorScreenStyles = createThemedStyles((theme) => ({
     fontSize: 15,
   },
   buttonPressed: {
-    opacity: 0.85,
+    opacity: theme.interaction.pressedOpacity,
   },
   disabled: {
-    opacity: 0.6,
+    opacity: theme.interaction.disabledOpacity,
   },
 }));
 
@@ -766,6 +766,12 @@ export const useSellerProductsPageStyles = createThemedStyles((theme, layout) =>
     gap: L.shelfRowGap,
     paddingTop: L.shelfRowPaddingTop,
     paddingBottom: L.shelfRowPaddingBottom,
+  },
+  /** web `.seller-products-page__shelves--nested` */
+  shelvesRowNested: {
+    paddingLeft: 12,
+    borderLeftWidth: 2,
+    borderLeftColor: theme.colors.border,
   },
   shelfChip: {
     flexShrink: 0,
@@ -1121,6 +1127,6 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme, layou
     color: theme.colors.onContrast,
   },
   buttonDisabled: {
-    opacity: 0.6,
+    opacity: theme.interaction.disabledOpacity,
   },
 }));

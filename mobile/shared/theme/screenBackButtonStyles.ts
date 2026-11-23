@@ -22,7 +22,7 @@ export const useScreenBackButtonStyles = createThemedStyles((theme) => ({
     backgroundColor: "rgba(255, 255, 255, 0.14)",
   },
   buttonDisabled: {
-    opacity: 0.55,
+    opacity: theme.interaction.disabledOpacity,
   },
   buttonInline: {
     width: SCREEN_BACK_BUTTON_SIZE,

@@ -2,7 +2,11 @@ import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 
-import { formatLoyaltyPointsAmount } from "@molha/api-contract";
+import {
+  FORTUNE_WHEEL_ORDER_PROMO_CODE,
+  LUCKY_BOX_ORDER_PROMO_CODE,
+  formatLoyaltyPointsAmount,
+} from "@molha/api-contract";
 
 import { getCartLineStockHint } from "@/entities/cart/lib/getCartLineStockHint";
 import { useCartActions } from "@/entities/cart/model/useCartActions";
@@ -11,6 +15,8 @@ import { getProductCartQuantityLimit } from "@/entities/product/lib/getProductPu
 import {
   CART_LINE_CARD_BORDER_RADIUS,
   CART_PAGE_UI,
+  FORTUNE_WHEEL_SECTION_UI,
+  LUCKY_BOX_SECTION_UI,
   PRODUCT_BUY_N_FREE_UI,
   PRODUCT_PROMO_CODE_UI,
 } from "@/shared/config";
@@ -59,11 +65,20 @@ export const CartLineItem = ({
     ? formatLoyaltyPointsAmount(line.pointsLineTotal)
     : formatPriceRub(line.lineTotal);
   const buyNFreeUnits = Math.floor(Number(line.buyNFreeUnits) || 0);
+  const prizeFreeUnits = Math.floor(Number(line.prizeFreeUnits) || 0);
   const paidQty = Math.max(0, line.quantity - buyNFreeUnits);
   const buyNFreeHint =
     buyNFreeUnits > 0
       ? PRODUCT_BUY_N_FREE_UI.CART_LINE_HINT(paidQty, unitPriceText)
       : null;
+  const prizeHint =
+    prizeFreeUnits > 0 ? CART_PAGE_UI.PRIZE_LINE_HINT(prizeFreeUnits) : null;
+  const promoLineLabel =
+    line.promoCode === LUCKY_BOX_ORDER_PROMO_CODE
+      ? LUCKY_BOX_SECTION_UI.CART_LINE_LABEL
+      : line.promoCode === FORTUNE_WHEEL_ORDER_PROMO_CODE
+        ? FORTUNE_WHEEL_SECTION_UI.CART_LINE_LABEL
+        : PRODUCT_PROMO_CODE_UI.CART_PROMO_LABEL;
 
   const handleDecrease = () => {
     if (line.quantity <= 1) {
@@ -123,9 +138,14 @@ export const CartLineItem = ({
                 {CART_PAGE_UI.WHOLESALE_LINE_BADGE}
               </Text>
             ) : null}
+            {prizeFreeUnits > 0 ? (
+              <Text style={styles.wholesaleBadge}>
+                {CART_PAGE_UI.PRIZE_LINE_BADGE}
+              </Text>
+            ) : null}
             {line.isPromoApplied ? (
               <Text style={styles.wholesaleBadge}>
-                {PRODUCT_PROMO_CODE_UI.CART_PROMO_LABEL}
+                {promoLineLabel}
                 {line.promoDiscountPercent != null
                   ? ` ${PRODUCT_PROMO_CODE_UI.CART_PROMO_PERCENT(line.promoDiscountPercent)}`
                   : ""}
@@ -133,6 +153,9 @@ export const CartLineItem = ({
             ) : null}
             {buyNFreeHint ? (
               <Text style={styles.wholesaleBadge}>{buyNFreeHint}</Text>
+            ) : null}
+            {prizeHint ? (
+              <Text style={styles.wholesaleBadge}>{prizeHint}</Text>
             ) : null}
             {stockHint ? <Text style={styles.stockHint}>{stockHint}</Text> : null}
             {product ? (

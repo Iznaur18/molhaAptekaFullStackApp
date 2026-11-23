@@ -72,3 +72,76 @@ export async function spinFortuneWheel(
     throw new Error(formatApiErrorMessage(error, "Не удалось крутить колесо"));
   }
 }
+
+/** Активный выигрыш покупателя для корзины (скидка или товар-приз). */
+export type MyFortuneWheelWin = {
+  sellerId?: string | null;
+  discountPercent?: number | null;
+  prizeProductId?: string | null;
+  prizeProductName?: string | null;
+};
+
+export type FortuneWheelConfigSector = {
+  discountPercent?: number;
+  durationHours?: number;
+  chancePercent?: number;
+  prizeProductId?: string | null;
+  enabled?: boolean;
+};
+
+export type MyFortuneWheelConfig = {
+  enabled?: boolean;
+  sectors?: FortuneWheelConfigSector[];
+  spinsTotal?: number;
+  winsTotal?: number;
+};
+
+export type PutMyFortuneWheelConfigBody = {
+  enabled: boolean;
+  sectors: Array<{
+    discountPercent: number;
+    durationHours: number;
+    chancePercent: number;
+    prizeProductId?: string | null;
+    enabled: boolean;
+  }>;
+};
+
+/** Паритет web `fetchMyFortuneWheelConfig`. */
+export async function fetchMyFortuneWheelConfig(): Promise<MyFortuneWheelConfig | null> {
+  try {
+    const { data } = await apiClient.get("/seller-fortune-wheel/me/config");
+    return (data?.data?.config as MyFortuneWheelConfig | undefined) ?? null;
+  } catch (error) {
+    throw new Error(
+      formatApiErrorMessage(error, "Не удалось загрузить настройки игры"),
+    );
+  }
+}
+
+/** Паритет web `putMyFortuneWheelConfig`. */
+export async function putMyFortuneWheelConfig(
+  body: PutMyFortuneWheelConfigBody,
+): Promise<MyFortuneWheelConfig | null> {
+  try {
+    const { data } = await apiClient.put("/seller-fortune-wheel/me/config", body);
+    return (data?.data?.config as MyFortuneWheelConfig | undefined) ?? null;
+  } catch (error) {
+    throw new Error(
+      formatApiErrorMessage(error, "Не удалось сохранить настройки игры"),
+    );
+  }
+}
+
+/** Паритет web `fetchMyFortuneWheelWins`. */
+export async function fetchMyFortuneWheelWins(): Promise<MyFortuneWheelWin[]> {
+  try {
+    const { data } = await apiClient.get("/seller-fortune-wheel/me/wins");
+    const wins = data?.data?.wins;
+    return Array.isArray(wins) ? (wins as MyFortuneWheelWin[]) : [];
+  } catch (error) {
+    throw new Error(
+      formatApiErrorMessage(error, "Не удалось загрузить выигрыши"),
+    );
+  }
+}

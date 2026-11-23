@@ -111,3 +111,13 @@
 5. ~~delivery-payment (gap-todo A)~~ — закрыто: `WEB_ONLY` → `null`.
 6. ~~п.10 dig~~ — закрыто v1: story viewer → `/user/:id` (+ self my-products); `create-raffle-parity` под reveal-only home; staff docs = гибрид 15 in-app + 3 web-only. SKIP: seller services nav, partner sales-tab, raffle CTA visual.
 7. ~~п.11 Store/MP docs sync~~ — закрыто v1: privacy copy ↔ `privacy.html`; Post-mobile таблица (push/GDPR ✅; AASA/EAS/Samsung open/отложен). Код фич не трогали.
+8. ~~P1 Universal/App Links scaffold~~ — `client/public/.well-known/` + nginx `^~ /.well-known/` + `mobile/docs/UNIVERSAL-APP-LINKS.md`. Placeholders Team ID / SHA256. Live verify / деплой — отдельно.
+9. ~~P0 EAS preview~~ — APK готов: https://expo.dev/accounts/iznaur18/projects/izibuy/builds/22699959-cc4b-42bd-8c77-40fc7b65b825 (`slug` выровнен на `izibuy` под projectId).
+10. ~~Raffle CTA visual (#1)~~ — gradient pill + Gift + ChevronRight (`HomeFeaturedRafflesRevealButton` ↔ web). SKIP п.10 снят для этого пункта.
+11. ~~Catalog browser spacing (#2)~~ — `CATALOG_BROWSER_LANDING_LAYOUT` ↔ `CatalogFeedTilesGrid.css` (rem×16).
+12. ~~Catalog section titles (#3)~~ — `CatalogSectionTitleAccent` gradient 180° action→accent ↔ web `::before`.
+13. ~~Boost error UI (#4)~~ — `InlineErrorBanner` на home ↔ web.
+14. ~~Promo return streak dock~~ — mobile `PromoReturnStreakDock` над tab bar ↔ web (claim API).
+15. ~~Stories strip visible~~ — `HorizontalOverflowRow`: убран flex-shorthand (RN Web схлопывал track в 0); ringAdd soft как web.
+16. ~~Promo streak prices on services~~ — mobile promotion / banner / category / raffle: charge + «было» / badge после claim ↔ web; invalidate streak после оплаты.
+17. ~~Home colors v1~~ — section tabs idle `textSecondary`; sellers search `surface`+`border` ↔ web SearchInput.

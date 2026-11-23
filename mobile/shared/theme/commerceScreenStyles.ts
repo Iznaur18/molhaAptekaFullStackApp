@@ -249,7 +249,7 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.danger,
   },
   actionDisabled: {
-    opacity: 0.6,
+    opacity: theme.interaction.disabledOpacity,
   },
   actionButtonText: {
     fontSize: 13.1,
@@ -526,7 +526,8 @@ export const useCartLineItemStyles = createThemedStyles((theme) => ({
     gap: 8,
   },
   unitPrice: {
-    fontSize: 18,
+    /** Web cart line current ≈ 1.0625rem (17) / 700 */
+    fontSize: 17,
     fontWeight: "700",
     lineHeight: 22,
     color: theme.colors.text,
@@ -849,7 +850,7 @@ export const useRaffleProductsPageStyles = createThemedStyles((theme) => ({
     width: "100%",
     marginBottom: L.mediaMarginBottom,
     overflow: "hidden",
-    borderRadius: 22,
+    borderRadius: L.mediaRadius,
     backgroundColor: theme.colors.surfaceMuted,
   },
   mediaWide: {
