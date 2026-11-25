@@ -282,7 +282,7 @@ test("mobile seller preview matches web product-details-seller-preview chrome", 
   assert.match(layout, /rootPadding: 14/);
   assert.match(layout, /avatarSize: 56/);
   assert.match(webCss, /padding: 0\.875rem/);
-  assert.match(webCss, /grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(webCss, /grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/);
   assert.match(
     webPageCss,
     /product-details-modal--page-split \.product-details-seller-preview/,
