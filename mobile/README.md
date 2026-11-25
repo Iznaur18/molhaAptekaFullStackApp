@@ -88,27 +88,27 @@ npm run smoke:buyer-path     # API smoke (server + e2e seed)
 
 Legacy in-app не расширять; баги — P3, фикс только если ломает buyer-path.
 
-| Section ID                            | Feature / экран                                     | Роль      | Меню / open                         |
-| ------------------------------------- | --------------------------------------------------- | --------- | ----------------------------------- |
-| `create-raffle`                       | `features/create-raffle-page`                       | moderator | **in-app** `/hub/create-raffle`     |
-| `product-moderation`                  | `features/product-moderation-page`                  | moderator | **in-app** (web path `/moderation-products`) |
-| `intro-ad-moderation`                 | `features/intro-ad-moderation-page`                 | moderator | **in-app** |
-| `product-reports`                     | `features/product-reports-page` (+ story reports)   | moderator | **in-app** |
-| `product-promotions`                  | `features/product-promotions-staff-page`            | moderator | **in-app** |
-| `data-confirmation-requests`          | `features/data-confirmation-requests-page`          | moderator | **in-app** |
-| `safe-deal-moderation`                | hub legacy                                          | moderator | **in-app** (order) / deep link      |
-| `installment-disputes`                | `features/installment-disputes-page`                | moderator | **in-app** |
-| `shipment-disputes`                   | hub / WEB_ONLY deep                                 | moderator | **in-app** order; deep often null   |
-| `shipping-carriers`                   | hub / WEB_ONLY deep                                 | admin     | **in-app** management order         |
-| `admin-orders`                        | `features/admin-orders-page`                        | admin     | **in-app** |
-| `search-synonyms-admin`               | `features/search-synonyms-admin-page`               | admin     | **in-app** |
-| `category-tree-admin`                 | `features/category-tree-admin-page`                 | admin     | **in-app** |
-| `app-intro-admin`                     | `features/app-intro-admin-page`                     | admin     | **in-app** |
-| `site-header-banner-admin`            | `features/site-header-banner-admin-page`            | admin     | **in-app** |
-| `popular-products-admin`              | `features/popular-products-admin-page`              | admin     | **in-app** |
-| `raffles`                             | `features/raffles-staff-page` (legacy)              | moderator | **web-only** меню → `/staff-raffles` |
+| Section ID                            | Feature / экран                                     | Роль      | Меню / open                                         |
+| ------------------------------------- | --------------------------------------------------- | --------- | --------------------------------------------------- |
+| `create-raffle`                       | `features/create-raffle-page`                       | moderator | **in-app** `/hub/create-raffle`                     |
+| `product-moderation`                  | `features/product-moderation-page`                  | moderator | **in-app** (web path `/moderation-products`)        |
+| `intro-ad-moderation`                 | `features/intro-ad-moderation-page`                 | moderator | **in-app**                                          |
+| `product-reports`                     | `features/product-reports-page` (+ story reports)   | moderator | **in-app**                                          |
+| `product-promotions`                  | `features/product-promotions-staff-page`            | moderator | **in-app**                                          |
+| `data-confirmation-requests`          | `features/data-confirmation-requests-page`          | moderator | **in-app**                                          |
+| `safe-deal-moderation`                | hub legacy                                          | moderator | **in-app** (order) / deep link                      |
+| `installment-disputes`                | `features/installment-disputes-page`                | moderator | **in-app**                                          |
+| `shipment-disputes`                   | hub / WEB_ONLY deep                                 | moderator | **in-app** order; deep often null                   |
+| `shipping-carriers`                   | hub / WEB_ONLY deep                                 | admin     | **in-app** management order                         |
+| `admin-orders`                        | `features/admin-orders-page`                        | admin     | **in-app**                                          |
+| `search-synonyms-admin`               | `features/search-synonyms-admin-page`               | admin     | **in-app**                                          |
+| `category-tree-admin`                 | `features/category-tree-admin-page`                 | admin     | **in-app**                                          |
+| `app-intro-admin`                     | `features/app-intro-admin-page`                     | admin     | **in-app**                                          |
+| `site-header-banner-admin`            | `features/site-header-banner-admin-page`            | admin     | **in-app**                                          |
+| `popular-products-admin`              | `features/popular-products-admin-page`              | admin     | **in-app**                                          |
+| `raffles`                             | `features/raffles-staff-page` (legacy)              | moderator | **web-only** меню → `/staff-raffles`                |
 | `seller-personal-category-moderation` | `features/seller-personal-category-moderation-page` | moderator | **web-only** меню → `/moderation-seller-categories` |
-| `courier-moderation`                  | —                                                   | moderator | **web-only** меню → `/courier-moderation` |
+| `courier-moderation`                  | —                                                   | moderator | **web-only** меню → `/courier-moderation`           |
 
 **Связанный legacy-код (не hub, тоже maintenance):**
 

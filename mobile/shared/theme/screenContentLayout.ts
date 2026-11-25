@@ -10,8 +10,7 @@ import {
  * Базовый горизонтальный inset контента (phone).
  * Канон: `izLayout.contentPaddingHorizontalPhone` = web AppShell phone gutter 0.5rem.
  */
-export const SCREEN_CONTENT_PADDING_HORIZONTAL =
-  izLayout.contentPaddingHorizontalPhone;
+export const SCREEN_CONTENT_PADDING_HORIZONTAL = izLayout.contentPaddingHorizontalPhone;
 
 /** Отступ между секциями на главной / в каталоге (`izLayout.contentSectionGap` / `--iz-space-2`). */
 export const SCREEN_CONTENT_SECTION_GAP = izLayout.contentSectionGap;

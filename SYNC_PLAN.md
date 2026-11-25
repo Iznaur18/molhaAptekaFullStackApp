@@ -3,7 +3,7 @@
 **Эталон (web):** `client/`  
 **Цель (mobile):** `mobile/`  
 **Общие токены:** `packages/design-tokens/`  
-**Дата аудита:** 2026-11-21  
+**Дата аудита:** 2026-11-21
 
 **Правила плана**
 
@@ -17,13 +17,13 @@
 
 ## Карта эталон ↔ цель
 
-| Слой | Web | Mobile |
-| --- | --- | --- |
-| Токены | `packages/design-tokens` + `client/src/shared/styles/designTokens.css` | `@izibuy/design-tokens` → `AppThemeProvider` → `createThemedStyles` |
-| Display font | `client/src/shared/styles/displayFont.css` (`Intro`) | `mobile/shared/theme/displayTypography.ts` |
-| Shell | `client/src/app/ui/AppShell*` + `widgets/mobile-bottom-nav` | `mobile/app/(tabs)/_layout.tsx` + `MobileBottomTabBar` |
-| Атомы | `client/src/shared/ui/*` | `mobile/shared/ui/*` + `mobile/shared/theme/*` |
-| Buyer path | `/` → `/product/:id` → `/basket` → account views | `/(tabs)/index` → `/product/[id]` → `/(tabs)/cart` → `/hub/*` |
+| Слой         | Web                                                                    | Mobile                                                              |
+| ------------ | ---------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Токены       | `packages/design-tokens` + `client/src/shared/styles/designTokens.css` | `@izibuy/design-tokens` → `AppThemeProvider` → `createThemedStyles` |
+| Display font | `client/src/shared/styles/displayFont.css` (`Intro`)                   | `mobile/shared/theme/displayTypography.ts`                          |
+| Shell        | `client/src/app/ui/AppShell*` + `widgets/mobile-bottom-nav`            | `mobile/app/(tabs)/_layout.tsx` + `MobileBottomTabBar`              |
+| Атомы        | `client/src/shared/ui/*`                                               | `mobile/shared/ui/*` + `mobile/shared/theme/*`                      |
+| Buyer path   | `/` → `/product/:id` → `/basket` → account views                       | `/(tabs)/index` → `/product/[id]` → `/(tabs)/cart` → `/hub/*`       |
 
 ---
 
@@ -31,14 +31,14 @@
 
 Не синхронизировать UI в RN без отдельного product-решения:
 
-| Path / section | Источник |
-| --- | --- |
-| `/profile/onec-integration`, `/profile/delivery-payment` | `WEB_ONLY_PATHS` |
-| `/become-courier`, `/courier-overview`, `/courier-moderation` | `WEB_ONLY_PATHS` + staff web-only |
-| `/admin-analytics`, `/staff-audit-log-admin`, `/broadcast-notifications-admin` | `WEB_ONLY_PATHS` |
-| `/safe-deal-moderation`, `/shipment-disputes`, `/shipping-carriers` | `WEB_ONLY_PATHS` |
+| Path / section                                                                     | Источник                             |
+| ---------------------------------------------------------------------------------- | ------------------------------------ |
+| `/profile/onec-integration`, `/profile/delivery-payment`                           | `WEB_ONLY_PATHS`                     |
+| `/become-courier`, `/courier-overview`, `/courier-moderation`                      | `WEB_ONLY_PATHS` + staff web-only    |
+| `/admin-analytics`, `/staff-audit-log-admin`, `/broadcast-notifications-admin`     | `WEB_ONLY_PATHS`                     |
+| `/safe-deal-moderation`, `/shipment-disputes`, `/shipping-carriers`                | `WEB_ONLY_PATHS`                     |
 | Staff menu: `raffles`, `seller-personal-category-moderation`, `courier-moderation` | `PROFILE_STAFF_WEB_ONLY_SECTION_IDS` |
-| Desktop-only: sidebar profile ≥desktop, hover-states, gallery split pinned | platform |
+| Desktop-only: sidebar profile ≥desktop, hover-states, gallery split pinned         | platform                             |
 
 ---
 
@@ -468,37 +468,37 @@ VERDICT: blocked (ручной smoke: Phone+LAN path + themes light/dark/custom 
 
 ## Приоритет внедрения (кратко)
 
-1. **Этап 0** — токены/шрифты (блокер дрейфа)  
-2. **Этап 1** — Search / Skeleton / Hero (самый заметный UI drift)  
-3. **Этап 2–7** — shell → home → catalog → cards → product → cart (buyer-critical)  
-4. **Этап 8–10** — auth / profile / lists  
-5. **Этап 11** — контентные дыры money/ads (loyalty pay, games ads, partner sales)  
-6. **Этап 12–16** — auction/raffle/wizard/storefront/states  
-7. **Этап 17** — GATE  
+1. **Этап 0** — токены/шрифты (блокер дрейфа)
+2. **Этап 1** — Search / Skeleton / Hero (самый заметный UI drift)
+3. **Этап 2–7** — shell → home → catalog → cards → product → cart (buyer-critical)
+4. **Этап 8–10** — auth / profile / lists
+5. **Этап 11** — контентные дыры money/ads (loyalty pay, games ads, partner sales)
+6. **Этап 12–16** — auction/raffle/wizard/storefront/states
+7. **Этап 17** — GATE
 
 ---
 
 ## Сводка этапов
 
-| # | Название | Фокус |
-| --- | --- | --- |
-| 0 | Токены / тема / шрифты | design-tokens, Intro, shadows, gutters |
-| 1 | Базовые UI | Button, Skeleton, Search, Modal, Hero, Form |
-| 2 | Shell / nav | Bottom pill, insets, back |
-| 3 | Home feed ✅ | Tabs, titles, grid, sections |
-| 4 | Catalog browser ✅ | Landing tiles |
-| 5 | Product cards ✅ | Grid + list geometry |
-| 6 | Product details ✅ | Price, gaps, tabs, motion |
-| 7 | Cart / checkout | Dock metrics + promo wins |
-| 8 | Auth | Login chrome |
-| 9 | Profile | Overview + nav scope |
-| 10 | Wishlist / Orders / Sales | List chrome |
-| 11 | Premium / Ads / Loyalty / Partner / Subs ✅ | Heroes + content gaps |
-| 12 | Auction / Raffle ✅ | List + featured |
-| 13 | Product wizard ✅ | Steps/fields parity |
-| 14 | Seller storefront ✅ | 1С shelves |
-| 15 | Misc buyer | Notifications, deals, FAQ… |
-| 16 | Dynamics / states | Loading/empty/error/motion |
-| 17 | Visual QA / GATE | Proof |
+| #   | Название                                    | Фокус                                       |
+| --- | ------------------------------------------- | ------------------------------------------- |
+| 0   | Токены / тема / шрифты                      | design-tokens, Intro, shadows, gutters      |
+| 1   | Базовые UI                                  | Button, Skeleton, Search, Modal, Hero, Form |
+| 2   | Shell / nav                                 | Bottom pill, insets, back                   |
+| 3   | Home feed ✅                                | Tabs, titles, grid, sections                |
+| 4   | Catalog browser ✅                          | Landing tiles                               |
+| 5   | Product cards ✅                            | Grid + list geometry                        |
+| 6   | Product details ✅                          | Price, gaps, tabs, motion                   |
+| 7   | Cart / checkout                             | Dock metrics + promo wins                   |
+| 8   | Auth                                        | Login chrome                                |
+| 9   | Profile                                     | Overview + nav scope                        |
+| 10  | Wishlist / Orders / Sales                   | List chrome                                 |
+| 11  | Premium / Ads / Loyalty / Partner / Subs ✅ | Heroes + content gaps                       |
+| 12  | Auction / Raffle ✅                         | List + featured                             |
+| 13  | Product wizard ✅                           | Steps/fields parity                         |
+| 14  | Seller storefront ✅                        | 1С shelves                                  |
+| 15  | Misc buyer                                  | Notifications, deals, FAQ…                  |
+| 16  | Dynamics / states                           | Loading/empty/error/motion                  |
+| 17  | Visual QA / GATE                            | Proof                                       |
 
 **Всего этапов: 18 (0–17).**

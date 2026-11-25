@@ -819,334 +819,339 @@ export default function ProductDetailScreen() {
 
   return (
     <ProductDetailsPageEnterShell>
-    <View
-      style={[styles.screen, { paddingTop: insets.top }, pageLayout.pageShellStyle]}
-    >
-      <View style={[styles.scrollArea, centeredContentStyle]}>
-        <KeyboardAvoidingView
-          style={styles.scrollArea}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          keyboardVerticalOffset={Platform.OS === "ios" ? insets.top : 0}
-        >
-          <ScrollView
+      <View
+        style={[styles.screen, { paddingTop: insets.top }, pageLayout.pageShellStyle]}
+      >
+        <View style={[styles.scrollArea, centeredContentStyle]}>
+          <KeyboardAvoidingView
             style={styles.scrollArea}
-            contentContainerStyle={[
-              styles.container,
-              pageLayout.isPageSplit && styles.containerSplit,
-              !showMobilePurchaseDock &&
-                !showMobileDealDock &&
-                !showInstallmentDock &&
-                !showAuctionDock &&
-                styles.containerNoDock,
-              { paddingBottom: scrollPaddingBottom },
-              keyboardBottomInset > 0 ? { paddingBottom: keyboardBottomInset } : null,
-            ]}
-            keyboardShouldPersistTaps="handled"
-            automaticallyAdjustKeyboardInsets={Platform.OS !== "web"}
-            automaticallyAdjustsScrollIndicatorInsets={Platform.OS !== "web"}
-            onScroll={handleProductScroll}
-            scrollEventThrottle={16}
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+            keyboardVerticalOffset={Platform.OS === "ios" ? insets.top : 0}
           >
-            {pageLayout.isPageSplit ? (
-              <View style={styles.pageWideLayout}>
-                <View style={styles.pageWideTop}>
-                  <View style={styles.pageWideGallery}>
-                    <ProductDetailMediaSection
-                      product={productRecord}
-                      productId={productId}
-                      imageUrls={imageUrls}
-                      previewVideoUrl={previewVideoUrl}
-                      isOwnProduct={isOwnProduct}
-                      onReportPress={handleReportPress}
-                      reportDisabled={isAuthorized && hasPendingReport}
-                      heroSize={pageLayout.heroSize}
-                      isSplitLayout
-                    />
+            <ScrollView
+              style={styles.scrollArea}
+              contentContainerStyle={[
+                styles.container,
+                pageLayout.isPageSplit && styles.containerSplit,
+                !showMobilePurchaseDock &&
+                  !showMobileDealDock &&
+                  !showInstallmentDock &&
+                  !showAuctionDock &&
+                  styles.containerNoDock,
+                { paddingBottom: scrollPaddingBottom },
+                keyboardBottomInset > 0 ? { paddingBottom: keyboardBottomInset } : null,
+              ]}
+              keyboardShouldPersistTaps="handled"
+              automaticallyAdjustKeyboardInsets={Platform.OS !== "web"}
+              automaticallyAdjustsScrollIndicatorInsets={Platform.OS !== "web"}
+              onScroll={handleProductScroll}
+              scrollEventThrottle={16}
+            >
+              {pageLayout.isPageSplit ? (
+                <View style={styles.pageWideLayout}>
+                  <View style={styles.pageWideTop}>
+                    <View style={styles.pageWideGallery}>
+                      <ProductDetailMediaSection
+                        product={productRecord}
+                        productId={productId}
+                        imageUrls={imageUrls}
+                        previewVideoUrl={previewVideoUrl}
+                        isOwnProduct={isOwnProduct}
+                        onReportPress={handleReportPress}
+                        reportDisabled={isAuthorized && hasPendingReport}
+                        heroSize={pageLayout.heroSize}
+                        isSplitLayout
+                      />
+                    </View>
+                    <View style={styles.pageWideRail}>
+                      <ProductDetailsDetailsTab
+                        {...detailsTabProps}
+                        presentation="split-rail"
+                      />
+                    </View>
                   </View>
-                  <View style={styles.pageWideRail}>
+
+                  {showTabs ? (
+                    <View style={styles.pageWideTabs}>
+                      <ProductDetailTabBar
+                        tabs={tabs}
+                        activeTab={activeTab}
+                        onTabChange={setActiveTab}
+                        layout="wide"
+                      />
+                    </View>
+                  ) : null}
+
+                  {isAltTab ? (
+                    <View
+                      style={[
+                        styles.tabPanel,
+                        styles.pageWideAltPanel,
+                        styles.tabPanelSplit,
+                      ]}
+                    >
+                      {isSimilarTab ? (
+                        <ProductSimilarTab
+                          product={productRecord}
+                          excludeProductId={productId}
+                          enabled
+                          variant="detailTab"
+                          onRegisterLoadMore={handleRegisterSimilarLoadMore}
+                        />
+                      ) : (
+                        renderAltTabPanel()
+                      )}
+                    </View>
+                  ) : null}
+
+                  {activeTab === "details" ? (
                     <ProductDetailsDetailsTab
                       {...detailsTabProps}
-                      presentation="split-rail"
+                      presentation="split-rest"
                     />
-                  </View>
-                </View>
+                  ) : null}
 
-                {showTabs ? (
-                  <View style={styles.pageWideTabs}>
+                  {renderManageActions()}
+
+                  {reportSuccessMessage ? (
+                    <Text style={styles.reportSuccess}>{reportSuccessMessage}</Text>
+                  ) : null}
+                </View>
+              ) : (
+                <>
+                  <ProductDetailMediaSection
+                    product={productRecord}
+                    productId={productId}
+                    imageUrls={imageUrls}
+                    previewVideoUrl={previewVideoUrl}
+                    isOwnProduct={isOwnProduct}
+                    onReportPress={handleReportPress}
+                    reportDisabled={isAuthorized && hasPendingReport}
+                    heroSize={pageLayout.heroSize}
+                  />
+                  {showTabs ? (
                     <ProductDetailTabBar
                       tabs={tabs}
                       activeTab={activeTab}
                       onTabChange={setActiveTab}
-                      layout="wide"
                     />
-                  </View>
-                ) : null}
+                  ) : null}
 
-                {isAltTab ? (
-                  <View
-                    style={[
-                      styles.tabPanel,
-                      styles.pageWideAltPanel,
-                      styles.tabPanelSplit,
-                    ]}
-                  >
-                    {isSimilarTab ? (
-                      <ProductSimilarTab
-                        product={productRecord}
-                        excludeProductId={productId}
-                        enabled
-                        variant="detailTab"
-                        onRegisterLoadMore={handleRegisterSimilarLoadMore}
+                  {isAltTab ? (
+                    <View style={[styles.tabPanel, styles.tabPanelInset]}>
+                      {isSimilarTab ? (
+                        <ProductSimilarTab
+                          product={productRecord}
+                          excludeProductId={productId}
+                          enabled
+                          variant="detailTab"
+                          onRegisterLoadMore={handleRegisterSimilarLoadMore}
+                        />
+                      ) : (
+                        renderAltTabPanel()
+                      )}
+                    </View>
+                  ) : (
+                    <View style={styles.tabPanel}>
+                      <ProductDetailsDetailsTab
+                        {...detailsTabProps}
+                        presentation="default"
                       />
-                    ) : (
-                      renderAltTabPanel()
-                    )}
-                  </View>
-                ) : null}
+                    </View>
+                  )}
 
-                {activeTab === "details" ? (
-                  <ProductDetailsDetailsTab
-                    {...detailsTabProps}
-                    presentation="split-rest"
-                  />
-                ) : null}
+                  {renderManageActions()}
 
-                {renderManageActions()}
+                  {reportSuccessMessage ? (
+                    <Text style={styles.reportSuccess}>{reportSuccessMessage}</Text>
+                  ) : null}
+                </>
+              )}
+            </ScrollView>
+          </KeyboardAvoidingView>
 
-                {reportSuccessMessage ? (
-                  <Text style={styles.reportSuccess}>{reportSuccessMessage}</Text>
-                ) : null}
-              </View>
-            ) : (
-              <>
-                <ProductDetailMediaSection
-                  product={productRecord}
-                  productId={productId}
-                  imageUrls={imageUrls}
-                  previewVideoUrl={previewVideoUrl}
-                  isOwnProduct={isOwnProduct}
-                  onReportPress={handleReportPress}
-                  reportDisabled={isAuthorized && hasPendingReport}
-                  heroSize={pageLayout.heroSize}
-                />
-                {showTabs ? (
-                  <ProductDetailTabBar
-                    tabs={tabs}
-                    activeTab={activeTab}
-                    onTabChange={setActiveTab}
-                  />
-                ) : null}
-
-                {isAltTab ? (
-                  <View style={[styles.tabPanel, styles.tabPanelInset]}>
-                    {isSimilarTab ? (
-                      <ProductSimilarTab
-                        product={productRecord}
-                        excludeProductId={productId}
-                        enabled
-                        variant="detailTab"
-                        onRegisterLoadMore={handleRegisterSimilarLoadMore}
-                      />
-                    ) : (
-                      renderAltTabPanel()
-                    )}
-                  </View>
-                ) : (
-                  <View style={styles.tabPanel}>
-                    <ProductDetailsDetailsTab
-                      {...detailsTabProps}
-                      presentation="default"
-                    />
-                  </View>
-                )}
-
-                {renderManageActions()}
-
-                {reportSuccessMessage ? (
-                  <Text style={styles.reportSuccess}>{reportSuccessMessage}</Text>
-                ) : null}
-              </>
-            )}
-          </ScrollView>
-        </KeyboardAvoidingView>
-
-        {showMobilePurchaseDock && keyboardBottomInset === 0 ? (
-          <View
-            style={[
-              styles.purchaseDock,
-              styles.purchaseDockInner,
-              { paddingBottom: Math.max(insets.bottom, 10.4) },
-            ]}
-          >
-            <ProductDetailPurchaseActions
-              productId={productId}
-              product={productRecord}
-              canShowAddToCart={canShowAddToCart}
-              showOutOfStockPurchaseButton={showOutOfStockPurchaseButton}
-              showBlockedPurchaseButton={showBlockedPurchaseButton}
-              blockedPurchaseLabel={blockedLabel}
-              showSellerClosedPurchaseButton={showSellerClosedPurchaseButton}
-              showOwnProductPurchaseButton={showOwnProductPurchaseButton}
-              sellerClosedPurchaseLabel={sellerClosedLabel}
-              variant="dock"
-              onBack={() => {
-                if (router.canGoBack()) {
-                  router.back();
-                } else {
-                  router.replace("/(tabs)");
-                }
-              }}
-            />
-          </View>
-        ) : null}
-
-        {showMobileDealDock && keyboardBottomInset === 0 ? (
-          <View
-            style={[
-              styles.purchaseDock,
-              styles.purchaseDockInner,
-              { paddingBottom: Math.max(insets.bottom, 10.4) },
-            ]}
-          >
-            <ProductDealActions
-              product={productRecord}
-              isOwnProduct={false}
-              variant="dock"
-            />
-          </View>
-        ) : null}
-
-        {showInstallmentDock && installmentDock && keyboardBottomInset === 0 ? (
-          <View
-            style={[
-              styles.installmentDock,
-              { paddingBottom: Math.max(insets.bottom, 10.4) },
-            ]}
-          >
-            <AppButton
-              label={installmentDock.label}
-              variant="primary"
-              onPress={installmentDock.onSubmit}
-              disabled={installmentDock.disabled}
-              style={styles.installmentDockButton}
-              accessibilityLabel={INSTALLMENT_UI.SUBMIT}
-            />
-          </View>
-        ) : null}
-
-        {showAuctionDock && auctionDock && keyboardBottomInset === 0 ? (
-          <View
-            style={[
-              styles.installmentDock,
-              { paddingBottom: Math.max(insets.bottom, 10.4) },
-            ]}
-          >
-            <AppButton
-              label={auctionDock.label}
-              variant="contrast"
-              onPress={auctionDock.onSubmit}
-              disabled={auctionDock.disabled}
-              style={styles.installmentDockButton}
-              accessibilityLabel={auctionDock.label}
-            />
-          </View>
-        ) : null}
-      </View>
-
-      <ReportProductModal
-        visible={reportModalVisible}
-        productId={productId}
-        productName={name}
-        hasPendingReport={hasPendingReport}
-        onClose={() => setReportModalVisible(false)}
-        onSubmitted={handleReportSubmitted}
-      />
-
-      <ProductPromotionModal
-        visible={promotionModalVisible}
-        product={
-          isOwnProduct
-            ? (productRecord as Record<string, unknown> & { _id: string })
-            : null
-        }
-        productName={name}
-        productPrice={productPrice}
-        tiers={promotionTariffsQuery.data?.tiers ?? []}
-        durations={promotionTariffsQuery.data?.durations ?? []}
-        isTariffsLoading={promotionTariffsQuery.isPending}
-        tariffsError={
-          promotionTariffsQuery.error instanceof Error
-            ? promotionTariffsQuery.error
-            : null
-        }
-        isSubmitting={requestPromotionMutation.isPending}
-        errorMessage={promotionErrorMessage}
-        onRetryTariffs={() => void promotionTariffsQuery.refetch()}
-        onClose={handleClosePromotionModal}
-        onSubmit={handleSubmitPromotion}
-        onSetProductAvailability={
-          isOwnProduct ? handleSetMyProductAvailability : undefined
-        }
-        onSetProductAuction={isOwnProduct ? handleSetProductAuction : undefined}
-        onSetProductOriginality={isOwnProduct ? handleSetProductOriginality : undefined}
-        onSetProductOutOfStock={isOwnProduct ? handleSetProductOutOfStock : undefined}
-        onSetProductWholesale={isOwnProduct ? handleSetProductWholesale : undefined}
-        onSetProductBuyNFree={isOwnProduct ? handleSetProductBuyNFree : undefined}
-        onSetProductAffiliate={isOwnProduct ? handleSetProductAffiliate : undefined}
-        onSetProductLoyaltyPoints={
-          isOwnProduct ? handleSetProductLoyaltyPoints : undefined
-        }
-        onSetProductInstallment={isOwnProduct ? handleSetProductInstallment : undefined}
-        onWholesaleSaved={isOwnProduct ? handleWholesaleSaved : undefined}
-        onDeleteProduct={
-          isOwnProduct || isAdmin
-            ? async (id) => {
-                try {
-                  await deleteMutation.mutateAsync(id);
-                  handleClosePromotionModal();
+          {showMobilePurchaseDock && keyboardBottomInset === 0 ? (
+            <View
+              style={[
+                styles.purchaseDock,
+                styles.purchaseDockInner,
+                { paddingBottom: Math.max(insets.bottom, 10.4) },
+              ]}
+            >
+              <ProductDetailPurchaseActions
+                productId={productId}
+                product={productRecord}
+                canShowAddToCart={canShowAddToCart}
+                showOutOfStockPurchaseButton={showOutOfStockPurchaseButton}
+                showBlockedPurchaseButton={showBlockedPurchaseButton}
+                blockedPurchaseLabel={blockedLabel}
+                showSellerClosedPurchaseButton={showSellerClosedPurchaseButton}
+                showOwnProductPurchaseButton={showOwnProductPurchaseButton}
+                sellerClosedPurchaseLabel={sellerClosedLabel}
+                variant="dock"
+                onBack={() => {
                   if (router.canGoBack()) {
                     router.back();
                   } else {
                     router.replace("/(tabs)");
                   }
-                } catch (error) {
-                  setManageErrorMessage(
-                    formatApiErrorMessage(
-                      error,
-                      API_CLIENT_UI.DELETE_MY_PRODUCT_FALLBACK,
-                    ),
-                  );
+                }}
+              />
+            </View>
+          ) : null}
+
+          {showMobileDealDock && keyboardBottomInset === 0 ? (
+            <View
+              style={[
+                styles.purchaseDock,
+                styles.purchaseDockInner,
+                { paddingBottom: Math.max(insets.bottom, 10.4) },
+              ]}
+            >
+              <ProductDealActions
+                product={productRecord}
+                isOwnProduct={false}
+                variant="dock"
+              />
+            </View>
+          ) : null}
+
+          {showInstallmentDock && installmentDock && keyboardBottomInset === 0 ? (
+            <View
+              style={[
+                styles.installmentDock,
+                { paddingBottom: Math.max(insets.bottom, 10.4) },
+              ]}
+            >
+              <AppButton
+                label={installmentDock.label}
+                variant="primary"
+                onPress={installmentDock.onSubmit}
+                disabled={installmentDock.disabled}
+                style={styles.installmentDockButton}
+                accessibilityLabel={INSTALLMENT_UI.SUBMIT}
+              />
+            </View>
+          ) : null}
+
+          {showAuctionDock && auctionDock && keyboardBottomInset === 0 ? (
+            <View
+              style={[
+                styles.installmentDock,
+                { paddingBottom: Math.max(insets.bottom, 10.4) },
+              ]}
+            >
+              <AppButton
+                label={auctionDock.label}
+                variant="contrast"
+                onPress={auctionDock.onSubmit}
+                disabled={auctionDock.disabled}
+                style={styles.installmentDockButton}
+                accessibilityLabel={auctionDock.label}
+              />
+            </View>
+          ) : null}
+        </View>
+
+        <ReportProductModal
+          visible={reportModalVisible}
+          productId={productId}
+          productName={name}
+          hasPendingReport={hasPendingReport}
+          onClose={() => setReportModalVisible(false)}
+          onSubmitted={handleReportSubmitted}
+        />
+
+        <ProductPromotionModal
+          visible={promotionModalVisible}
+          product={
+            isOwnProduct
+              ? (productRecord as Record<string, unknown> & { _id: string })
+              : null
+          }
+          productName={name}
+          productPrice={productPrice}
+          tiers={promotionTariffsQuery.data?.tiers ?? []}
+          durations={promotionTariffsQuery.data?.durations ?? []}
+          isTariffsLoading={promotionTariffsQuery.isPending}
+          tariffsError={
+            promotionTariffsQuery.error instanceof Error
+              ? promotionTariffsQuery.error
+              : null
+          }
+          isSubmitting={requestPromotionMutation.isPending}
+          errorMessage={promotionErrorMessage}
+          onRetryTariffs={() => void promotionTariffsQuery.refetch()}
+          onClose={handleClosePromotionModal}
+          onSubmit={handleSubmitPromotion}
+          onSetProductAvailability={
+            isOwnProduct ? handleSetMyProductAvailability : undefined
+          }
+          onSetProductAuction={isOwnProduct ? handleSetProductAuction : undefined}
+          onSetProductOriginality={
+            isOwnProduct ? handleSetProductOriginality : undefined
+          }
+          onSetProductOutOfStock={isOwnProduct ? handleSetProductOutOfStock : undefined}
+          onSetProductWholesale={isOwnProduct ? handleSetProductWholesale : undefined}
+          onSetProductBuyNFree={isOwnProduct ? handleSetProductBuyNFree : undefined}
+          onSetProductAffiliate={isOwnProduct ? handleSetProductAffiliate : undefined}
+          onSetProductLoyaltyPoints={
+            isOwnProduct ? handleSetProductLoyaltyPoints : undefined
+          }
+          onSetProductInstallment={
+            isOwnProduct ? handleSetProductInstallment : undefined
+          }
+          onWholesaleSaved={isOwnProduct ? handleWholesaleSaved : undefined}
+          onDeleteProduct={
+            isOwnProduct || isAdmin
+              ? async (id) => {
+                  try {
+                    await deleteMutation.mutateAsync(id);
+                    handleClosePromotionModal();
+                    if (router.canGoBack()) {
+                      router.back();
+                    } else {
+                      router.replace("/(tabs)");
+                    }
+                  } catch (error) {
+                    setManageErrorMessage(
+                      formatApiErrorMessage(
+                        error,
+                        API_CLIENT_UI.DELETE_MY_PRODUCT_FALLBACK,
+                      ),
+                    );
+                  }
                 }
-              }
-            : undefined
-        }
-        isAvailabilityTogglePending={isAvailabilityTogglePending}
-        isAuctionTogglePending={isAuctionTogglePending}
-        isOriginalityTogglePending={isOriginalityTogglePending}
-        isOutOfStockTogglePending={isOutOfStockTogglePending}
-        isWholesaleTogglePending={isWholesaleTogglePending}
-        isBuyNFreeTogglePending={isBuyNFreeTogglePending}
-        isAffiliateTogglePending={isAffiliateTogglePending}
-        isLoyaltyTogglePending={isLoyaltyTogglePending}
-        isInstallmentTogglePending={isInstallmentTogglePending}
-        isDeletePending={deleteMutation.isPending}
-        manageErrorMessage={manageErrorMessage}
-        canManageEdit={
-          (isOwnProduct || isAdmin) && (isAdmin || canSellerEditProduct(productRecord))
-        }
-        canManageDelete={
-          (isOwnProduct || isAdmin) &&
-          (isAdmin || canSellerDeleteProduct(productRecord))
-        }
-        canManageToggleVisibility={
-          isOwnProduct && (isAdmin || canSellerToggleCatalogVisibility(productRecord))
-        }
-        sellerRaffleActive={manageSupport.sellerRaffleActive}
-        onToggleRaffleParticipation={manageSupport.handleToggleRaffleParticipation}
-        isRaffleParticipationPending={manageSupport.isRaffleParticipationPending}
-        onInstallmentProgramSaved={handleInstallmentProgramSaved}
-      />
-    </View>
+              : undefined
+          }
+          isAvailabilityTogglePending={isAvailabilityTogglePending}
+          isAuctionTogglePending={isAuctionTogglePending}
+          isOriginalityTogglePending={isOriginalityTogglePending}
+          isOutOfStockTogglePending={isOutOfStockTogglePending}
+          isWholesaleTogglePending={isWholesaleTogglePending}
+          isBuyNFreeTogglePending={isBuyNFreeTogglePending}
+          isAffiliateTogglePending={isAffiliateTogglePending}
+          isLoyaltyTogglePending={isLoyaltyTogglePending}
+          isInstallmentTogglePending={isInstallmentTogglePending}
+          isDeletePending={deleteMutation.isPending}
+          manageErrorMessage={manageErrorMessage}
+          canManageEdit={
+            (isOwnProduct || isAdmin) &&
+            (isAdmin || canSellerEditProduct(productRecord))
+          }
+          canManageDelete={
+            (isOwnProduct || isAdmin) &&
+            (isAdmin || canSellerDeleteProduct(productRecord))
+          }
+          canManageToggleVisibility={
+            isOwnProduct && (isAdmin || canSellerToggleCatalogVisibility(productRecord))
+          }
+          sellerRaffleActive={manageSupport.sellerRaffleActive}
+          onToggleRaffleParticipation={manageSupport.handleToggleRaffleParticipation}
+          isRaffleParticipationPending={manageSupport.isRaffleParticipationPending}
+          onInstallmentProgramSaved={handleInstallmentProgramSaved}
+        />
+      </View>
     </ProductDetailsPageEnterShell>
   );
 }
