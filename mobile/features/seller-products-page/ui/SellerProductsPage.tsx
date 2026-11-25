@@ -47,6 +47,7 @@ import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useSellerGamesStyles } from "@/shared/theme/sellerGamesStyles";
 import { useSellerProductsPageStyles } from "@/shared/theme/sellerFlowStyles";
+import { MobileBottomNavOverlay } from "@/shared/ui/MobileBottomNavOverlay";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 export const SellerProductsPage = () => {
@@ -260,7 +261,8 @@ export const SellerProductsPage = () => {
           contentContainerStyle={[
             styles.list,
             resolveCatalogGridListContentStyle(productGrid.gap),
-            { paddingBottom: contentPaddingBottom + insets.bottom },
+            // contentPaddingBottom уже включает safe-area + высоту floating nav.
+            { paddingBottom: contentPaddingBottom },
           ]}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.4}
@@ -538,6 +540,8 @@ export const SellerProductsPage = () => {
             />
           )}
         />
+        {/* Паритет web AppShell: bottom nav на `/seller/:id`. */}
+        <MobileBottomNavOverlay />
       </View>
     </CatalogScrollAnimationProvider>
   );

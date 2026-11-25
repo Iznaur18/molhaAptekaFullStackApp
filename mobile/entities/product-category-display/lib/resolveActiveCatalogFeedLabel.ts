@@ -54,14 +54,15 @@ type CatalogFeedQuery = {
   near?: boolean;
 };
 
+/** Порядок флагов — как web `resolveActiveCatalogFeedLabel.js`. */
 export const resolveActiveCatalogFeedLabel = (
   query: CatalogFeedQuery,
 ): string | null => {
-  if (query.near) {
-    return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_NEAR];
-  }
   if (query.flashSaleOnly) {
     return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_FLASH_SALE_ONLY];
+  }
+  if (query.near) {
+    return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_NEAR];
   }
   if (query.followingOnly) {
     return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_FOLLOWING_ONLY];

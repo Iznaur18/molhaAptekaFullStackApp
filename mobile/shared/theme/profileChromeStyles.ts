@@ -3,12 +3,17 @@ import { Platform, StyleSheet } from "react-native";
 import {
   GUEST_PROFILE_LAYOUT as G,
   MY_PROFILE_LAYOUT_GAP,
+  MY_PROFILE_SECTION_GAP,
   MY_PROFILE_SHELL_PAD_X,
   MY_PROFILE_SIDEBAR_LAYOUT as S,
   MY_PROFILE_SIDEBAR_WIDTH,
   PROFILE_OVERVIEW_LAYOUT as O,
 } from "@/shared/lib/guestProfileLayout";
 import { PRODUCT_DETAILS_SELLER_PRODUCTS_CAROUSEL_LAYOUT as SPC } from "@/entities/product/lib/productDetailsSellerProductsCarouselLayout";
+import { USER_PROFILE_PURCHASES_LAYOUT as UPP } from "@/entities/user/lib/userProfilePurchasesLayout";
+export {
+  USER_PROFILE_PURCHASES_TRACK_HEIGHT,
+} from "@/entities/user/lib/userProfilePurchasesLayout";
 import { PROFILE_CONTENT_MAX_WIDTH_PHONE } from "@/shared/lib/screenBreakpoints";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { SCREEN_CONTENT_PADDING_BOTTOM } from "@/shared/theme/screenContentLayout";
@@ -34,6 +39,20 @@ export const PROFILE_BANNER_MARGIN_BOTTOM = 0;
 export const PROFILE_CARD_SQUIRCLE_RADIUS = 24;
 /** Паритет с teaser/wholesale chrome на экране товара. */
 export const PRODUCT_DETAIL_SECTION_RADIUS = 20;
+/** web `--user-details-screen-gap: 6px` */
+export const USER_DETAILS_SCREEN_GAP = MY_PROFILE_SECTION_GAP;
+
+/**
+ * web `--iz-color-ink` / `--iz-color-on-contrast` —
+ * заголовки «Список товаров», «ОСНОВНОЕ», «КОНТАКТЫ», …
+ */
+export const resolveProfileSectionHeaderChrome = (theme: {
+  colors: { ink: string; onContrast: string };
+}) => ({
+  backgroundColor: theme.colors.ink,
+  borderBottomColor: theme.colors.ink,
+  color: theme.colors.onContrast,
+});
 
 export const useProfileScreenStyles = createThemedStyles((theme, layout) => ({
   safeArea: {
@@ -661,11 +680,12 @@ export const useThemePreferenceToggleStyles = createThemedStyles((theme, layout)
   },
 }));
 
-const USER_PROFILE_THUMB_SIZE = SPC.thumbSize;
+const USER_PROFILE_THUMB_SIZE = UPP.thumbSize;
 export { USER_PROFILE_THUMB_SIZE };
+/** Product-detail carousel (squircle). Profile purchases — `UPP.thumbRadius` (14). */
 export const USER_PROFILE_THUMB_SQUIRCLE_RADIUS = SPC.thumbRadius;
-export const USER_PROFILE_THUMB_GAP = SPC.trackGap;
-/** Паритет `.user-profile-purchases__list` / seller carousel track — фиксирует высоту на RN Web. */
+export const USER_PROFILE_THUMB_GAP = UPP.tileGap;
+/** Паритет product-detail carousel track — pad внутри трека. */
 export const USER_PROFILE_THUMB_TRACK_HEIGHT =
   SPC.thumbSize + SPC.trackPaddingTop + SPC.trackPaddingBottom;
 /** До первого onLayout — запасной размер ряда. */
@@ -685,7 +705,10 @@ export const resolveUserProfileThumbColumns = (contentWidth: number): number => 
   );
 };
 
-export const useUserProfileThumbListStyles = createThemedStyles((theme, layout) => ({
+export const useUserProfileThumbListStyles = createThemedStyles((theme, layout) => {
+  const sectionHeader = resolveProfileSectionHeaderChrome(theme);
+
+  return {
   root: {
     marginBottom: theme.spacing[4],
     backgroundColor: theme.colors.surface,
@@ -694,6 +717,13 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme, layout) 
     flexGrow: 0,
     flexShrink: 0,
     alignSelf: "stretch",
+  },
+  /** web `--user-profile-purchases-section-radius: 24px` (не squircle). */
+  rootProfileRadius: {
+    marginBottom: 0,
+    borderRadius: PROFILE_CARD_SQUIRCLE_RADIUS,
+    overflow: "hidden",
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
   rootHorizontal: {
     marginBottom: 0,
@@ -711,11 +741,11 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme, layout) 
     alignItems: "center",
     justifyContent: "space-between",
     gap: theme.spacing[2],
-    paddingVertical: 8,
-    paddingHorizontal: 14,
+    paddingVertical: UPP.headingPaddingY,
+    paddingHorizontal: UPP.headingPaddingX,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    backgroundColor: theme.colors.ink,
-    borderBottomColor: theme.colors.ink,
+    backgroundColor: sectionHeader.backgroundColor,
+    borderBottomColor: sectionHeader.borderBottomColor,
   },
   headerHorizontal: {
     backgroundColor: "transparent",
@@ -732,7 +762,7 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme, layout) 
     fontWeight: "800",
     letterSpacing: 0.9,
     textTransform: "uppercase",
-    color: theme.colors.onContrast,
+    color: sectionHeader.color,
   },
   headerTitleHorizontal: {
     fontSize: SPC.headingFontSize,
@@ -755,15 +785,21 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme, layout) 
     opacity: 0.82,
   },
   body: {
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingHorizontal: UPP.bodyPaddingX,
+    paddingVertical: UPP.bodyPaddingY,
     gap: theme.spacing[2],
   },
+  /**
+   * Vertical pad как web `0.75rem`. Horizontal 0 — трек full-bleed до края карточки;
+   * боковой inset даёт spacer в `UserProfileThumbScrollRow` (скроллится вместе с thumbs).
+   */
   bodyProfileScrollRow: {
     flexGrow: 0,
     flexShrink: 0,
     overflow: "hidden",
     gap: 0,
+    paddingVertical: UPP.bodyPaddingY,
+    paddingHorizontal: 0,
   },
   bodyHorizontal: {
     paddingHorizontal: 0,
@@ -811,6 +847,29 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme, layout) 
     flexGrow: 0,
     flexShrink: 0,
   },
+  /** Profile purchases: трек без pad — inset на inner (скроллится → thumbs в край). */
+  scrollRowContentProfile: {
+    flexDirection: "row",
+    flexWrap: "nowrap",
+    alignItems: "center",
+    gap: 0,
+    paddingTop: 0,
+    paddingLeft: 0,
+    paddingRight: 0,
+    paddingBottom: 0,
+    flexGrow: 0,
+    flexShrink: 0,
+  },
+  /** web `padding: 0.75rem 0.875rem` по горизонтали — внутри скролла. */
+  scrollRowInnerProfile: {
+    flexDirection: "row",
+    flexWrap: "nowrap",
+    alignItems: "center",
+    gap: UPP.tileGap,
+    paddingHorizontal: UPP.bodyPaddingX,
+    flexGrow: 0,
+    flexShrink: 0,
+  },
   thumbButton: {
     width: USER_PROFILE_THUMB_SIZE,
     height: USER_PROFILE_THUMB_SIZE,
@@ -839,6 +898,16 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme, layout) 
     borderWidth: SPC.thumbBorderWidth,
     borderColor: theme.colors.border,
   },
+  /** web `--user-profile-purchases-thumb-radius: 14px` */
+  thumbClipProfile: {
+    width: USER_PROFILE_THUMB_SIZE,
+    height: USER_PROFILE_THUMB_SIZE,
+    borderRadius: UPP.thumbRadius,
+    overflow: "hidden",
+    backgroundColor: theme.colors.surfaceMuted,
+    borderWidth: UPP.thumbBorderWidth,
+    borderColor: theme.colors.border,
+  },
   thumbClipCurrent: {
     borderWidth: SPC.thumbCurrentOutlineWidth,
     borderColor: theme.colors.action,
@@ -862,7 +931,8 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme, layout) 
     textAlign: "center",
     color: theme.colors.warningText,
   },
-}));
+};
+});
 
 export const useUserDetailsPageStyles = createThemedStyles((theme, layout) => ({
   screen: {
@@ -874,17 +944,17 @@ export const useUserDetailsPageStyles = createThemedStyles((theme, layout) => ({
     paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: theme.spacing[3],
     paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
-    gap: theme.spacing[2],
+    gap: USER_DETAILS_SCREEN_GAP,
   },
   header: {
-    gap: theme.spacing[2],
+    gap: USER_DETAILS_SCREEN_GAP,
   },
   titleRow: {
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: theme.spacing[2],
+    gap: USER_DETAILS_SCREEN_GAP,
   },
   titleLeading: {
     flex: 1,
@@ -903,10 +973,32 @@ export const useUserDetailsPageStyles = createThemedStyles((theme, layout) => ({
     color: theme.colors.text,
   },
   profileBody: {
+    gap: USER_DETAILS_SCREEN_GAP,
+  },
+  storefrontBtn: {
+    width: "100%",
+    minHeight: 44,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: theme.spacing[2],
+    paddingHorizontal: theme.spacing[3],
+    borderRadius: theme.radius.pill,
+    borderWidth: 1,
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.action,
+  },
+  storefrontBtnPressed: {
+    opacity: 0.88,
+  },
+  storefrontBtnText: {
+    flexShrink: 1,
+    color: theme.colors.onContrast,
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   footer: {
     gap: theme.spacing[3],
-    marginTop: theme.spacing[2],
+    marginTop: USER_DETAILS_SCREEN_GAP,
   },
 }));

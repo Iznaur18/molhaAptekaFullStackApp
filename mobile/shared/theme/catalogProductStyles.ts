@@ -234,23 +234,116 @@ const catalogBreadcrumbTitleBase = {
 } as const;
 
 export const useCatalogBreadcrumbStyles = createThemedStyles((theme, layout) => ({
+  /**
+   * Web `.catalog-categories-browser__toolbar { margin: 0 0 1rem }`.
+   * Итог breadcrumb→сетка = этот margin + FlatList `contentContainer.gap`.
+   * На экране категории margin режется до `16 - gap`, чтобы сумма была 1rem.
+   */
   toolbar: {
+    marginBottom: 16,
+    paddingTop: 0,
+  },
+  /** Web `.catalog-categories-browser__breadcrumb` */
+  nav: {
+    minWidth: 0,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.pill,
+    backgroundColor: theme.colors.actionSoft,
+    paddingVertical: 5,
+    paddingLeft: 5,
+    paddingRight: 6,
+    shadowColor: theme.colors.ink,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  list: {
+    flexDirection: "row",
+    flexWrap: "nowrap",
+    alignItems: "center",
+    gap: 2,
+    paddingRight: 4,
+  },
+  node: {
+    flexDirection: "row",
+    flexShrink: 0,
+    alignItems: "center",
+    gap: 2,
+  },
+  root: {
+    maxWidth: "100%",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: theme.radius.pill,
+  },
+  rootPressed: {
+    backgroundColor: theme.colors.surface,
+  },
+  rootText: {
+    color: theme.colors.action,
+    fontSize: 13,
+    fontWeight: "500",
+    lineHeight: 16,
+  },
+  rootStatic: {
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+  },
+  sep: {
+    marginHorizontal: 1,
+    color: theme.colors.textPlaceholder,
+    fontSize: 12,
+    fontWeight: "500",
+    lineHeight: 14,
+  },
+  itemText: {
+    maxWidth: 160,
+    paddingVertical: 5,
+    paddingHorizontal: 6,
+    color: theme.colors.textSecondary,
+    fontSize: 13,
+    fontWeight: "500",
+    lineHeight: 16,
+  },
+  itemButton: {
+    borderRadius: theme.radius.pill,
+  },
+  itemButtonPressed: {
+    backgroundColor: theme.colors.surface,
+  },
+  /** Web `.catalog-categories-browser__breadcrumb-current` */
+  current: {
+    maxWidth: 256,
+    overflow: "hidden",
+    paddingVertical: 5,
+    paddingHorizontal: 12,
+    borderRadius: theme.radius.pill,
+    backgroundColor: theme.colors.action,
+    color: theme.colors.onContrast,
+    fontSize: 13,
+    fontWeight: "600",
+    lineHeight: 16,
+    letterSpacing: 0.1,
+  },
+  /** Display-title «Главная» — web `.home-feed-section-title` */
+  displayToolbar: {
     paddingTop: 16,
     marginBottom: 14,
   },
-  toolbarCompactTop: {
+  displayToolbarCompactTop: {
     paddingTop: 0,
     marginTop: -HOME_CATALOG_SECTION_TITLE_COMPACT_PULL_UP,
-    // Web `.home-feed-section-title { margin: 1rem 0 }` — marginBottom на title.
     marginBottom: 0,
   },
-  // Паритет web `.home-feed-section-title`
-  title: {
+  displayTitle: {
     ...catalogBreadcrumbTitleBase,
     color: theme.colors.text,
     marginTop: HOME_FEED_DISPLAY_TITLE.marginTop,
   },
-  titleCompactTop: {
+  displayTitleCompactTop: {
     ...catalogBreadcrumbTitleBase,
     color: theme.colors.text,
     marginTop: HOME_CATALOG_SECTION_TITLE_MARGIN_TOP,
@@ -1863,11 +1956,17 @@ export const useProductMediaGalleryStyles = createThemedStyles((theme, layout) =
     paddingHorizontal: 0,
     paddingBottom: 0,
   },
+  /** Web `.product-media-gallery-readonly__hero` + `@supports squircle` 2.75rem. */
   detailHero: {
     width: "100%",
-    borderRadius: 13.6,
+    borderRadius:
+      Platform.OS === "web" || Platform.OS === "ios"
+        ? GRL.heroSquircleRadius
+        : GRL.heroFallbackRadius,
     overflow: "hidden",
     backgroundColor: theme.colors.surfaceMuted,
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+    ...(Platform.OS === "web" ? ({ cornerShape: "squircle" } as const) : null),
   },
   detailBackButton: {
     position: "absolute",

@@ -42,6 +42,7 @@ export const UserProfilePurchasesList = ({
       heading={USER_PROFILE_PURCHASES_UI.HEADING}
       phase={phase}
       items={items}
+      layout="profile-scroll"
       loadingText={USER_PROFILE_PURCHASES_UI.LOADING}
       emptyText={USER_PROFILE_PURCHASES_UI.EMPTY}
       errorText={errorText}

@@ -63,7 +63,9 @@ export const useUserFollowButtonStyles = createThemedStyles((theme, layout) => (
     alignSelf: "flex-start",
     paddingVertical: theme.spacing[2],
     paddingHorizontal: 14,
-    borderRadius: theme.radius.button,
+    borderRadius: theme.radius.pill,
+    borderWidth: 1,
+    borderColor: theme.colors.action,
     backgroundColor: theme.colors.action,
     alignItems: "center",
   },
@@ -107,7 +109,8 @@ export const useUserFollowButtonStyles = createThemedStyles((theme, layout) => (
 
 export const useUserVoteRatingStyles = createThemedStyles((theme, layout) => ({
   root: {
-    marginTop: theme.spacing[4],
+    /** web `.user-details-page .user-vote-rating-form__details { margin: 0 }` — gap даёт parent. */
+    marginTop: 0,
     borderWidth: 1,
     borderRadius: theme.radius.sm,
     overflow: "hidden",

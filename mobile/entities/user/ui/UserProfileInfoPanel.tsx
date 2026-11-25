@@ -1,7 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
-import { izColors } from "@izibuy/design-tokens";
+import { Linking, Pressable, Text, View } from "react-native";
 
 import { fetchUserPhone } from "@/entities/user/api/fetchUserPhone";
 import type { ProfileRow } from "@/entities/user/lib/getUserProfileRows";
@@ -11,14 +10,19 @@ import {
 } from "@/entities/user/lib/groupProfileRows";
 import { getProfileRowIcon } from "@/entities/user/lib/profileRowIcons";
 import {
+  PROFILE_STATS_SECTION_ID,
+  PROFILE_STATS_WIDE_ROW_IDS,
+} from "@/entities/user/lib/profileStatIconGradients";
+import {
   formatRuPhoneDisplayOrEmpty,
   RU_PHONE_EMPTY_LABEL,
   toRuPhoneTelHref,
 } from "@/entities/user/lib/ruPhone";
+import { ProfileEmailReveal } from "@/entities/user/ui/ProfileEmailReveal";
+import { ProfileStatCard } from "@/entities/user/ui/ProfileStatCard";
+import { useUserProfileInfoPanelStyles } from "@/entities/user/ui/userProfileInfoPanelStyles";
 import { USER_PROFILE_COPY } from "@/shared/config";
-import { PROFILE_OVERVIEW_LAYOUT as O } from "@/shared/lib/guestProfileLayout";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
-import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const PHONE_ROW_ID = "userPhoneNumber";
 
@@ -27,118 +31,9 @@ type UserProfileInfoPanelProps = {
   hidePhoneUntilReveal?: boolean;
   userId?: string | null;
   accountSectionFooter?: ReactNode;
+  /** Свой профиль: id строки → переход (паритет web `rowActions`). */
+  rowActions?: Record<string, () => void> | null;
 };
-
-/** Section chrome stays black/white in all themes (dark remaps `ink` to white). */
-const PROFILE_INFO_SECTION_TITLE_BG = izColors.nearBlack;
-const PROFILE_INFO_SECTION_TITLE_FG = izColors.onContrast;
-
-const useStyles = createThemedStyles((theme) => ({
-  root: {
-    gap: O.infoSectionsGap,
-  },
-  section: {
-    borderWidth: 1,
-    borderRadius: O.infoSectionRadius,
-    overflow: "hidden",
-    backgroundColor: theme.colors.surface,
-    borderColor: theme.colors.border,
-  },
-  sectionTitle: {
-    fontSize: 11,
-    fontWeight: "800",
-    letterSpacing: 0.66,
-    textTransform: "uppercase",
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    backgroundColor: PROFILE_INFO_SECTION_TITLE_BG,
-    color: PROFILE_INFO_SECTION_TITLE_FG,
-    borderBottomColor: PROFILE_INFO_SECTION_TITLE_BG,
-  },
-  detailRow: {
-    flexDirection: "row",
-    flexWrap: "nowrap",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 11,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: theme.colors.border,
-  },
-  detailLabelRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    flexGrow: 0,
-    flexShrink: 1,
-    maxWidth: "55%",
-    minWidth: 0,
-  },
-  detailIconWrap: {
-    width: 26,
-    height: 26,
-    borderRadius: 6,
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-    backgroundColor: theme.colors.surfaceMuted,
-  },
-  detailLabel: {
-    fontSize: 13,
-    fontWeight: "600",
-    flexShrink: 1,
-    color: theme.colors.textSecondary,
-  },
-  detailValue: {
-    fontSize: 14,
-    fontWeight: "600",
-    lineHeight: 20,
-    textAlign: "right",
-    flexGrow: 1,
-    flexShrink: 1,
-    minWidth: 0,
-    color: theme.colors.textSecondary,
-  },
-  detailValueEmpty: {
-    fontWeight: "500",
-    color: theme.colors.textMuted,
-  },
-  detailValueLink: {
-    color: theme.colors.link,
-    textDecorationLine: "underline",
-  },
-  revealPhone: {
-    color: theme.colors.link,
-    fontWeight: "700",
-  },
-  revealError: {
-    marginTop: 4,
-    fontSize: 12,
-    fontWeight: "500",
-    color: theme.colors.danger,
-    textAlign: "right",
-  },
-  detailValuePositive: {
-    flexGrow: 0,
-    flexShrink: 0,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 999,
-    backgroundColor: theme.colors.surfaceMuted,
-    color: theme.colors.textSecondary,
-  },
-  detailValueMuted: {
-    flexGrow: 0,
-    flexShrink: 0,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 999,
-    backgroundColor: theme.colors.surfaceMuted,
-    color: theme.colors.textMuted,
-  },
-}));
 
 const openProfileRowHref = (href: string) => {
   void Linking.openURL(href).catch(() => undefined);
@@ -148,10 +43,10 @@ type ProfileDetailValueProps = {
   row: ProfileRow;
   hidePhoneUntilReveal: boolean;
   userId: string | null;
-  styles: ReturnType<typeof useStyles>;
+  styles: ReturnType<typeof useUserProfileInfoPanelStyles>;
 };
 
-const ProfileDetailValue = ({
+const ProfileDetailPlainValue = ({
   row,
   hidePhoneUntilReveal,
   userId,
@@ -177,6 +72,7 @@ const ProfileDetailValue = ({
   const isNo = displayValue === "Нет";
   const isEmpty =
     !row.needsPhoneReveal &&
+    !row.needsEmailReveal &&
     (displayValue === "—" || displayValue === RU_PHONE_EMPTY_LABEL);
 
   useEffect(() => {
@@ -190,6 +86,8 @@ const ProfileDetailValue = ({
       <View>
         <Pressable
           disabled={revealPending}
+          accessibilityRole="button"
+          accessibilityLabel={USER_PROFILE_COPY.SHOW_PHONE_NUMBER}
           onPress={() => {
             void (async () => {
               if (row.needsPhoneReveal) {
@@ -252,14 +150,109 @@ const ProfileDetailValue = ({
   return valueNode;
 };
 
+const ProfileDetailValue = ({
+  row,
+  hidePhoneUntilReveal,
+  userId,
+  styles,
+}: ProfileDetailValueProps) => {
+  if (row.needsEmailReveal) {
+    return <ProfileEmailReveal userId={userId} />;
+  }
+
+  return (
+    <ProfileDetailPlainValue
+      row={row}
+      hidePhoneUntilReveal={hidePhoneUntilReveal}
+      userId={userId}
+      styles={styles}
+    />
+  );
+};
+
+type ProfileDetailsSectionProps = {
+  sectionId: string;
+  title: string | null;
+  rows: ProfileRow[];
+  hidePhoneUntilReveal: boolean;
+  userId: string | null;
+  sectionFooter?: ReactNode;
+  rowActions?: Record<string, () => void> | null;
+};
+
+const ProfileDetailsSection = ({
+  sectionId,
+  title,
+  rows,
+  hidePhoneUntilReveal,
+  userId,
+  sectionFooter = null,
+  rowActions = null,
+}: ProfileDetailsSectionProps) => {
+  const theme = useAppTheme();
+  const styles = useUserProfileInfoPanelStyles();
+  const isStatsSection = sectionId === PROFILE_STATS_SECTION_ID;
+
+  if (isStatsSection) {
+    return (
+      <View style={styles.section}>
+        {title ? <Text style={styles.sectionTitle}>{title}</Text> : null}
+        <View style={styles.statsGrid}>
+          {rows.map((row) => (
+            <ProfileStatCard
+              key={row.id}
+              row={row}
+              isWide={PROFILE_STATS_WIDE_ROW_IDS.has(row.id)}
+              onPress={rowActions?.[row.id] ?? null}
+            />
+          ))}
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.section}>
+      {title ? <Text style={styles.sectionTitle}>{title}</Text> : null}
+      {rows.map((row, index) => {
+        const icon = getProfileRowIcon(row.id);
+        const isLast = index === rows.length - 1 && !sectionFooter;
+
+        return (
+          <View
+            key={row.id}
+            style={[styles.detailRow, isLast && { borderBottomWidth: 0 }]}
+          >
+            <View style={styles.detailLabelRow}>
+              {icon ? (
+                <View style={styles.detailIconWrap}>
+                  <Feather name={icon} size={13} color={theme.colors.textSecondary} />
+                </View>
+              ) : null}
+              <Text style={styles.detailLabel}>{row.label}</Text>
+            </View>
+            <ProfileDetailValue
+              row={row}
+              hidePhoneUntilReveal={hidePhoneUntilReveal}
+              userId={userId}
+              styles={styles}
+            />
+          </View>
+        );
+      })}
+      {sectionFooter}
+    </View>
+  );
+};
+
 export const UserProfileInfoPanel = ({
   rows,
   hidePhoneUntilReveal = false,
   userId = null,
   accountSectionFooter = null,
+  rowActions = null,
 }: UserProfileInfoPanelProps) => {
-  const theme = useAppTheme();
-  const styles = useStyles();
+  const styles = useUserProfileInfoPanelStyles();
   const sections = useMemo(() => groupProfileRows(rows), [rows]);
 
   if (sections.length === 0) {
@@ -269,42 +262,16 @@ export const UserProfileInfoPanel = ({
   return (
     <View style={styles.root}>
       {sections.map((section) => (
-        <View key={section.id} style={styles.section}>
-          {section.title ? (
-            <Text style={styles.sectionTitle}>{section.title}</Text>
-          ) : null}
-          {section.rows.map((row, index) => {
-            const icon = getProfileRowIcon(row.id);
-            const isLast = index === section.rows.length - 1 && !accountSectionFooter;
-
-            return (
-              <View
-                key={row.id}
-                style={[styles.detailRow, isLast && { borderBottomWidth: 0 }]}
-              >
-                <View style={styles.detailLabelRow}>
-                  {icon ? (
-                    <View style={styles.detailIconWrap}>
-                      <Feather
-                        name={icon}
-                        size={13}
-                        color={theme.colors.textSecondary}
-                      />
-                    </View>
-                  ) : null}
-                  <Text style={styles.detailLabel}>{row.label}</Text>
-                </View>
-                <ProfileDetailValue
-                  row={row}
-                  hidePhoneUntilReveal={hidePhoneUntilReveal}
-                  userId={userId}
-                  styles={styles}
-                />
-              </View>
-            );
-          })}
-          {section.id === "account" ? accountSectionFooter : null}
-        </View>
+        <ProfileDetailsSection
+          key={section.id}
+          sectionId={section.id}
+          title={section.title}
+          rows={section.rows}
+          hidePhoneUntilReveal={hidePhoneUntilReveal}
+          userId={userId}
+          sectionFooter={section.id === "account" ? accountSectionFooter : null}
+          rowActions={rowActions}
+        />
       ))}
     </View>
   );

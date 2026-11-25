@@ -12,8 +12,8 @@ import { isProfileProductThumbUnavailable } from "@/entities/user/lib/resolvePro
 import type { UserProfileThumbItem } from "@/entities/user/model/userProfileThumbTypes";
 import { isReactNativeWeb } from "@/shared/lib/isReactNativeWeb";
 import {
-  PROFILE_CARD_SQUIRCLE_RADIUS,
   resolveUserProfileThumbColumns,
+  USER_PROFILE_PURCHASES_TRACK_HEIGHT,
   USER_PROFILE_THUMB_ROW_SIZE,
   USER_PROFILE_THUMB_SQUIRCLE_RADIUS,
   USER_PROFILE_THUMB_TRACK_HEIGHT,
@@ -38,6 +38,8 @@ type ThumbPressableProps = {
   thumbSrc: string | null;
   isUnavailable: boolean;
   isCurrent?: boolean;
+  /** web purchases: radius 14; product-detail carousel: squircle 18. */
+  chrome?: "profile" | "carousel";
   onPress: () => void;
   onImageError: () => void;
 };
@@ -47,31 +49,38 @@ const UserProfileThumbPressable = ({
   thumbSrc,
   isUnavailable,
   isCurrent = false,
+  chrome = "carousel",
   onPress,
   onImageError,
 }: ThumbPressableProps) => {
   const styles = useUserProfileThumbListStyles();
   const isDisabled = isUnavailable || isCurrent;
-  const thumbContent = (
-    <SquircleView
-      radius={USER_PROFILE_THUMB_SQUIRCLE_RADIUS}
-      style={[styles.thumbClip, isCurrent && styles.thumbClipCurrent]}
-    >
-      {thumbSrc ? (
-        <View style={styles.thumbImageHost}>
-          <CachedProductImage
-            uri={thumbSrc}
-            style={styles.thumbImage}
-            contentFit="cover"
-            priority="low"
-            onError={onImageError}
-          />
-        </View>
-      ) : (
-        <View style={styles.thumbPlaceholder} />
-      )}
-    </SquircleView>
+  const imageNode = thumbSrc ? (
+    <View style={styles.thumbImageHost}>
+      <CachedProductImage
+        uri={thumbSrc}
+        style={styles.thumbImage}
+        contentFit="cover"
+        priority="low"
+        onError={onImageError}
+      />
+    </View>
+  ) : (
+    <View style={styles.thumbPlaceholder} />
   );
+  const thumbContent =
+    chrome === "profile" ? (
+      <View style={[styles.thumbClipProfile, isCurrent && styles.thumbClipCurrent]}>
+        {imageNode}
+      </View>
+    ) : (
+      <SquircleView
+        radius={USER_PROFILE_THUMB_SQUIRCLE_RADIUS}
+        style={[styles.thumbClip, isCurrent && styles.thumbClipCurrent]}
+      >
+        {imageNode}
+      </SquircleView>
+    );
 
   if (isReactNativeWeb()) {
     return (
@@ -190,6 +199,7 @@ type UserProfileThumbScrollRowProps = {
   onItemPress: (item: UserProfileThumbItem) => void;
   isSelf?: boolean;
   applySellerProductGates?: boolean;
+  chrome?: "profile" | "carousel";
 };
 
 export const UserProfileThumbScrollRow = ({
@@ -199,9 +209,11 @@ export const UserProfileThumbScrollRow = ({
   onItemPress,
   isSelf = false,
   applySellerProductGates = false,
+  chrome = "carousel",
 }: UserProfileThumbScrollRowProps) => {
   const styles = useUserProfileThumbListStyles();
   const [failedThumbIds, setFailedThumbIds] = useState<Set<string>>(() => new Set());
+  const isProfileChrome = chrome === "profile";
 
   const markThumbFailed = (productId: string) => {
     setFailedThumbIds((prev) => {
@@ -235,6 +247,7 @@ export const UserProfileThumbScrollRow = ({
         thumbSrc={thumbSrc}
         isUnavailable={isUnavailable}
         isCurrent={isCurrent}
+        chrome={chrome}
         onPress={() => onItemPress(item)}
         onImageError={() => markThumbFailed(item.productId)}
       />
@@ -244,10 +257,20 @@ export const UserProfileThumbScrollRow = ({
   return (
     <>
       <HorizontalOverflowRow
-        height={USER_PROFILE_THUMB_TRACK_HEIGHT}
-        trackStyle={styles.scrollRowContent}
+        height={
+          isProfileChrome
+            ? USER_PROFILE_PURCHASES_TRACK_HEIGHT
+            : USER_PROFILE_THUMB_TRACK_HEIGHT
+        }
+        trackStyle={
+          isProfileChrome ? styles.scrollRowContentProfile : styles.scrollRowContent
+        }
       >
-        {thumbItems}
+        {isProfileChrome ? (
+          <View style={styles.scrollRowInnerProfile}>{thumbItems}</View>
+        ) : (
+          thumbItems
+        )}
       </HorizontalOverflowRow>
       {unavailableHint ? (
         <Text style={styles.hint} accessibilityRole="alert">
@@ -299,7 +322,8 @@ export const UserProfileThumbSection = ({
   const [unavailableHint, setUnavailableHint] = useState("");
   const [columnsPerRow, setColumnsPerRow] = useState(USER_PROFILE_THUMB_ROW_SIZE);
   const isHorizontalChrome = layout === "horizontal";
-  const useScrollRow = layout === "horizontal" || layout === "profile-scroll";
+  const isProfileScroll = layout === "profile-scroll";
+  const useScrollRow = isHorizontalChrome || isProfileScroll;
 
   const showViewAll =
     typeof onViewAllPress === "function" && phase === "success" && items.length > 0;
@@ -389,6 +413,7 @@ export const UserProfileThumbSection = ({
             onItemPress={handleItemPress}
             isSelf={isSelf}
             applySellerProductGates={applySellerProductGates}
+            chrome={isProfileScroll ? "profile" : "carousel"}
           />
         ) : (
           <UserProfileThumbGrid
@@ -426,8 +451,6 @@ export const UserProfileThumbSection = ({
   }
 
   return (
-    <SquircleView radius={PROFILE_CARD_SQUIRCLE_RADIUS} style={styles.root}>
-      {cardContent}
-    </SquircleView>
+    <View style={[styles.root, styles.rootProfileRadius]}>{cardContent}</View>
   );
 };

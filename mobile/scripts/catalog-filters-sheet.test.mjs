@@ -96,6 +96,13 @@ test("кнопка фильтров стоит в шапке главной, о�
   assert.match(read("app/(tabs)/index.tsx"), /<HomeCatalogFiltersSheet/);
 });
 
+test("saleOnly уходит в запрос ленты; search-chrome только на curated home", () => {
+  const index = read("app/(tabs)/index.tsx");
+  assert.match(index, /saleOnly: feedFilters\.saleOnly === true/);
+  assert.match(index, /homeFeedSearchRow = showHomeFeed \?/);
+  assert.doesNotMatch(index, /renderFilteredCatalogChrome/);
+});
+
 test("запрос ленты передаёт фильтры окна на сервер", () => {
   const source = read("entities/product/api/fetchCatalogProductsPage.ts");
   for (const key of [

@@ -47,6 +47,7 @@ export const API_CLIENT_UI = {
   REPLACE_WISHLIST_FALLBACK: "Не удалось сохранить список желаний",
   FETCH_MY_FOLLOWING_FALLBACK: "Не удалось загрузить подписки",
   FETCH_MY_FOLLOWERS_FALLBACK: "Не удалось загрузить подписчиков",
+  FETCH_MY_RECEIVED_VOTES_FALLBACK: "Не удалось загрузить голоса",
   UNFOLLOW_USER_FALLBACK: "Не удалось отписаться",
   BLOCK_USER_FALLBACK: "Не удалось заблокировать пользователя",
   UNBLOCK_USER_FALLBACK: "Не удалось разблокировать пользователя",
@@ -1836,6 +1837,8 @@ export const USER_PROFILE_COPY = {
   SHOW_PHONE_NUMBER: "Показать номер",
   SHOW_PHONE_NUMBER_PENDING: "Загрузка…",
   SHOW_PHONE_NUMBER_ERROR: "Не удалось показать номер",
+  SHOW_EMAIL: "Показать почту",
+  SHOW_EMAIL_ERROR: "Не удалось показать почту",
   LABELS: {
     userName: "Никнейм",
     userFullName: "Имя и фамилия",
@@ -1873,6 +1876,21 @@ export const USER_PROFILE_COPY = {
 
 export const USER_SEARCH_UI = {
   API_PAGE_LIMIT: 100,
+} as const;
+
+/** Sheet «Кто оценил» на своём профиле — паритет web `USER_RATING_VOTES_SHEET_UI`. */
+export const USER_RATING_VOTES_SHEET_UI = {
+  TITLE: "Кто оценил",
+  CLOSE: "Закрыть",
+  SUMMARY: (average: number, votes: number) =>
+    `Средняя оценка ${average.toFixed(1)} · голосов ${votes}`,
+  LOADING: "Загружаем голоса",
+  EMPTY: "Пока нет голосов.",
+  RETRY: "Повторить",
+  LOAD_MORE: "Ещё",
+  DELETED_USER: "Удалённый пользователь",
+  OPEN_PROFILE_ARIA: (userName: string) => `Открыть профиль: ${userName}`,
+  SCORE_ARIA: (score: number) => `Оценка ${score} из 10`,
 } as const;
 
 export const USER_SEARCH_INPUT_UI = {
@@ -1941,6 +1959,7 @@ export const USER_DETAILS_PAGE_UI = {
   SELF_REDIRECT_HINT: "Это ваш профиль",
   OPEN_OVERVIEW: "Мой обзор",
   BACK_ARIA: "Назад",
+  SELLER_STOREFRONT: "Витрина продавца",
 } as const;
 
 export const USER_PROFILE_PRODUCTS_UI = {

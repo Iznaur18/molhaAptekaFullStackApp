@@ -5,6 +5,7 @@ type FeatherIconName = ComponentProps<typeof Feather>["name"];
 
 export const PROFILE_ROW_ICONS: Record<string, FeatherIconName> = {
   userName: "user",
+  userFullName: "check-circle",
   followersCount: "users",
   followingCount: "user-check",
   email: "mail",

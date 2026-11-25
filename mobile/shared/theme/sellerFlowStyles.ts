@@ -720,13 +720,7 @@ export const useSellerProductsPageStyles = createThemedStyles((theme, layout) =>
     alignItems: "center",
     justifyContent: "space-between",
     gap: L.metaZoneGap,
-    paddingVertical: L.metaZonePaddingVertical,
     paddingHorizontal: L.metaZonePaddingHorizontal,
-    borderRadius: L.metaZoneBorderRadius,
-    /* Паритет web PR #87: белый блок, как `.seller-products-page__seller-meta`. */
-    backgroundColor: theme.colors.surface,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
   },
   sellerMetaNameHost: {
     flex: 1,

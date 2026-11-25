@@ -1,5 +1,12 @@
 /** Паритет `ProductMediaGalleryReadonly.css` + `productImageTokens.css`. */
 export const PRODUCT_MEDIA_GALLERY_READONLY_LAYOUT = {
+  /**
+   * Web `@supports (corner-shape: squircle)` → `border-radius: 2.75rem`.
+   * Без squircle — `--product-media-hero-squircle-radius: 7%` стороны.
+   */
+  heroSquircleRadius: 44,
+  /** 7% от эталонной стороны 360 (fallback без corner-shape). */
+  heroFallbackRadius: 25,
   /** `--product-image-thumb-side` (4rem @ 16px). */
   thumbSize: 64,
   /** `.product-media-gallery-readonly__thumbs` gap (0.4rem). */

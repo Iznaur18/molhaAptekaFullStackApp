@@ -2,6 +2,7 @@ import "dotenv/config";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 
+import { INSTALLMENT_MODERATION_APPROVED } from "../constants/installmentConstants.js";
 import { PRODUCT_MODERATION_APPROVED } from "../constants/productModerationConstants.js";
 import {
   PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS,
@@ -12,6 +13,7 @@ import {
 } from "../constants/productPromotionConstants.js";
 import { RAFFLE_STATUS_ACTIVE } from "../constants/raffleConstants.js";
 import {
+  ProductInstallmentProgramModel,
   ProductModel,
   ProductPromotionModel,
   RaffleModel,
@@ -39,6 +41,10 @@ const PICKUP = {
 /** @param {string} seed */
 const img = (seed) => `https://picsum.photos/seed/${seed}/800/800`;
 
+/**
+ * Каждый key — отдельный демо-тумблер/продвижение.
+ * Взаимоисключающие режимы (flash↔auction, points↔остальные) — на разных товарах.
+ */
 const PRODUCTS = [
   {
     key: "gold",
@@ -94,62 +100,98 @@ const PRODUCTS = [
   {
     key: "flash",
     productName: "Demo · Горящая скидка — лампа",
-    productDescription: "Настольная лампа со скидкой на время.",
+    productDescription: "Настольная лампа со скидкой на время (горящая скидка).",
     productPrice: 1990,
-    productOldPrice: 3990,
     productCategory: "home",
     imageSeed: "demo-flash-lamp",
     flashSale: true,
+    flashBasePrice: 3990,
   },
   {
-    key: "plain-1",
-    productName: "Demo · Обычный — рюкзак",
-    productDescription: "Городской рюкзак без продвижения.",
+    key: "buy-n-free",
+    productName: "Demo · Акция +1 — футболка",
+    productDescription: "Бесплатно от N (N+1 в подарок): порог 3 покупки.",
+    productPrice: 1490,
+    productCategory: "fashion",
+    imageSeed: "demo-buynfree-tee",
+    buyNFree: { threshold: 3 },
+  },
+  {
+    key: "installment",
+    productName: "Demo · Рассрочка — планшет",
+    productDescription: "Рассрочка включена: одобренная программа с планами 3/6 мес.",
+    productPrice: 24990,
+    productCategory: "electronics",
+    imageSeed: "demo-installment-tablet",
+    installment: true,
+  },
+  {
+    key: "auction",
+    productName: "Demo · Аукцион — винтажные часы",
+    productDescription: "Аукцион включён: покупатели делают ставки (price offers).",
+    productPrice: 15990,
+    productCategory: "fashion",
+    imageSeed: "demo-auction-watch",
+    auction: true,
+  },
+  {
+    key: "wholesale",
+    productName: "Demo · Опт — блок тетрадей",
+    productDescription: "Оптовая цена от 10 шт.",
+    productPrice: 890,
+    productCategory: "home",
+    imageSeed: "demo-wholesale-notebooks",
+    wholesale: { minQty: 10, price: 690 },
+  },
+  {
+    key: "rental",
+    productName: "Demo · Аренда — проектор",
+    productDescription: "Аренда / прокат: 990 ₽/день (продажа тоже доступна).",
+    productPrice: 45990,
+    productCategory: "electronics",
+    imageSeed: "demo-rental-projector",
+    rental: { priceRub: 990, unit: "day" },
+  },
+  {
+    key: "affiliate",
+    productName: "Demo · Партнёрка — колонка",
+    productDescription: "Партнёрская программа: 12% с продажи.",
+    productPrice: 5990,
+    productOldPrice: 7490,
+    productCategory: "electronics",
+    imageSeed: "demo-affiliate-speaker",
+    affiliate: { percent: 12 },
+    loyaltyPointsPerUnit: 50,
+  },
+  {
+    key: "points-sale",
+    productName: "Demo · За баллы — стикерпак",
+    productDescription:
+      "Продажа только за баллы (остальные промо выключены — взаимное исключение).",
+    productPrice: 490,
+    productCategory: "home",
+    imageSeed: "demo-points-stickers",
+    pointsSale: { price: 490, perBuyerLimit: 2 },
+  },
+  {
+    key: "qa-return",
+    productName: "Demo · Q&A + возврат — коврик",
+    productDescription: "Включены вопросы к товару и возврат; баллы лояльности с продажи.",
+    productPrice: 2190,
+    productCategory: "home",
+    imageSeed: "demo-qa-mat",
+    productQaEnabled: true,
+    productReturnEnabled: true,
+    loyaltyPointsPerUnit: 30,
+  },
+  {
+    key: "out-of-stock",
+    productName: "Demo · Нет в наличии — рюкзак",
+    productDescription: "Карточка «нет в наличии» (coming soon).",
     productPrice: 4590,
     productCategory: "fashion",
-    imageSeed: "demo-plain-backpack",
-  },
-  {
-    key: "plain-2",
-    productName: "Demo · Обычный — чайник",
-    productDescription: "Электрочайник 1.7 л.",
-    productPrice: 3290,
-    productOldPrice: 3990,
-    productCategory: "home",
-    imageSeed: "demo-plain-kettle",
-  },
-  {
-    key: "plain-3",
-    productName: "Demo · Обычный — мышь",
-    productDescription: "Беспроводная мышь.",
-    productPrice: 1490,
-    productCategory: "electronics",
-    imageSeed: "demo-plain-mouse",
-  },
-  {
-    key: "plain-4",
-    productName: "Demo · Обычный — плед",
-    productDescription: "Мягкий плед 150×200.",
-    productPrice: 2790,
-    productCategory: "home",
-    imageSeed: "demo-plain-blanket",
-  },
-  {
-    key: "plain-5",
-    productName: "Demo · Обычный — бутылка",
-    productDescription: "Спортивная бутылка 750 мл.",
-    productPrice: 890,
-    productCategory: "sport",
-    imageSeed: "demo-plain-bottle",
-  },
-  {
-    key: "plain-6",
-    productName: "Demo · Обычный — клавиатура",
-    productDescription: "Механическая клавиатура.",
-    productPrice: 6990,
-    productOldPrice: 8490,
-    productCategory: "electronics",
-    imageSeed: "demo-plain-keyboard",
+    imageSeed: "demo-oos-backpack",
+    outOfStock: { label: "coming_soon" },
   },
 ];
 
@@ -158,6 +200,108 @@ const TIER_TITLE = {
   [PRODUCT_PROMOTION_TIER_TOP]: "ТОП",
   [PRODUCT_PROMOTION_TIER_BANNER]: "Баннер",
 };
+
+/**
+ * @param {object} item
+ * @param {Date} now
+ * @param {Date} flashEnds
+ * @param {Date} promoUntil
+ */
+function buildProductPayload(item, now, flashEnds, promoUntil) {
+  const productDescription = item.productDescription;
+  const payload = {
+    productName: item.productName,
+    productDescription,
+    productSearchBlob: buildProductSearchBlobFromFields({
+      productName: item.productName,
+      productDescription,
+      productCategory: item.productCategory,
+    }),
+    productImageUrls: [img(item.imageSeed)],
+    productPrice: item.productPrice,
+    productOldPrice: item.productOldPrice ?? null,
+    productCategory: item.productCategory,
+    productModerationStatus: PRODUCT_MODERATION_APPROVED,
+    productIsAvailable: true,
+    productStockQuantity: 25,
+    productListingOrigin: "own",
+    productIsOriginal: true,
+    productRegionCode: REGION,
+    productSaleCity: "Москва",
+    productPickupEnabled: true,
+    productDeliveryEnabled: false,
+    productPickupLocations: [PICKUP],
+    productPickupAddress: PICKUP.address,
+    productPickupLat: PICKUP.lat,
+    productPickupLon: PICKUP.lon,
+    productPickupLocation: {
+      type: "Point",
+      coordinates: [PICKUP.lon, PICKUP.lat],
+    },
+    averageRating: 4.2 + Math.random() * 0.7,
+    reviewCount: 3 + Math.floor(Math.random() * 40),
+    uniqueViewerCount: 50 + Math.floor(Math.random() * 400),
+    soldQuantity: Math.floor(Math.random() * 30),
+    productQaEnabled: item.productQaEnabled === true,
+    productReturnEnabled: item.productReturnEnabled === true,
+    loyaltyPointsPerUnit: item.loyaltyPointsPerUnit ?? 0,
+  };
+
+  if (item.flashSale) {
+    const base = item.flashBasePrice ?? item.productPrice * 2;
+    payload.productFlashSaleEnabled = true;
+    payload.productFlashSaleEndsAt = flashEnds;
+    payload.productFlashSaleDurationMinutes = 360;
+    payload.productFlashSaleBasePrice = base;
+    payload.productOldPrice = base;
+  }
+
+  if (item.buyNFree) {
+    payload.productBuyNFreeEnabled = true;
+    payload.productBuyNFreeThreshold = item.buyNFree.threshold;
+  }
+
+  if (item.auction) {
+    payload.productAuctionEnabled = true;
+    payload.productAuctionCompletedOnce = false;
+  }
+
+  if (item.wholesale) {
+    payload.productWholesaleEnabled = true;
+    payload.productWholesaleMinQty = item.wholesale.minQty;
+    payload.productWholesalePrice = item.wholesale.price;
+  }
+
+  if (item.rental) {
+    payload.productRentalEnabled = true;
+    payload.productRentalPriceRub = item.rental.priceRub;
+    payload.productRentalPriceUnit = item.rental.unit;
+  }
+
+  if (item.affiliate) {
+    payload.affiliateEnabled = true;
+    payload.affiliatePercent = item.affiliate.percent;
+  }
+
+  if (item.pointsSale) {
+    payload.productPointsSaleEnabled = true;
+    payload.productPointsPrice = item.pointsSale.price;
+    payload.productPointsPerBuyerLimit = item.pointsSale.perBuyerLimit;
+  }
+
+  if (item.outOfStock) {
+    payload.productOutOfStock = true;
+    payload.productOutOfStockLabel = item.outOfStock.label;
+  }
+
+  if (item.promotionTier) {
+    payload.catalogPromotionTier = item.promotionTier;
+    payload.catalogPromotionActivatedAt = now;
+    payload.catalogPromotionExpiresAt = promoUntil;
+  }
+
+  return payload;
+}
 
 /**
  * @param {string} mongoUri
@@ -184,6 +328,14 @@ async function seed(mongoUri) {
     { upsert: true, new: true, setDefaultsOnInsert: true },
   );
 
+  const sellerProductIds = await ProductModel.find({ productSeller: seller._id })
+    .select("_id")
+    .lean();
+  const productIdList = sellerProductIds.map((p) => p._id);
+
+  await ProductInstallmentProgramModel.deleteMany({
+    $or: [{ sellerId: seller._id }, { productId: { $in: productIdList } }],
+  });
   await ProductPromotionModel.deleteMany({ sellerId: seller._id });
   await RaffleModel.deleteMany({ sellerId: seller._id });
   await ProductModel.deleteMany({ productSeller: seller._id });
@@ -196,55 +348,8 @@ async function seed(mongoUri) {
   const createdByKey = new Map();
 
   for (const item of PRODUCTS) {
-    const productDescription = item.productDescription;
-    const payload = {
-      productName: item.productName,
-      productDescription,
-      productSearchBlob: buildProductSearchBlobFromFields({
-        productName: item.productName,
-        productDescription,
-        productCategory: item.productCategory,
-      }),
-      productImageUrls: [img(item.imageSeed)],
-      productPrice: item.productPrice,
-      productOldPrice: item.productOldPrice ?? null,
-      productCategory: item.productCategory,
-      productSeller: seller._id,
-      productModerationStatus: PRODUCT_MODERATION_APPROVED,
-      productIsAvailable: true,
-      productStockQuantity: 25,
-      productListingOrigin: "own",
-      productIsOriginal: true,
-      productRegionCode: REGION,
-      productSaleCity: "Москва",
-      productPickupEnabled: true,
-      productDeliveryEnabled: false,
-      productPickupLocations: [PICKUP],
-      productPickupAddress: PICKUP.address,
-      productPickupLat: PICKUP.lat,
-      productPickupLon: PICKUP.lon,
-      productPickupLocation: {
-        type: "Point",
-        coordinates: [PICKUP.lon, PICKUP.lat],
-      },
-      averageRating: 4.2 + Math.random() * 0.7,
-      reviewCount: 3 + Math.floor(Math.random() * 40),
-      uniqueViewerCount: 50 + Math.floor(Math.random() * 400),
-      soldQuantity: Math.floor(Math.random() * 30),
-    };
-
-    if (item.flashSale) {
-      payload.productFlashSaleEnabled = true;
-      payload.productFlashSaleEndsAt = flashEnds;
-      payload.productFlashSaleDurationMinutes = 360;
-      payload.productFlashSaleBasePrice = item.productOldPrice ?? item.productPrice * 2;
-    }
-
-    if (item.promotionTier) {
-      payload.catalogPromotionTier = item.promotionTier;
-      payload.catalogPromotionActivatedAt = now;
-      payload.catalogPromotionExpiresAt = promoUntil;
-    }
+    const payload = buildProductPayload(item, now, flashEnds, promoUntil);
+    payload.productSeller = seller._id;
 
     const product = await ProductModel.create(payload);
     createdByKey.set(item.key, product);
@@ -265,6 +370,37 @@ async function seed(mongoUri) {
         activatedAt: now,
         activeUntil: promoUntil,
       });
+    }
+
+    if (item.installment) {
+      const monthly3 = Math.max(1, Math.ceil(item.productPrice / 3));
+      const monthly6 = Math.max(1, Math.ceil(item.productPrice / 6));
+      await ProductInstallmentProgramModel.create({
+        productId: product._id,
+        sellerId: seller._id,
+        isEnabled: true,
+        moderationStatus: INSTALLMENT_MODERATION_APPROVED,
+        wasEverApproved: true,
+        reviewedAt: now,
+        plans: [
+          {
+            title: "3 месяца",
+            monthsCount: 3,
+            monthlyAmountRub: monthly3,
+            firstPaymentRequiredNow: true,
+          },
+          {
+            title: "6 месяцев",
+            monthsCount: 6,
+            monthlyAmountRub: monthly6,
+            firstPaymentRequiredNow: true,
+          },
+        ],
+      });
+      await ProductModel.updateOne(
+        { _id: product._id },
+        { $set: { productInstallmentEnabled: true } },
+      );
     }
   }
 
@@ -299,16 +435,32 @@ async function seed(mongoUri) {
     );
   }
 
+  const flags = PRODUCTS.map((p) => {
+    const tags = [];
+    if (p.promotionTier) tags.push(`promo:${TIER_TITLE[p.promotionTier]}`);
+    if (p.joinRaffle) tags.push("розыгрыш");
+    if (p.flashSale) tags.push("горящая скидка");
+    if (p.buyNFree) tags.push(`акция +1 (N=${p.buyNFree.threshold})`);
+    if (p.installment) tags.push("рассрочка");
+    if (p.auction) tags.push("аукцион");
+    if (p.wholesale) tags.push("опт");
+    if (p.rental) tags.push("аренда");
+    if (p.affiliate) tags.push("партнёрка");
+    if (p.pointsSale) tags.push("за баллы");
+    if (p.productQaEnabled) tags.push("Q&A");
+    if (p.productReturnEnabled) tags.push("возврат");
+    if (p.outOfStock) tags.push("нет в наличии");
+    if (p.loyaltyPointsPerUnit) tags.push(`loyalty=${p.loyaltyPointsPerUnit}`);
+    return { key: p.key, tags };
+  });
+
   const summary = {
     sellerEmail: SELLER_EMAIL,
+    sellerUsername: SELLER_USERNAME,
     sellerPassword: SEED_PASSWORD,
     products: PRODUCTS.length,
     raffleId: String(raffle._id),
-    promotions: PRODUCTS.filter((p) => p.promotionTier).map((p) => ({
-      key: p.key,
-      tier: p.promotionTier,
-      title: TIER_TITLE[p.promotionTier],
-    })),
+    flags,
   };
 
   console.log("DEMO_SHOWCASE_READY", JSON.stringify(summary, null, 2));
