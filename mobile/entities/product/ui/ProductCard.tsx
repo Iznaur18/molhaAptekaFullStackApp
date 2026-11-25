@@ -187,6 +187,13 @@ export const ProductCard = memo(
     // рендерами (в переиспользуемых ячейках списка → «Rendered fewer hooks
     // than expected»).
     const cardMediaStyles = useProductCardMediaStyles();
+    const handleCatalogCardLayout = useCallback((event: LayoutChangeEvent) => {
+      const nextWidth = event.nativeEvent.layout.width;
+      if (!(nextWidth > 0)) {
+        return;
+      }
+      setMeasuredCatalogCardWidth((prev) => (prev === nextWidth ? prev : nextWidth));
+    }, []);
 
     if (flags.showBannerLayout) {
       return (
@@ -279,13 +286,6 @@ export const ProductCard = memo(
             },
           )
         : undefined;
-    const handleCatalogCardLayout = useCallback((event: LayoutChangeEvent) => {
-      const nextWidth = event.nativeEvent.layout.width;
-      if (!(nextWidth > 0)) {
-        return;
-      }
-      setMeasuredCatalogCardWidth((prev) => (prev === nextWidth ? prev : nextWidth));
-    }, []);
 
     return (
       <View
