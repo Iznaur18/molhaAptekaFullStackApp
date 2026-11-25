@@ -60,7 +60,9 @@ export const CatalogBreadcrumb = ({
       return null;
     }
     return (
-      <View style={[styles.displayToolbar, compactTop && styles.displayToolbarCompactTop]}>
+      <View
+        style={[styles.displayToolbar, compactTop && styles.displayToolbarCompactTop]}
+      >
         <Text
           style={[styles.displayTitle, compactTop && styles.displayTitleCompactTop]}
           accessibilityRole="header"

@@ -31,10 +31,7 @@ test("catalog browser opens subcategory picker before leaf category products", (
   assert.match(hook, /openPickerForCategory/);
   assert.match(hook, /IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED/);
   assert.match(hook, /navigateWithLegacyCategorySlug/);
-  assert.match(
-    flags,
-    /EXPO_PUBLIC_FF_CATALOG_BROWSER_SUBCATEGORY_FILTER/,
-  );
+  assert.match(flags, /EXPO_PUBLIC_FF_CATALOG_BROWSER_SUBCATEGORY_FILTER/);
   assert.match(page, /EditCategoryNodeDisplayModal/);
   assert.match(page, /editingCategoryNode/);
   assert.match(page, /PRODUCT_CATEGORY_DISPLAY_UI\.LOADING/);

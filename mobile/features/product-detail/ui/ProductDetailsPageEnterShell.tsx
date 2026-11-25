@@ -17,11 +17,7 @@ const exiting = createProductDetailsPageExiting();
 /** Web page enter/exit scale+fade — mount/unmount оболочки экрана товара. */
 export const ProductDetailsPageEnterShell = memo(
   ({ children }: ProductDetailsPageEnterShellProps) => (
-    <Animated.View
-      entering={entering}
-      exiting={exiting}
-      style={styles.shell}
-    >
+    <Animated.View entering={entering} exiting={exiting} style={styles.shell}>
       {children}
     </Animated.View>
   ),

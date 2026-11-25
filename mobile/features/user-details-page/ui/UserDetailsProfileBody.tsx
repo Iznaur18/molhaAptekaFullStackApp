@@ -61,9 +61,7 @@ export const UserDetailsProfileBody = ({
         <UserProfilePurchasesList targetUserId={userId} />
       ) : null}
 
-      {showOtherUserProducts ? (
-        <UserProfileProductsList targetUserId={userId} />
-      ) : null}
+      {showOtherUserProducts ? <UserProfileProductsList targetUserId={userId} /> : null}
 
       <UserProfileInfoPanel
         rows={profileRows}

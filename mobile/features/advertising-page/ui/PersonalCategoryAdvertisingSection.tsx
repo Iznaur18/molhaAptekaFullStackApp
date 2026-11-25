@@ -255,9 +255,7 @@ export const PersonalCategoryAdvertisingSection = ({
                       <Text style={styles.tariffTitle}>{item.title}</Text>
                       <Text style={styles.tariffPrice}>
                         {chargePoints} баллов
-                        {streakDiscountPercent > 0
-                          ? ` (было ${item.pricePoints})`
-                          : ""}
+                        {streakDiscountPercent > 0 ? ` (было ${item.pricePoints})` : ""}
                       </Text>
                     </Pressable>
                   );

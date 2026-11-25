@@ -672,232 +672,228 @@ export const CheckoutForm = ({
   );
 
   const fulfillmentDetailsBlock = isPickup ? (
-          <View
-            style={[
-              checkoutStyles.fulfillmentSection,
-              checkoutStyles.fulfillmentSectionPickup,
-            ]}
-          >
-            <View style={checkoutStyles.fulfillmentSectionHead}>
-              <Text
-                style={[
-                  checkoutStyles.fulfillmentSectionBadge,
-                  checkoutStyles.fulfillmentSectionBadgePickup,
-                ]}
-              >
-                {CHECKOUT_FORM_UI.FULFILLMENT_PICKUP}
+    <View
+      style={[
+        checkoutStyles.fulfillmentSection,
+        checkoutStyles.fulfillmentSectionPickup,
+      ]}
+    >
+      <View style={checkoutStyles.fulfillmentSectionHead}>
+        <Text
+          style={[
+            checkoutStyles.fulfillmentSectionBadge,
+            checkoutStyles.fulfillmentSectionBadgePickup,
+          ]}
+        >
+          {CHECKOUT_FORM_UI.FULFILLMENT_PICKUP}
+        </Text>
+        <Text style={checkoutStyles.fulfillmentSectionTitle}>
+          {CHECKOUT_FORM_UI.PICKUP_ADDRESS_LABEL}
+        </Text>
+      </View>
+      <View style={checkoutStyles.fulfillmentSectionBody}>
+        {pickupReady ? (
+          <>
+            {pickupGroups.length > 1 ? (
+              <Text style={checkoutStyles.pickupHint}>
+                {CHECKOUT_FORM_UI.PICKUP_MULTI_HINT}
               </Text>
-              <Text style={checkoutStyles.fulfillmentSectionTitle}>
-                {CHECKOUT_FORM_UI.PICKUP_ADDRESS_LABEL}
-              </Text>
-            </View>
-            <View style={checkoutStyles.fulfillmentSectionBody}>
-              {pickupReady ? (
-                <>
-                  {pickupGroups.length > 1 ? (
-                    <Text style={checkoutStyles.pickupHint}>
-                      {CHECKOUT_FORM_UI.PICKUP_MULTI_HINT}
-                    </Text>
-                  ) : null}
-                  <View style={checkoutStyles.pickupList}>
-                    {pickupGroups.map((group) => {
-                      const needsSelect = group.locations.length >= 2;
-                      const selectedId =
-                        selectedPickupByProductId[group.productId] ??
-                        group.locations.find((item) => item.isDefault)?.id ??
-                        group.locations[0]?.id;
+            ) : null}
+            <View style={checkoutStyles.pickupList}>
+              {pickupGroups.map((group) => {
+                const needsSelect = group.locations.length >= 2;
+                const selectedId =
+                  selectedPickupByProductId[group.productId] ??
+                  group.locations.find((item) => item.isDefault)?.id ??
+                  group.locations[0]?.id;
 
-                      return (
-                        <View key={group.productId} style={checkoutStyles.pickupGroup}>
-                          {showPickupTitles && group.productTitle ? (
-                            <Text style={checkoutStyles.pickupProducts}>
-                              {group.productTitle}
-                            </Text>
-                          ) : null}
-                          {needsSelect ? (
-                            <>
-                              <Text style={checkoutStyles.pickupSelectLabel}>
-                                {CHECKOUT_FORM_UI.CHECKOUT_PICK_LOCATION}
-                              </Text>
-                              <View style={checkoutStyles.pickupOptions}>
-                                {group.locations.map((location) => {
-                                  const active = selectedId === location.id;
-                                  return (
-                                    <Pressable
-                                      key={location.id}
-                                      disabled={isDisabled || isSubmitting}
-                                      accessibilityRole="radio"
-                                      accessibilityState={{ checked: active }}
-                                      onPress={() =>
-                                        setSelectedPickupByProductId((prev) => ({
-                                          ...prev,
-                                          [group.productId]: location.id,
-                                        }))
-                                      }
-                                      style={[
-                                        checkoutStyles.pickupOption,
-                                        active && checkoutStyles.pickupOptionActive,
-                                      ]}
-                                    >
-                                      {location.label ? (
-                                        <Text style={checkoutStyles.pickupOptionLabel}>
-                                          {location.label}
-                                        </Text>
-                                      ) : null}
-                                      <Text style={checkoutStyles.pickupAddressText}>
-                                        {location.address}
-                                      </Text>
-                                    </Pressable>
-                                  );
-                                })}
-                              </View>
-                            </>
-                          ) : (
-                            <Text style={checkoutStyles.pickupAddressText}>
-                              {group.locations[0]?.address}
-                            </Text>
-                          )}
+                return (
+                  <View key={group.productId} style={checkoutStyles.pickupGroup}>
+                    {showPickupTitles && group.productTitle ? (
+                      <Text style={checkoutStyles.pickupProducts}>
+                        {group.productTitle}
+                      </Text>
+                    ) : null}
+                    {needsSelect ? (
+                      <>
+                        <Text style={checkoutStyles.pickupSelectLabel}>
+                          {CHECKOUT_FORM_UI.CHECKOUT_PICK_LOCATION}
+                        </Text>
+                        <View style={checkoutStyles.pickupOptions}>
+                          {group.locations.map((location) => {
+                            const active = selectedId === location.id;
+                            return (
+                              <Pressable
+                                key={location.id}
+                                disabled={isDisabled || isSubmitting}
+                                accessibilityRole="radio"
+                                accessibilityState={{ checked: active }}
+                                onPress={() =>
+                                  setSelectedPickupByProductId((prev) => ({
+                                    ...prev,
+                                    [group.productId]: location.id,
+                                  }))
+                                }
+                                style={[
+                                  checkoutStyles.pickupOption,
+                                  active && checkoutStyles.pickupOptionActive,
+                                ]}
+                              >
+                                {location.label ? (
+                                  <Text style={checkoutStyles.pickupOptionLabel}>
+                                    {location.label}
+                                  </Text>
+                                ) : null}
+                                <Text style={checkoutStyles.pickupAddressText}>
+                                  {location.address}
+                                </Text>
+                              </Pressable>
+                            );
+                          })}
                         </View>
-                      );
-                    })}
+                      </>
+                    ) : (
+                      <Text style={checkoutStyles.pickupAddressText}>
+                        {group.locations[0]?.address}
+                      </Text>
+                    )}
                   </View>
-                </>
-              ) : (
-                <Text
-                  style={[
-                    checkoutStyles.pickupAddressText,
-                    checkoutStyles.pickupAddressError,
-                  ]}
-                >
-                  {CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED}
-                </Text>
-              )}
+                );
+              })}
             </View>
-          </View>
+          </>
         ) : (
-          <View
+          <Text
             style={[
-              checkoutStyles.fulfillmentSection,
-              checkoutStyles.fulfillmentSectionDelivery,
+              checkoutStyles.pickupAddressText,
+              checkoutStyles.pickupAddressError,
             ]}
           >
-            <View style={checkoutStyles.fulfillmentSectionHead}>
-              <Text
-                style={[
-                  checkoutStyles.fulfillmentSectionBadge,
-                  checkoutStyles.fulfillmentSectionBadgeDelivery,
-                ]}
-              >
-                {CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY}
-              </Text>
-            </View>
-            <View style={checkoutStyles.fulfillmentSectionBody}>
-              <CheckoutShippingProviderPicker
-                disabled={isDisabled || isSubmitting}
-                sellerDeliveryAvailable={sellerDeliverySelectable}
-                sellerCardLabel={
-                  productCarrier === PRODUCT_DELIVERY_CARRIER_LOBO
-                    ? CHECKOUT_FORM_UI.SHIPPING_PROVIDER_LOBO
-                    : null
-                }
-                carriers={carrierCards}
-                selectedCarrier={chosenCarrier}
-                onSelectCarrier={(carrier) => {
-                  setLocalError("");
-                  setCarrierChoice(carrier);
-                }}
-              />
+            {CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED}
+          </Text>
+        )}
+      </View>
+    </View>
+  ) : (
+    <View
+      style={[
+        checkoutStyles.fulfillmentSection,
+        checkoutStyles.fulfillmentSectionDelivery,
+      ]}
+    >
+      <View style={checkoutStyles.fulfillmentSectionHead}>
+        <Text
+          style={[
+            checkoutStyles.fulfillmentSectionBadge,
+            checkoutStyles.fulfillmentSectionBadgeDelivery,
+          ]}
+        >
+          {CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY}
+        </Text>
+      </View>
+      <View style={checkoutStyles.fulfillmentSectionBody}>
+        <CheckoutShippingProviderPicker
+          disabled={isDisabled || isSubmitting}
+          sellerDeliveryAvailable={sellerDeliverySelectable}
+          sellerCardLabel={
+            productCarrier === PRODUCT_DELIVERY_CARRIER_LOBO
+              ? CHECKOUT_FORM_UI.SHIPPING_PROVIDER_LOBO
+              : null
+          }
+          carriers={carrierCards}
+          selectedCarrier={chosenCarrier}
+          onSelectCarrier={(carrier) => {
+            setLocalError("");
+            setCarrierChoice(carrier);
+          }}
+        />
 
-              {yandexChosen && yandex ? (
-                <>
-                  <Text style={checkoutStyles.pickupHint}>
-                    {CHECKOUT_FORM_UI.YANDEX_CARD_ONLY_HINT}
-                  </Text>
-                  <YandexPickupPointPicker
-                    sellerId={yandex.sellerId}
-                    items={yandex.items}
-                    initialRecipientName={yandex.recipientName}
-                    initialRecipientPhone={yandex.recipientPhone}
-                    disabled={isDisabled || isSubmitting}
-                    onChange={setYandexSelection}
-                    onCost={setCarrierCost}
-                  />
-                </>
-              ) : cdekChosen && cdek ? (
-                <CdekPickupPointPicker
-                  sellerId={cdek.sellerId}
-                  productIds={cdek.productIds}
-                  initialRecipientName={cdek.recipientName}
-                  initialRecipientPhone={cdek.recipientPhone}
+        {yandexChosen && yandex ? (
+          <>
+            <Text style={checkoutStyles.pickupHint}>
+              {CHECKOUT_FORM_UI.YANDEX_CARD_ONLY_HINT}
+            </Text>
+            <YandexPickupPointPicker
+              sellerId={yandex.sellerId}
+              items={yandex.items}
+              initialRecipientName={yandex.recipientName}
+              initialRecipientPhone={yandex.recipientPhone}
+              disabled={isDisabled || isSubmitting}
+              onChange={setYandexSelection}
+              onCost={setCarrierCost}
+            />
+          </>
+        ) : cdekChosen && cdek ? (
+          <CdekPickupPointPicker
+            sellerId={cdek.sellerId}
+            productIds={cdek.productIds}
+            initialRecipientName={cdek.recipientName}
+            initialRecipientPhone={cdek.recipientPhone}
+            disabled={isDisabled || isSubmitting}
+            onChange={setCdekSelection}
+            onCost={setCarrierCost}
+          />
+        ) : (
+          <>
+            <CheckoutSavedAddressPicker
+              addresses={savedAddresses}
+              selectedId={selectedSavedAddressId}
+              onSelect={handleSavedAddressSelect}
+              disabled={isDisabled || isSubmitting}
+            />
+
+            <AddressSuggestInput
+              value={deliveryAddress}
+              onChange={handleDeliveryAddressChange}
+              disabled={isDisabled || isSubmitting}
+              displayOnly
+              placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_DELIVERY_ADDRESS}
+              label={CHECKOUT_FORM_UI.LABEL_DELIVERY_ADDRESS}
+              containerStyle={checkoutStyles.fieldGroup}
+              labelStyle={checkoutStyles.fieldLabel}
+              inputStyle={checkoutStyles.fieldInput}
+            />
+
+            <Text style={checkoutStyles.fieldLabel}>{CHECKOUT_FORM_UI.LABEL_FLAT}</Text>
+            <TextInput
+              style={checkoutStyles.fieldInput}
+              value={deliveryAddress.flat}
+              onChangeText={(flat) => setDeliveryAddress((prev) => ({ ...prev, flat }))}
+              placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_FLAT}
+              placeholderTextColor={theme.colors.textMuted}
+              editable={!isDisabled && !isSubmitting}
+              keyboardType="default"
+            />
+
+            {expressChosen && express ? (
+              <>
+                <Text style={checkoutStyles.pickupHint}>
+                  {CHECKOUT_FORM_UI.YANDEX_EXPRESS_CARD_HINT}
+                </Text>
+                <YandexExpressPanel
+                  items={express.items}
+                  geo={deliveryAddress.geo}
+                  initialRecipientName={express.recipientName}
+                  initialRecipientPhone={express.recipientPhone}
                   disabled={isDisabled || isSubmitting}
-                  onChange={setCdekSelection}
+                  onChange={setExpressSelection}
                   onCost={setCarrierCost}
                 />
-              ) : (
-                <>
-                  <CheckoutSavedAddressPicker
-                    addresses={savedAddresses}
-                    selectedId={selectedSavedAddressId}
-                    onSelect={handleSavedAddressSelect}
-                    disabled={isDisabled || isSubmitting}
-                  />
+              </>
+            ) : null}
 
-                  <AddressSuggestInput
-                    value={deliveryAddress}
-                    onChange={handleDeliveryAddressChange}
-                    disabled={isDisabled || isSubmitting}
-                    displayOnly
-                    placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_DELIVERY_ADDRESS}
-                    label={CHECKOUT_FORM_UI.LABEL_DELIVERY_ADDRESS}
-                    containerStyle={checkoutStyles.fieldGroup}
-                    labelStyle={checkoutStyles.fieldLabel}
-                    inputStyle={checkoutStyles.fieldInput}
-                  />
+            {loboOwnDelivery ? (
+              <CheckoutShippingEstimateNotice
+                estimate={shippingEstimate}
+                blockMessage={shippingBlockMessage}
+              />
+            ) : null}
+          </>
+        )}
 
-                  <Text style={checkoutStyles.fieldLabel}>
-                    {CHECKOUT_FORM_UI.LABEL_FLAT}
-                  </Text>
-                  <TextInput
-                    style={checkoutStyles.fieldInput}
-                    value={deliveryAddress.flat}
-                    onChangeText={(flat) =>
-                      setDeliveryAddress((prev) => ({ ...prev, flat }))
-                    }
-                    placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_FLAT}
-                    placeholderTextColor={theme.colors.textMuted}
-                    editable={!isDisabled && !isSubmitting}
-                    keyboardType="default"
-                  />
-
-                  {expressChosen && express ? (
-                    <>
-                      <Text style={checkoutStyles.pickupHint}>
-                        {CHECKOUT_FORM_UI.YANDEX_EXPRESS_CARD_HINT}
-                      </Text>
-                      <YandexExpressPanel
-                        items={express.items}
-                        geo={deliveryAddress.geo}
-                        initialRecipientName={express.recipientName}
-                        initialRecipientPhone={express.recipientPhone}
-                        disabled={isDisabled || isSubmitting}
-                        onChange={setExpressSelection}
-                        onCost={setCarrierCost}
-                      />
-                    </>
-                  ) : null}
-
-                  {loboOwnDelivery ? (
-                    <CheckoutShippingEstimateNotice
-                      estimate={shippingEstimate}
-                      blockMessage={shippingBlockMessage}
-                    />
-                  ) : null}
-                </>
-              )}
-
-              {renderFooter ? null : renderSellerDeliveryCost(false)}
-            </View>
-          </View>
+        {renderFooter ? null : renderSellerDeliveryCost(false)}
+      </View>
+    </View>
   );
 
   const paymentMethodBlock =

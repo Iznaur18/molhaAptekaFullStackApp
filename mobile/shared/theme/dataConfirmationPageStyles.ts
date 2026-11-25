@@ -170,116 +170,118 @@ export const useDataConfirmationPageStyles = createThemedStyles((theme, layout) 
 }));
 
 /** Fullscreen dialog: fade + тап по затемнению. */
-export const useDataConfirmationRequestModalStyles = createThemedStyles((theme, layout) => ({
-  root: {
-    flex: 1,
-  },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  keyboardHost: {
-    flex: 1,
-    width: "100%",
-    maxHeight: "100%",
-  },
-  card: {
-    flex: 1,
-    width: "100%",
-    maxHeight: "100%",
-    borderRadius: 0,
-    backgroundColor: theme.colors.surface,
-    overflow: "hidden",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: theme.spacing[4],
-    paddingTop: theme.spacing[4],
-    paddingBottom: theme.spacing[3],
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: theme.colors.border,
-  },
-  title: {
-    fontSize: theme.typography.font2xl,
-    fontWeight: theme.typography.fontWeightBold,
-    flex: 1,
-    color: theme.colors.text,
-  },
-  intro: {
-    fontSize: theme.typography.fontBase,
-    lineHeight: theme.typography.leadingBase,
-    marginBottom: theme.spacing[2],
-    color: theme.colors.textMuted,
-  },
-  form: {
-    paddingHorizontal: theme.spacing[4],
-    paddingTop: theme.spacing[3],
-    paddingBottom: theme.spacing[5],
-    gap: 10,
-  },
-  passportInput: {
-    borderWidth: 1,
-    borderColor: theme.colors.borderStrong,
-    borderRadius: theme.radius.button,
-    paddingHorizontal: theme.spacing[3],
-    paddingVertical: 12,
-    fontSize: theme.typography.fontLg,
-    backgroundColor: theme.colors.bg,
-    color: theme.colors.text,
-  },
-  stepMeta: {
-    gap: 4,
-    marginBottom: theme.spacing[1],
-  },
-  stepProgress: {
-    fontSize: theme.typography.fontXs,
-    fontWeight: theme.typography.fontWeightSemibold,
-    color: theme.colors.textMuted,
-  },
-  stepTitle: {
-    fontSize: theme.typography.fontLg,
-    fontWeight: theme.typography.fontWeightBold,
-    color: theme.colors.text,
-  },
-  stepActions: {
-    flexDirection: "row",
-    gap: theme.spacing[2],
-    marginTop: theme.spacing[2],
-  },
-  stepActionFlex: {
-    flex: 1,
-  },
-  selfieSection: {
-    gap: theme.spacing[2],
-    marginTop: theme.spacing[1],
-  },
-  selfieHint: {
-    fontSize: theme.typography.fontSm,
-    color: theme.colors.textMuted,
-  },
-  preview: {
-    width: "100%",
-    height: 180,
-    borderRadius: theme.radius.sm,
-    backgroundColor: theme.colors.surfaceMuted,
-  },
-  fileName: {
-    fontSize: theme.typography.fontSm,
-    color: theme.colors.textMuted,
-  },
-  rejectBlock: {
-    paddingHorizontal: theme.spacing[4],
-    paddingVertical: theme.spacing[3],
-    gap: 6,
-  },
-  staffNote: {
-    fontSize: theme.typography.fontBase,
-    lineHeight: theme.typography.leadingBase,
-    color: theme.colors.textMuted,
-  },
-  statusPadding: {
-    paddingHorizontal: theme.spacing[4],
-    paddingVertical: theme.spacing[3],
-  },
-}));
+export const useDataConfirmationRequestModalStyles = createThemedStyles(
+  (theme, layout) => ({
+    root: {
+      flex: 1,
+    },
+    backdrop: {
+      ...StyleSheet.absoluteFillObject,
+    },
+    keyboardHost: {
+      flex: 1,
+      width: "100%",
+      maxHeight: "100%",
+    },
+    card: {
+      flex: 1,
+      width: "100%",
+      maxHeight: "100%",
+      borderRadius: 0,
+      backgroundColor: theme.colors.surface,
+      overflow: "hidden",
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: theme.spacing[4],
+      paddingTop: theme.spacing[4],
+      paddingBottom: theme.spacing[3],
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: theme.colors.border,
+    },
+    title: {
+      fontSize: theme.typography.font2xl,
+      fontWeight: theme.typography.fontWeightBold,
+      flex: 1,
+      color: theme.colors.text,
+    },
+    intro: {
+      fontSize: theme.typography.fontBase,
+      lineHeight: theme.typography.leadingBase,
+      marginBottom: theme.spacing[2],
+      color: theme.colors.textMuted,
+    },
+    form: {
+      paddingHorizontal: theme.spacing[4],
+      paddingTop: theme.spacing[3],
+      paddingBottom: theme.spacing[5],
+      gap: 10,
+    },
+    passportInput: {
+      borderWidth: 1,
+      borderColor: theme.colors.borderStrong,
+      borderRadius: theme.radius.button,
+      paddingHorizontal: theme.spacing[3],
+      paddingVertical: 12,
+      fontSize: theme.typography.fontLg,
+      backgroundColor: theme.colors.bg,
+      color: theme.colors.text,
+    },
+    stepMeta: {
+      gap: 4,
+      marginBottom: theme.spacing[1],
+    },
+    stepProgress: {
+      fontSize: theme.typography.fontXs,
+      fontWeight: theme.typography.fontWeightSemibold,
+      color: theme.colors.textMuted,
+    },
+    stepTitle: {
+      fontSize: theme.typography.fontLg,
+      fontWeight: theme.typography.fontWeightBold,
+      color: theme.colors.text,
+    },
+    stepActions: {
+      flexDirection: "row",
+      gap: theme.spacing[2],
+      marginTop: theme.spacing[2],
+    },
+    stepActionFlex: {
+      flex: 1,
+    },
+    selfieSection: {
+      gap: theme.spacing[2],
+      marginTop: theme.spacing[1],
+    },
+    selfieHint: {
+      fontSize: theme.typography.fontSm,
+      color: theme.colors.textMuted,
+    },
+    preview: {
+      width: "100%",
+      height: 180,
+      borderRadius: theme.radius.sm,
+      backgroundColor: theme.colors.surfaceMuted,
+    },
+    fileName: {
+      fontSize: theme.typography.fontSm,
+      color: theme.colors.textMuted,
+    },
+    rejectBlock: {
+      paddingHorizontal: theme.spacing[4],
+      paddingVertical: theme.spacing[3],
+      gap: 6,
+    },
+    staffNote: {
+      fontSize: theme.typography.fontBase,
+      lineHeight: theme.typography.leadingBase,
+      color: theme.colors.textMuted,
+    },
+    statusPadding: {
+      paddingHorizontal: theme.spacing[4],
+      paddingVertical: theme.spacing[3],
+    },
+  }),
+);

@@ -1,6 +1,7 @@
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-export const useSellerPersonalCategoryModerationPageStyles = createThemedStyles((theme, layout) => ({
+export const useSellerPersonalCategoryModerationPageStyles = createThemedStyles(
+  (theme, layout) => ({
     container: {
       flex: 1,
       minHeight: 0,

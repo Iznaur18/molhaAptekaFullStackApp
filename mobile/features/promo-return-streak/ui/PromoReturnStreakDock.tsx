@@ -153,7 +153,10 @@ export const PromoReturnStreakDock = () => {
   return (
     <View
       pointerEvents="box-none"
-      style={[styles.shell, { bottom, paddingHorizontal: Math.max(0, horizontalInset - L.inset) }]}
+      style={[
+        styles.shell,
+        { bottom, paddingHorizontal: Math.max(0, horizontalInset - L.inset) },
+      ]}
     >
       <Animated.View
         style={[

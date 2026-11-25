@@ -1,7 +1,8 @@
 import { writeFileSync } from "node:fs";
 import { MongoMemoryReplSet } from "mongodb-memory-server";
 
-const uriFile = process.argv[2] || "E:/coding/molhaAptekaFullStackApp/server/.dev-mongo-uri";
+const uriFile =
+  process.argv[2] || "E:/coding/molhaAptekaFullStackApp/server/.dev-mongo-uri";
 
 const replSet = await MongoMemoryReplSet.create({ replSet: { count: 1 } });
 await replSet.waitUntilRunning();

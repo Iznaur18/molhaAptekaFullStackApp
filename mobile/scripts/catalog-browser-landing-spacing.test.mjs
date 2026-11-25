@@ -70,7 +70,10 @@ test("catalog section title accent uses vertical action→accent gradient", () =
   const accent = readMobile(
     "features/catalog-browser/ui/CatalogSectionTitleAccent.tsx",
   );
-  assert.match(accent, /mixHexColors\(theme\.colors\.action, theme\.colors\.accent, 0\.55\)/);
+  assert.match(
+    accent,
+    /mixHexColors\(theme\.colors\.action, theme\.colors\.accent, 0\.55\)/,
+  );
   assert.match(accent, /x1="0" y1="0" x2="0" y2="1"/);
   assert.match(accent, /LinearGradient/);
 });

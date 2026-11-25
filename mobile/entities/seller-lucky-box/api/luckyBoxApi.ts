@@ -146,8 +146,6 @@ export async function fetchMyLuckyBoxWins(): Promise<MyLuckyBoxWin[]> {
     const wins = data?.data?.wins;
     return Array.isArray(wins) ? (wins as MyLuckyBoxWin[]) : [];
   } catch (error) {
-    throw new Error(
-      formatApiErrorMessage(error, "Не удалось загрузить выигрыши"),
-    );
+    throw new Error(formatApiErrorMessage(error, "Не удалось загрузить выигрыши"));
   }
 }

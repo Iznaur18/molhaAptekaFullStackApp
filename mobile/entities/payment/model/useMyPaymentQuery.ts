@@ -6,11 +6,7 @@ import { authMeQueryKeys, loyaltyPointsQueryKeys } from "@/shared/api";
 
 import { paymentQueryKeys } from "./paymentQueryKeys";
 
-export const useMyPaymentQuery = ({
-  paymentId,
-}: {
-  paymentId: string | null;
-}) => {
+export const useMyPaymentQuery = ({ paymentId }: { paymentId: string | null }) => {
   const queryClient = useQueryClient();
   const id = paymentId?.trim() ? String(paymentId) : "";
 

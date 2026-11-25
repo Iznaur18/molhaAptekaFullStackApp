@@ -36,9 +36,7 @@ test("11.2 advertising games tab + lucky/fortune sections + me/config", () => {
     "features/advertising-page/ui/FortuneWheelAdvertisingSection.tsx",
   );
   const luckyApi = readMobile("entities/seller-lucky-box/api/luckyBoxApi.ts");
-  const wheelApi = readMobile(
-    "entities/seller-fortune-wheel/api/fortuneWheelApi.ts",
-  );
+  const wheelApi = readMobile("entities/seller-fortune-wheel/api/fortuneWheelApi.ts");
   const styles = readMobile("shared/theme/advertisingPageStyles.ts");
   const copy = readMobile("shared/config/appUiCopy.ts");
   const web = readClient("pages/advertising/ui/AdvertisingPage.jsx");

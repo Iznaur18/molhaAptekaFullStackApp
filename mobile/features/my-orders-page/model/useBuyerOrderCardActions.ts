@@ -45,9 +45,7 @@ export const useBuyerOrderCardActions = ({
   } = useOrderMutations();
   const createOrderPaymentMutation = useCreateOrderPaymentMutation();
   const [pendingActionKey, setPendingActionKey] = useState<string | null>(null);
-  const [itemActionErrors, setItemActionErrors] = useState<Record<string, string>>(
-    {},
-  );
+  const [itemActionErrors, setItemActionErrors] = useState<Record<string, string>>({});
   const [loyaltyFlash, setLoyaltyFlash] = useState("");
 
   useEffect(() => {

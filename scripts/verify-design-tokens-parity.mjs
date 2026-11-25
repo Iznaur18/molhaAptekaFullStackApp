@@ -9,9 +9,7 @@ import {
 import { izInteraction } from "../packages/design-tokens/src/interaction.ts";
 import { izPageBgCustom } from "../packages/design-tokens/src/pageBg.ts";
 import { izRadius } from "../packages/design-tokens/src/radius.ts";
-import {
-  izModalBackdropScrimCss,
-} from "../packages/design-tokens/src/scrim.ts";
+import { izModalBackdropScrimCss } from "../packages/design-tokens/src/scrim.ts";
 import { izSpacing } from "../packages/design-tokens/src/spacing.ts";
 import { izTypography } from "../packages/design-tokens/src/typography.ts";
 
@@ -138,9 +136,7 @@ for (const [suffix, tokenValue] of FONT_SCALE) {
   }
   const cssPx = parseCssLengthToPx(cssValue);
   if (!Number.isFinite(cssPx) || Math.abs(cssPx - tokenValue) > FLOAT_TOLERANCE) {
-    violations.push(
-      `font mismatch ${varName}: css=${cssValue} tokens=${tokenValue}px`,
-    );
+    violations.push(`font mismatch ${varName}: css=${cssValue} tokens=${tokenValue}px`);
   }
 }
 
@@ -148,8 +144,7 @@ const modalScrimCss = cssVars.get("--iz-color-modal-scrim");
 if (!modalScrimCss) {
   violations.push("missing --iz-color-modal-scrim");
 } else if (
-  modalScrimCss.replace(/\s+/g, " ") !==
-  izModalBackdropScrimCss.replace(/\s+/g, " ")
+  modalScrimCss.replace(/\s+/g, " ") !== izModalBackdropScrimCss.replace(/\s+/g, " ")
 ) {
   violations.push(
     `modal scrim mismatch: css=${modalScrimCss} tokens=${izModalBackdropScrimCss}`,
@@ -171,9 +166,7 @@ if (!disabledOpacityCss) {
 const indexCssPath = path.resolve(scriptDir, "../client/src/index.css");
 const indexCss = await fs.readFile(indexCssPath, "utf8");
 if (!indexCss.includes(`--iz-page-bg-custom: ${izPageBgCustom}`)) {
-  violations.push(
-    `custom page bg missing in index.css (expected ${izPageBgCustom})`,
-  );
+  violations.push(`custom page bg missing in index.css (expected ${izPageBgCustom})`);
 }
 
 if (violations.length > 0) {

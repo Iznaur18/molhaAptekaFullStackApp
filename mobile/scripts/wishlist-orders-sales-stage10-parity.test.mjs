@@ -81,14 +81,8 @@ test("sales chrome matches orders; toolbar bg surface vs orders surfaceMuted", (
   assert.match(layout, /MY_SALES_PAGE_LAYOUT[\s\S]*toolbarRadius: 16/);
   assert.match(sales, /CHIP_PADDING_VERTICAL = 4/);
   assert.match(sales, /CHIP_PADDING_HORIZONTAL = 8/);
-  assert.match(
-    sales,
-    /toolbar:[\s\S]*backgroundColor: theme\.colors\.surface,/,
-  );
-  assert.match(
-    orders,
-    /toolbar:[\s\S]*backgroundColor: theme\.colors\.surfaceMuted,/,
-  );
+  assert.match(sales, /toolbar:[\s\S]*backgroundColor: theme\.colors\.surface,/);
+  assert.match(orders, /toolbar:[\s\S]*backgroundColor: theme\.colors\.surfaceMuted,/);
   assert.match(page, /AppButton/);
   assert.match(page, /LOGIN_HINT/);
   assert.match(page, /ScreenErrorState/);

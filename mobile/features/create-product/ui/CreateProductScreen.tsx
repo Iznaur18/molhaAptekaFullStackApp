@@ -1133,8 +1133,7 @@ function WizardProgress({
                     progressStyles.circleText,
                     isActive && { color: theme.colors.onContrast },
                     isComplete && { color: theme.colors.success },
-                    !isActive &&
-                      !isComplete && { color: theme.colors.textSecondary },
+                    !isActive && !isComplete && { color: theme.colors.textSecondary },
                   ]}
                 >
                   {isComplete ? "✓" : String(i + 1)}

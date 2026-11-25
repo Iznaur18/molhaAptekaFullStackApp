@@ -35,10 +35,7 @@ export const BoostProductsHomeSection = ({
     return resolveBoostHomeCardWidth(scrollContainerWidth);
   }, [contentPaddingHorizontal, layoutWidth]);
 
-  const trackHeight = useMemo(
-    () => resolveBoostHomeCardHeight(cardWidth),
-    [cardWidth],
-  );
+  const trackHeight = useMemo(() => resolveBoostHomeCardHeight(cardWidth), [cardWidth]);
 
   if (products.length === 0) {
     return null;
@@ -65,15 +62,14 @@ export const BoostProductsHomeSection = ({
             style={styles.viewAll}
             onPress={() => setIsViewAllOpen(true)}
             accessibilityRole="button"
-            accessibilityLabel={HOME_PAGE_UI.CATALOG_HOME_SECTION_BOOST_PRODUCTS_VIEW_ALL}
+            accessibilityLabel={
+              HOME_PAGE_UI.CATALOG_HOME_SECTION_BOOST_PRODUCTS_VIEW_ALL
+            }
           >
             <Text style={styles.viewAllLabel}>
               {HOME_PAGE_UI.CATALOG_HOME_SECTION_BOOST_PRODUCTS_VIEW_ALL}
             </Text>
-            <ArrowRight
-              size={BOOST_HOME_VIEW_ALL_ICON}
-              color={theme.colors.action}
-            />
+            <ArrowRight size={BOOST_HOME_VIEW_ALL_ICON} color={theme.colors.action} />
           </Pressable>
         </View>
         <HorizontalOverflowRow height={trackHeight} trackStyle={styles.row}>

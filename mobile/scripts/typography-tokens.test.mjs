@@ -6,8 +6,7 @@ import { test } from "node:test";
 
 const MOBILE_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const PKG = join(MOBILE_ROOT, "..", "packages/design-tokens/src");
-const read = (relativePath) =>
-  readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
+const read = (relativePath) => readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
 const readPkg = (relativePath) => readFileSync(join(PKG, relativePath), "utf8");
 
 test("design-tokens typography ladder matches web --iz-font-*", () => {
@@ -68,8 +67,5 @@ test("shared/theme integer ladder prefers theme.typography (sample)", () => {
 });
 
 test("createThemedStyles documents typography rule", () => {
-  assert.match(
-    read("shared/theme/createThemedStyles.ts"),
-    /theme\.typography\.\*/,
-  );
+  assert.match(read("shared/theme/createThemedStyles.ts"), /theme\.typography\.\*/);
 });

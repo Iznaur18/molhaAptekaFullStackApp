@@ -104,8 +104,7 @@ export const PRODUCT_CARD_IMAGE_BADGE_OVERLAY =
  */
 export const resolveProductCardImageOverlayInsetX = (
   layout: "default" | "catalog-grid" = "default",
-): number =>
-  layout === "catalog-grid" ? 0 : PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX;
+): number => (layout === "catalog-grid" ? 0 : PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX);
 
 /** Ozon-стиль: стопка плашек флеш к левому краю фото, скругление только справа. */
 export const PRODUCT_CARD_IMAGE_BADGE_OVERLAY_LAYOUT = {

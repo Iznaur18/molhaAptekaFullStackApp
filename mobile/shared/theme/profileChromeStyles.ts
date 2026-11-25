@@ -11,9 +11,7 @@ import {
 } from "@/shared/lib/guestProfileLayout";
 import { PRODUCT_DETAILS_SELLER_PRODUCTS_CAROUSEL_LAYOUT as SPC } from "@/entities/product/lib/productDetailsSellerProductsCarouselLayout";
 import { USER_PROFILE_PURCHASES_LAYOUT as UPP } from "@/entities/user/lib/userProfilePurchasesLayout";
-export {
-  USER_PROFILE_PURCHASES_TRACK_HEIGHT,
-} from "@/entities/user/lib/userProfilePurchasesLayout";
+export { USER_PROFILE_PURCHASES_TRACK_HEIGHT } from "@/entities/user/lib/userProfilePurchasesLayout";
 import { PROFILE_CONTENT_MAX_WIDTH_PHONE } from "@/shared/lib/screenBreakpoints";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { SCREEN_CONTENT_PADDING_BOTTOM } from "@/shared/theme/screenContentLayout";
@@ -709,229 +707,229 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme, layout) 
   const sectionHeader = resolveProfileSectionHeaderChrome(theme);
 
   return {
-  root: {
-    marginBottom: theme.spacing[4],
-    backgroundColor: theme.colors.surface,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    flexGrow: 0,
-    flexShrink: 0,
-    alignSelf: "stretch",
-  },
-  /** web `--user-profile-purchases-section-radius: 24px` (не squircle). */
-  rootProfileRadius: {
-    marginBottom: 0,
-    borderRadius: PROFILE_CARD_SQUIRCLE_RADIUS,
-    overflow: "hidden",
-    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
-  },
-  rootHorizontal: {
-    marginBottom: 0,
-    backgroundColor: theme.colors.surfaceMuted,
-    borderColor: theme.colors.border,
-    borderWidth: SPC.borderWidth,
-  },
-  rootHorizontalRadius: {
-    borderRadius: SPC.borderRadius,
-    overflow: "hidden",
-    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: theme.spacing[2],
-    paddingVertical: UPP.headingPaddingY,
-    paddingHorizontal: UPP.headingPaddingX,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    backgroundColor: sectionHeader.backgroundColor,
-    borderBottomColor: sectionHeader.borderBottomColor,
-  },
-  headerHorizontal: {
-    backgroundColor: "transparent",
-    borderBottomWidth: 0,
-    paddingTop: SPC.headingPaddingTop,
-    paddingHorizontal: SPC.headingPaddingHorizontal,
-    paddingBottom: SPC.headingPaddingBottom,
-    paddingVertical: 0,
-  },
-  headerTitle: {
-    flex: 1,
-    minWidth: 0,
-    fontSize: theme.typography.font2xs,
-    fontWeight: "800",
-    letterSpacing: 0.9,
-    textTransform: "uppercase",
-    color: sectionHeader.color,
-  },
-  headerTitleHorizontal: {
-    fontSize: SPC.headingFontSize,
-    fontWeight: SPC.headingFontWeight,
-    letterSpacing: SPC.headingLetterSpacing,
-    lineHeight: SPC.headingLineHeight,
-    textTransform: "none",
-    color: theme.colors.text,
-  },
-  headerTitlePressable: {
-    flex: 1,
-    minWidth: 0,
-  },
-  headerAction: {
-    flexShrink: 0,
-    fontSize: theme.typography.font2xs,
-    fontWeight: theme.typography.fontWeightBold,
-    letterSpacing: 0.4,
-    color: theme.colors.onContrast,
-    opacity: 0.82,
-  },
-  body: {
-    paddingHorizontal: UPP.bodyPaddingX,
-    paddingVertical: UPP.bodyPaddingY,
-    gap: theme.spacing[2],
-  },
-  /**
-   * Vertical pad как web `0.75rem`. Horizontal 0 — трек full-bleed до края карточки;
-   * боковой inset даёт spacer в `UserProfileThumbScrollRow` (скроллится вместе с thumbs).
-   */
-  bodyProfileScrollRow: {
-    flexGrow: 0,
-    flexShrink: 0,
-    overflow: "hidden",
-    gap: 0,
-    paddingVertical: UPP.bodyPaddingY,
-    paddingHorizontal: 0,
-  },
-  bodyHorizontal: {
-    paddingHorizontal: 0,
-    paddingVertical: 0,
-    paddingTop: 0,
-    paddingBottom: 0,
-    gap: 0,
-    backgroundColor: "transparent",
-  },
-  state: {
-    fontSize: theme.typography.fontBase,
-    textAlign: "center",
-    color: theme.colors.textMuted,
-  },
-  stateError: {
-    color: theme.colors.danger,
-  },
-  stateErrorHorizontal: {
-    margin: 0,
-    paddingHorizontal: SPC.errorPaddingHorizontal,
-    paddingBottom: SPC.errorPaddingBottom,
-    fontSize: SPC.errorFontSize,
-    lineHeight: SPC.errorFontSize * 1.35,
-    textAlign: "left",
-  },
-  grid: {
-    gap: 10,
-  },
-  gridRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  gridRowPartial: {
-    justifyContent: "flex-start",
-    gap: USER_PROFILE_THUMB_GAP,
-  },
-  scrollRowContent: {
-    flexDirection: "row",
-    flexWrap: "nowrap",
-    alignItems: "center",
-    gap: USER_PROFILE_THUMB_GAP,
-    paddingTop: SPC.trackPaddingTop,
-    paddingHorizontal: SPC.trackPaddingHorizontal,
-    paddingBottom: SPC.trackPaddingBottom,
-    flexGrow: 0,
-    flexShrink: 0,
-  },
-  /** Profile purchases: трек без pad — inset на inner (скроллится → thumbs в край). */
-  scrollRowContentProfile: {
-    flexDirection: "row",
-    flexWrap: "nowrap",
-    alignItems: "center",
-    gap: 0,
-    paddingTop: 0,
-    paddingLeft: 0,
-    paddingRight: 0,
-    paddingBottom: 0,
-    flexGrow: 0,
-    flexShrink: 0,
-  },
-  /** web `padding: 0.75rem 0.875rem` по горизонтали — внутри скролла. */
-  scrollRowInnerProfile: {
-    flexDirection: "row",
-    flexWrap: "nowrap",
-    alignItems: "center",
-    gap: UPP.tileGap,
-    paddingHorizontal: UPP.bodyPaddingX,
-    flexGrow: 0,
-    flexShrink: 0,
-  },
-  thumbButton: {
-    width: USER_PROFILE_THUMB_SIZE,
-    height: USER_PROFILE_THUMB_SIZE,
-    flex: 0,
-    flexShrink: 0,
-    flexGrow: 0,
-    overflow: "hidden",
-    ...(Platform.OS === "web"
-      ? ({
-          flexBasis: USER_PROFILE_THUMB_SIZE,
-          minWidth: USER_PROFILE_THUMB_SIZE,
-          maxWidth: USER_PROFILE_THUMB_SIZE,
-          minHeight: USER_PROFILE_THUMB_SIZE,
-          maxHeight: USER_PROFILE_THUMB_SIZE,
-          alignSelf: "center",
-        } as const)
-      : null),
-  },
-  thumbButtonUnavailable: {
-    opacity: SPC.thumbUnavailableOpacity,
-  },
-  thumbClip: {
-    width: USER_PROFILE_THUMB_SIZE,
-    height: USER_PROFILE_THUMB_SIZE,
-    backgroundColor: theme.colors.surfaceMuted,
-    borderWidth: SPC.thumbBorderWidth,
-    borderColor: theme.colors.border,
-  },
-  /** web `--user-profile-purchases-thumb-radius: 14px` */
-  thumbClipProfile: {
-    width: USER_PROFILE_THUMB_SIZE,
-    height: USER_PROFILE_THUMB_SIZE,
-    borderRadius: UPP.thumbRadius,
-    overflow: "hidden",
-    backgroundColor: theme.colors.surfaceMuted,
-    borderWidth: UPP.thumbBorderWidth,
-    borderColor: theme.colors.border,
-  },
-  thumbClipCurrent: {
-    borderWidth: SPC.thumbCurrentOutlineWidth,
-    borderColor: theme.colors.action,
-  },
-  thumbImageHost: {
-    width: USER_PROFILE_THUMB_SIZE,
-    height: USER_PROFILE_THUMB_SIZE,
-    overflow: "hidden",
-    position: "relative",
-  },
-  thumbImage: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  thumbPlaceholder: {
-    width: USER_PROFILE_THUMB_SIZE,
-    height: USER_PROFILE_THUMB_SIZE,
-    backgroundColor: theme.colors.surfaceMuted,
-  },
-  hint: {
-    fontSize: theme.typography.fontSm,
-    textAlign: "center",
-    color: theme.colors.warningText,
-  },
-};
+    root: {
+      marginBottom: theme.spacing[4],
+      backgroundColor: theme.colors.surface,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: theme.colors.border,
+      flexGrow: 0,
+      flexShrink: 0,
+      alignSelf: "stretch",
+    },
+    /** web `--user-profile-purchases-section-radius: 24px` (не squircle). */
+    rootProfileRadius: {
+      marginBottom: 0,
+      borderRadius: PROFILE_CARD_SQUIRCLE_RADIUS,
+      overflow: "hidden",
+      ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+    },
+    rootHorizontal: {
+      marginBottom: 0,
+      backgroundColor: theme.colors.surfaceMuted,
+      borderColor: theme.colors.border,
+      borderWidth: SPC.borderWidth,
+    },
+    rootHorizontalRadius: {
+      borderRadius: SPC.borderRadius,
+      overflow: "hidden",
+      ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: theme.spacing[2],
+      paddingVertical: UPP.headingPaddingY,
+      paddingHorizontal: UPP.headingPaddingX,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      backgroundColor: sectionHeader.backgroundColor,
+      borderBottomColor: sectionHeader.borderBottomColor,
+    },
+    headerHorizontal: {
+      backgroundColor: "transparent",
+      borderBottomWidth: 0,
+      paddingTop: SPC.headingPaddingTop,
+      paddingHorizontal: SPC.headingPaddingHorizontal,
+      paddingBottom: SPC.headingPaddingBottom,
+      paddingVertical: 0,
+    },
+    headerTitle: {
+      flex: 1,
+      minWidth: 0,
+      fontSize: theme.typography.font2xs,
+      fontWeight: "800",
+      letterSpacing: 0.9,
+      textTransform: "uppercase",
+      color: sectionHeader.color,
+    },
+    headerTitleHorizontal: {
+      fontSize: SPC.headingFontSize,
+      fontWeight: SPC.headingFontWeight,
+      letterSpacing: SPC.headingLetterSpacing,
+      lineHeight: SPC.headingLineHeight,
+      textTransform: "none",
+      color: theme.colors.text,
+    },
+    headerTitlePressable: {
+      flex: 1,
+      minWidth: 0,
+    },
+    headerAction: {
+      flexShrink: 0,
+      fontSize: theme.typography.font2xs,
+      fontWeight: theme.typography.fontWeightBold,
+      letterSpacing: 0.4,
+      color: theme.colors.onContrast,
+      opacity: 0.82,
+    },
+    body: {
+      paddingHorizontal: UPP.bodyPaddingX,
+      paddingVertical: UPP.bodyPaddingY,
+      gap: theme.spacing[2],
+    },
+    /**
+     * Vertical pad как web `0.75rem`. Horizontal 0 — трек full-bleed до края карточки;
+     * боковой inset даёт spacer в `UserProfileThumbScrollRow` (скроллится вместе с thumbs).
+     */
+    bodyProfileScrollRow: {
+      flexGrow: 0,
+      flexShrink: 0,
+      overflow: "hidden",
+      gap: 0,
+      paddingVertical: UPP.bodyPaddingY,
+      paddingHorizontal: 0,
+    },
+    bodyHorizontal: {
+      paddingHorizontal: 0,
+      paddingVertical: 0,
+      paddingTop: 0,
+      paddingBottom: 0,
+      gap: 0,
+      backgroundColor: "transparent",
+    },
+    state: {
+      fontSize: theme.typography.fontBase,
+      textAlign: "center",
+      color: theme.colors.textMuted,
+    },
+    stateError: {
+      color: theme.colors.danger,
+    },
+    stateErrorHorizontal: {
+      margin: 0,
+      paddingHorizontal: SPC.errorPaddingHorizontal,
+      paddingBottom: SPC.errorPaddingBottom,
+      fontSize: SPC.errorFontSize,
+      lineHeight: SPC.errorFontSize * 1.35,
+      textAlign: "left",
+    },
+    grid: {
+      gap: 10,
+    },
+    gridRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+    },
+    gridRowPartial: {
+      justifyContent: "flex-start",
+      gap: USER_PROFILE_THUMB_GAP,
+    },
+    scrollRowContent: {
+      flexDirection: "row",
+      flexWrap: "nowrap",
+      alignItems: "center",
+      gap: USER_PROFILE_THUMB_GAP,
+      paddingTop: SPC.trackPaddingTop,
+      paddingHorizontal: SPC.trackPaddingHorizontal,
+      paddingBottom: SPC.trackPaddingBottom,
+      flexGrow: 0,
+      flexShrink: 0,
+    },
+    /** Profile purchases: трек без pad — inset на inner (скроллится → thumbs в край). */
+    scrollRowContentProfile: {
+      flexDirection: "row",
+      flexWrap: "nowrap",
+      alignItems: "center",
+      gap: 0,
+      paddingTop: 0,
+      paddingLeft: 0,
+      paddingRight: 0,
+      paddingBottom: 0,
+      flexGrow: 0,
+      flexShrink: 0,
+    },
+    /** web `padding: 0.75rem 0.875rem` по горизонтали — внутри скролла. */
+    scrollRowInnerProfile: {
+      flexDirection: "row",
+      flexWrap: "nowrap",
+      alignItems: "center",
+      gap: UPP.tileGap,
+      paddingHorizontal: UPP.bodyPaddingX,
+      flexGrow: 0,
+      flexShrink: 0,
+    },
+    thumbButton: {
+      width: USER_PROFILE_THUMB_SIZE,
+      height: USER_PROFILE_THUMB_SIZE,
+      flex: 0,
+      flexShrink: 0,
+      flexGrow: 0,
+      overflow: "hidden",
+      ...(Platform.OS === "web"
+        ? ({
+            flexBasis: USER_PROFILE_THUMB_SIZE,
+            minWidth: USER_PROFILE_THUMB_SIZE,
+            maxWidth: USER_PROFILE_THUMB_SIZE,
+            minHeight: USER_PROFILE_THUMB_SIZE,
+            maxHeight: USER_PROFILE_THUMB_SIZE,
+            alignSelf: "center",
+          } as const)
+        : null),
+    },
+    thumbButtonUnavailable: {
+      opacity: SPC.thumbUnavailableOpacity,
+    },
+    thumbClip: {
+      width: USER_PROFILE_THUMB_SIZE,
+      height: USER_PROFILE_THUMB_SIZE,
+      backgroundColor: theme.colors.surfaceMuted,
+      borderWidth: SPC.thumbBorderWidth,
+      borderColor: theme.colors.border,
+    },
+    /** web `--user-profile-purchases-thumb-radius: 14px` */
+    thumbClipProfile: {
+      width: USER_PROFILE_THUMB_SIZE,
+      height: USER_PROFILE_THUMB_SIZE,
+      borderRadius: UPP.thumbRadius,
+      overflow: "hidden",
+      backgroundColor: theme.colors.surfaceMuted,
+      borderWidth: UPP.thumbBorderWidth,
+      borderColor: theme.colors.border,
+    },
+    thumbClipCurrent: {
+      borderWidth: SPC.thumbCurrentOutlineWidth,
+      borderColor: theme.colors.action,
+    },
+    thumbImageHost: {
+      width: USER_PROFILE_THUMB_SIZE,
+      height: USER_PROFILE_THUMB_SIZE,
+      overflow: "hidden",
+      position: "relative",
+    },
+    thumbImage: {
+      ...StyleSheet.absoluteFillObject,
+    },
+    thumbPlaceholder: {
+      width: USER_PROFILE_THUMB_SIZE,
+      height: USER_PROFILE_THUMB_SIZE,
+      backgroundColor: theme.colors.surfaceMuted,
+    },
+    hint: {
+      fontSize: theme.typography.fontSm,
+      textAlign: "center",
+      color: theme.colors.warningText,
+    },
+  };
 });
 
 export const useUserDetailsPageStyles = createThemedStyles((theme, layout) => ({

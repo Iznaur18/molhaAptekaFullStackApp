@@ -42,7 +42,10 @@ test("boost error UI uses InlineErrorBanner like web", () => {
   const banner = readMobileFile("shared/ui/InlineErrorBanner.tsx");
   const layout = readMobileFile("shared/lib/inlineErrorBannerLayout.ts");
   const webCss = readFileSync(
-    join(MOBILE_ROOT, "../client/src/shared/ui/InlineErrorBanner/InlineErrorBanner.css"),
+    join(
+      MOBILE_ROOT,
+      "../client/src/shared/ui/InlineErrorBanner/InlineErrorBanner.css",
+    ),
     "utf8",
   );
 

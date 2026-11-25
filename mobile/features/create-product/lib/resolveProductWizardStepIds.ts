@@ -12,8 +12,7 @@ export const CREATE_PRODUCT_WIZARD_STEP_IDS = [
   "review",
 ] as const;
 
-export type CreateProductWizardStepId =
-  (typeof CREATE_PRODUCT_WIZARD_STEP_IDS)[number];
+export type CreateProductWizardStepId = (typeof CREATE_PRODUCT_WIZARD_STEP_IDS)[number];
 
 const NON_CART_WIZARD_STEP_IDS = CREATE_PRODUCT_WIZARD_STEP_IDS.filter(
   (stepId) => stepId !== "originality",
@@ -23,6 +22,4 @@ const NON_CART_WIZARD_STEP_IDS = CREATE_PRODUCT_WIZARD_STEP_IDS.filter(
 export const resolveProductWizardStepIds = (
   dealType: unknown,
 ): readonly CreateProductWizardStepId[] =>
-  isCartDealType(dealType)
-    ? CREATE_PRODUCT_WIZARD_STEP_IDS
-    : NON_CART_WIZARD_STEP_IDS;
+  isCartDealType(dealType) ? CREATE_PRODUCT_WIZARD_STEP_IDS : NON_CART_WIZARD_STEP_IDS;

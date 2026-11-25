@@ -62,7 +62,9 @@ export const SubscriptionsPage = () => {
   const [navSheetVisible, setNavSheetVisible] = useState(false);
 
   const setListMode = useCallback(
-    (next: typeof SUBSCRIPTIONS_LIST_FOLLOWING | typeof SUBSCRIPTIONS_LIST_FOLLOWERS) => {
+    (
+      next: typeof SUBSCRIPTIONS_LIST_FOLLOWING | typeof SUBSCRIPTIONS_LIST_FOLLOWERS,
+    ) => {
       if (next === SUBSCRIPTIONS_LIST_FOLLOWERS) {
         router.replace({
           pathname: "/(tabs)/hub/subscriptions",
@@ -109,8 +111,7 @@ export const SubscriptionsPage = () => {
     : SUBSCRIPTIONS_PAGE_UI.EMPTY;
 
   const heroAccessibilityLabel = useMemo(
-    () =>
-      `${heroCaption}: ${users.length} ${pluralizeRu(users.length, heroUnitForms)}`,
+    () => `${heroCaption}: ${users.length} ${pluralizeRu(users.length, heroUnitForms)}`,
     [heroCaption, users.length, heroUnitForms],
   );
 

@@ -42,11 +42,7 @@ export const HomeFeaturedRafflesRevealButton = ({
           <Gift size={18} color={iconColor} />
           <Text style={styles.revealButtonText}>{label}</Text>
         </View>
-        <ChevronRight
-          size={18}
-          color={iconColor}
-          style={styles.revealChevron}
-        />
+        <ChevronRight size={18} color={iconColor} style={styles.revealChevron} />
       </SquircleView>
     </Pressable>
   );

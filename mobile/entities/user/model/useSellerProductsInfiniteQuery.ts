@@ -26,11 +26,7 @@ export const useSellerProductsInfiniteQuery = ({
   const shelfKey = shelfId != null ? String(shelfId).trim() : "";
   const onecKey = onecGroupId != null ? String(onecGroupId).trim() : "";
   const query = useInfiniteQuery({
-    queryKey: sellerProductsQueryKeys.list(
-      sellerId,
-      shelfKey || null,
-      onecKey || null,
-    ),
+    queryKey: sellerProductsQueryKeys.list(sellerId, shelfKey || null, onecKey || null),
     enabled: enabled && Boolean(sellerId),
     initialPageParam: 1,
     retry: 1,

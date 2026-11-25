@@ -37,9 +37,7 @@ test("14.2 OneC shelves read-only tree + catalog filter", () => {
   );
   const rows = readMobile("entities/seller-shelf/lib/buildOneCShelfRows.ts");
   const fetchProducts = readMobile("entities/user/api/fetchUserProducts.ts");
-  const infinite = readMobile(
-    "entities/user/model/useSellerProductsInfiniteQuery.ts",
-  );
+  const infinite = readMobile("entities/user/model/useSellerProductsInfiniteQuery.ts");
   const productKeys = readMobile("entities/user/model/sellerProductsQueryKeys.ts");
   const styles = readMobile("shared/theme/sellerFlowStyles.ts");
 
@@ -52,11 +50,17 @@ test("14.2 OneC shelves read-only tree + catalog filter", () => {
   assert.match(webPage, /usePublicSellerOneCShelvesQuery/);
   assert.match(webPage, /onecPath/);
   assert.match(webPage, /onecGroupId/);
-  assert.match(webApi, /\/seller-shelf\/seller\/\$\{encodeURIComponent\(sellerId\)\}\/onec/);
+  assert.match(
+    webApi,
+    /\/seller-shelf\/seller\/\$\{encodeURIComponent\(sellerId\)\}\/onec/,
+  );
   assert.match(webQuery, /publicOneCBySeller/);
 
   assert.match(api, /fetchPublicSellerOneCShelves/);
-  assert.match(api, /\/seller-shelf\/seller\/\$\{encodeURIComponent\(sellerId\)\}\/onec/);
+  assert.match(
+    api,
+    /\/seller-shelf\/seller\/\$\{encodeURIComponent\(sellerId\)\}\/onec/,
+  );
   assert.match(keys, /publicOneCBySeller/);
   assert.match(query, /fetchPublicSellerOneCShelves/);
   assert.match(rows, /buildOneCShelfRows/);

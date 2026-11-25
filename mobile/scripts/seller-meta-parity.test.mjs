@@ -44,10 +44,7 @@ test("seller meta row matches web layout tokens", () => {
   assert.match(share, /flexShrink: 0/);
   assert.match(follow, /layout === "sellerMeta"/);
   assert.match(webCss, /padding: 0 14px/);
-  assert.doesNotMatch(
-    webCss,
-    /\.seller-products-page__seller-meta\s*\{[^}]*\bborder:/,
-  );
+  assert.doesNotMatch(webCss, /\.seller-products-page__seller-meta\s*\{[^}]*\bborder:/);
   assert.doesNotMatch(
     webCss,
     /\.seller-products-page__seller-meta\s*\{[^}]*\bbackground:/,

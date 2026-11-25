@@ -80,10 +80,7 @@ export const RaffleParticipantsSheet = ({
 
   let body: ReactNode;
   if (participantsQuery.isPending) {
-    const skeletonCount = Math.min(
-      SKELETON_ROWS,
-      Math.max(1, participantsCount),
-    );
+    const skeletonCount = Math.min(SKELETON_ROWS, Math.max(1, participantsCount));
     body = (
       <View
         accessibilityRole="summary"
@@ -138,10 +135,7 @@ export const RaffleParticipantsSheet = ({
         ListFooterComponent={
           total > participants.length ? (
             <Text style={styles.footnote}>
-              {RAFFLE_PARTICIPANTS_SHEET_UI.SHOWN_OF_TOTAL(
-                participants.length,
-                total,
-              )}
+              {RAFFLE_PARTICIPANTS_SHEET_UI.SHOWN_OF_TOTAL(participants.length, total)}
             </Text>
           ) : null
         }
@@ -163,10 +157,7 @@ export const RaffleParticipantsSheet = ({
             </Pressable>
             <Text style={styles.count}>
               {formatIntegerGroupRu(item.ticketCount)}{" "}
-              {pluralizeRu(
-                item.ticketCount,
-                RAFFLE_PARTICIPANTS_SHEET_UI.ITEM_FORMS,
-              )}
+              {pluralizeRu(item.ticketCount, RAFFLE_PARTICIPANTS_SHEET_UI.ITEM_FORMS)}
             </Text>
           </View>
         )}
@@ -175,12 +166,7 @@ export const RaffleParticipantsSheet = ({
   }
 
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      transparent
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <View style={styles.overlay}>
         <ModalSheetGradientBackdrop />
         <Pressable
@@ -199,9 +185,7 @@ export const RaffleParticipantsSheet = ({
                 {RAFFLE_PARTICIPANTS_SHEET_UI.TITLE}
               </Text>
               <View style={styles.totalBadge}>
-                <Text style={styles.totalText}>
-                  {formatIntegerGroupRu(total)}
-                </Text>
+                <Text style={styles.totalText}>{formatIntegerGroupRu(total)}</Text>
               </View>
             </View>
             <Pressable onPress={onClose} accessibilityRole="button" hitSlop={8}>

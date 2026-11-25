@@ -2,11 +2,7 @@
  * Bottom nav вне `(tabs)` — паритет web AppShell `MobileBottomNav` на `/user/:id`.
  * Та же pill-хромка, что `MobileBottomTabBar`, без tab-state.
  */
-import {
-  isDimColorScheme,
-  izIconSizes,
-  izIconStrokeNav,
-} from "@izibuy/design-tokens";
+import { isDimColorScheme, izIconSizes, izIconStrokeNav } from "@izibuy/design-tokens";
 import Home from "lucide-react-native/icons/house";
 import LayoutGrid from "lucide-react-native/icons/layout-grid";
 import Plus from "lucide-react-native/icons/plus";

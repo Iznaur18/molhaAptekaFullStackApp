@@ -53,7 +53,10 @@ export async function fetchMyReceivedVotes({
       pagination: data.data.pagination,
     };
   } catch (error) {
-    const err = error as { response?: { data?: { message?: string } }; message?: string };
+    const err = error as {
+      response?: { data?: { message?: string } };
+      message?: string;
+    };
     throw new Error(
       err?.response?.data?.message ??
         err?.message ??

@@ -176,7 +176,8 @@ const PRODUCTS = [
   {
     key: "qa-return",
     productName: "Demo · Q&A + возврат — коврик",
-    productDescription: "Включены вопросы к товару и возврат; баллы лояльности с продажи.",
+    productDescription:
+      "Включены вопросы к товару и возврат; баллы лояльности с продажи.",
     productPrice: 2190,
     productCategory: "home",
     imageSeed: "demo-qa-mat",

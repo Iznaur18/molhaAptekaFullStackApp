@@ -163,10 +163,7 @@ export const CreateProductDealTermsFields = ({
               }}
               accessibilityLabel={label}
             >
-              <CheckboxBox
-                checked={locations.includes(value)}
-                disabled={disabled}
-              />
+              <CheckboxBox checked={locations.includes(value)} disabled={disabled} />
               <Text style={{ color: theme.colors.text, fontSize: 15, flex: 1 }}>
                 {label}
               </Text>

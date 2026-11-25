@@ -18,7 +18,10 @@ test("auth layout tokens: column 420, pad 24, title 26, input 10/12×14, hero 32
 
   assert.match(webCss, /--auth-page-column-max:\s*420px/);
   assert.match(webCss, /padding:\s*24px 24px/);
-  assert.match(webCss, /\.auth-page__title \{[\s\S]*font-size:\s*26px[\s\S]*font-weight:\s*700/);
+  assert.match(
+    webCss,
+    /\.auth-page__title \{[\s\S]*font-size:\s*26px[\s\S]*font-weight:\s*700/,
+  );
   assert.match(webCss, /padding:\s*12px 14px/);
   assert.match(webCss, /border-radius:\s*var\(--iz-control-btn-radius,\s*10px\)/);
   assert.match(webHero, /border-radius:\s*32px/);
@@ -44,7 +47,10 @@ test("auth channel btn pad matches web 0.45rem/0.65rem → 7.2/10.4", () => {
   const styles = readMobile("shared/theme/formChromeStyles.ts");
   const webCss = readClient("pages/auth/ui/AuthPage.css");
 
-  assert.match(webCss, /\.auth-page__channel-btn \{[\s\S]*padding:\s*0\.45rem 0\.65rem/);
+  assert.match(
+    webCss,
+    /\.auth-page__channel-btn \{[\s\S]*padding:\s*0\.45rem 0\.65rem/,
+  );
   assert.match(layout, /channelBtnPaddingY: 7\.2/);
   assert.match(layout, /channelBtnPaddingX: 10\.4/);
   assert.match(styles, /paddingVertical: A\.channelBtnPaddingY/);

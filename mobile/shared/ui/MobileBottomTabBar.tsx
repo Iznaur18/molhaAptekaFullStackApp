@@ -1,8 +1,4 @@
-import {
-  isDimColorScheme,
-  izIconSizes,
-  izIconStrokeNav,
-} from "@izibuy/design-tokens";
+import { isDimColorScheme, izIconSizes, izIconStrokeNav } from "@izibuy/design-tokens";
 /** Lucide RN ≥0.469: `Home` удалён → `House` (тот же глиф, что web `Home`). */
 import Home from "lucide-react-native/icons/house";
 import LayoutGrid from "lucide-react-native/icons/layout-grid";

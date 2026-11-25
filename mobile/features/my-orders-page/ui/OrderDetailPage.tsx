@@ -11,11 +11,7 @@ import { useMyOrdersQuery } from "@/entities/order/model/useMyOrdersQuery";
 import { OrderCard } from "@/entities/order/ui/OrderCard";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useBuyerOrderCardActions } from "@/features/my-orders-page/model/useBuyerOrderCardActions";
-import {
-  API_CLIENT_UI,
-  AUTH_UI,
-  MY_ORDERS_PAGE_UI,
-} from "@/shared/config";
+import { API_CLIENT_UI, AUTH_UI, MY_ORDERS_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { resolveScreenBackContentPaddingTop } from "@/shared/lib/screenBackButtonLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";

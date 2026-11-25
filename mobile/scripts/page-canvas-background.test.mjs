@@ -6,8 +6,7 @@ import { test } from "node:test";
 
 const MOBILE_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const PKG = join(MOBILE_ROOT, "..", "packages/design-tokens/src");
-const read = (relativePath) =>
-  readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
+const read = (relativePath) => readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
 const readPkg = (relativePath) => readFileSync(join(PKG, relativePath), "utf8");
 
 test("page canvas: package resolvePageBackground + izPageBgCustom", () => {
@@ -23,18 +22,9 @@ test("PageCanvas + usePageBackground wire resolvePageBackground", () => {
     read("shared/ui/PageCanvas.tsx"),
     /backgroundColor:\s*layout\.pageBackground/,
   );
-  assert.match(
-    read("shared/theme/usePageBackground.ts"),
-    /resolvePageBackground/,
-  );
-  assert.match(
-    read("shared/theme/createThemedStyles.ts"),
-    /pageBackground:\s*string/,
-  );
-  assert.match(
-    read("shared/ui/ScreenWithBack.tsx"),
-    /PageCanvas/,
-  );
+  assert.match(read("shared/theme/usePageBackground.ts"), /resolvePageBackground/);
+  assert.match(read("shared/theme/createThemedStyles.ts"), /pageBackground:\s*string/);
+  assert.match(read("shared/ui/ScreenWithBack.tsx"), /PageCanvas/);
 });
 
 test("nav stacks use page canvas, not colors.bg", () => {

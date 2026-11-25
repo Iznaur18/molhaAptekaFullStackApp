@@ -22,9 +22,7 @@ export const buildOneCShelfRows = (
   while (items.length > 0) {
     rows.push({ level, parentName, items });
     const selectedId = onecPath[level];
-    const selected = selectedId
-      ? items.find((item) => item.id === selectedId)
-      : null;
+    const selected = selectedId ? items.find((item) => item.id === selectedId) : null;
     if (!selected) break;
     items = Array.isArray(selected.children) ? selected.children : [];
     parentName = selected.name;

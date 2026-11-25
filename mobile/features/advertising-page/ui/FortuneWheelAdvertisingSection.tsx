@@ -59,14 +59,16 @@ type SectorDraft = {
 };
 
 function normalizeSectorDraft(
-  sector: {
-    discountPercent?: unknown;
-    durationHours?: unknown;
-    chancePercent?: unknown;
-    prizeProductId?: unknown;
-    enabled?: unknown;
-  } | null
-  | undefined,
+  sector:
+    | {
+        discountPercent?: unknown;
+        durationHours?: unknown;
+        chancePercent?: unknown;
+        prizeProductId?: unknown;
+        enabled?: unknown;
+      }
+    | null
+    | undefined,
 ): SectorDraft {
   return {
     discountPercent: String(
@@ -92,16 +94,22 @@ function evenChances(count: number) {
 }
 
 function matchBuilderShape(
-  sectors: Array<{
-    discountPercent?: unknown;
-    durationHours?: unknown;
-    chancePercent?: unknown;
-    prizeProductId?: unknown;
-    enabled?: unknown;
-  }> | null
-  | undefined,
+  sectors:
+    | Array<{
+        discountPercent?: unknown;
+        durationHours?: unknown;
+        chancePercent?: unknown;
+        prizeProductId?: unknown;
+        enabled?: unknown;
+      }>
+    | null
+    | undefined,
 ): Array<{ discount: number | null }> | null {
-  if (!Array.isArray(sectors) || sectors.length < SECTORS_MIN || sectors.length > SECTORS_MAX) {
+  if (
+    !Array.isArray(sectors) ||
+    sectors.length < SECTORS_MIN ||
+    sectors.length > SECTORS_MAX
+  ) {
     return null;
   }
   const baseOk = sectors.every(
@@ -330,7 +338,9 @@ export const FortuneWheelAdvertisingSection = () => {
     ...DISCOUNT_CHOICES,
     ...sectorsSimple
       .map((sector) => sector.discount)
-      .filter((value): value is number => value !== null && !DISCOUNT_CHOICES.includes(value)),
+      .filter(
+        (value): value is number => value !== null && !DISCOUNT_CHOICES.includes(value),
+      ),
   ].sort((a, b) => a - b);
   const sectorAngle = 360 / sectorsSimple.length;
   const chancePerSector = Math.round(CHANCE_TOTAL / sectorsSimple.length);
@@ -451,7 +461,10 @@ export const FortuneWheelAdvertisingSection = () => {
                       return (
                         <Pressable
                           key={value}
-                          style={[adminStyles.chip, active ? adminStyles.chipActive : null]}
+                          style={[
+                            adminStyles.chip,
+                            active ? adminStyles.chipActive : null,
+                          ]}
                           onPress={() => handlePaletteDiscount(value)}
                           accessibilityState={{ selected: active }}
                         >
@@ -469,7 +482,9 @@ export const FortuneWheelAdvertisingSection = () => {
                     <Pressable
                       style={[
                         adminStyles.chip,
-                        selectedIsPrize && prizesCount <= 1 ? adminStyles.chipDisabled : null,
+                        selectedIsPrize && prizesCount <= 1
+                          ? adminStyles.chipDisabled
+                          : null,
                         !selectedIsPrize ? adminStyles.chipActive : null,
                       ]}
                       disabled={selectedIsPrize && prizesCount <= 1}
@@ -508,7 +523,9 @@ export const FortuneWheelAdvertisingSection = () => {
 
               {sectorsSimple.length < SECTORS_MAX ? (
                 <Pressable style={adminStyles.linkButton} onPress={handleAddSector}>
-                  <Text style={adminStyles.linkButtonText}>{UI.BUILDER_ADD_SECTOR}</Text>
+                  <Text style={adminStyles.linkButtonText}>
+                    {UI.BUILDER_ADD_SECTOR}
+                  </Text>
                 </Pressable>
               ) : null}
 
@@ -527,7 +544,10 @@ export const FortuneWheelAdvertisingSection = () => {
                     return (
                       <Pressable
                         key={count}
-                        style={[adminStyles.chip, active ? adminStyles.chipActive : null]}
+                        style={[
+                          adminStyles.chip,
+                          active ? adminStyles.chipActive : null,
+                        ]}
                         onPress={() => handleSectorsCountChange(count)}
                         accessibilityState={{ selected: active }}
                       >
@@ -554,7 +574,14 @@ export const FortuneWheelAdvertisingSection = () => {
                   ]}
                 >
                   <View style={adminStyles.prizeHead}>
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: 6, flex: 1 }}>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 6,
+                        flex: 1,
+                      }}
+                    >
                       <Feather
                         name="gift"
                         size={14}
@@ -573,7 +600,9 @@ export const FortuneWheelAdvertisingSection = () => {
                     </View>
                     <Switch
                       value={draft.enabled}
-                      onValueChange={(next) => handleSectorChange(index, "enabled", next)}
+                      onValueChange={(next) =>
+                        handleSectorChange(index, "enabled", next)
+                      }
                       trackColor={{
                         false: theme.colors.border,
                         true: theme.colors.action,
@@ -589,7 +618,9 @@ export const FortuneWheelAdvertisingSection = () => {
                     ]}
                   >
                     <View style={adminStyles.adminField}>
-                      <Text style={adminStyles.adminFieldLabel}>{UI.DISCOUNT_LABEL}</Text>
+                      <Text style={adminStyles.adminFieldLabel}>
+                        {UI.DISCOUNT_LABEL}
+                      </Text>
                       <TextInput
                         style={adminStyles.adminInput}
                         keyboardType="number-pad"
@@ -602,7 +633,9 @@ export const FortuneWheelAdvertisingSection = () => {
                       <Text style={adminStyles.adminFieldHint}>{UI.DISCOUNT_HINT}</Text>
                     </View>
                     <View style={adminStyles.adminField}>
-                      <Text style={adminStyles.adminFieldLabel}>{UI.DURATION_LABEL}</Text>
+                      <Text style={adminStyles.adminFieldLabel}>
+                        {UI.DURATION_LABEL}
+                      </Text>
                       <TextInput
                         style={adminStyles.adminInput}
                         keyboardType="number-pad"

@@ -43,13 +43,9 @@ test("product compact/list card geometry matches web ProductCardListLayout", () 
 });
 
 test("catalog mini card tokens stay ALIGNED with web mobile catalog", () => {
-  const layout = readMobile(
-    "entities/product/lib/productCardMobileCatalogLayout.ts",
-  );
+  const layout = readMobile("entities/product/lib/productCardMobileCatalogLayout.ts");
   const palette = readMobile("entities/product/lib/productCardBadgePalette.ts");
-  const tokens = readClient(
-    "entities/product/ui/product-card/productCardTokens.css",
-  );
+  const tokens = readClient("entities/product/ui/product-card/productCardTokens.css");
   const styles = readMobile("shared/theme/catalogProductStyles.ts");
   const frame = readClient("entities/product/ui/product-card/ProductCardFrame.css");
 

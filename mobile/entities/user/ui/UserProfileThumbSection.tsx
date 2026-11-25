@@ -450,7 +450,5 @@ export const UserProfileThumbSection = ({
     );
   }
 
-  return (
-    <View style={[styles.root, styles.rootProfileRadius]}>{cardContent}</View>
-  );
+  return <View style={[styles.root, styles.rootProfileRadius]}>{cardContent}</View>;
 };

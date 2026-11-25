@@ -326,15 +326,21 @@ test("home section tabs + sellers search colors match web tokens", () => {
     "utf8",
   );
 
-  assert.match(webTabs, /\.home-feed-section-tab[\s\S]*color:\s*var\(--iz-color-text-secondary\)/);
-  assert.match(styles, /tabLabel:[\s\S]*color:\s*theme\.colors\.textSecondary/);
-  assert.doesNotMatch(
-    styles,
-    /tabLabel:[\s\S]*color:\s*theme\.colors\.textMuted/,
+  assert.match(
+    webTabs,
+    /\.home-feed-section-tab[\s\S]*color:\s*var\(--iz-color-text-secondary\)/,
   );
+  assert.match(styles, /tabLabel:[\s\S]*color:\s*theme\.colors\.textSecondary/);
+  assert.doesNotMatch(styles, /tabLabel:[\s\S]*color:\s*theme\.colors\.textMuted/);
 
-  assert.match(webSearch, /\.search-input__field[\s\S]*background:\s*var\(--iz-color-surface\)/);
-  assert.match(webSearch, /\.search-input__field[\s\S]*border:\s*1px solid var\(--iz-color-border\)/);
+  assert.match(
+    webSearch,
+    /\.search-input__field[\s\S]*background:\s*var\(--iz-color-surface\)/,
+  );
+  assert.match(
+    webSearch,
+    /\.search-input__field[\s\S]*border:\s*1px solid var\(--iz-color-border\)/,
+  );
   assert.match(styles, /searchInput:[\s\S]*backgroundColor:\s*theme\.colors\.surface/);
   assert.match(styles, /searchInput:[\s\S]*borderColor:\s*theme\.colors\.border/);
   assert.match(styles, /paddingVertical:\s*8\.8/);

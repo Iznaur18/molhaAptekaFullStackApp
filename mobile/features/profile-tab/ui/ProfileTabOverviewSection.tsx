@@ -63,8 +63,7 @@ export const ProfileTabOverviewSection = ({
         router.push("/(tabs)/hub/my-sales" as never),
       [PROFILE_ROW_ID.TOTAL_PURCHASES_AMOUNT]: () =>
         router.push("/(tabs)/hub/my-orders" as never),
-      [PROFILE_ROW_ID.WISHLIST]: () =>
-        router.push("/(tabs)/hub/wishlist" as never),
+      [PROFILE_ROW_ID.WISHLIST]: () => router.push("/(tabs)/hub/wishlist" as never),
       [PROFILE_ROW_ID.LOYALTY_POINTS]: () =>
         router.push("/(tabs)/hub/loyalty-points" as never),
       [PROFILE_ROW_ID.RATING]: () => setRatingVotesOpen(true),

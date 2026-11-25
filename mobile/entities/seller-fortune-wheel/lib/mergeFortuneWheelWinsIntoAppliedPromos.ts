@@ -41,10 +41,7 @@ export function mergeFortuneWheelWinsIntoAppliedPromos(
       continue;
     }
     const current = bestWinBySellerId.get(sellerId);
-    if (
-      !current ||
-      Number(win.discountPercent) > Number(current.discountPercent)
-    ) {
+    if (!current || Number(win.discountPercent) > Number(current.discountPercent)) {
       bestWinBySellerId.set(sellerId, win);
     }
   }
@@ -61,10 +58,7 @@ export function mergeFortuneWheelWinsIntoAppliedPromos(
       (row) => String(row?.productId) === productId,
     );
     const existing = existingIndex >= 0 ? merged[existingIndex] : null;
-    if (
-      existing &&
-      Number(existing.discountPercent) >= Number(win.discountPercent)
-    ) {
+    if (existing && Number(existing.discountPercent) >= Number(win.discountPercent)) {
       continue;
     }
     const row: CartAppliedPromoRow = {

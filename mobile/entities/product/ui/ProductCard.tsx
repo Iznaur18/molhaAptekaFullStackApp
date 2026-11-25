@@ -271,9 +271,13 @@ export const ProductCard = memo(
       !desktopCatalogCard &&
       catalogTileWidthForHeight != null &&
       catalogTileWidthForHeight > 0
-        ? resolveProductCardCatalogGridTotalHeight(catalogTileWidthForHeight, undefined, {
-            withAction: showPurchaseSlot,
-          })
+        ? resolveProductCardCatalogGridTotalHeight(
+            catalogTileWidthForHeight,
+            undefined,
+            {
+              withAction: showPurchaseSlot,
+            },
+          )
         : undefined;
     const handleCatalogCardLayout = useCallback((event: LayoutChangeEvent) => {
       const nextWidth = event.nativeEvent.layout.width;

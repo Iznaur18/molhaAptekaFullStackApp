@@ -139,9 +139,7 @@ export const CartLineItem = ({
               </Text>
             ) : null}
             {prizeFreeUnits > 0 ? (
-              <Text style={styles.wholesaleBadge}>
-                {CART_PAGE_UI.PRIZE_LINE_BADGE}
-              </Text>
+              <Text style={styles.wholesaleBadge}>{CART_PAGE_UI.PRIZE_LINE_BADGE}</Text>
             ) : null}
             {line.isPromoApplied ? (
               <Text style={styles.wholesaleBadge}>
@@ -154,9 +152,7 @@ export const CartLineItem = ({
             {buyNFreeHint ? (
               <Text style={styles.wholesaleBadge}>{buyNFreeHint}</Text>
             ) : null}
-            {prizeHint ? (
-              <Text style={styles.wholesaleBadge}>{prizeHint}</Text>
-            ) : null}
+            {prizeHint ? <Text style={styles.wholesaleBadge}>{prizeHint}</Text> : null}
             {stockHint ? <Text style={styles.stockHint}>{stockHint}</Text> : null}
             {product ? (
               <Pressable onPress={handleOpenProduct}>

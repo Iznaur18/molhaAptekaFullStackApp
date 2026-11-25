@@ -36,7 +36,11 @@ import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/
 import { ProfileAccountScrollBody } from "@/features/profile-tab/ui/ProfileAccountScrollBody";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
-import { LOYALTY_POINTS_PAGE_UI, MY_PROFILE_PAGE_UI, PAYMENT_UI } from "@/shared/config";
+import {
+  LOYALTY_POINTS_PAGE_UI,
+  MY_PROFILE_PAGE_UI,
+  PAYMENT_UI,
+} from "@/shared/config";
 import { rublesToLoyaltyPoints } from "@/shared/config/loyaltyPointsConstants";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { pluralizeRuBall } from "@/shared/lib/pluralizeRuBall";
@@ -185,9 +189,7 @@ export const LoyaltyPointsPage = () => {
         return;
       }
     } catch (error) {
-      setPaymentError(
-        formatApiErrorMessage(error, LOYALTY_POINTS_PAGE_UI.PAY_ERROR),
-      );
+      setPaymentError(formatApiErrorMessage(error, LOYALTY_POINTS_PAGE_UI.PAY_ERROR));
     }
   };
 

@@ -12,11 +12,7 @@ import { PROFILE_SECTION_OVERVIEW } from "@/features/profile-hub/model/profileSe
 import { ProfileAccountShell } from "@/features/profile-tab/ui/ProfileAccountShell";
 import { ProfileTabOverviewSection } from "@/features/profile-tab/ui/ProfileTabOverviewSection";
 import { ThemePreferenceToggle } from "@/features/theme-settings/ui/ThemePreferenceToggle";
-import {
-  AUTH_UI,
-  EMAIL_VERIFICATION_UI,
-  LEGAL_UI,
-} from "@/shared/config";
+import { AUTH_UI, EMAIL_VERIFICATION_UI, LEGAL_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
 import { useStableAuthHeroHeight } from "@/shared/lib/useStableAuthHeroHeight";

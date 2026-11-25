@@ -2342,8 +2342,7 @@ export const CREATE_PRODUCT_UI = {
   WIZARD_MEDIA_INSTAGRAM_OPTIONAL_TAG: "(необязательно)",
   WIZARD_MEDIA_INSTAGRAM_LABEL: "Ссылка на пост Instagram",
   WIZARD_MEDIA_INSTAGRAM_PLACEHOLDER: "https://www.instagram.com/p/…",
-  ERROR_INSTAGRAM_POST_URL:
-    "Укажите ссылку на пост Instagram: /p/, /reel/ или /tv/",
+  ERROR_INSTAGRAM_POST_URL: "Укажите ссылку на пост Instagram: /p/, /reel/ или /tv/",
   LABEL_PRICE: "Цена, ₽",
   LABEL_OLD_PRICE: "Старая цена, ₽",
   HINT_OLD_PRICE: "Старая цена покажет скидку, если она выше текущей.",

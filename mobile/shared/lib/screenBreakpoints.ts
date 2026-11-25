@@ -49,8 +49,7 @@ export const SCREEN_CONTENT_INLINE_PADDING_PHONE =
   izLayout.contentPaddingHorizontalPhone;
 export const SCREEN_CONTENT_INLINE_PADDING_COMPACT =
   izLayout.contentPaddingHorizontalCompact;
-export const SCREEN_CONTENT_INLINE_PADDING_WIDE =
-  izLayout.contentPaddingHorizontalWide;
+export const SCREEN_CONTENT_INLINE_PADDING_WIDE = izLayout.contentPaddingHorizontalWide;
 
 export const resolveScreenContentInlinePadding = (width: number): number => {
   if (width <= SCREEN_CONTENT_INLINE_PADDING_PHONE_MAX_WIDTH) {

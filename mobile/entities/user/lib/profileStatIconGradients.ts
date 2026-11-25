@@ -15,9 +15,7 @@ export const PROFILE_STAT_ICON_GRADIENT_DEFAULT: [string, string] = [
   "#3b6fd9",
 ];
 
-export const resolveProfileStatIconGradient = (
-  rowId: string,
-): [string, string] =>
+export const resolveProfileStatIconGradient = (rowId: string): [string, string] =>
   PROFILE_STAT_ICON_GRADIENTS[rowId] ?? PROFILE_STAT_ICON_GRADIENT_DEFAULT;
 
 /** web: часы работы + баллы на всю ширину сетки. */

@@ -40,19 +40,14 @@ test("seller products page includes web header blocks", () => {
   assert.match(page, /styles\.shelfChip/);
   {
     const stylesSource = readFile(MOBILE_ROOT, "shared/theme/sellerFlowStyles.ts");
-    const metaZoneMatch = stylesSource.match(
-      /sellerMetaZone:\s*\{([^}]*)\}/,
-    );
+    const metaZoneMatch = stylesSource.match(/sellerMetaZone:\s*\{([^}]*)\}/);
     assert.ok(metaZoneMatch, "sellerMetaZone style missing");
     assert.doesNotMatch(metaZoneMatch[1], /backgroundColor/);
     assert.doesNotMatch(metaZoneMatch[1], /borderWidth/);
     assert.doesNotMatch(metaZoneMatch[1], /borderColor/);
     assert.doesNotMatch(metaZoneMatch[1], /borderRadius/);
   }
-  assert.doesNotMatch(
-    webCss,
-    /\.seller-products-page__seller-meta\s*\{[^}]*\bborder:/,
-  );
+  assert.doesNotMatch(webCss, /\.seller-products-page__seller-meta\s*\{[^}]*\bborder:/);
   assert.doesNotMatch(
     webCss,
     /\.seller-products-page__seller-meta\s*\{[^}]*\bbackground:/,

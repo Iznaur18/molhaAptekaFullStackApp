@@ -23,9 +23,7 @@ export const CatalogBrowserTilesGrid = ({
 }: CatalogBrowserTilesGridProps) => {
   const styles = useCatalogBrowserSectionStyles();
   const isFeed = variant === "feed";
-  const accentHeight = isFeed
-    ? L.titleAccentHeightFeed
-    : L.titleAccentHeightCategories;
+  const accentHeight = isFeed ? L.titleAccentHeightFeed : L.titleAccentHeightCategories;
 
   return (
     <View
@@ -35,9 +33,7 @@ export const CatalogBrowserTilesGrid = ({
     >
       <View style={styles.sectionTitleRow}>
         <CatalogSectionTitleAccent height={accentHeight} />
-        <Text
-          style={[styles.sectionTitle, !isFeed && styles.sectionTitleCategories]}
-        >
+        <Text style={[styles.sectionTitle, !isFeed && styles.sectionTitleCategories]}>
           {title}
         </Text>
       </View>

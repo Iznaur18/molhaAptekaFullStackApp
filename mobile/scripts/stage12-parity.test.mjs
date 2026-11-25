@@ -20,9 +20,7 @@ test("12.1 auction stackGap/toolbar/chips/overview/thumb + accept/reject", () =>
     "entities/product-price-offer/ui/AuctionSellerOfferRow.tsx",
   );
   const webCss = readClient("pages/auction/ui/AuctionPage.css");
-  const webDash = readClient(
-    "entities/product-price-offer/ui/AuctionDashboard.css",
-  );
+  const webDash = readClient("entities/product-price-offer/ui/AuctionDashboard.css");
   const webChip = readClient("shared/styles/statusFilterChipActive.css");
   const webActions = readClient(
     "entities/product-price-offer/ui/AuctionDashboardSellerActions.jsx",

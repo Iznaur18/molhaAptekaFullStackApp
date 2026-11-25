@@ -50,8 +50,7 @@ export async function fetchPublicSellerOneCShelves(
     const { data } = await apiClient.get(
       `/seller-shelf/seller/${encodeURIComponent(sellerId)}/onec`,
     );
-    const shelves = (data as { data?: { shelves?: unknown } } | null)?.data
-      ?.shelves;
+    const shelves = (data as { data?: { shelves?: unknown } } | null)?.data?.shelves;
     return Array.isArray(shelves) ? (shelves as PublicSellerOneCShelf[]) : [];
   } catch (error) {
     throw new Error(

@@ -12,10 +12,7 @@ import { DEFAULT_USER_AVATAR_URL } from "@/entities/user/model/constants";
 import { UserPremiumAvatar } from "@/entities/user/ui/UserPremiumAvatar";
 import { UserPremiumDisplayName } from "@/entities/user/ui/UserPremiumDisplayName";
 import { PRODUCT_DETAILS_SELLER_PREVIEW_LAYOUT as SP } from "@/entities/product/lib/productDetailsSellerPreviewLayout";
-import {
-  PRODUCT_SELLER_PREVIEW_UI,
-  USER_LIST_ROW_UI,
-} from "@/shared/config";
+import { PRODUCT_SELLER_PREVIEW_UI, USER_LIST_ROW_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductDetailsSellerPreviewStyles } from "@/shared/theme/catalogProductStyles";
 

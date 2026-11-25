@@ -31,13 +31,15 @@ type PrizeDraft = {
 };
 
 function normalizePrizeDraft(
-  prize: {
-    discountPercent?: unknown;
-    durationHours?: unknown;
-    prizeProductId?: unknown;
-    enabled?: unknown;
-  } | null
-  | undefined,
+  prize:
+    | {
+        discountPercent?: unknown;
+        durationHours?: unknown;
+        prizeProductId?: unknown;
+        enabled?: unknown;
+      }
+    | null
+    | undefined,
 ): PrizeDraft {
   return {
     discountPercent: String(
@@ -53,15 +55,21 @@ function normalizePrizeDraft(
 }
 
 function matchBuilderShape(
-  prizes: Array<{
-    discountPercent?: unknown;
-    durationHours?: unknown;
-    prizeProductId?: unknown;
-    enabled?: unknown;
-  }> | null
-  | undefined,
+  prizes:
+    | Array<{
+        discountPercent?: unknown;
+        durationHours?: unknown;
+        prizeProductId?: unknown;
+        enabled?: unknown;
+      }>
+    | null
+    | undefined,
 ): number[] | null {
-  if (!Array.isArray(prizes) || prizes.length < PRIZES_MIN || prizes.length > PRIZES_MAX) {
+  if (
+    !Array.isArray(prizes) ||
+    prizes.length < PRIZES_MIN ||
+    prizes.length > PRIZES_MAX
+  ) {
     return null;
   }
   const simple = prizes.every(
@@ -227,8 +235,7 @@ export const LuckyBoxAdvertisingSection = () => {
     ...DISCOUNT_CHOICES,
     ...prizeDiscounts.filter((value) => !DISCOUNT_CHOICES.includes(value)),
   ];
-  const selectedIsPrize =
-    selectedBox !== null && selectedBox < prizeDiscounts.length;
+  const selectedIsPrize = selectedBox !== null && selectedBox < prizeDiscounts.length;
 
   return (
     <View style={[cardStyles.card, cardStyles.cardCategory]}>
@@ -324,7 +331,10 @@ export const LuckyBoxAdvertisingSection = () => {
                       return (
                         <Pressable
                           key={value}
-                          style={[adminStyles.chip, active ? adminStyles.chipActive : null]}
+                          style={[
+                            adminStyles.chip,
+                            active ? adminStyles.chipActive : null,
+                          ]}
                           onPress={() => handlePaletteDiscount(value)}
                           accessibilityRole="button"
                           accessibilityState={{ selected: active }}
@@ -373,7 +383,10 @@ export const LuckyBoxAdvertisingSection = () => {
                     return (
                       <Pressable
                         key={count}
-                        style={[adminStyles.chip, active ? adminStyles.chipActive : null]}
+                        style={[
+                          adminStyles.chip,
+                          active ? adminStyles.chipActive : null,
+                        ]}
                         onPress={() => handlePrizesCountChange(count)}
                         accessibilityState={{ selected: active }}
                       >
@@ -410,7 +423,9 @@ export const LuckyBoxAdvertisingSection = () => {
                     </Text>
                     <Switch
                       value={draft.enabled}
-                      onValueChange={(next) => handlePrizeChange(index, "enabled", next)}
+                      onValueChange={(next) =>
+                        handlePrizeChange(index, "enabled", next)
+                      }
                       trackColor={{
                         false: theme.colors.border,
                         true: theme.colors.action,
@@ -426,7 +441,9 @@ export const LuckyBoxAdvertisingSection = () => {
                     ]}
                   >
                     <View style={adminStyles.adminField}>
-                      <Text style={adminStyles.adminFieldLabel}>{UI.DISCOUNT_LABEL}</Text>
+                      <Text style={adminStyles.adminFieldLabel}>
+                        {UI.DISCOUNT_LABEL}
+                      </Text>
                       <TextInput
                         style={adminStyles.adminInput}
                         keyboardType="number-pad"
@@ -439,7 +456,9 @@ export const LuckyBoxAdvertisingSection = () => {
                       <Text style={adminStyles.adminFieldHint}>{UI.DISCOUNT_HINT}</Text>
                     </View>
                     <View style={adminStyles.adminField}>
-                      <Text style={adminStyles.adminFieldLabel}>{UI.DURATION_LABEL}</Text>
+                      <Text style={adminStyles.adminFieldLabel}>
+                        {UI.DURATION_LABEL}
+                      </Text>
                       <TextInput
                         style={adminStyles.adminInput}
                         keyboardType="number-pad"

@@ -654,84 +654,86 @@ export const useCheckoutFormStyles = createThemedStyles((theme, layout) => ({
   },
 }));
 
-export const useCheckoutPaymentMethodPickerStyles = createThemedStyles((theme, layout) => ({
-  /** web cart `.cart-fulfillment__payment .checkout-payment-method-picker { margin-top: 0 }`. */
-  root: {
-    gap: 10,
-    marginTop: 0,
-  },
-  legend: {
-    fontSize: theme.typography.fontBase,
-    fontWeight: theme.typography.fontWeightSemibold,
-    color: theme.colors.textSecondary,
-  },
-  /** web `.checkout-payment-method-picker__scroll` gap 8. */
-  row: {
-    flexDirection: "row",
-    flexWrap: "nowrap",
-    gap: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.gap,
-    paddingVertical: 0,
-  },
-  /** web `.checkout-payment-method-picker__card` live: pad 8/12 minH 52 r12. */
-  card: {
-    flexGrow: 0,
-    flexShrink: 0,
-    width: "auto",
-    minWidth: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.minWidth,
-    maxWidth: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.maxWidth,
-    minHeight: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.minHeight,
-    borderRadius: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.borderRadius,
-    paddingHorizontal: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.paddingHorizontal,
-    paddingVertical: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.paddingVertical,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.unselectedBorderWidth,
-    backgroundColor: theme.colors.surface,
-  },
-  cardSelected: {
-    backgroundColor: theme.colors.surface,
-    borderColor: theme.colors.action,
-    borderWidth: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.selectedBorderWidth,
-  },
-  cardLabel: {
-    fontSize: theme.typography.fontSm,
-    lineHeight: theme.typography.leadingXs,
-    fontWeight: theme.typography.fontWeightSemibold,
-    textAlign: "center",
-  },
-  cardLabelSelected: {
-    color: theme.colors.text,
-  },
-  // Web: `.checkout-payment-method-picker__card--locked` — пунктир без заливки.
-  cardLocked: {
-    backgroundColor: "transparent",
-    borderColor: theme.colors.border,
-    borderStyle: "dashed",
-    opacity: 0.7,
-  },
-  cardLockReason: {
-    marginTop: 2,
-    fontSize: theme.typography.font2xs,
-    lineHeight: 13,
-    fontWeight: theme.typography.fontWeightMedium,
-    textAlign: "center",
-    color: theme.colors.textMuted,
-  },
-  // Web: `.checkout-payment-method-picker__single` — один способ строкой.
-  single: {
-    alignSelf: "flex-start",
-    paddingHorizontal: 14,
-    paddingVertical: 9,
-    borderWidth: 1.5,
-    borderColor: theme.colors.action,
-    borderRadius: 12,
-    backgroundColor: theme.colors.actionSoft,
-    color: theme.colors.text,
-    fontSize: theme.typography.fontBase,
-    fontWeight: theme.typography.fontWeightSemibold,
-    overflow: "hidden",
-  },
-}));
+export const useCheckoutPaymentMethodPickerStyles = createThemedStyles(
+  (theme, layout) => ({
+    /** web cart `.cart-fulfillment__payment .checkout-payment-method-picker { margin-top: 0 }`. */
+    root: {
+      gap: 10,
+      marginTop: 0,
+    },
+    legend: {
+      fontSize: theme.typography.fontBase,
+      fontWeight: theme.typography.fontWeightSemibold,
+      color: theme.colors.textSecondary,
+    },
+    /** web `.checkout-payment-method-picker__scroll` gap 8. */
+    row: {
+      flexDirection: "row",
+      flexWrap: "nowrap",
+      gap: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.gap,
+      paddingVertical: 0,
+    },
+    /** web `.checkout-payment-method-picker__card` live: pad 8/12 minH 52 r12. */
+    card: {
+      flexGrow: 0,
+      flexShrink: 0,
+      width: "auto",
+      minWidth: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.minWidth,
+      maxWidth: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.maxWidth,
+      minHeight: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.minHeight,
+      borderRadius: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.borderRadius,
+      paddingHorizontal: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.paddingHorizontal,
+      paddingVertical: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.paddingVertical,
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.unselectedBorderWidth,
+      backgroundColor: theme.colors.surface,
+    },
+    cardSelected: {
+      backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.action,
+      borderWidth: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.selectedBorderWidth,
+    },
+    cardLabel: {
+      fontSize: theme.typography.fontSm,
+      lineHeight: theme.typography.leadingXs,
+      fontWeight: theme.typography.fontWeightSemibold,
+      textAlign: "center",
+    },
+    cardLabelSelected: {
+      color: theme.colors.text,
+    },
+    // Web: `.checkout-payment-method-picker__card--locked` — пунктир без заливки.
+    cardLocked: {
+      backgroundColor: "transparent",
+      borderColor: theme.colors.border,
+      borderStyle: "dashed",
+      opacity: 0.7,
+    },
+    cardLockReason: {
+      marginTop: 2,
+      fontSize: theme.typography.font2xs,
+      lineHeight: 13,
+      fontWeight: theme.typography.fontWeightMedium,
+      textAlign: "center",
+      color: theme.colors.textMuted,
+    },
+    // Web: `.checkout-payment-method-picker__single` — один способ строкой.
+    single: {
+      alignSelf: "flex-start",
+      paddingHorizontal: 14,
+      paddingVertical: 9,
+      borderWidth: 1.5,
+      borderColor: theme.colors.action,
+      borderRadius: 12,
+      backgroundColor: theme.colors.actionSoft,
+      color: theme.colors.text,
+      fontSize: theme.typography.fontBase,
+      fontWeight: theme.typography.fontWeightSemibold,
+      overflow: "hidden",
+    },
+  }),
+);
 
 export const useAddressSuggestStyles = createThemedStyles((theme, layout) => ({
   wrap: {
@@ -964,89 +966,91 @@ export const useAuthGateStyles = createThemedStyles((theme, layout) => ({
 }));
 
 /** Паритет с web `CheckoutSellerDeliveryCost.css`: цена доставки по тарифу продавца. */
-export const useCheckoutSellerDeliveryCostStyles = createThemedStyles((theme, layout) => ({
-  root: {
-    gap: 6,
-    marginTop: theme.spacing[2],
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    borderRadius: 12,
-    backgroundColor: theme.colors.surfaceMuted,
-  },
-  /** web `.cart-fulfillment__dock .checkout-seller-delivery { margin-top: 4px }`. */
-  rootInDock: {
-    marginTop: 4,
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    justifyContent: "space-between",
-    gap: 12,
-  },
-  legend: {
-    flexShrink: 1,
-    fontSize: theme.typography.fontBase,
-    fontWeight: theme.typography.fontWeightSemibold,
-    color: theme.colors.textSecondary,
-  },
-  value: {
-    fontSize: theme.typography.fontMd,
-    fontWeight: theme.typography.fontWeightBold,
-    color: theme.colors.text,
-    fontVariant: ["tabular-nums"],
-  },
-  hint: {
-    fontSize: 12.5,
-    lineHeight: theme.typography.leadingXs,
-    color: theme.colors.textMuted,
-  },
-  hintError: {
-    color: theme.colors.danger,
-  },
-  totals: {
-    gap: 4,
-    marginTop: 4,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
-  },
-  totalRow: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    justifyContent: "space-between",
-    gap: 12,
-  },
-  totalRowSum: {
-    marginTop: 4,
-  },
-  totalLabel: {
-    fontSize: 13.5,
-    color: theme.colors.textSecondary,
-  },
-  totalValue: {
-    fontSize: 13.5,
-    color: theme.colors.text,
-    fontVariant: ["tabular-nums"],
-  },
-  totalSumLabel: {
-    fontSize: theme.typography.fontMd,
-    fontWeight: theme.typography.fontWeightBold,
-    color: theme.colors.text,
-  },
-  totalSumValue: {
-    fontSize: theme.typography.fontLg,
-    fontWeight: "800",
-    color: theme.colors.text,
-    fontVariant: ["tabular-nums"],
-  },
-  attribution: {
-    fontSize: theme.typography.font2xs,
-    lineHeight: 14,
-    color: theme.colors.textMuted,
-  },
-}));
+export const useCheckoutSellerDeliveryCostStyles = createThemedStyles(
+  (theme, layout) => ({
+    root: {
+      gap: 6,
+      marginTop: theme.spacing[2],
+      paddingVertical: 12,
+      paddingHorizontal: 14,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: 12,
+      backgroundColor: theme.colors.surfaceMuted,
+    },
+    /** web `.cart-fulfillment__dock .checkout-seller-delivery { margin-top: 4px }`. */
+    rootInDock: {
+      marginTop: 4,
+    },
+    row: {
+      flexDirection: "row",
+      alignItems: "baseline",
+      justifyContent: "space-between",
+      gap: 12,
+    },
+    legend: {
+      flexShrink: 1,
+      fontSize: theme.typography.fontBase,
+      fontWeight: theme.typography.fontWeightSemibold,
+      color: theme.colors.textSecondary,
+    },
+    value: {
+      fontSize: theme.typography.fontMd,
+      fontWeight: theme.typography.fontWeightBold,
+      color: theme.colors.text,
+      fontVariant: ["tabular-nums"],
+    },
+    hint: {
+      fontSize: 12.5,
+      lineHeight: theme.typography.leadingXs,
+      color: theme.colors.textMuted,
+    },
+    hintError: {
+      color: theme.colors.danger,
+    },
+    totals: {
+      gap: 4,
+      marginTop: 4,
+      paddingTop: 8,
+      borderTopWidth: 1,
+      borderTopColor: theme.colors.border,
+    },
+    totalRow: {
+      flexDirection: "row",
+      alignItems: "baseline",
+      justifyContent: "space-between",
+      gap: 12,
+    },
+    totalRowSum: {
+      marginTop: 4,
+    },
+    totalLabel: {
+      fontSize: 13.5,
+      color: theme.colors.textSecondary,
+    },
+    totalValue: {
+      fontSize: 13.5,
+      color: theme.colors.text,
+      fontVariant: ["tabular-nums"],
+    },
+    totalSumLabel: {
+      fontSize: theme.typography.fontMd,
+      fontWeight: theme.typography.fontWeightBold,
+      color: theme.colors.text,
+    },
+    totalSumValue: {
+      fontSize: theme.typography.fontLg,
+      fontWeight: "800",
+      color: theme.colors.text,
+      fontVariant: ["tabular-nums"],
+    },
+    attribution: {
+      fontSize: theme.typography.font2xs,
+      lineHeight: 14,
+      color: theme.colors.textMuted,
+    },
+  }),
+);
 
 /** Паритет с web `CdekPickupPointPicker.css`: город, тариф, пункт, получатель. */
 export const useCdekPickupPointPickerStyles = createThemedStyles((theme, layout) => ({

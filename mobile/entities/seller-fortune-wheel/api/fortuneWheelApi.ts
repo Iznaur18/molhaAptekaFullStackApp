@@ -140,8 +140,6 @@ export async function fetchMyFortuneWheelWins(): Promise<MyFortuneWheelWin[]> {
     const wins = data?.data?.wins;
     return Array.isArray(wins) ? (wins as MyFortuneWheelWin[]) : [];
   } catch (error) {
-    throw new Error(
-      formatApiErrorMessage(error, "Не удалось загрузить выигрыши"),
-    );
+    throw new Error(formatApiErrorMessage(error, "Не удалось загрузить выигрыши"));
   }
 }

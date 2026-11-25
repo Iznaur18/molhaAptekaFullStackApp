@@ -123,6 +123,9 @@ test("category breadcrumb→grid gap totals web 1rem (compensate FlatList gap)",
     "features/catalog-filter/ui/CatalogBreadcrumb.tsx",
   );
   assert.match(breadcrumb, /CATALOG_BROWSER_TOOLBAR_MARGIN_BOTTOM = 16/);
-  assert.match(catalogScreen, /CATALOG_BROWSER_TOOLBAR_MARGIN_BOTTOM - productGrid\.gap/);
+  assert.match(
+    catalogScreen,
+    /CATALOG_BROWSER_TOOLBAR_MARGIN_BOTTOM - productGrid\.gap/,
+  );
   assert.match(catalogScreen, /catalogBreadcrumbToolbarMarginBottom/);
 });

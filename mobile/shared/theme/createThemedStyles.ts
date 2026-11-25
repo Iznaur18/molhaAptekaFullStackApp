@@ -13,10 +13,7 @@ import {
 } from "react-native";
 
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
-import {
-  AppThemeContext,
-  useAppTheme,
-} from "@/shared/theme/AppThemeProvider";
+import { AppThemeContext, useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { resolveThemePreferenceFromSystem } from "@/shared/theme/themePreferenceStorage";
 
 type NamedStyles<T> = { [P in keyof T]: ViewStyle | TextStyle | ImageStyle };
@@ -47,8 +44,7 @@ export const createThemedStyles = <T extends NamedStyles<T>>(
   return function useThemedStyles(): T {
     const theme = useAppTheme();
     const themeContext = useContext(AppThemeContext);
-    const colorScheme =
-      themeContext?.colorScheme ?? resolveFallbackColorScheme();
+    const colorScheme = themeContext?.colorScheme ?? resolveFallbackColorScheme();
     const { contentPaddingHorizontal } = useScreenLayout();
     const pageBackground = resolvePageBackground(
       colorScheme,
@@ -58,9 +54,7 @@ export const createThemedStyles = <T extends NamedStyles<T>>(
     // иначе остаются в useMemo и Text падает с "Cannot read property 'color' of undefined".
     return useMemo(
       () =>
-        StyleSheet.create(
-          factory(theme, { contentPaddingHorizontal, pageBackground }),
-        ),
+        StyleSheet.create(factory(theme, { contentPaddingHorizontal, pageBackground })),
       [theme, factory, contentPaddingHorizontal, pageBackground],
     );
   };

@@ -2,10 +2,7 @@ import { Text, type StyleProp, type TextProps, type TextStyle } from "react-nati
 
 import { FIXED_FONT_PROPS } from "@/shared/lib/fixedTypography";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
-import {
-  resolveTypeScale,
-  type TypeScaleRole,
-} from "@/shared/theme/typeScale";
+import { resolveTypeScale, type TypeScaleRole } from "@/shared/theme/typeScale";
 
 type AppTextProps = TextProps & {
   /** false — разрешить системное масштабирование шрифта */

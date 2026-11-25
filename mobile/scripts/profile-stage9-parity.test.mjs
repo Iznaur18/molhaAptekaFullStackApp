@@ -66,9 +66,7 @@ test("theme toggle both; WebPush web-only; mobile remote push registration", () 
 
 test("WEB_ONLY services stripped from mobile nav; hub sections remain", () => {
   const nav = readMobile("features/profile-hub/model/buildProfileNavGroups.ts");
-  const deep = readMobile(
-    "features/deep-linking/lib/resolveWebPathToMobileRoute.ts",
-  );
+  const deep = readMobile("features/deep-linking/lib/resolveWebPathToMobileRoute.ts");
 
   assert.match(nav, /safe-deal/);
   assert.doesNotMatch(nav, /onec-integration/);

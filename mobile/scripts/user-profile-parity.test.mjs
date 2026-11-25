@@ -71,7 +71,10 @@ test("UserDetailsPage uses premium header and thumb lists", () => {
   assert.match(overlay, /router\.navigate/);
   assert.match(overlay, /\/\(tabs\)/);
   assert.match(webPageCss, /--user-details-screen-gap:\s*6px/);
-  assert.match(webPageCss, /\.user-profile-purchases-section\s*\{\s*margin-bottom:\s*0/);
+  assert.match(
+    webPageCss,
+    /\.user-profile-purchases-section\s*\{\s*margin-bottom:\s*0/,
+  );
   assert.match(webShell, /MobileBottomNav/);
 });
 
@@ -80,7 +83,9 @@ test("profile thumb lists match web purchases/products blocks", () => {
   const purchases = readMobileFile("entities/user/ui/UserProfilePurchasesList.tsx");
   const section = readMobileFile("entities/user/ui/UserProfileThumbSection.tsx");
   const chrome = readMobileFile("shared/theme/profileChromeStyles.ts");
-  const webPurchasesCss = readClientFile("entities/user/ui/UserProfilePurchasesList.css");
+  const webPurchasesCss = readClientFile(
+    "entities/user/ui/UserProfilePurchasesList.css",
+  );
   const followStyles = readMobileFile("shared/theme/accountFeatureStyles.ts");
   const webFollowCss = readClientFile("entities/user-follow/ui/UserFollowButton.css");
 
@@ -207,7 +212,9 @@ test("stats section uses grid cards with gradient icons like web", () => {
   assert.match(webPanel, /ProfileStatCard/);
   assert.match(webPanel, /section_stats/);
   assert.match(webPanel, /rowActions/);
-  const overview = readMobileFile("features/profile-tab/ui/ProfileTabOverviewSection.tsx");
+  const overview = readMobileFile(
+    "features/profile-tab/ui/ProfileTabOverviewSection.tsx",
+  );
   assert.match(overview, /PROFILE_ROW_ID\.FOLLOWING/);
   assert.match(overview, /PROFILE_ROW_ID\.FOLLOWERS/);
   assert.match(overview, /PROFILE_ROW_ID\.TOTAL_SALES_AMOUNT/);

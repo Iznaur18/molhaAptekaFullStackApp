@@ -32,9 +32,7 @@ const resolveContentBelowImageHeight = (layout) =>
   layout.sellerRowHeight;
 
 const resolveTotalHeight = (tileWidth, layout = LAYOUT) =>
-  tileWidth +
-  resolveContentBelowImageHeight(layout) +
-  layout.bottomPadding;
+  tileWidth + resolveContentBelowImageHeight(layout) + layout.bottomPadding;
 
 test("product media display aspect ratio is square", () => {
   assert.equal(PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO, 1);
@@ -59,10 +57,7 @@ test("catalogProductStyles uses shared product media aspect ratio for catalog gr
   );
 
   assert.match(source, /PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO/);
-  assert.match(
-    source,
-    /imageWrapCatalogGrid:[\s\S]*marginHorizontal: 0/,
-  );
+  assert.match(source, /imageWrapCatalogGrid:[\s\S]*marginHorizontal: 0/);
   assert.match(
     source,
     /imageWrapCatalogGrid:[\s\S]*aspectRatio: PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO/,

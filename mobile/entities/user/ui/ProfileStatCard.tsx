@@ -58,7 +58,9 @@ export const ProfileStatCard = ({
   );
 
   if (!clickable) {
-    return <View style={[styles.statCard, isWide && styles.statCardWide]}>{content}</View>;
+    return (
+      <View style={[styles.statCard, isWide && styles.statCardWide]}>{content}</View>
+    );
   }
 
   return (
