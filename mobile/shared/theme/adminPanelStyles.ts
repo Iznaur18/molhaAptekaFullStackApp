@@ -17,13 +17,13 @@ export const useAdminPanelStyles = createThemedStyles((theme, layout) => ({
   },
   title: {
     fontSize: 19.2,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: -0.3,
     color: theme.colors.text,
   },
   hint: {
     maxWidth: 672,
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     lineHeight: 19.5,
     color: theme.colors.textMuted,
   },
@@ -49,8 +49,8 @@ export const useAdminPanelStyles = createThemedStyles((theme, layout) => ({
     backgroundColor: theme.colors.accentSoft,
   },
   countBadgeText: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.accent,
   },
   searchWrap: {
@@ -67,7 +67,7 @@ export const useAdminPanelStyles = createThemedStyles((theme, layout) => ({
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 8,
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.text,
     backgroundColor: theme.colors.surface,
   },
@@ -76,8 +76,8 @@ export const useAdminPanelStyles = createThemedStyles((theme, layout) => ({
     paddingVertical: 4,
   },
   searchClearText: {
-    fontSize: 18,
-    lineHeight: 20,
+    fontSize: theme.typography.font2xl,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.textMuted,
   },
   toolbarButton: {
@@ -96,8 +96,8 @@ export const useAdminPanelStyles = createThemedStyles((theme, layout) => ({
     opacity: 0.6,
   },
   toolbarButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   toolbarButtonPrimaryText: {
@@ -107,8 +107,8 @@ export const useAdminPanelStyles = createThemedStyles((theme, layout) => ({
     paddingVertical: 9,
     paddingHorizontal: 12,
     borderRadius: 8,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
   },
   alertError: {
     borderWidth: StyleSheet.hairlineWidth,
@@ -132,8 +132,8 @@ export const useAdminPanelStyles = createThemedStyles((theme, layout) => ({
   createHeading: {
     paddingTop: 12,
     paddingHorizontal: 16,
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   createBody: {
@@ -145,8 +145,8 @@ export const useAdminPanelStyles = createThemedStyles((theme, layout) => ({
     gap: 4,
   },
   fieldLabel: {
-    fontSize: 13,
-    fontWeight: "500",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.textSecondary,
   },
   fieldInput: {
@@ -156,13 +156,13 @@ export const useAdminPanelStyles = createThemedStyles((theme, layout) => ({
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 8,
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.text,
     backgroundColor: theme.colors.surface,
   },
   fieldHint: {
-    fontSize: 12,
-    lineHeight: 16,
+    fontSize: theme.typography.fontXs,
+    lineHeight: theme.typography.leading2xs,
     color: theme.colors.textMuted,
   },
   fieldFull: {
@@ -198,7 +198,7 @@ export const useAdminPanelStyles = createThemedStyles((theme, layout) => ({
     backgroundColor: theme.colors.actionSurface,
   },
   pickerChipText: {
-    fontSize: 11,
+    fontSize: theme.typography.font2xs,
     color: theme.colors.text,
   },
   createActions: {
@@ -219,8 +219,8 @@ export const useAdminPanelStyles = createThemedStyles((theme, layout) => ({
     opacity: 0.6,
   },
   primaryButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
   },
   list: {
@@ -253,23 +253,23 @@ export const useAdminPanelStyles = createThemedStyles((theme, layout) => ({
     gap: 6,
   },
   token: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   path: {
-    fontSize: 15,
-    fontWeight: "600",
-    lineHeight: 20,
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.text,
   },
   slug: {
     fontFamily: "monospace",
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
   },
   keywords: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     lineHeight: 19,
     color: theme.colors.textMuted,
   },
@@ -285,8 +285,8 @@ export const useAdminPanelStyles = createThemedStyles((theme, layout) => ({
     backgroundColor: theme.colors.accentSoft,
   },
   chipText: {
-    fontSize: 12,
-    lineHeight: 16,
+    fontSize: theme.typography.fontXs,
+    lineHeight: theme.typography.leading2xs,
     color: theme.colors.accent,
   },
   chipLeaf: {
@@ -305,8 +305,8 @@ export const useAdminPanelStyles = createThemedStyles((theme, layout) => ({
     backgroundColor: theme.colors.surfaceMuted,
   },
   chipNeutralText: {
-    fontSize: 12,
-    lineHeight: 16,
+    fontSize: theme.typography.fontXs,
+    lineHeight: theme.typography.leading2xs,
     color: theme.colors.textSecondary,
   },
   cardActions: {
@@ -329,8 +329,8 @@ export const useAdminPanelStyles = createThemedStyles((theme, layout) => ({
     backgroundColor: theme.colors.danger,
   },
   cancelButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
   },
   dangerButton: {
@@ -342,13 +342,13 @@ export const useAdminPanelStyles = createThemedStyles((theme, layout) => ({
     backgroundColor: theme.colors.surface,
   },
   secondaryButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   dangerButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.danger,
   },
   editActions: {
@@ -359,7 +359,7 @@ export const useAdminPanelStyles = createThemedStyles((theme, layout) => ({
   pageContainer: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   pageList: {
     paddingHorizontal: layout.contentPaddingHorizontal,
@@ -396,8 +396,8 @@ export const useAdminPanelStyles = createThemedStyles((theme, layout) => ({
     opacity: 0.45,
   },
   orderButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   addProductRow: {
@@ -411,7 +411,7 @@ export const useAdminPanelStyles = createThemedStyles((theme, layout) => ({
     minWidth: 180,
   },
   emptyList: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.textMuted,
   },
   productItems: {
@@ -426,7 +426,7 @@ export const useAdminPanelStyles = createThemedStyles((theme, layout) => ({
   productIdText: {
     flex: 1,
     fontFamily: "monospace",
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.text,
   },
 }));

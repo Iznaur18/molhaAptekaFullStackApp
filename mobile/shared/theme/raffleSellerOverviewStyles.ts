@@ -18,12 +18,12 @@ export const useRaffleSellerOverviewStyles = createThemedStyles((theme) => ({
   title: {
     marginBottom: 8,
     fontSize: 15.2,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   empty: {
     fontSize: 13.6,
-    lineHeight: 20,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.textMuted,
   },
   state: {
@@ -41,8 +41,8 @@ export const useRaffleSellerOverviewStyles = createThemedStyles((theme) => ({
   },
   name: {
     marginBottom: 3,
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   status: {
@@ -53,7 +53,7 @@ export const useRaffleSellerOverviewStyles = createThemedStyles((theme) => ({
   comment: {
     marginBottom: 8,
     fontSize: 12.8,
-    lineHeight: 18,
+    lineHeight: theme.typography.leadingSm,
     color: P.warningBrownDeep,
   },
   inlineError: {
@@ -73,12 +73,12 @@ export const useRaffleSellerOverviewStyles = createThemedStyles((theme) => ({
   },
   archiveTitle: {
     fontSize: 13.1,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   archiveItem: {
     fontSize: 12.8,
-    lineHeight: 18,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.textMuted,
   },
 }));

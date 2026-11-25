@@ -12,7 +12,7 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme, layou
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   scroll: {
     paddingHorizontal: layout.contentPaddingHorizontal,
@@ -44,7 +44,7 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme, layou
   toolbarHeading: {
     flex: 1,
     fontSize: 15.2,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   disputesCount: {
@@ -56,7 +56,7 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme, layou
   },
   state: {
     fontSize: 15.2,
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textSecondary,
   },
   stateError: {
@@ -68,7 +68,7 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme, layou
     justifyContent: "center",
     gap: 12,
     paddingHorizontal: layout.contentPaddingHorizontal,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   card: {
     gap: 8,
@@ -83,12 +83,12 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme, layou
   },
   cardTitle: {
     fontSize: 15.2,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   cardMeta: {
     fontSize: 13.6,
-    lineHeight: 20,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.textSecondary,
   },
   partyRow: {
@@ -103,7 +103,7 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme, layou
   },
   partyLink: {
     fontSize: 13.6,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.action,
     textDecorationLine: "underline",
   },
@@ -119,7 +119,7 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme, layou
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 8,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.text,
     backgroundColor: theme.colors.surfaceMuted,
     textAlignVertical: "top",
@@ -131,7 +131,7 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme, layou
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 8,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.text,
     backgroundColor: theme.colors.surfaceMuted,
   },
@@ -165,12 +165,12 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme, layou
   },
   actionPrimaryText: {
     fontSize: 13.6,
-    fontWeight: "500",
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.onContrast,
   },
   actionSecondaryText: {
     fontSize: 13.6,
-    fontWeight: "500",
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.text,
   },
 }));

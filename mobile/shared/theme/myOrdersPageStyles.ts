@@ -11,7 +11,7 @@ export const useMyOrdersPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   listFlex: {
     flex: 1,
@@ -57,7 +57,7 @@ export const useMyOrdersPageStyles = createThemedStyles((theme, layout) => ({
   toolbarHeading: {
     flex: 1,
     fontSize: 15.2,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   ordersCount: {
@@ -80,7 +80,7 @@ export const useMyOrdersPageStyles = createThemedStyles((theme, layout) => ({
   },
   statusMoreText: {
     fontSize: 14.4,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     lineHeight: 18.7,
     color: theme.colors.textSecondary,
   },
@@ -94,7 +94,7 @@ export const useMyOrdersPageStyles = createThemedStyles((theme, layout) => ({
   },
   statusChipText: {
     fontSize: 14.4,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     lineHeight: 18.7,
     color: theme.colors.textSecondary,
   },
@@ -129,8 +129,8 @@ export const useMyOrdersPageStyles = createThemedStyles((theme, layout) => ({
     padding: theme.spacing[6],
   },
   hint: {
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: theme.typography.fontLg,
+    lineHeight: theme.typography.leadingXl,
     textAlign: "center",
     color: theme.colors.textMuted,
     marginBottom: theme.spacing[4],
@@ -165,14 +165,14 @@ export const useMyOrdersPageStyles = createThemedStyles((theme, layout) => ({
   },
   overviewLabel: {
     fontSize: 11.2,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: 0.4,
     textTransform: "uppercase",
     color: theme.colors.textMuted,
   },
   overviewValue: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     fontVariant: ["tabular-nums"],
   },

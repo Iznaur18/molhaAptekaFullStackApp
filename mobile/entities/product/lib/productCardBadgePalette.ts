@@ -1,4 +1,4 @@
-import { izColors, type IzTheme } from "@izibuy/design-tokens";
+import { izColors, izProductBadgeColors, type IzTheme } from "@izibuy/design-tokens";
 
 import { PRODUCT_CARD_MOBILE_CATALOG_LAYOUT } from "@/entities/product/lib/productCardMobileCatalogLayout";
 import { mixHexColors } from "@/shared/lib/mixHexColors";
@@ -46,9 +46,9 @@ export const resolveProductCardBadgeColors = (c: ThemeColors) =>
     wholesaleBg: `${c.action}14`,
     wholesaleText: c.action,
     /** Розыгрыш — розовая палитра (не warning/жёлтый). */
-    raffleBorder: "#f9a8d466",
-    raffleBg: "#fdf2f8",
-    raffleText: "#be185d",
+    raffleBorder: izProductBadgeColors.raffle.border,
+    raffleBg: izProductBadgeColors.raffle.bg,
+    raffleText: izProductBadgeColors.raffle.text,
     statusPlaceholderBorder: c.border,
     statusPlaceholderBg: c.surfaceMuted,
     statusPlaceholderText: `${c.text}7a`,
@@ -74,9 +74,9 @@ export const resolveProductCardFlashSaleBadgeColors = (
         textColor: c.warningText,
       }
     : {
-        borderColor: "#fdba7466",
-        backgroundColor: "#fff3e8",
-        textColor: "#c2410c",
+        borderColor: izProductBadgeColors.flashSaleLight.border,
+        backgroundColor: izProductBadgeColors.flashSaleLight.bg,
+        textColor: izProductBadgeColors.flashSaleLight.text,
       };
 
 /** Ozon-стиль: непрозрачные пастельные плашки с ярким жирным текстом поверх фото. */
@@ -98,15 +98,14 @@ export const PRODUCT_CARD_IMAGE_BADGE_OVERLAY =
   resolveProductCardImageBadgeOverlay(izColors);
 
 /**
- * Компенсация image bleed (`marginHorizontal: -contentInsetX`): overlay с left:0
- * обрезается `overflow:hidden` карточки. Web mobile catalog ставит bleed-x: 0.
+ * Catalog-grid: bleed-x = 0 (фото = ширина карточки) → overlay left: 0.
+ * Default: компенсация `marginHorizontal: -contentInsetX`, иначе плашки
+ * обрезает `overflow:hidden` карточки.
  */
 export const resolveProductCardImageOverlayInsetX = (
   layout: "default" | "catalog-grid" = "default",
 ): number =>
-  layout === "catalog-grid"
-    ? PRODUCT_CARD_MOBILE_CATALOG_LAYOUT.contentInsetX
-    : PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX;
+  layout === "catalog-grid" ? 0 : PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX;
 
 /** Ozon-стиль: стопка плашек флеш к левому краю фото, скругление только справа. */
 export const PRODUCT_CARD_IMAGE_BADGE_OVERLAY_LAYOUT = {

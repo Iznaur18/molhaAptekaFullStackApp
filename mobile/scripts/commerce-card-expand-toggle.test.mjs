@@ -35,7 +35,7 @@ test("commerce cards use CommerceCardExpandToggle instead of chevron glyph", () 
   );
 
   assert.match(toggle, /COMMERCE_CARD_UI\.EXPAND_TOGGLE_LABEL/);
-  assert.match(toggleStyles, /fontSize: 11/);
+  assert.match(toggleStyles, /fontSize: theme\.typography\.font2xs/);
   assert.doesNotMatch(toggle, /▸/);
 
   for (const source of [buyerBid, sellerOffer, installmentCard]) {

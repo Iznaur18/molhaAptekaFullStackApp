@@ -48,8 +48,13 @@
   width: 0.875rem;
   height: 0.875rem;
   border-radius: 999px;
-  background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af);
-  color: #fff;
+  background: linear-gradient(
+    45deg,
+    var(--iz-social-instagram-media-start),
+    var(--iz-social-instagram-media-mid),
+    var(--iz-social-instagram-media-end)
+  );
+  color: var(--iz-social-on-brand);
 }
 
 .product-instagram-post-media-btn--detail .product-instagram-post-media-btn__ig {

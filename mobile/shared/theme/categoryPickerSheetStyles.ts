@@ -2,14 +2,14 @@ import { StyleSheet } from "react-native";
 
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-export const useCategoryPickerSheetStyles = createThemedStyles((theme) => ({
+export const useCategoryPickerSheetStyles = createThemedStyles((theme, layout) => ({
   // ── Поле-селект в форме ──
   fieldWrap: {
     gap: 6,
   },
   fieldLabel: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   fieldBox: {
@@ -29,22 +29,22 @@ export const useCategoryPickerSheetStyles = createThemedStyles((theme) => ({
   },
   fieldValue: {
     flex: 1,
-    fontSize: 15,
-    lineHeight: 20,
+    fontSize: theme.typography.fontMd,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.text,
   },
   fieldPlaceholder: {
     color: theme.colors.textMuted,
   },
   fieldChevron: {
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     color: theme.colors.textSecondary,
   },
 
   // ── Шторка ──
   sheetRoot: {
     flex: 1,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   sheetHeader: {
     flexDirection: "row",
@@ -57,13 +57,13 @@ export const useCategoryPickerSheetStyles = createThemedStyles((theme) => ({
   },
   sheetTitle: {
     flex: 1,
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: theme.typography.font2xl,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   sheetClose: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.link,
   },
   searchWrap: {
@@ -76,7 +76,7 @@ export const useCategoryPickerSheetStyles = createThemedStyles((theme) => ({
     borderRadius: 10,
     paddingHorizontal: theme.spacing[3],
     paddingVertical: 10,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.text,
     backgroundColor: theme.colors.surface,
   },
@@ -102,8 +102,8 @@ export const useCategoryPickerSheetStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.action,
   },
   crumbText: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.action,
   },
   crumbTextCurrent: {
@@ -153,23 +153,23 @@ export const useCategoryPickerSheetStyles = createThemedStyles((theme) => ({
     gap: 2,
   },
   rowLabel: {
-    fontSize: 15,
-    lineHeight: 20,
+    fontSize: theme.typography.fontMd,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.text,
   },
   rowPath: {
-    fontSize: 12,
-    lineHeight: 16,
+    fontSize: theme.typography.fontXs,
+    lineHeight: theme.typography.leading2xs,
     color: theme.colors.textMuted,
   },
   rowChevron: {
-    fontSize: 18,
+    fontSize: theme.typography.font2xl,
     color: theme.colors.textSecondary,
     opacity: 0.55,
   },
   rowLeafMark: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.action,
   },
 
@@ -182,13 +182,13 @@ export const useCategoryPickerSheetStyles = createThemedStyles((theme) => ({
     gap: theme.spacing[2],
   },
   statusText: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.textMuted,
   },
   errorText: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.danger,
   },
 }));

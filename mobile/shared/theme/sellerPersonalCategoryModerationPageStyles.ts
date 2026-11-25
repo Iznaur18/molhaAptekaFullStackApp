@@ -4,7 +4,7 @@ export const useSellerPersonalCategoryModerationPageStyles = createThemedStyles(
     container: {
       flex: 1,
       minHeight: 0,
-      backgroundColor: theme.colors.bg,
+      backgroundColor: layout.pageBackground,
     },
     scroll: {
       paddingHorizontal: layout.contentPaddingHorizontal,
@@ -20,7 +20,7 @@ export const useSellerPersonalCategoryModerationPageStyles = createThemedStyles(
     state: {
       marginBottom: 16,
       fontSize: 15.2,
-      lineHeight: 22,
+      lineHeight: theme.typography.leadingLg,
       color: theme.colors.textSecondary,
     },
     stateError: {
@@ -28,7 +28,7 @@ export const useSellerPersonalCategoryModerationPageStyles = createThemedStyles(
     },
     empty: {
       fontSize: 15.2,
-      lineHeight: 22,
+      lineHeight: theme.typography.leadingLg,
       color: theme.colors.textSecondary,
       textAlign: "center",
       paddingVertical: 8,
@@ -39,7 +39,7 @@ export const useSellerPersonalCategoryModerationPageStyles = createThemedStyles(
       justifyContent: "center",
       gap: 12,
       paddingHorizontal: layout.contentPaddingHorizontal,
-      backgroundColor: theme.colors.bg,
+      backgroundColor: layout.pageBackground,
     },
   }),
 );

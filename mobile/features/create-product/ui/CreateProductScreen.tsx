@@ -101,6 +101,7 @@ import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 import { textInputFocusScrollProps } from "@/shared/lib/scrollTextInputIntoViewOnFocus";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
+import { usePageBackground } from "@/shared/theme/usePageBackground";
 import { resolveWizardFooterPaddingBottom } from "@/shared/theme/screenContentLayout";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -414,6 +415,7 @@ export const ProductWizardScreen = ({
   );
   const router = useRouter();
   const theme = useAppTheme();
+  const pageBackground = usePageBackground();
   const styles = useStyles();
   const insets = useSafeAreaInsets();
   // Мастер в вебе ограничен не общей лесенкой, а собственными 40rem
@@ -1050,10 +1052,10 @@ export const ProductWizardScreen = ({
   return (
     <SafeAreaView
       edges={["top"]}
-      style={[styles.root, { backgroundColor: theme.colors.bg }]}
+      style={[styles.root, { backgroundColor: pageBackground }]}
     >
       <ScrollView
-        style={[styles.body, { backgroundColor: theme.colors.bg }]}
+        style={[styles.body, { backgroundColor: pageBackground }]}
         contentContainerStyle={[styles.bodyContent, wizardColumnStyle, { flexGrow: 1 }]}
         keyboardShouldPersistTaps="handled"
         automaticallyAdjustKeyboardInsets

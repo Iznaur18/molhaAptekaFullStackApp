@@ -35,17 +35,17 @@ export const PROFILE_CARD_SQUIRCLE_RADIUS = 24;
 /** Паритет с teaser/wholesale chrome на экране товара. */
 export const PRODUCT_DETAIL_SECTION_RADIUS = 20;
 
-export const useProfileScreenStyles = createThemedStyles((theme) => ({
+export const useProfileScreenStyles = createThemedStyles((theme, layout) => ({
   safeArea: {
     flex: 1,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   pageLayout: {
     flexDirection: "row",
     alignItems: "stretch",
     width: "100%",
     gap: MY_PROFILE_LAYOUT_GAP,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   pageScrollContent: {
     flexGrow: 1,
@@ -73,7 +73,7 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
   mainColumn: {
     flex: 1,
     minWidth: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   /** Контент колонки overview: gap как web `__main { gap: var(--my-profile-section-gap) }`. */
   mainColumnContent: {
@@ -83,7 +83,7 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
     paddingTop: O.scrollPaddingTop,
     paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
     gap: O.mainGap,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   guestSafeArea: {
     flex: 1,
@@ -107,7 +107,7 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
     paddingTop: O.scrollPaddingTop,
     paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
     gap: O.mainGap,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   bodyCard: {
     borderWidth: 1,
@@ -148,7 +148,7 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
   },
   title: {
     fontSize: G.titleFontSize,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     textAlign: "center",
   },
@@ -167,7 +167,7 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.warningBorder,
   },
   emailBannerText: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.warningText,
     textAlign: "center",
   },
@@ -203,7 +203,7 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useProfileOverviewSectionStyles = createThemedStyles((theme) => ({
+export const useProfileOverviewSectionStyles = createThemedStyles((theme, layout) => ({
   root: {
     width: "100%",
     gap: O.mainGap,
@@ -235,8 +235,8 @@ export const useProfileOverviewSectionStyles = createThemedStyles((theme) => ({
   storefrontBtnText: {
     flexShrink: 1,
     color: theme.colors.action,
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   notificationsBtn: {
     flex: 1,
@@ -264,7 +264,7 @@ export const useProfileOverviewSectionStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useProfileOverviewBannerStyles = createThemedStyles((theme) => ({
+export const useProfileOverviewBannerStyles = createThemedStyles((theme, layout) => ({
   wrap: {
     width: "100%",
     marginBottom: PROFILE_BANNER_MARGIN_BOTTOM,
@@ -349,7 +349,7 @@ const PROFILE_MOBILE_NAV_TOGGLE = {
 export const PROFILE_MOBILE_NAV_TOGGLE_BORDER_RADIUS =
   PROFILE_MOBILE_NAV_TOGGLE.borderRadius;
 
-export const useProfileMobileNavToggleStyles = createThemedStyles((theme) => ({
+export const useProfileMobileNavToggleStyles = createThemedStyles((theme, layout) => ({
   outer: {
     alignSelf: "stretch",
   },
@@ -407,7 +407,7 @@ export const useProfileMobileNavToggleStyles = createThemedStyles((theme) => ({
   },
   caption: {
     fontSize: PROFILE_MOBILE_NAV_TOGGLE.captionSize,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     textTransform: "uppercase",
     letterSpacing: PROFILE_MOBILE_NAV_TOGGLE.letterSpacing,
     color: theme.colors.onContrast,
@@ -417,12 +417,12 @@ export const useProfileMobileNavToggleStyles = createThemedStyles((theme) => ({
   },
   label: {
     fontSize: PROFILE_MOBILE_NAV_TOGGLE.labelSize,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.onContrast,
   },
   labelTablet: {
     color: theme.colors.primary,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
   },
 }));
 
@@ -432,7 +432,7 @@ export const PROFILE_MOBILE_NAV_SHEET_ANIMATION = {
   slideDistance: 320,
 } as const;
 
-export const useProfileMobileNavSheetStyles = createThemedStyles((theme) => ({
+export const useProfileMobileNavSheetStyles = createThemedStyles((theme, layout) => ({
   backdrop: {
     flex: 1,
     flexDirection: "row",
@@ -475,15 +475,15 @@ export const useProfileMobileNavSheetStyles = createThemedStyles((theme) => ({
   },
   logoutError: {
     color: theme.colors.danger,
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     textAlign: "center",
   },
   logoutConfirm: {
     gap: theme.spacing[3],
   },
   logoutQuestion: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
     textAlign: "center",
   },
@@ -492,7 +492,7 @@ export const useProfileMobileNavSheetStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useProfileHubMenuStyles = createThemedStyles((theme) => ({
+export const useProfileHubMenuStyles = createThemedStyles((theme, layout) => ({
   root: {
     width: "100%",
     marginTop: theme.spacing[5],
@@ -548,7 +548,7 @@ export const useProfileHubMenuStyles = createThemedStyles((theme) => ({
     borderTopColor: theme.colors.border,
   },
   groupLabel: {
-    fontSize: 11,
+    fontSize: theme.typography.font2xs,
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 0.7,
@@ -579,8 +579,8 @@ export const useProfileHubMenuStyles = createThemedStyles((theme) => ({
   },
   itemLabel: {
     flex: 1,
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   itemLabelDisabled: {
@@ -596,8 +596,8 @@ export const useProfileHubMenuStyles = createThemedStyles((theme) => ({
   },
   badgeText: {
     color: theme.colors.onContrast,
-    fontSize: 12,
-    fontWeight: "700",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightBold,
   },
   alertDot: {
     width: 8,
@@ -607,7 +607,7 @@ export const useProfileHubMenuStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useThemePreferenceToggleStyles = createThemedStyles((theme) => ({
+export const useThemePreferenceToggleStyles = createThemedStyles((theme, layout) => ({
   root: {
     width: "100%",
     gap: theme.spacing[2],
@@ -620,8 +620,8 @@ export const useThemePreferenceToggleStyles = createThemedStyles((theme) => ({
     marginTop: 0,
   },
   label: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   labelCentered: {
@@ -650,8 +650,8 @@ export const useThemePreferenceToggleStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.borderStrong,
   },
   chipText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   chipTextActive: {
     color: theme.colors.onContrast,
@@ -685,7 +685,7 @@ export const resolveUserProfileThumbColumns = (contentWidth: number): number => 
   );
 };
 
-export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
+export const useUserProfileThumbListStyles = createThemedStyles((theme, layout) => ({
   root: {
     marginBottom: theme.spacing[4],
     backgroundColor: theme.colors.surface,
@@ -728,7 +728,7 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
   headerTitle: {
     flex: 1,
     minWidth: 0,
-    fontSize: 11,
+    fontSize: theme.typography.font2xs,
     fontWeight: "800",
     letterSpacing: 0.9,
     textTransform: "uppercase",
@@ -748,8 +748,8 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
   },
   headerAction: {
     flexShrink: 0,
-    fontSize: 11,
-    fontWeight: "700",
+    fontSize: theme.typography.font2xs,
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: 0.4,
     color: theme.colors.onContrast,
     opacity: 0.82,
@@ -774,7 +774,7 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
     backgroundColor: "transparent",
   },
   state: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     textAlign: "center",
     color: theme.colors.textMuted,
   },
@@ -858,7 +858,7 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surfaceMuted,
   },
   hint: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     textAlign: "center",
     color: theme.colors.warningText,
   },
@@ -867,7 +867,7 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
 export const useUserDetailsPageStyles = createThemedStyles((theme, layout) => ({
   screen: {
     flex: 1,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   scrollContent: {
     flexGrow: 1,
@@ -898,8 +898,8 @@ export const useUserDetailsPageStyles = createThemedStyles((theme, layout) => ({
     minWidth: 0,
   },
   titleText: {
-    fontSize: 22,
-    fontWeight: "700",
+    fontSize: theme.typography.font4xl,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   profileBody: {

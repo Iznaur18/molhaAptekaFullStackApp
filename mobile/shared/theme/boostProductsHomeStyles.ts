@@ -42,8 +42,8 @@ export const useBoostProductsHomeSectionStyles = createThemedStyles((theme) => (
   title: {
     margin: 0,
     fontSize: 16.3,
-    fontWeight: "700",
-    lineHeight: 20,
+    fontWeight: theme.typography.fontWeightBold,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.text,
   },
   subtitle: {
@@ -64,7 +64,7 @@ export const useBoostProductsHomeSectionStyles = createThemedStyles((theme) => (
   },
   viewAllLabel: {
     fontSize: 13.6,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.action,
   },
   row: {
@@ -95,7 +95,7 @@ export const useBoostProductMiniCardStyles = createThemedStyles((theme) => ({
     ...StyleSheet.absoluteFillObject,
     textAlign: "center",
     textAlignVertical: "center",
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
     paddingHorizontal: 8,
   },
@@ -116,7 +116,7 @@ export const useBoostProductMiniCardStyles = createThemedStyles((theme) => ({
   },
   price: {
     fontSize: 13.6,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   wishlistSlot: {

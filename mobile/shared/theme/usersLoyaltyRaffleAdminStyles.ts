@@ -6,13 +6,13 @@ export const useUsersLoyaltyRaffleAdminStyles = createThemedStyles((theme) => ({
     paddingBottom: 8,
   },
   title: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   label: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textMuted,
   },
   input: {
@@ -24,7 +24,7 @@ export const useUsersLoyaltyRaffleAdminStyles = createThemedStyles((theme) => ({
     borderRadius: 12,
     backgroundColor: theme.colors.surface,
     color: theme.colors.text,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
   },
   textarea: {
     minHeight: 120,
@@ -35,15 +35,15 @@ export const useUsersLoyaltyRaffleAdminStyles = createThemedStyles((theme) => ({
     borderRadius: 12,
     backgroundColor: theme.colors.surface,
     color: theme.colors.text,
-    fontSize: 15,
-    lineHeight: 20,
+    fontSize: theme.typography.fontMd,
+    lineHeight: theme.typography.leadingBase,
   },
   error: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.danger,
   },
   success: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.success,
   },
 }));

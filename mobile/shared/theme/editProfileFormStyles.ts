@@ -8,16 +8,16 @@ import { createThemedStyles } from "@/shared/theme/createThemedStyles";
  * смысловая группа полей. Цвет применяется сдержанно и семантично: единый
  * акцент в заголовках зон, приглушённые read-only поля, danger для обязательных.
  */
-export const useEditProfileFormStyles = createThemedStyles((theme) => ({
+export const useEditProfileFormStyles = createThemedStyles((theme, layout) => ({
   scrollView: {
     flex: 1,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   scroll: {
     padding: theme.spacing[4],
     paddingBottom: theme.spacing[8],
     gap: theme.spacing[4],
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
 
   /** Заголовок зоны: тонкий акцент-маркер + приглушённая подпись. */
@@ -35,8 +35,8 @@ export const useEditProfileFormStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.action,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: "700",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: 0.3,
     color: theme.colors.textSecondary,
   },
@@ -59,16 +59,16 @@ export const useEditProfileFormStyles = createThemedStyles((theme) => ({
     gap: 5,
   },
   label: {
-    fontSize: 13,
-    fontWeight: "500",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.textMuted,
   },
   labelRequired: {
     color: theme.colors.danger,
   },
   hint: {
-    fontSize: 12,
-    lineHeight: 16,
+    fontSize: theme.typography.fontXs,
+    lineHeight: theme.typography.leading2xs,
     color: theme.colors.textMuted,
   },
 
@@ -79,7 +79,7 @@ export const useEditProfileFormStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surfaceMuted,
     paddingHorizontal: theme.spacing[3],
     paddingVertical: 9,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.text,
   },
   inputReadOnly: {
@@ -123,13 +123,13 @@ export const useEditProfileFormStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.action,
   },
   segmentText: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.textSecondary,
   },
   segmentTextActive: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
 
   /** Зона уведомлений: подпись + пояснение слева, свитч справа. */
@@ -144,8 +144,8 @@ export const useEditProfileFormStyles = createThemedStyles((theme) => ({
     gap: 2,
   },
   switchLabel: {
-    fontSize: 15,
-    fontWeight: "500",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.text,
   },
   weekdayRow: {
@@ -166,8 +166,8 @@ export const useEditProfileFormStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.action,
   },
   weekdayChipText: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   weekdayChipTextSelected: {
@@ -175,7 +175,7 @@ export const useEditProfileFormStyles = createThemedStyles((theme) => ({
   },
 
   charMeter: {
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     textAlign: "right",
     color: theme.colors.textMuted,
   },
@@ -184,7 +184,7 @@ export const useEditProfileFormStyles = createThemedStyles((theme) => ({
   },
 
   feedback: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     marginTop: -theme.spacing[1],
   },
   feedbackError: {
@@ -209,18 +209,18 @@ export const useEditProfileFormStyles = createThemedStyles((theme) => ({
     color: theme.colors.danger,
   },
   dangerText: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.textSecondary,
   },
   dangerListTitle: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   dangerListItem: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.textSecondary,
     paddingLeft: theme.spacing[2],
   },
@@ -245,18 +245,18 @@ export const useEditProfileFormStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surfaceMuted,
   },
   savedAddressBadge: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.action,
   },
   savedAddressLabel: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   savedAddressLine: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.textSecondary,
   },
 }));

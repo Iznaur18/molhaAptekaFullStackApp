@@ -4,7 +4,7 @@ export const useProductReportsPageStyles = createThemedStyles((theme, layout) =>
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   scroll: {
     paddingHorizontal: layout.contentPaddingHorizontal,
@@ -30,7 +30,7 @@ export const useProductReportsPageStyles = createThemedStyles((theme, layout) =>
     gap: 8,
   },
   toolbarCount: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.textSecondary,
   },
   chips: {
@@ -51,8 +51,8 @@ export const useProductReportsPageStyles = createThemedStyles((theme, layout) =>
     backgroundColor: theme.colors.danger,
   },
   chipText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   chipTextActive: {
@@ -72,7 +72,7 @@ export const useProductReportsPageStyles = createThemedStyles((theme, layout) =>
   },
   state: {
     fontSize: 15.2,
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textSecondary,
   },
   stateError: {
@@ -80,7 +80,7 @@ export const useProductReportsPageStyles = createThemedStyles((theme, layout) =>
   },
   empty: {
     fontSize: 15.2,
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textSecondary,
     textAlign: "center",
     paddingVertical: 8,
@@ -91,6 +91,6 @@ export const useProductReportsPageStyles = createThemedStyles((theme, layout) =>
     justifyContent: "center",
     gap: 12,
     paddingHorizontal: layout.contentPaddingHorizontal,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
 }));

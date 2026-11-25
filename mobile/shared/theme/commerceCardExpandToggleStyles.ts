@@ -6,9 +6,9 @@ export const useCommerceCardExpandToggleStyles = createThemedStyles((theme) => (
     paddingVertical: 2,
   },
   label: {
-    fontSize: 11,
+    fontSize: theme.typography.font2xs,
     lineHeight: 14,
-    fontWeight: "500",
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.textMuted,
   },
 }));

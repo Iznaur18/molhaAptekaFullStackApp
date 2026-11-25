@@ -11,7 +11,7 @@ export const useInstallmentPaymentsPageStyles = createThemedStyles((theme, layou
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   listFlex: {
     flex: 1,
@@ -53,7 +53,7 @@ export const useInstallmentPaymentsPageStyles = createThemedStyles((theme, layou
   toolbarHeading: {
     flex: 1,
     fontSize: 15.2,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   contractsCount: {
@@ -76,7 +76,7 @@ export const useInstallmentPaymentsPageStyles = createThemedStyles((theme, layou
   },
   statusChipText: {
     fontSize: 14.4,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     lineHeight: 18.7,
     color: theme.colors.textSecondary,
   },
@@ -84,7 +84,7 @@ export const useInstallmentPaymentsPageStyles = createThemedStyles((theme, layou
     color: theme.colors.onContrast,
   },
   emptyState: {
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     color: theme.colors.textMuted,
   },
   centered: {
@@ -95,7 +95,7 @@ export const useInstallmentPaymentsPageStyles = createThemedStyles((theme, layou
     paddingHorizontal: layout.contentPaddingHorizontal,
   },
   hint: {
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     color: theme.colors.textMuted,
     textAlign: "center",
   },
@@ -107,7 +107,7 @@ export const useInstallmentPaymentsPageStyles = createThemedStyles((theme, layou
   },
   buttonText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   overview: {
     flexDirection: "row",
@@ -137,14 +137,14 @@ export const useInstallmentPaymentsPageStyles = createThemedStyles((theme, layou
   },
   overviewLabel: {
     fontSize: 11.2,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: 0.4,
     textTransform: "uppercase",
     color: theme.colors.textMuted,
   },
   overviewValue: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     fontVariant: ["tabular-nums"],
   },
@@ -167,7 +167,7 @@ export const useInstallmentPaymentsPageStyles = createThemedStyles((theme, layou
   },
   listActionText: {
     fontSize: 13.1,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   filterHint: {

@@ -270,7 +270,7 @@ export const PRODUCT_SELLER_PREVIEW_UI = {
   SELLER_STOREFRONT_BUTTON: "Витрина продавца",
   SELLER_STOREFRONT_HINT: "Все товары и полки продавца",
   SELLER_STOREFRONT_ARIA: "Открыть витрину продавца",
-  LISTED_PRODUCTS_LABEL: "Товаров в продаже",
+  LISTED_PRODUCTS_LABEL: "Товары",
   PROFILE_CTA: "Смотреть профиль",
   PREMIUM_LABEL: "Премиум",
 };

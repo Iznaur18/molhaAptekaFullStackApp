@@ -17,10 +17,8 @@ export const INLINE_ERROR_BANNER_LAYOUT = {
   markSize: 21.6,
   /** mark `margin-top: 0.05rem` */
   markMarginTop: 0.8,
-  /** mark `font-size: 0.8rem` */
+  /** mark `font-size: 0.8rem` (дробный rem — не лестница) */
   markFontSize: 12.8,
-  /** text `font-size: 0.875rem` */
-  textFontSize: 14,
-  /** text `line-height: 1.4` */
+  /** text line-height 1.4 × 14 — дробный rem leftover */
   textLineHeight: 19.6,
 } as const;

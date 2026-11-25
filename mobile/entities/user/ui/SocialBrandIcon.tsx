@@ -1,3 +1,7 @@
+import {
+  izSocialBrandBadgeSolidByFieldId,
+  izSocialBrandColors,
+} from "@izibuy/design-tokens";
 import { type ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 import Svg, { Circle, Defs, LinearGradient, Path, Rect, Stop } from "react-native-svg";
@@ -75,15 +79,8 @@ export const SocialBrandIcon = ({
   </Svg>
 );
 
-/** Фирменные цвета сервисов: по ним ссылку узнают раньше, чем прочтут (web CSS). */
-const SOCIAL_BADGE_COLORS: Record<string, string> = {
-  socialWhatsappUrl: "#25d366",
-  socialTelegramUrl: "#29a9eb",
-  socialYoutubeUrl: "#ff0033",
-  socialVkUrl: "#0077ff",
-};
-
 const BADGE_SIZE = 40;
+const IG = izSocialBrandColors.instagramBadgeGradient;
 
 const badgeStyles = StyleSheet.create({
   badge: {
@@ -114,17 +111,21 @@ export const SocialBrandBadge = ({
     <View
       style={[
         badgeStyles.badge,
-        !isInstagram && { backgroundColor: SOCIAL_BADGE_COLORS[id] ?? fallbackColor },
+        !isInstagram && {
+          backgroundColor:
+            izSocialBrandBadgeSolidByFieldId[
+              id as keyof typeof izSocialBrandBadgeSolidByFieldId
+            ] ?? fallbackColor,
+        },
       ]}
     >
       {isInstagram ? (
-        // web: linear-gradient(45deg, #f9a03f, #e1306c, #833ab4).
         <Svg style={StyleSheet.absoluteFill} width={BADGE_SIZE} height={BADGE_SIZE}>
           <Defs>
             <LinearGradient id="instagram-badge" x1="0" y1="1" x2="1" y2="0">
-              <Stop offset="0" stopColor="#f9a03f" />
-              <Stop offset="0.5" stopColor="#e1306c" />
-              <Stop offset="1" stopColor="#833ab4" />
+              <Stop offset="0" stopColor={IG.start} />
+              <Stop offset="0.5" stopColor={IG.mid} />
+              <Stop offset="1" stopColor={IG.end} />
             </LinearGradient>
           </Defs>
           <Rect width={BADGE_SIZE} height={BADGE_SIZE} fill="url(#instagram-badge)" />
@@ -132,7 +133,12 @@ export const SocialBrandBadge = ({
       ) : null}
       {/* Над градиентом: абсолютный слой иначе перекрывает значок (RN Web). */}
       <View style={badgeStyles.glyph}>
-        <SocialBrandIcon id={id} size={22} strokeWidth={2} color="#ffffff" />
+        <SocialBrandIcon
+          id={id}
+          size={22}
+          strokeWidth={2}
+          color={izSocialBrandColors.onBrand}
+        />
       </View>
     </View>
   );

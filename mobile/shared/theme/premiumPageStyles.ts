@@ -11,7 +11,7 @@ export const usePremiumPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   scroll: {
     flexGrow: 1,
@@ -44,7 +44,7 @@ export const usePremiumPageStyles = createThemedStyles((theme, layout) => ({
   },
   heroCaption: {
     fontSize: HERO.captionFontSize,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     textTransform: "uppercase",
     letterSpacing: HERO.captionLetterSpacing,
     color: theme.colors.onContrast,
@@ -63,14 +63,14 @@ export const usePremiumPageStyles = createThemedStyles((theme, layout) => ({
     fontVariant: ["tabular-nums"],
   },
   heroUnit: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
     opacity: 0.85,
   },
   heroInfo: {
     marginTop: 8,
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     lineHeight: 19,
     color: theme.colors.onContrast,
     opacity: 0.8,
@@ -93,8 +93,8 @@ export const usePremiumPageStyles = createThemedStyles((theme, layout) => ({
     backgroundColor: theme.colors.surface,
   },
   benefitsTitle: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   benefitRow: {
@@ -114,7 +114,7 @@ export const usePremiumPageStyles = createThemedStyles((theme, layout) => ({
     flex: 1,
     minWidth: 0,
     fontSize: 14.5,
-    lineHeight: 20,
+    lineHeight: theme.typography.leadingBase,
     paddingTop: 6,
     color: theme.colors.textSecondary,
   },
@@ -141,7 +141,7 @@ export const usePremiumPageStyles = createThemedStyles((theme, layout) => ({
     flex: 1,
     minWidth: 0,
     fontSize: 14.5,
-    lineHeight: 20,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.textSecondary,
     fontVariant: ["tabular-nums"],
   },
@@ -220,10 +220,10 @@ export const usePremiumPageStyles = createThemedStyles((theme, layout) => ({
     justifyContent: "center",
     gap: 12,
     paddingHorizontal: layout.contentPaddingHorizontal,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   hint: {
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     color: theme.colors.textMuted,
     textAlign: "center",
   },
@@ -235,7 +235,7 @@ export const usePremiumPageStyles = createThemedStyles((theme, layout) => ({
   },
   loginButtonText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     fontSize: 15.2,
   },
 }));

@@ -3,7 +3,7 @@ import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 export const useUsersPageStyles = createThemedStyles((theme, layout) => ({
   screen: {
     flex: 1,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   searchBar: {
     paddingHorizontal: layout.contentPaddingHorizontal,
@@ -32,7 +32,7 @@ export const useUsersPageStyles = createThemedStyles((theme, layout) => ({
     textAlign: "center",
     marginTop: 24,
     paddingHorizontal: layout.contentPaddingHorizontal,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.textMuted,
   },
   stateError: {

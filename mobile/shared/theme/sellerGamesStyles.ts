@@ -46,7 +46,7 @@ export const useSellerGamesStyles = createThemedStyles((theme) => ({
   },
   toggleTitle: {
     fontSize: 15.2,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: -0.1,
     color: "#ffffff",
   },
@@ -111,7 +111,7 @@ export const useSellerGamesStyles = createThemedStyles((theme) => ({
   },
   boxFaceLabel: {
     fontSize: 10,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
     opacity: 0.85,
   },
@@ -126,7 +126,7 @@ export const useSellerGamesStyles = createThemedStyles((theme) => ({
   },
   boxFaceValueEmpty: {
     fontSize: 13.6,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textMuted,
   },
 
@@ -144,7 +144,7 @@ export const useSellerGamesStyles = createThemedStyles((theme) => ({
   },
   hint: {
     fontSize: 12.8,
-    lineHeight: 17,
+    lineHeight: theme.typography.leadingXs,
     color: theme.colors.textMuted,
     textAlign: "center",
   },
@@ -166,12 +166,12 @@ export const useSellerGamesStyles = createThemedStyles((theme) => ({
   },
   resultTitle: {
     fontSize: 15.2,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   resultText: {
     fontSize: 13.1,
-    lineHeight: 18,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.textMuted,
   },
   timerPill: {
@@ -187,7 +187,7 @@ export const useSellerGamesStyles = createThemedStyles((theme) => ({
   },
   timerPillText: {
     fontSize: 12.8,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.onContrast,
   },
 
@@ -240,7 +240,7 @@ export const useSellerGamesStyles = createThemedStyles((theme) => ({
   },
   prizesTitle: {
     fontSize: 13.6,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   prizesList: {
@@ -258,7 +258,7 @@ export const useSellerGamesStyles = createThemedStyles((theme) => ({
   },
   prizeChipText: {
     fontSize: 12.5,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
 }));

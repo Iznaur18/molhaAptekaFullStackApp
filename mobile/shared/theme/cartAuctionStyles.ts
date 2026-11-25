@@ -15,12 +15,12 @@ export const useCartAuctionStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.warningSurface,
   },
   sectionTitle: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.ink,
   },
   sectionHint: {
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.textSecondary,
   },
   row: {
@@ -47,12 +47,12 @@ export const useCartAuctionStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.warning,
     color: theme.colors.onContrast,
     fontSize: 10,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     textTransform: "uppercase",
   },
   title: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.ink,
   },
   priceRow: {
@@ -61,16 +61,16 @@ export const useCartAuctionStyles = createThemedStyles((theme) => ({
     gap: 6,
   },
   priceLabel: {
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.textSecondary,
   },
   price: {
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     fontWeight: "800",
     color: theme.colors.ink,
   },
   meta: {
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.textSecondary,
   },
   actions: {
@@ -89,14 +89,14 @@ export const useCartAuctionStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.border,
   },
   removeButtonText: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.danger,
   },
   buttonDisabled: {
     opacity: 0.6,
   },
   error: {
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.danger,
   },
 }));

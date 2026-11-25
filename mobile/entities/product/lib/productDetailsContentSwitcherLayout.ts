@@ -1,6 +1,7 @@
 /** Паритет `ModalSectionTabs.css` + `ProductDetailsContentSwitcher.css`. */
 export const PRODUCT_DETAILS_CONTENT_SWITCHER_LAYOUT = {
-  sectionGap: 9,
+  /** Web `--product-details-section-gap: 6px`. */
+  sectionGap: 6,
   tabsGap: 8,
   tabMinHeight: 36,
   tabPaddingVertical: 6.4,

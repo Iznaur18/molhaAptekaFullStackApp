@@ -7,6 +7,7 @@ import type {
   HomeCuratedCategoryList,
 } from "@/entities/curated-category-list/api/fetchHomeCuratedCategoryLists";
 import {
+  CURATED_CATEGORY_LIST_HOME_CAROUSEL_IMAGE_ASPECT,
   resolveCuratedCategoryCompactCardHeight,
   resolveCuratedCategoryCompactCardWidth,
 } from "@/entities/curated-category-list/lib/curatedCategoryListHomeLayout";
@@ -93,6 +94,7 @@ export const HomeCuratedCategoryListsSection = ({
                   key={category.itemKey}
                   category={category}
                   width={compactCardWidth}
+                  imageAspectRatio={CURATED_CATEGORY_LIST_HOME_CAROUSEL_IMAGE_ASPECT}
                   onOpen={onOpenCategory}
                 />
               ))}

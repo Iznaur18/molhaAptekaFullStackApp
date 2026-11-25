@@ -28,7 +28,7 @@ export const useHomeFeedSectionTabStyles = createThemedStyles((theme) => ({
   tabLabel: {
     /** Web `.home-feed-section-tabs { font-size: 0.95rem }` */
     fontSize: 15.2,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     // Web `.home-feed-section-tab` → `--iz-color-text-secondary`
     color: theme.colors.textSecondary,
   },

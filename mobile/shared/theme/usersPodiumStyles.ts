@@ -12,7 +12,7 @@ export const useUsersPodiumStyles = createThemedStyles((theme) => ({
     paddingBottom: 4,
   },
   title: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     fontWeight: "800",
     letterSpacing: 0.7,
     textTransform: "uppercase",
@@ -73,7 +73,7 @@ export const useUsersPodiumStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.warningText,
   },
   placeBadgeText: {
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     fontWeight: "800",
     color: theme.colors.onContrast,
   },
@@ -87,13 +87,13 @@ export const useUsersPodiumStyles = createThemedStyles((theme) => ({
   },
   nameText: {
     textAlign: "center",
-    fontSize: 12,
-    fontWeight: "700",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   placeLabel: {
     fontSize: 10,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.textMuted,
     textAlign: "center",
   },
@@ -111,14 +111,14 @@ export const useUsersPodiumStyles = createThemedStyles((theme) => ({
   metricLabel: {
     flexShrink: 1,
     fontSize: 10,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textMuted,
     textAlign: "center",
   },
   metricValue: {
     flexShrink: 0,
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: theme.typography.font2xl,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     fontVariant: ["tabular-nums"],
     textAlign: "center",

@@ -14,7 +14,7 @@ export const useUsersMonthlyLoyaltyLoadBarStyles = createThemedStyles((theme) =>
   },
   title: {
     flexShrink: 1,
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     fontWeight: "800",
     letterSpacing: 0.7,
     textTransform: "uppercase",
@@ -22,8 +22,8 @@ export const useUsersMonthlyLoyaltyLoadBarStyles = createThemedStyles((theme) =>
   },
   counter: {
     flexShrink: 0,
-    fontSize: 13,
-    fontWeight: "700",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     fontVariant: ["tabular-nums"],
   },
@@ -39,12 +39,12 @@ export const useUsersMonthlyLoyaltyLoadBarStyles = createThemedStyles((theme) =>
     backgroundColor: theme.colors.action,
   },
   description: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.textSecondary,
   },
   hint: {
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.textMuted,
   },
 }));

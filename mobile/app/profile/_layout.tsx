@@ -1,15 +1,15 @@
 import { Stack } from "expo-router";
 
-import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
+import { usePageBackground } from "@/shared/theme/usePageBackground";
 
 export default function ProfileStackLayout() {
-  const { theme } = useAppThemeSettings();
+  const pageBackground = usePageBackground();
 
   return (
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: theme.colors.bg },
+        contentStyle: { backgroundColor: pageBackground },
       }}
     >
       <Stack.Screen name="edit" />

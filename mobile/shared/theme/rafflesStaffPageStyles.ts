@@ -8,7 +8,7 @@ export const useRafflesStaffPageStyles = createThemedStyles((theme, layout) => (
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   scroll: {
     paddingHorizontal: layout.contentPaddingHorizontal,
@@ -23,8 +23,8 @@ export const useRafflesStaffPageStyles = createThemedStyles((theme, layout) => (
     marginBottom: 4,
   },
   sectionTitle: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   list: {
@@ -75,18 +75,18 @@ export const useRafflesStaffPageStyles = createThemedStyles((theme, layout) => (
     backgroundColor: theme.colors.surfaceMuted,
   },
   title: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   meta: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.textSecondary,
   },
   rowError: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.danger,
   },
   actions: {
@@ -120,28 +120,28 @@ export const useRafflesStaffPageStyles = createThemedStyles((theme, layout) => (
     opacity: 0.65,
   },
   actionPrimaryText: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.onContrast,
   },
   actionDangerText: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.danger,
   },
   actionEditText: {
-    fontSize: 14,
-    fontWeight: "700",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.link,
   },
   state: {
     fontSize: 15.2,
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textSecondary,
   },
   empty: {
     fontSize: 15.2,
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textSecondary,
   },
   centered: {
@@ -150,6 +150,6 @@ export const useRafflesStaffPageStyles = createThemedStyles((theme, layout) => (
     justifyContent: "center",
     gap: 12,
     paddingHorizontal: layout.contentPaddingHorizontal,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
 }));

@@ -205,7 +205,7 @@ const useTabBarStyles = createThemedStyles((theme) => ({
   label: {
     maxWidth: "100%",
     fontSize: 10.56,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     lineHeight: 12,
   },
   iconWrap: {
@@ -228,7 +228,7 @@ const useTabBarStyles = createThemedStyles((theme) => ({
   /** Web `.mobile-bottom-nav__badge` font 0.55rem / line-height 1 → 8.8. */
   badgeText: {
     fontSize: 8.8,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.onContrast,
     lineHeight: 8.8,
   },

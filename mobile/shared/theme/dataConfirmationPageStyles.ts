@@ -8,7 +8,7 @@ export const useDataConfirmationPageStyles = createThemedStyles((theme, layout) 
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   scroll: {
     flexGrow: 1,
@@ -44,14 +44,14 @@ export const useDataConfirmationPageStyles = createThemedStyles((theme, layout) 
     gap: 2,
   },
   heroTitle: {
-    fontSize: 22,
+    fontSize: theme.typography.font4xl,
     fontWeight: "800",
     letterSpacing: -0.3,
     color: theme.colors.onContrast,
   },
   heroInfo: {
     marginTop: 8,
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     lineHeight: 19,
     color: theme.colors.onContrast,
     opacity: 0.8,
@@ -73,8 +73,8 @@ export const useDataConfirmationPageStyles = createThemedStyles((theme, layout) 
     backgroundColor: theme.colors.surface,
   },
   benefitsTitle: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   benefitRow: {
@@ -94,12 +94,12 @@ export const useDataConfirmationPageStyles = createThemedStyles((theme, layout) 
     flex: 1,
     minWidth: 0,
     fontSize: 14.5,
-    lineHeight: 20,
+    lineHeight: theme.typography.leadingBase,
     paddingTop: 6,
     color: theme.colors.textSecondary,
   },
   planNote: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     lineHeight: 18.5,
     color: theme.colors.textMuted,
   },
@@ -149,10 +149,10 @@ export const useDataConfirmationPageStyles = createThemedStyles((theme, layout) 
     justifyContent: "center",
     gap: 12,
     paddingHorizontal: layout.contentPaddingHorizontal,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   hint: {
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     color: theme.colors.textMuted,
     textAlign: "center",
   },
@@ -164,13 +164,13 @@ export const useDataConfirmationPageStyles = createThemedStyles((theme, layout) 
   },
   loginButtonText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     fontSize: 15.2,
   },
 }));
 
 /** Fullscreen dialog: fade + тап по затемнению. */
-export const useDataConfirmationRequestModalStyles = createThemedStyles((theme) => ({
+export const useDataConfirmationRequestModalStyles = createThemedStyles((theme, layout) => ({
   root: {
     flex: 1,
   },
@@ -201,14 +201,14 @@ export const useDataConfirmationRequestModalStyles = createThemedStyles((theme) 
     borderBottomColor: theme.colors.border,
   },
   title: {
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: theme.typography.font2xl,
+    fontWeight: theme.typography.fontWeightBold,
     flex: 1,
     color: theme.colors.text,
   },
   intro: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     marginBottom: theme.spacing[2],
     color: theme.colors.textMuted,
   },
@@ -224,7 +224,7 @@ export const useDataConfirmationRequestModalStyles = createThemedStyles((theme) 
     borderRadius: theme.radius.button,
     paddingHorizontal: theme.spacing[3],
     paddingVertical: 12,
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     backgroundColor: theme.colors.bg,
     color: theme.colors.text,
   },
@@ -233,13 +233,13 @@ export const useDataConfirmationRequestModalStyles = createThemedStyles((theme) 
     marginBottom: theme.spacing[1],
   },
   stepProgress: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textMuted,
   },
   stepTitle: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   stepActions: {
@@ -255,7 +255,7 @@ export const useDataConfirmationRequestModalStyles = createThemedStyles((theme) 
     marginTop: theme.spacing[1],
   },
   selfieHint: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
   },
   preview: {
@@ -265,7 +265,7 @@ export const useDataConfirmationRequestModalStyles = createThemedStyles((theme) 
     backgroundColor: theme.colors.surfaceMuted,
   },
   fileName: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
   },
   rejectBlock: {
@@ -274,8 +274,8 @@ export const useDataConfirmationRequestModalStyles = createThemedStyles((theme) 
     gap: 6,
   },
   staffNote: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.textMuted,
   },
   statusPadding: {

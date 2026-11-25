@@ -35,7 +35,7 @@ test("auth layout tokens: column 420, pad 24, title 26, input 10/12×14, hero 32
   assert.match(styles, /maxWidth: A\.columnMaxWidth/);
   assert.match(styles, /borderRadius: A\.heroRadius/);
   assert.match(styles, /fontSize: A\.titleFontSize/);
-  assert.match(styles, /fontWeight: "700"/);
+  assert.match(styles, /fontWeight: theme\.typography\.fontWeightBold/);
   assert.doesNotMatch(styles, /useAuthFormStyles/);
 });
 

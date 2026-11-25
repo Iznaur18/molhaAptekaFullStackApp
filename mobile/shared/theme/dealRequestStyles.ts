@@ -5,13 +5,13 @@ import { PROFILE_ACCOUNT_STACK_PAGE_LAYOUT as L } from "@/shared/lib/guestProfil
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 /** Чипы дня/часа/минут — паритет полей даты и времени web `DealRequestSheet`. */
-export const useDealRequestTimePickerStyles = createThemedStyles((theme) => ({
+export const useDealRequestTimePickerStyles = createThemedStyles((theme, layout) => ({
   root: {
     gap: 10,
   },
   label: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   row: {
@@ -44,18 +44,18 @@ export const useDealRequestTimePickerStyles = createThemedStyles((theme) => ({
     opacity: 0.4,
   },
   chipText: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.text,
     fontVariant: ["tabular-nums"],
   },
   chipTextActive: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
 }));
 
 /** Окно заявки снизу — паритет web `DealRequestSheet.css`. */
-export const useDealRequestSheetStyles = createThemedStyles((theme) => ({
+export const useDealRequestSheetStyles = createThemedStyles((theme, layout) => ({
   overlay: {
     flex: 1,
     justifyContent: "flex-end",
@@ -83,21 +83,21 @@ export const useDealRequestSheetStyles = createThemedStyles((theme) => ({
     padding: 20,
   },
   title: {
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: theme.typography.font2xl,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   hint: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.textMuted,
   },
   field: {
     gap: 6,
   },
   fieldLabel: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   input: {
@@ -106,7 +106,7 @@ export const useDealRequestSheetStyles = createThemedStyles((theme) => ({
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 12,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.text,
     backgroundColor: theme.colors.surfaceMuted,
   },
@@ -115,7 +115,7 @@ export const useDealRequestSheetStyles = createThemedStyles((theme) => ({
     textAlignVertical: "top",
   },
   error: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.danger,
   },
   actions: {
@@ -128,7 +128,7 @@ export const useDealRequestSheetStyles = createThemedStyles((theme) => ({
 }));
 
 /** Кнопки заявки и телефона на месте «В корзину». */
-export const useProductDealActionsStyles = createThemedStyles((theme) => ({
+export const useProductDealActionsStyles = createThemedStyles((theme, layout) => ({
   root: {
     width: "100%",
     minWidth: 0,
@@ -173,7 +173,7 @@ export const useProductDealActionsStyles = createThemedStyles((theme) => ({
   },
   cardButtonText: {
     fontSize: 14.4,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
   },
   phoneButton: {
@@ -192,16 +192,16 @@ export const useProductDealActionsStyles = createThemedStyles((theme) => ({
     opacity: 0.55,
   },
   phoneText: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   hint: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
   },
   error: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.danger,
   },
 }));
@@ -211,7 +211,7 @@ export const useDealRequestsPageStyles = createThemedStyles((theme, layout) => (
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   scroll: {
     flexGrow: 1,
@@ -231,19 +231,19 @@ export const useDealRequestsPageStyles = createThemedStyles((theme, layout) => (
     justifyContent: "center",
     gap: 12,
     paddingHorizontal: layout.contentPaddingHorizontal,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   root: {
     gap: 14,
   },
   title: {
-    fontSize: 22,
-    fontWeight: "700",
+    fontSize: theme.typography.font4xl,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   lead: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.textMuted,
   },
   state: {
@@ -251,8 +251,8 @@ export const useDealRequestsPageStyles = createThemedStyles((theme, layout) => (
     alignItems: "flex-start",
   },
   stateText: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.textMuted,
   },
   /** web `.deal-requests-page__list { gap: 0.75rem }` */
@@ -278,8 +278,8 @@ export const useDealRequestsPageStyles = createThemedStyles((theme, layout) => (
     gap: 8,
   },
   kind: {
-    fontSize: 13,
-    fontWeight: "700",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: 0.4,
     textTransform: "uppercase",
     color: theme.colors.textMuted,
@@ -291,18 +291,18 @@ export const useDealRequestsPageStyles = createThemedStyles((theme, layout) => (
     backgroundColor: theme.colors.surfaceMuted,
   },
   statusText: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   product: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.link,
   },
   price: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   facts: {
@@ -314,20 +314,20 @@ export const useDealRequestsPageStyles = createThemedStyles((theme, layout) => (
   },
   factLabel: {
     width: 120,
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
   },
   factValue: {
     flex: 1,
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.text,
   },
   factLink: {
     color: theme.colors.link,
   },
   hint: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.textMuted,
   },
   form: {
@@ -337,13 +337,13 @@ export const useDealRequestsPageStyles = createThemedStyles((theme, layout) => (
     backgroundColor: theme.colors.surfaceMuted,
   },
   formTitle: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   fieldLabel: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   input: {
@@ -352,7 +352,7 @@ export const useDealRequestsPageStyles = createThemedStyles((theme, layout) => (
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 12,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.text,
     backgroundColor: theme.colors.surface,
   },
@@ -362,7 +362,7 @@ export const useDealRequestsPageStyles = createThemedStyles((theme, layout) => (
     gap: 8,
   },
   error: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.danger,
   },
 }));

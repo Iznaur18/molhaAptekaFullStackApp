@@ -5,7 +5,7 @@ import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 export const useAppIntroAdminPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   scroll: {
     flexGrow: 1,
@@ -22,17 +22,17 @@ export const useAppIntroAdminPageStyles = createThemedStyles((theme, layout) => 
     gap: 6,
   },
   title: {
-    fontSize: 20,
-    fontWeight: "700",
+    fontSize: theme.typography.font3xl,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   hint: {
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: theme.typography.fontMd,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textMuted,
   },
   status: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.textMuted,
   },
   notice: {
@@ -48,7 +48,7 @@ export const useAppIntroAdminPageStyles = createThemedStyles((theme, layout) => 
     backgroundColor: theme.colors.successSurface,
   },
   noticeText: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.text,
   },
   noticeButton: {
@@ -58,8 +58,8 @@ export const useAppIntroAdminPageStyles = createThemedStyles((theme, layout) => 
     backgroundColor: theme.colors.link,
   },
   noticeButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
   },
   form: {
@@ -77,8 +77,8 @@ export const useAppIntroAdminPageStyles = createThemedStyles((theme, layout) => 
     opacity: 0.65,
   },
   legend: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
     marginBottom: 2,
   },
@@ -86,8 +86,8 @@ export const useAppIntroAdminPageStyles = createThemedStyles((theme, layout) => 
     gap: 6,
   },
   fieldLabel: {
-    fontSize: 15,
-    fontWeight: "500",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.textSecondary,
   },
   fieldInput: {
@@ -97,13 +97,13 @@ export const useAppIntroAdminPageStyles = createThemedStyles((theme, layout) => 
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 8,
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.text,
     backgroundColor: theme.colors.surface,
   },
   fieldHint: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.textMuted,
   },
   timingGrid: {
@@ -124,12 +124,12 @@ export const useAppIntroAdminPageStyles = createThemedStyles((theme, layout) => 
   },
   checkboxLabel: {
     flex: 1,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     lineHeight: 21,
     color: theme.colors.text,
   },
   error: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.danger,
   },
   actions: {
@@ -149,8 +149,8 @@ export const useAppIntroAdminPageStyles = createThemedStyles((theme, layout) => 
     opacity: 0.6,
   },
   secondaryButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   primaryButton: {
@@ -163,8 +163,8 @@ export const useAppIntroAdminPageStyles = createThemedStyles((theme, layout) => 
     opacity: 0.6,
   },
   primaryButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
   },
 }));

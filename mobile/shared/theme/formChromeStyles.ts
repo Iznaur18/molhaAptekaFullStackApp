@@ -20,7 +20,7 @@ export const CHECKOUT_SHEET_HEIGHT_PERCENT = 70;
 
 /** Канон auth — `useLoginScreenStyles` (+ AUTH_PAGE_LAYOUT). */
 
-export const useLoginScreenStyles = createThemedStyles((theme) => ({
+export const useLoginScreenStyles = createThemedStyles((theme, layout) => ({
   flex: {
     flex: 1,
     backgroundColor: theme.colors.surface,
@@ -66,7 +66,7 @@ export const useLoginScreenStyles = createThemedStyles((theme) => ({
   },
   title: {
     fontSize: A.titleFontSize,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     textAlign: "center",
   },
@@ -98,7 +98,7 @@ export const useLoginScreenStyles = createThemedStyles((theme) => ({
   },
   label: {
     fontSize: A.labelFontSize,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
     marginLeft: 4,
   },
@@ -175,7 +175,7 @@ export const useLoginScreenStyles = createThemedStyles((theme) => ({
   },
   channelBtnLabel: {
     fontSize: A.channelBtnFontSize,
-    fontWeight: "500",
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.text,
   },
   channelBtnLabelActive: {
@@ -198,7 +198,7 @@ export const useLoginScreenStyles = createThemedStyles((theme) => ({
   },
   registerLinkText: {
     fontSize: A.linkFontSize,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.link,
     textDecorationLine: "underline",
     textDecorationColor: theme.colors.link,
@@ -217,36 +217,36 @@ export const useLoginScreenStyles = createThemedStyles((theme) => ({
     gap: theme.spacing[2],
   },
   consentText: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.textSecondary,
   },
   consentLink: {
     color: theme.colors.link,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   consentSummary: {
-    fontSize: 12,
-    lineHeight: 17,
+    fontSize: theme.typography.fontXs,
+    lineHeight: theme.typography.leadingXs,
     color: theme.colors.textMuted,
   },
 }));
 
-export const useFormFieldStyles = createThemedStyles((theme) => ({
+export const useFormFieldStyles = createThemedStyles((theme, layout) => ({
   label: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.textSecondary,
     marginBottom: 6,
   },
   labelStrong: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
     marginBottom: 6,
   },
   hint: {
     marginTop: theme.spacing[1],
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.textMuted,
   },
   input: {
@@ -256,7 +256,7 @@ export const useFormFieldStyles = createThemedStyles((theme) => ({
     paddingHorizontal: theme.spacing[3],
     paddingVertical: 10,
     marginBottom: theme.spacing[4],
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     backgroundColor: theme.colors.surface,
     color: theme.colors.text,
   },
@@ -272,7 +272,7 @@ export const useFormFieldStyles = createThemedStyles((theme) => ({
     textAlignVertical: "top",
   },
   inputCode: {
-    fontSize: 20,
+    fontSize: theme.typography.font3xl,
     letterSpacing: 4,
     textAlign: "center",
   },
@@ -280,14 +280,14 @@ export const useFormFieldStyles = createThemedStyles((theme) => ({
     gap: theme.spacing[1],
   },
   fieldLabel: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   error: {
     color: theme.colors.danger,
     marginBottom: theme.spacing[3],
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
   },
   errorInline: {
     marginBottom: theme.spacing[2],
@@ -295,23 +295,23 @@ export const useFormFieldStyles = createThemedStyles((theme) => ({
   success: {
     color: theme.colors.success,
     marginBottom: theme.spacing[2],
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
   },
   statusOk: {
     color: theme.colors.success,
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   statusPending: {
     color: theme.colors.warning,
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   statusRejected: {
     color: theme.colors.danger,
-    fontSize: 15,
-    fontWeight: "600",
-    lineHeight: 22,
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
+    lineHeight: theme.typography.leadingLg,
   },
   switchRow: {
     marginTop: theme.spacing[5],
@@ -321,7 +321,7 @@ export const useFormFieldStyles = createThemedStyles((theme) => ({
   },
   switchLabel: {
     flex: 1,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.text,
     marginRight: theme.spacing[3],
   },
@@ -334,7 +334,7 @@ export const useFormFieldStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useCheckoutFormStyles = createThemedStyles((theme) => ({
+export const useCheckoutFormStyles = createThemedStyles((theme, layout) => ({
   form: {
     gap: 14,
   },
@@ -384,16 +384,16 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
   heading: {
-    fontSize: 17,
-    fontWeight: "700",
+    fontSize: theme.typography.fontXl,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   fieldGroup: {
     marginBottom: 0,
   },
   fieldLabel: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
     marginBottom: 4,
   },
@@ -435,9 +435,9 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surfaceMuted,
   },
   fulfillmentOptionText: {
-    fontSize: 14,
-    fontWeight: "600",
-    lineHeight: 17,
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
+    lineHeight: theme.typography.leadingXs,
     color: theme.colors.text,
     textAlign: "center",
   },
@@ -448,8 +448,8 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     color: theme.colors.textMuted,
   },
   fulfillmentOptionHint: {
-    fontSize: 11,
-    fontWeight: "500",
+    fontSize: theme.typography.font2xs,
+    fontWeight: theme.typography.fontWeightMedium,
     lineHeight: 14,
     color: theme.colors.textMuted,
     textAlign: "center",
@@ -491,7 +491,7 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     paddingVertical: 2.88,
     borderRadius: 999,
     fontSize: 10.88,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: 0.4,
     textTransform: "uppercase",
     overflow: "hidden",
@@ -505,8 +505,8 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     color: theme.colors.textSecondary,
   },
   fulfillmentSectionTitle: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   fulfillmentSectionBody: {
@@ -520,16 +520,16 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     marginVertical: 2,
   },
   pickupAddressText: {
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: theme.typography.fontMd,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.text,
   },
   pickupAddressError: {
     color: theme.colors.danger,
   },
   pickupHint: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.textMuted,
     marginBottom: 4,
   },
@@ -551,8 +551,8 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.action,
   },
   pickupIndexText: {
-    fontSize: 12,
-    fontWeight: "700",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightBold,
     color: "#fff",
     lineHeight: 14,
   },
@@ -561,9 +561,9 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     gap: 2,
   },
   pickupProducts: {
-    fontSize: 13,
-    fontWeight: "700",
-    lineHeight: 17,
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightBold,
+    lineHeight: theme.typography.leadingXs,
     color: theme.colors.text,
   },
   pickupGroup: {
@@ -577,8 +577,8 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surfaceMuted,
   },
   pickupSelectLabel: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.textMuted,
   },
   pickupOptions: {
@@ -597,13 +597,13 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.actionSoft,
   },
   pickupOptionLabel: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   legend: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
     marginTop: theme.spacing[2],
   },
@@ -625,16 +625,16 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.action,
   },
   radioLabel: {
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.text,
   },
   feedbackError: {
     color: theme.colors.danger,
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
   },
   feedbackSuccess: {
     color: theme.colors.success,
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
   },
   /** web `.cart-page__checkout-cta` / `--iz-radius-button: 10px`. */
   submitSpacer: {
@@ -654,15 +654,15 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useCheckoutPaymentMethodPickerStyles = createThemedStyles((theme) => ({
+export const useCheckoutPaymentMethodPickerStyles = createThemedStyles((theme, layout) => ({
   /** web cart `.cart-fulfillment__payment .checkout-payment-method-picker { margin-top: 0 }`. */
   root: {
     gap: 10,
     marginTop: 0,
   },
   legend: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   /** web `.checkout-payment-method-picker__scroll` gap 8. */
@@ -694,9 +694,9 @@ export const useCheckoutPaymentMethodPickerStyles = createThemedStyles((theme) =
     borderWidth: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.selectedBorderWidth,
   },
   cardLabel: {
-    fontSize: 13,
-    lineHeight: 17,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingXs,
+    fontWeight: theme.typography.fontWeightSemibold,
     textAlign: "center",
   },
   cardLabelSelected: {
@@ -711,9 +711,9 @@ export const useCheckoutPaymentMethodPickerStyles = createThemedStyles((theme) =
   },
   cardLockReason: {
     marginTop: 2,
-    fontSize: 11,
+    fontSize: theme.typography.font2xs,
     lineHeight: 13,
-    fontWeight: "500",
+    fontWeight: theme.typography.fontWeightMedium,
     textAlign: "center",
     color: theme.colors.textMuted,
   },
@@ -727,13 +727,13 @@ export const useCheckoutPaymentMethodPickerStyles = createThemedStyles((theme) =
     borderRadius: 12,
     backgroundColor: theme.colors.actionSoft,
     color: theme.colors.text,
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     overflow: "hidden",
   },
 }));
 
-export const useAddressSuggestStyles = createThemedStyles((theme) => ({
+export const useAddressSuggestStyles = createThemedStyles((theme, layout) => ({
   wrap: {
     marginBottom: theme.spacing[4],
   },
@@ -752,7 +752,7 @@ export const useAddressSuggestStyles = createThemedStyles((theme) => ({
     borderBottomColor: theme.colors.border,
   },
   suggestionText: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.text,
   },
   loader: {
@@ -805,19 +805,19 @@ export const useBottomSheetFormStyles = createThemedStyles((theme, layout) => ({
     borderBottomColor: theme.colors.border,
   },
   title: {
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: theme.typography.font2xl,
+    fontWeight: theme.typography.fontWeightBold,
     flex: 1,
     color: theme.colors.text,
   },
   close: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.link,
   },
   intro: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     marginBottom: theme.spacing[2],
     color: theme.colors.textMuted,
   },
@@ -833,7 +833,7 @@ export const useBottomSheetFormStyles = createThemedStyles((theme, layout) => ({
     borderRadius: theme.radius.button,
     paddingHorizontal: theme.spacing[3],
     paddingVertical: 12,
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     backgroundColor: theme.colors.bg,
     color: theme.colors.text,
   },
@@ -842,13 +842,13 @@ export const useBottomSheetFormStyles = createThemedStyles((theme, layout) => ({
     marginBottom: theme.spacing[1],
   },
   stepProgress: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textMuted,
   },
   stepTitle: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   stepActions: {
@@ -869,7 +869,7 @@ export const useBottomSheetFormStyles = createThemedStyles((theme, layout) => ({
     marginTop: theme.spacing[1],
   },
   selfieHint: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
   },
   preview: {
@@ -879,7 +879,7 @@ export const useBottomSheetFormStyles = createThemedStyles((theme, layout) => ({
     backgroundColor: theme.colors.surfaceMuted,
   },
   fileName: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
   },
   rejectBlock: {
@@ -887,15 +887,15 @@ export const useBottomSheetFormStyles = createThemedStyles((theme, layout) => ({
     gap: 6,
   },
   staffNote: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.textMuted,
   },
   statusPadding: {
     paddingHorizontal: theme.spacing[4],
   },
   modalText: {
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.textSecondary,
     marginBottom: theme.spacing[4],
   },
@@ -906,13 +906,13 @@ export const useBottomSheetFormStyles = createThemedStyles((theme, layout) => ({
   },
   secondaryActionText: {
     color: theme.colors.link,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
   },
   dismiss: {
     marginTop: theme.spacing[4],
     textAlign: "center",
     color: theme.colors.textMuted,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
   },
   sheetPadding: {
     padding: theme.spacing[6],
@@ -941,22 +941,22 @@ export const useBottomSheetFormStyles = createThemedStyles((theme, layout) => ({
     paddingBottom: theme.spacing[8],
   },
   emailVerifyTitle: {
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: theme.typography.font2xl,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
 }));
 
-export const useAuthGateStyles = createThemedStyles((theme) => ({
+export const useAuthGateStyles = createThemedStyles((theme, layout) => ({
   centered: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     padding: theme.spacing[6],
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   message: {
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     color: theme.colors.textMuted,
     textAlign: "center",
     marginBottom: theme.spacing[4],
@@ -964,7 +964,7 @@ export const useAuthGateStyles = createThemedStyles((theme) => ({
 }));
 
 /** Паритет с web `CheckoutSellerDeliveryCost.css`: цена доставки по тарифу продавца. */
-export const useCheckoutSellerDeliveryCostStyles = createThemedStyles((theme) => ({
+export const useCheckoutSellerDeliveryCostStyles = createThemedStyles((theme, layout) => ({
   root: {
     gap: 6,
     marginTop: theme.spacing[2],
@@ -987,19 +987,19 @@ export const useCheckoutSellerDeliveryCostStyles = createThemedStyles((theme) =>
   },
   legend: {
     flexShrink: 1,
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   value: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     fontVariant: ["tabular-nums"],
   },
   hint: {
     fontSize: 12.5,
-    lineHeight: 17,
+    lineHeight: theme.typography.leadingXs,
     color: theme.colors.textMuted,
   },
   hintError: {
@@ -1031,25 +1031,25 @@ export const useCheckoutSellerDeliveryCostStyles = createThemedStyles((theme) =>
     fontVariant: ["tabular-nums"],
   },
   totalSumLabel: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   totalSumValue: {
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     fontWeight: "800",
     color: theme.colors.text,
     fontVariant: ["tabular-nums"],
   },
   attribution: {
-    fontSize: 11,
+    fontSize: theme.typography.font2xs,
     lineHeight: 14,
     color: theme.colors.textMuted,
   },
 }));
 
 /** Паритет с web `CdekPickupPointPicker.css`: город, тариф, пункт, получатель. */
-export const useCdekPickupPointPickerStyles = createThemedStyles((theme) => ({
+export const useCdekPickupPointPickerStyles = createThemedStyles((theme, layout) => ({
   root: {
     gap: 12,
     marginTop: theme.spacing[2],
@@ -1058,8 +1058,8 @@ export const useCdekPickupPointPickerStyles = createThemedStyles((theme) => ({
     gap: 6,
   },
   label: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   input: {
@@ -1071,7 +1071,7 @@ export const useCdekPickupPointPickerStyles = createThemedStyles((theme) => ({
     borderRadius: 12,
     backgroundColor: theme.colors.surface,
     color: theme.colors.text,
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
   },
   findButton: {
     minHeight: 46,
@@ -1083,8 +1083,8 @@ export const useCdekPickupPointPickerStyles = createThemedStyles((theme) => ({
     justifyContent: "center",
   },
   findButtonText: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.onContrast,
   },
   disabled: {
@@ -1108,30 +1108,30 @@ export const useCdekPickupPointPickerStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.actionSoft,
   },
   optionTitle: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     lineHeight: 19,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   optionMeta: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.textSecondary,
   },
   price: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     fontVariant: ["tabular-nums"],
   },
   hint: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.textMuted,
   },
   error: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.danger,
   },
 }));

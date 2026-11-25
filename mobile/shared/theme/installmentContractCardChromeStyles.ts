@@ -59,7 +59,7 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
   title: {
     fontSize: 15.2,
     lineHeight: 21,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   titleStatic: {
@@ -67,7 +67,7 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
     minWidth: 0,
     fontSize: 15.2,
     lineHeight: 21,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   statusPill: {
@@ -78,7 +78,7 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
   },
   statusPillText: {
     fontSize: 12.8,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   statusPillActive: {
@@ -109,8 +109,8 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
     backgroundColor: theme.colors.dangerSurface,
   },
   overdueBadgeText: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.danger,
   },
   progress: {
@@ -128,12 +128,12 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
     gap: 2,
   },
   counterpartyLabel: {
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.textMuted,
   },
   counterpartyName: {
     fontSize: 13.6,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   counterpartyNameStatic: {
@@ -163,23 +163,23 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
   },
   summaryLabel: {
     fontSize: 11.2,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: 0.4,
     textTransform: "uppercase",
     color: theme.colors.textMuted,
   },
   summaryValue: {
     fontSize: 14.4,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     fontVariant: ["tabular-nums"],
   },
   summaryMuted: {
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textMuted,
   },
   summaryFoot: {
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.textMuted,
   },
   payments: {
@@ -187,7 +187,7 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
   },
   paymentsTitle: {
     fontSize: 14.4,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   fold: {
@@ -203,7 +203,7 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
   },
   foldSummaryText: {
     fontSize: 13.6,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   foldBody: {
@@ -229,7 +229,7 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
   },
   paymentAmount: {
     fontSize: 15.2,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     fontVariant: ["tabular-nums"],
   },
@@ -239,8 +239,8 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
   },
   paymentStatus: {
     alignSelf: "flex-start",
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   paymentStatusPaid: {
@@ -285,8 +285,8 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
     backgroundColor: theme.colors.danger,
   },
   btnText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   btnTextPrimary: {
@@ -328,8 +328,8 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
   },
   paymentsTitleLegacy: {
     marginTop: 4,
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   paymentRowLegacy: {
@@ -346,8 +346,8 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
   },
   actionText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
-    fontSize: 14,
+    fontWeight: theme.typography.fontWeightSemibold,
+    fontSize: theme.typography.fontBase,
   },
   rejectButton: {
     backgroundColor: theme.colors.surface,
@@ -356,17 +356,17 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
   },
   rejectText: {
     color: theme.colors.danger,
-    fontWeight: "600",
-    fontSize: 14,
+    fontWeight: theme.typography.fontWeightSemibold,
+    fontSize: theme.typography.fontBase,
   },
   product: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   productLink: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.link,
   },
   sellerActions: {

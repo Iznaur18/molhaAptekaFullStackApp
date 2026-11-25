@@ -1,6 +1,13 @@
 import { useRouter } from "expo-router";
 import { memo, useCallback, useState, type ReactNode } from "react";
-import { Pressable, Text, useWindowDimensions, View } from "react-native";
+import {
+  Platform,
+  Pressable,
+  Text,
+  useWindowDimensions,
+  View,
+  type LayoutChangeEvent,
+} from "react-native";
 
 import { ProductCardRatingRow } from "@/entities/product/ui/ProductCardRatingRow";
 import {
@@ -130,6 +137,10 @@ export const ProductCard = memo(
     const sessionQuery = useAuthSessionQuery();
     const { isInWishlist, toggleItem } = useWishlist();
     const [wishlistBurstToken, setWishlistBurstToken] = useState(0);
+    /** Web `calc` ширина ячейки ≠ floor(tileWidth) — minHeight от замера, иначе дыра под кнопкой. */
+    const [measuredCatalogCardWidth, setMeasuredCatalogCardWidth] = useState<
+      number | undefined
+    >(undefined);
     const flags = useProductCardChromeFlags(product, {
       promotionFullWidth,
       highlightCatalogPromotion,
@@ -250,22 +261,37 @@ export const ProductCard = memo(
 
     const showPurchaseSlot =
       typeof renderPurchaseAction === "function" && !isMineMode && !isModerationQueue;
+    // Web: ячейка через calc(), floor(tileWidth) завышает minHeight → дыра под «В корзину».
+    // Native: width = tileWidth, можно сразу; после onLayout — факт.
+    const catalogTileWidthForHeight =
+      measuredCatalogCardWidth ??
+      (Platform.OS !== "web" ? catalogGridTileWidth : undefined);
     const catalogGridMinHeight =
       isCatalogGrid &&
       !desktopCatalogCard &&
-      catalogGridTileWidth != null &&
-      catalogGridTileWidth > 0
-        ? resolveProductCardCatalogGridTotalHeight(catalogGridTileWidth, undefined, {
+      catalogTileWidthForHeight != null &&
+      catalogTileWidthForHeight > 0
+        ? resolveProductCardCatalogGridTotalHeight(catalogTileWidthForHeight, undefined, {
             withAction: showPurchaseSlot,
           })
         : undefined;
+    const handleCatalogCardLayout = useCallback((event: LayoutChangeEvent) => {
+      const nextWidth = event.nativeEvent.layout.width;
+      if (!(nextWidth > 0)) {
+        return;
+      }
+      setMeasuredCatalogCardWidth((prev) => (prev === nextWidth ? prev : nextWidth));
+    }, []);
 
     return (
       <View
         style={[
           styles.card,
-          isCatalogGrid &&
-            (desktopCatalogCard ? styles.cardCatalogDesktop : styles.cardCatalogGrid),
+          isCatalogGrid
+            ? desktopCatalogCard
+              ? styles.cardCatalogDesktop
+              : styles.cardCatalogGrid
+            : styles.cardStretch,
           catalogGridMinHeight != null ? { minHeight: catalogGridMinHeight } : null,
           isCatalogGrid && isModerationQueue && styles.cardCatalogGridModerationQueue,
           showOutOfStockOverlay && styles.cardOutOfStock,
@@ -273,6 +299,9 @@ export const ProductCard = memo(
           promotionFrameStyle,
           raffleParticipantFrameStyle,
         ]}
+        onLayout={
+          isCatalogGrid && !desktopCatalogCard ? handleCatalogCardLayout : undefined
+        }
       >
         {showPromotionFrame && flags.promotionFrameTier ? (
           <ProductCardPromotionBackground

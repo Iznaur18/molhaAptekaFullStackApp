@@ -6,7 +6,7 @@ import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   scroll: {
     flexGrow: 1,
@@ -33,13 +33,13 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme, lay
     gap: 16,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   fieldHint: {
-    fontSize: 13,
-    lineHeight: 20,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.textMuted,
   },
   previewCard: {
@@ -52,7 +52,7 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme, lay
     backgroundColor: theme.colors.surfaceMuted,
   },
   previewEmpty: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.textMuted,
   },
   slidePicker: {
@@ -91,8 +91,8 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme, lay
     borderRadius: 999,
     overflow: "hidden",
     backgroundColor: theme.colors.surfaceMuted,
-    fontSize: 12,
-    fontWeight: "700",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     textAlign: "center",
   },
@@ -101,8 +101,8 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme, lay
     color: theme.colors.onContrast,
   },
   slidePickerLabel: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.text,
   },
   slidePickerBadge: {
@@ -111,8 +111,8 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme, lay
     paddingVertical: 2,
     borderRadius: 999,
     backgroundColor: theme.colors.surfaceMuted,
-    fontSize: 11,
-    fontWeight: "600",
+    fontSize: theme.typography.font2xs,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textMuted,
     textTransform: "lowercase",
   },
@@ -141,17 +141,17 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme, lay
     elevation: 2,
   },
   title: {
-    fontSize: 20,
-    fontWeight: "700",
+    fontSize: theme.typography.font3xl,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   hint: {
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: theme.typography.fontMd,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textMuted,
   },
   status: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.textMuted,
   },
   notice: {
@@ -163,7 +163,7 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme, lay
     backgroundColor: theme.colors.successSurface,
   },
   noticeText: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.text,
   },
   form: {
@@ -220,8 +220,8 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme, lay
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: theme.colors.action,
     backgroundColor: theme.colors.action,
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
   },
   fieldBlock: {
@@ -238,8 +238,8 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme, lay
     gap: 6,
   },
   labelText: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.text,
   },
   input: {
@@ -249,7 +249,7 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme, lay
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
     borderRadius: 10,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.text,
     backgroundColor: theme.colors.surface,
   },
@@ -264,7 +264,7 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme, lay
     backgroundColor: theme.colors.surfaceMuted,
   },
   empty: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.textMuted,
   },
   colorField: {
@@ -310,28 +310,28 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme, lay
     backgroundColor: theme.colors.danger,
   },
   buttonTextPrimary: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
   },
   buttonTextSecondary: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   buttonTextDanger: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
   },
   error: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.danger,
     backgroundColor: theme.colors.dangerSurface,
   },
 }));
 
-export const useSiteHeaderBannerAdminTabBarStyles = createThemedStyles((theme) => ({
+export const useSiteHeaderBannerAdminTabBarStyles = createThemedStyles((theme, layout) => ({
   root: {
     marginTop: 4,
   },
@@ -352,8 +352,8 @@ export const useSiteHeaderBannerAdminTabBarStyles = createThemedStyles((theme) =
     backgroundColor: theme.colors.action,
   },
   tabText: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.action,
   },
   tabTextActive: {

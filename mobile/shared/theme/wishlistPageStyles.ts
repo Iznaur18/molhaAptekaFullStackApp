@@ -13,7 +13,7 @@ export const useWishlistPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   listContent: {
     paddingHorizontal: layout.contentPaddingHorizontal,
@@ -50,7 +50,7 @@ export const useWishlistPageStyles = createThemedStyles((theme, layout) => ({
   },
   heroCaption: {
     fontSize: HERO.captionFontSize,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     textTransform: "uppercase",
     letterSpacing: HERO.captionLetterSpacing,
     color: theme.colors.onContrast,
@@ -69,14 +69,14 @@ export const useWishlistPageStyles = createThemedStyles((theme, layout) => ({
     fontVariant: ["tabular-nums"],
   },
   heroUnit: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
     opacity: 0.85,
   },
   heroInfo: {
     marginTop: 8,
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     lineHeight: 19,
     color: theme.colors.onContrast,
     opacity: 0.8,
@@ -117,7 +117,7 @@ export const useWishlistPageStyles = createThemedStyles((theme, layout) => ({
     justifyContent: "center",
     gap: 12,
     paddingHorizontal: layout.contentPaddingHorizontal,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   hint: {
     fontSize: 14.72,
@@ -139,12 +139,12 @@ export const useWishlistPageStyles = createThemedStyles((theme, layout) => ({
   },
   loginButtonText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     fontSize: 14.4,
   },
 }));
 
-export const useWishlistRowStyles = createThemedStyles((theme) => ({
+export const useWishlistRowStyles = createThemedStyles((theme, layout) => ({
   row: {
     flexDirection: "row",
     alignItems: "center",
@@ -172,7 +172,7 @@ export const useWishlistRowStyles = createThemedStyles((theme) => ({
   },
   heading: {
     fontSize: 14.72,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     lineHeight: 19.1,
     color: theme.colors.text,
   },

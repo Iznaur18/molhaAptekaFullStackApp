@@ -96,6 +96,7 @@ export const API_CLIENT_UI = {
   FETCH_MY_RAFFLE_FALLBACK: "Не удалось загрузить розыгрыш",
   FETCH_RAFFLE_FALLBACK: "Не удалось загрузить розыгрыш",
   FETCH_RAFFLE_PRODUCTS_FALLBACK: "Не удалось загрузить товары розыгрыша",
+  FETCH_RAFFLE_PARTICIPANTS_FALLBACK: "Не удалось загрузить участников розыгрыша",
   FETCH_RAFFLE_CREATE_ADVERTISING_FALLBACK: "Не удалось загрузить услугу «Розыгрыш»",
   UNLOCK_RAFFLE_CREATE_FALLBACK: "Не удалось оплатить создание розыгрыша",
   CANCEL_RAFFLE_CREATE_FALLBACK: "Не удалось отменить создание розыгрыша",
@@ -770,7 +771,7 @@ export const PRODUCT_SELLER_PREVIEW_UI = {
   SELLER_STOREFRONT_BUTTON: "Витрина продавца",
   SELLER_STOREFRONT_HINT: "Все товары и полки продавца",
   SELLER_STOREFRONT_ARIA: "Открыть витрину продавца",
-  LISTED_PRODUCTS_LABEL: "Товаров в продаже",
+  LISTED_PRODUCTS_LABEL: "Товары",
   PROFILE_CTA: "Смотреть профиль",
   PREMIUM_LABEL: "Премиум",
 } as const;
@@ -1090,6 +1091,22 @@ export const RAFFLE_PRODUCTS_PAGE_UI = {
   LOADING: "Загрузка…",
   EMPTY: "Нет товаров в этом розыгрыше.",
   FETCH_FALLBACK: "Не удалось загрузить товары розыгрыша",
+  PARTICIPANTS_OPEN_ARIA: (count: number) =>
+    `Участники розыгрыша: ${count}. Открыть список`,
+} as const;
+
+/** Окно «Участники» на странице розыгрыша — паритет web. */
+export const RAFFLE_PARTICIPANTS_SHEET_UI = {
+  TITLE: "Участники",
+  CLOSE: "Закрыть",
+  HINT: "Покупка засчитывается, когда покупатель подтвердил получение",
+  LOADING: "Загружаем участников",
+  EMPTY: "Пока никто не участвует — станьте первым.",
+  RETRY: "Повторить",
+  ITEM_FORMS: ["товар", "товара", "товаров"] as const,
+  OPEN_PROFILE_ARIA: (userName: string) => `Открыть профиль: ${userName}`,
+  SHOWN_OF_TOTAL: (shown: number, total: number) =>
+    `Показаны первые ${shown} из ${total}`,
 } as const;
 
 export const INSTALLMENT_UI = {

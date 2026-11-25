@@ -65,24 +65,24 @@ export const useBottomSheetReportModalStyles = createThemedStyles((theme) => ({
     overflow: "hidden",
   },
   title: {
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: theme.typography.font2xl,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   productName: {
     marginTop: 6,
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.textMuted,
   },
   blocked: {
     marginTop: theme.spacing[4],
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.textMuted,
   },
   label: {
     marginTop: theme.spacing[4],
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.action,
   },
   input: {
@@ -92,7 +92,7 @@ export const useBottomSheetReportModalStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.border,
     borderRadius: 10,
     padding: theme.spacing[3],
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.text,
     backgroundColor: theme.colors.surfaceMuted,
     textAlignVertical: "top",
@@ -102,7 +102,7 @@ export const useBottomSheetReportModalStyles = createThemedStyles((theme) => ({
   },
   charCount: {
     marginTop: 6,
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.textMuted,
     textAlign: "right",
   },
@@ -111,7 +111,7 @@ export const useBottomSheetReportModalStyles = createThemedStyles((theme) => ({
   },
   error: {
     marginTop: theme.spacing[2],
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.danger,
   },
   actions: {
@@ -127,8 +127,8 @@ export const useBottomSheetReportModalStyles = createThemedStyles((theme) => ({
     alignItems: "center",
   },
   cancelButtonText: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
   },
   submitButton: {
@@ -144,8 +144,8 @@ export const useBottomSheetReportModalStyles = createThemedStyles((theme) => ({
     opacity: 0.5,
   },
   submitButtonText: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
   },
 }));
@@ -214,13 +214,13 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
     marginBottom: L.headerMarginBottom,
   },
   title: {
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: theme.typography.font2xl,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   close: {
     fontSize: L.closeFontSize,
-    fontWeight: "500",
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.textMuted,
     paddingVertical: 4,
     paddingHorizontal: 8,
@@ -245,7 +245,7 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
   },
   placeholder: {
     color: theme.colors.textMuted,
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     textAlign: "center",
     paddingHorizontal: theme.spacing[4],
   },
@@ -253,8 +253,8 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
     opacity: 0.5,
   },
   label: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   caption: {
@@ -268,13 +268,13 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
     paddingVertical: L.captionPaddingVertical,
     paddingHorizontal: L.captionPaddingHorizontal,
     fontSize: L.captionFontSize,
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.text,
     textAlignVertical: "top",
   },
   error: {
     marginBottom: 8,
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.danger,
   },
   submit: {
@@ -292,7 +292,7 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
   },
   submitText: {
     fontSize: L.submitFontSize,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.onContrast,
   },
 }));
@@ -352,8 +352,8 @@ export const useStoryViewerModalStyles = createThemedStyles((theme) => ({
   },
   closeText: {
     color: theme.colors.onContrast,
-    fontSize: 24,
-    lineHeight: 24,
+    fontSize: theme.typography.font5xl,
+    lineHeight: theme.typography.leadingXl,
   },
   header: {
     position: "absolute",
@@ -380,8 +380,8 @@ export const useStoryViewerModalStyles = createThemedStyles((theme) => ({
   },
   viewsText: {
     color: theme.colors.onContrast,
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     fontVariant: ["tabular-nums"],
   },
   authorButton: {
@@ -405,14 +405,14 @@ export const useStoryViewerModalStyles = createThemedStyles((theme) => ({
   },
   avatarFallbackText: {
     color: theme.colors.onContrast,
-    fontWeight: "700",
-    fontSize: 16,
+    fontWeight: theme.typography.fontWeightBold,
+    fontSize: theme.typography.fontLg,
   },
   authorName: {
     flexShrink: 1,
     color: theme.colors.onContrast,
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   mediaLayer: {
     ...StyleSheet.absoluteFillObject,
@@ -446,8 +446,8 @@ export const useStoryViewerModalStyles = createThemedStyles((theme) => ({
   },
   mediaStateText: {
     color: theme.colors.onContrast,
-    fontSize: 15,
-    lineHeight: 20,
+    fontSize: theme.typography.fontMd,
+    lineHeight: theme.typography.leadingBase,
     textAlign: "center",
   },
   caption: {
@@ -461,8 +461,8 @@ export const useStoryViewerModalStyles = createThemedStyles((theme) => ({
     borderRadius: theme.radius.sm,
     backgroundColor: STORY_VIEWER_OVERLAY_SCRIM,
     color: theme.colors.onContrast,
-    fontSize: 15,
-    lineHeight: 20,
+    fontSize: theme.typography.fontMd,
+    lineHeight: theme.typography.leadingBase,
     textAlign: "center",
   },
   captionNoFooter: {
@@ -490,8 +490,8 @@ export const useStoryViewerModalStyles = createThemedStyles((theme) => ({
   },
   actionText: {
     color: theme.colors.onContrast,
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   state: {
     flex: 1,
@@ -501,7 +501,7 @@ export const useStoryViewerModalStyles = createThemedStyles((theme) => ({
   },
   stateText: {
     color: theme.colors.onContrast,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     textAlign: "center",
   },
   stateError: {
@@ -536,14 +536,14 @@ export const useAdminEditModalStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
   },
   title: {
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: theme.typography.font2xl,
+    fontWeight: theme.typography.fontWeightBold,
     marginBottom: 4,
     color: theme.colors.text,
   },
   fieldLabel: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     marginTop: theme.spacing[2],
     color: theme.colors.text,
   },
@@ -553,17 +553,17 @@ export const useAdminEditModalStyles = createThemedStyles((theme) => ({
     borderRadius: 10,
     paddingHorizontal: theme.spacing[3],
     paddingVertical: 10,
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     color: theme.colors.text,
     backgroundColor: theme.colors.surface,
   },
   hint: {
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.textMuted,
   },
   error: {
     color: theme.colors.danger,
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
   },
   actions: {
     flexDirection: "row",
@@ -581,7 +581,7 @@ export const useAdminEditModalStyles = createThemedStyles((theme) => ({
   },
   secondaryButtonText: {
     color: theme.colors.text,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   primaryButton: {
     flex: 1,
@@ -592,7 +592,7 @@ export const useAdminEditModalStyles = createThemedStyles((theme) => ({
   },
   primaryButtonText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   closeLink: {
     alignItems: "center",
@@ -632,8 +632,8 @@ export const useModalSectionTabsStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.actionSoft,
   },
   tabLabel: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.action,
   },
   tabLabelActive: {
@@ -677,8 +677,8 @@ export const useModalSectionTabsStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surfaceElevated,
   },
   segmentTabLabel: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textMuted,
   },
   segmentTabLabelActive: {
@@ -714,8 +714,8 @@ export const useProductManageToggleRowStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.actionSoft,
   },
   pendingLabel: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.action,
     textAlign: "center",
   },
@@ -734,17 +734,17 @@ export const useProductManageToggleRowStyles = createThemedStyles((theme) => ({
     minWidth: 0,
   },
   title: {
-    fontSize: 15,
-    fontWeight: "600",
-    lineHeight: 20,
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.action,
   },
   titleDanger: {
     color: theme.colors.action,
   },
   description: {
-    fontSize: 12,
-    lineHeight: 16,
+    fontSize: theme.typography.fontXs,
+    lineHeight: theme.typography.leading2xs,
     color: `${theme.colors.action}B3`,
   },
   descriptionDanger: {
@@ -758,7 +758,7 @@ export const useProductEditManageSectionStyles = createThemedStyles((theme) => (
   },
   /** Паритет web `.product-edit-manage__note`. */
   note: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     lineHeight: 19,
     color: theme.colors.textMuted,
   },
@@ -775,14 +775,14 @@ export const useProductEditManageSectionStyles = createThemedStyles((theme) => (
   },
   warningBannerText: {
     flex: 1,
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     lineHeight: 19,
     color: semanticColors.warningText,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   error: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.danger,
     paddingVertical: 10,
     paddingHorizontal: 12,
@@ -809,33 +809,33 @@ export const useProductEditManageSectionStyles = createThemedStyles((theme) => (
     opacity: 0.55,
   },
   deleteBtnTitle: {
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     // В вебе здесь `font-weight: 650`. RN такого значения не знает, а CSS при
     // подборе начертания для веса > 500 берёт ближайшее не меньшее — то есть
     // фактически рисует 700. Ставим 700, чтобы совпало по картинке.
     // Из-за невалидного "650" весь объект стилей терял тип и ломал 21 обращение
     // к styles.* в ProductEditManageSection.
-    fontWeight: "700",
-    lineHeight: 20,
+    fontWeight: theme.typography.fontWeightBold,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.danger,
   },
   deleteBtnHint: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.danger,
     opacity: 0.9,
   },
   deletePending: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.text,
   },
   deleteConfirm: {
     gap: 8,
   },
   deleteConfirmQuestion: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.text,
   },
   deleteConfirmActions: {
@@ -861,13 +861,13 @@ export const useProductEditManageSectionStyles = createThemedStyles((theme) => (
     opacity: 0.85,
   },
   deleteConfirmYesText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
   },
   deleteConfirmCancelText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
 }));
@@ -904,8 +904,8 @@ export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
   },
   title: {
     flex: 1,
-    fontSize: 20,
-    fontWeight: "700",
+    fontSize: theme.typography.font3xl,
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: -0.3,
     color: theme.colors.text,
   },
@@ -956,17 +956,17 @@ export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
     borderColor: `${semanticColors.danger}40`,
   },
   overviewProductLabel: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textMuted,
     textTransform: "uppercase",
     letterSpacing: 0.4,
   },
   overviewProductName: {
     marginTop: 4,
-    fontSize: 16,
-    fontWeight: "700",
-    lineHeight: 22,
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.text,
   },
   overviewDivider: {
@@ -981,22 +981,22 @@ export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
     gap: 12,
   },
   balanceLabel: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
   },
   balanceValue: {
-    fontSize: 17,
-    fontWeight: "700",
+    fontSize: theme.typography.fontXl,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   hint: {
-    fontSize: 12,
-    lineHeight: 18,
+    fontSize: theme.typography.fontXs,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.textMuted,
   },
   sectionTitle: {
-    fontSize: 14,
-    fontWeight: "700",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     marginBottom: 2,
   },
@@ -1029,25 +1029,25 @@ export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 7,
-    fontSize: 11,
-    fontWeight: "700",
+    fontSize: theme.typography.font2xs,
+    fontWeight: theme.typography.fontWeightBold,
     textTransform: "uppercase",
     letterSpacing: 0.3,
     overflow: "hidden",
   },
   tierTitle: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   tierRate: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textMuted,
   },
   tierDescription: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.textMuted,
   },
   planCard: {
@@ -1077,13 +1077,13 @@ export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.border,
   },
   durationTitle: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   durationPrice: {
-    fontSize: 12,
-    fontWeight: "700",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.link,
   },
   planDivider: {
@@ -1096,13 +1096,13 @@ export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
     gap: 12,
   },
   summaryLabel: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
   },
   summaryValueStrong: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.text,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     textAlign: "right",
   },
   summaryTotalRow: {
@@ -1112,14 +1112,14 @@ export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
     borderTopColor: theme.colors.borderStrong,
   },
   summaryValueBold: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.text,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
   },
   summaryTotalValue: {
-    fontSize: 17,
+    fontSize: theme.typography.fontXl,
     color: theme.colors.link,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     textAlign: "right",
   },
   errorBox: {
@@ -1132,8 +1132,8 @@ export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
   },
   error: {
     color: theme.colors.danger,
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
   },
   footer: {
     flexShrink: 0,
@@ -1157,8 +1157,8 @@ export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
   },
   secondaryButtonText: {
     color: theme.colors.textSecondary,
-    fontWeight: "700",
-    fontSize: 15,
+    fontWeight: theme.typography.fontWeightBold,
+    fontSize: theme.typography.fontMd,
   },
   cancelButton: {
     flex: 1,
@@ -1170,8 +1170,8 @@ export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
   },
   cancelButtonText: {
     color: theme.colors.onContrast,
-    fontWeight: "700",
-    fontSize: 15,
+    fontWeight: theme.typography.fontWeightBold,
+    fontSize: theme.typography.fontMd,
   },
   primaryButton: {
     flex: 1,
@@ -1194,8 +1194,8 @@ export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
   },
   primaryButtonText: {
     color: theme.colors.onContrast,
-    fontWeight: "700",
-    fontSize: 15,
+    fontWeight: theme.typography.fontWeightBold,
+    fontSize: theme.typography.fontMd,
   },
   buttonPressed: {
     opacity: 0.85,
@@ -1247,28 +1247,28 @@ export const useAccountRequirementModalStyles = createThemedStyles((theme) => ({
     color: theme.colors.successText,
   },
   title: {
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: theme.typography.font2xl,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     textAlign: "center",
   },
   intro: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
     textAlign: "center",
   },
   description: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.textSecondary,
     textAlign: "center",
   },
   benefitsTitle: {
     alignSelf: "stretch",
     marginTop: theme.spacing[2],
-    fontSize: 12,
-    fontWeight: "700",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: 0.3,
     textTransform: "uppercase",
     color: theme.colors.textSecondary,
@@ -1288,7 +1288,7 @@ export const useAccountRequirementModalStyles = createThemedStyles((theme) => ({
   },
   benefitText: {
     flex: 1,
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     lineHeight: 19,
     color: theme.colors.text,
   },
@@ -1312,8 +1312,8 @@ export const useAccountRequirementModalStyles = createThemedStyles((theme) => ({
   },
   ctaText: {
     color: theme.colors.onContrast,
-    fontWeight: "700",
-    fontSize: 15,
+    fontWeight: theme.typography.fontWeightBold,
+    fontSize: theme.typography.fontMd,
   },
   closeButton: {
     borderRadius: 10,
@@ -1325,8 +1325,8 @@ export const useAccountRequirementModalStyles = createThemedStyles((theme) => ({
   },
   closeButtonText: {
     color: theme.colors.textSecondary,
-    fontWeight: "600",
-    fontSize: 14,
+    fontWeight: theme.typography.fontWeightSemibold,
+    fontSize: theme.typography.fontBase,
   },
 }));
 
@@ -1343,13 +1343,13 @@ export const useSellerProductsLimitModalStyles = createThemedStyles((theme) => (
     backgroundColor: theme.colors.surface,
   },
   title: {
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: theme.typography.font2xl,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   body: {
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: theme.typography.fontMd,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textSecondary,
   },
   button: {
@@ -1361,8 +1361,8 @@ export const useSellerProductsLimitModalStyles = createThemedStyles((theme) => (
   },
   buttonText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
-    fontSize: 15,
+    fontWeight: theme.typography.fontWeightSemibold,
+    fontSize: theme.typography.fontMd,
   },
 }));
 
@@ -1381,8 +1381,8 @@ export const useInstallmentPassportShareConsentModalStyles = createThemedStyles(
       maxHeight: "90%",
     },
     title: {
-      fontSize: 18,
-      fontWeight: "700",
+      fontSize: theme.typography.font2xl,
+      fontWeight: theme.typography.fontWeightBold,
       color: theme.colors.text,
     },
     bodyScroll: {
@@ -1393,8 +1393,8 @@ export const useInstallmentPassportShareConsentModalStyles = createThemedStyles(
       paddingBottom: theme.spacing[1],
     },
     body: {
-      fontSize: 14,
-      lineHeight: 20,
+      fontSize: theme.typography.fontBase,
+      lineHeight: theme.typography.leadingBase,
       color: theme.colors.textSecondary,
     },
     actions: {
@@ -1418,8 +1418,8 @@ export const useInstallmentPassportShareConsentModalStyles = createThemedStyles(
     },
     cancelButtonText: {
       color: theme.colors.textSecondary,
-      fontWeight: "600",
-      fontSize: 14,
+      fontWeight: theme.typography.fontWeightSemibold,
+      fontSize: theme.typography.fontBase,
     },
     confirmButton: {
       flex: 1,
@@ -1429,8 +1429,8 @@ export const useInstallmentPassportShareConsentModalStyles = createThemedStyles(
       /* Dark: onContrast тёмный (для серебряных action-кнопок) — на ink-кнопке нужен белый. */
       color:
         theme.colors.onContrast === "#12151b" ? "#ffffff" : theme.colors.onContrast,
-      fontWeight: "600",
-      fontSize: 14,
+      fontWeight: theme.typography.fontWeightSemibold,
+      fontSize: theme.typography.fontBase,
       textAlign: "center",
     },
     disabled: {
@@ -1499,9 +1499,9 @@ export const useProductModalShellStyles = createThemedStyles((theme) => ({
   },
   title: {
     flex: 1,
-    fontSize: 18,
-    fontWeight: "700",
-    lineHeight: 24,
+    fontSize: theme.typography.font2xl,
+    fontWeight: theme.typography.fontWeightBold,
+    lineHeight: theme.typography.leadingXl,
     color: theme.colors.text,
   },
   closeButton: {
@@ -1519,10 +1519,10 @@ export const useProductModalShellStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surfaceElevated,
   },
   closeButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textMuted,
-    lineHeight: 16,
+    lineHeight: theme.typography.leading2xs,
   },
   bodyScroll: {
     flexGrow: 1,
@@ -1599,7 +1599,7 @@ export const useProductBadgeExplainSheetStyles = createThemedStyles((theme) => (
   },
   title: {
     fontSize: PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.titleFontSize,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     lineHeight: PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.titleLineHeight,
     color: theme.colors.text,
   },
@@ -1631,14 +1631,14 @@ export const useProductBadgeExplainSheetStyles = createThemedStyles((theme) => (
   },
   closeButtonText: {
     fontSize: PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.closeFontSize,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.onContrast,
   },
   closeButtonTextDark: {
     color: theme.colors.ink,
   },
   error: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     lineHeight: 18.9,
     textAlign: "center",
     color: theme.colors.dangerText,

@@ -8,8 +8,10 @@ import {
   izModalBackdropScrim,
   izModalBackdropScrimCss,
   izPageBgCustom,
+  izProductBadgeColors,
   izRadius,
   izShadows,
+  izSocialBrandColors,
   izTypography,
   resolveIzTheme,
   resolvePageBackground,
@@ -74,4 +76,15 @@ test("IzTheme exposes interaction + layout", () => {
   assert.equal(theme.layout.contentPaddingHorizontalPhone, 8);
   assert.equal(theme.radius.cardLg, 16);
   assert.equal(theme.typography.fontMd, 15);
+});
+
+test("social brand + product badge accent tokens", () => {
+  assert.equal(izSocialBrandColors.whatsapp, "#25d366");
+  assert.equal(izSocialBrandColors.instagramBadgeGradient.mid, "#e1306c");
+  assert.equal(izSocialBrandColors.instagramMediaGradient.mid, "#dd2a7b");
+  assert.equal(izProductBadgeColors.raffle.text, "#be185d");
+  assert.equal(izProductBadgeColors.flashSaleLight.bg, "#fff3e8");
+  assert.equal(izProductBadgeColors.buyNFreeReady, "#1f7a4d");
+  assert.equal(izProductBadgeColors.gameAccent, "#ff7a1a");
+  assert.equal(izProductBadgeColors.detailsSoft.affiliate.color, "#047857");
 });

@@ -141,8 +141,8 @@
   width: fit-content;
   border-radius: var(--product-card-overlay-badge-radius, 6px);
   border: none;
-  background: #fdf2f8;
-  color: #be185d;
+  background: var(--iz-badge-raffle-bg);
+  color: var(--iz-badge-raffle-text);
   font-size: var(--product-card-overlay-badge-font-size, 10px);
   font-weight: 800;
   line-height: var(--product-card-overlay-badge-line-height, 12px);
@@ -155,8 +155,8 @@
   width: fit-content;
   border-radius: var(--product-card-overlay-badge-radius, 6px);
   border: none;
-  background: #fff3e8;
-  color: #c2410c;
+  background: var(--iz-badge-flash-sale-bg);
+  color: var(--iz-badge-flash-sale-text);
   font-size: var(--product-card-overlay-badge-font-size, 10px);
   font-weight: 800;
   line-height: var(--product-card-overlay-badge-line-height, 12px);
@@ -170,8 +170,8 @@
   width: fit-content;
   border-radius: var(--product-card-overlay-badge-radius, 6px);
   border: none;
-  background: #ecfdf5;
-  color: #047857;
+  background: var(--iz-badge-affiliate-bg);
+  color: var(--iz-badge-affiliate-text);
   font-size: var(--product-card-overlay-badge-font-size, 10px);
   font-weight: 800;
   line-height: var(--product-card-overlay-badge-line-height, 12px);

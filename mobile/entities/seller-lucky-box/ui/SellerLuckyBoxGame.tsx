@@ -1,3 +1,4 @@
+import { izProductBadgeColors } from "@izibuy/design-tokens";
 import { LUCKY_BOX_BOXES_TOTAL } from "@molha/api-contract";
 import { useRouter } from "expo-router";
 import ChevronRight from "lucide-react-native/icons/chevron-right";
@@ -10,6 +11,8 @@ import { LUCKY_BOX_SECTION_UI as UI } from "@/shared/config";
 import { useSellerGamesStyles } from "@/shared/theme/sellerGamesStyles";
 import { AppButton } from "@/shared/ui/AppButton";
 import { GradientFill } from "@/shared/ui/GradientFill";
+
+const GAME_ACCENT = izProductBadgeColors.gameAccent;
 
 import type { LuckyBoxPlay } from "../api/luckyBoxApi";
 import { usePlayLuckyBoxMutation } from "../model/usePlayLuckyBoxMutation";
@@ -256,7 +259,7 @@ export const SellerLuckyBoxGame = ({
                     accessibilityLabel={UI.BOX_ARIA(index)}
                   >
                     {boxState === "closed" || boxState === "dimmed" ? (
-                      <Gift size={34} color="#ff7a1a" strokeWidth={1.6} />
+                      <Gift size={34} color={GAME_ACCENT} strokeWidth={1.6} />
                     ) : (
                       <View style={styles.boxFace}>
                         {isPrizeFace && !isProductFace && boxState === "picked-win" ? (
@@ -315,7 +318,7 @@ export const SellerLuckyBoxGame = ({
                       <Gift
                         key={index}
                         size={26}
-                        color="#ff7a1a"
+                        color={GAME_ACCENT}
                         strokeWidth={1.8}
                         style={index < attemptsUsed ? { opacity: 0.25 } : undefined}
                       />

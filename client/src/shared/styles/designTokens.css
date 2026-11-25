@@ -385,6 +385,27 @@
   /* Для многострочного текста без фикс. высоты в мобиле */
   --iz-leading-relaxed: 1.35;
 
+  /* --- Social brands + product badge accents (packages/design-tokens) --- */
+  --iz-social-whatsapp: #25d366;
+  --iz-social-telegram: #29a9eb;
+  --iz-social-youtube: #ff0033;
+  --iz-social-vk: #0077ff;
+  --iz-social-on-brand: #ffffff;
+  --iz-social-instagram-badge-start: #f9a03f;
+  --iz-social-instagram-badge-mid: #e1306c;
+  --iz-social-instagram-badge-end: #833ab4;
+  --iz-social-instagram-media-start: #f58529;
+  --iz-social-instagram-media-mid: #dd2a7b;
+  --iz-social-instagram-media-end: #8134af;
+  --iz-badge-raffle-bg: #fdf2f8;
+  --iz-badge-raffle-text: #be185d;
+  --iz-badge-flash-sale-bg: #fff3e8;
+  --iz-badge-flash-sale-text: #c2410c;
+  --iz-badge-affiliate-bg: #ecfdf5;
+  --iz-badge-affiliate-text: #047857;
+  --iz-badge-buy-n-free-ready: #1f7a4d;
+  --iz-game-accent: #ff7a1a;
+
   --iz-weight-regular: 400;
   --iz-weight-medium: 500;
   --iz-weight-semibold: 600;

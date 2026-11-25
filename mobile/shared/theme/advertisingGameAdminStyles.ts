@@ -15,7 +15,7 @@ export const useAdvertisingGameAdminStyles = createThemedStyles((theme) => ({
   },
   toggleLabel: {
     fontSize: 14.08,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
     flexShrink: 1,
   },
@@ -57,7 +57,7 @@ export const useAdvertisingGameAdminStyles = createThemedStyles((theme) => ({
     elevation: 3,
   },
   boxDiscount: {
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     fontWeight: "800",
     color: theme.colors.action,
   },
@@ -92,7 +92,7 @@ export const useAdvertisingGameAdminStyles = createThemedStyles((theme) => ({
   },
   chipLabel: {
     fontSize: 13.6,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.textSecondary,
   },
   chipLabelActive: {
@@ -102,7 +102,7 @@ export const useAdvertisingGameAdminStyles = createThemedStyles((theme) => ({
     opacity: 0.45,
   },
   builderNote: {
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     lineHeight: 17.6,
     color: theme.colors.textMuted,
   },
@@ -115,7 +115,7 @@ export const useAdvertisingGameAdminStyles = createThemedStyles((theme) => ({
   },
   countLabel: {
     fontSize: 13.6,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   prizeBlock: {
@@ -138,7 +138,7 @@ export const useAdvertisingGameAdminStyles = createThemedStyles((theme) => ({
   prizeTitle: {
     flex: 1,
     fontSize: 13.6,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.action,
   },
   prizeTitleMuted: {
@@ -154,8 +154,8 @@ export const useAdvertisingGameAdminStyles = createThemedStyles((theme) => ({
     gap: 4.8,
   },
   adminFieldLabel: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   adminInput: {
@@ -164,8 +164,8 @@ export const useAdvertisingGameAdminStyles = createThemedStyles((theme) => ({
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 9.6,
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
     backgroundColor: theme.colors.surface,
   },
@@ -217,7 +217,7 @@ export const useAdvertisingGameAdminStyles = createThemedStyles((theme) => ({
   },
   chanceTotal: {
     fontSize: 13.12,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.danger,
   },
   chanceTotalOk: {
@@ -229,7 +229,7 @@ export const useAdvertisingGameAdminStyles = createThemedStyles((theme) => ({
   },
   linkButtonText: {
     fontSize: 13.12,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.action,
   },
   linkButtonDisabled: {

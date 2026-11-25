@@ -13,6 +13,12 @@ export { izLayout } from "./layout";
 export { izShadows } from "./shadows";
 export { izGradients, type IzGradientName } from "./gradients";
 export { izIconSizes, izIconStrokeNav, type IzIconSize } from "./iconSizes";
+export {
+  izSocialBrandColors,
+  izSocialBrandBadgeSolidByFieldId,
+  type IzSocialBrandFieldId,
+} from "./socialBrandColors";
+export { izProductBadgeColors } from "./productBadgeColors";
 
 import { izColors, izColorsCustom, izColorsDark } from "./colors";
 import { izInteraction } from "./interaction";

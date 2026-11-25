@@ -23,13 +23,13 @@ export const useStaffReportGroupCardStyles = createThemedStyles((theme) => ({
   title: {
     flex: 1,
     minWidth: 0,
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   count: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.danger,
   },
   links: {
@@ -38,7 +38,7 @@ export const useStaffReportGroupCardStyles = createThemedStyles((theme) => ({
     gap: 8,
   },
   link: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.link,
     textDecorationLine: "underline",
   },
@@ -58,17 +58,17 @@ export const useStaffReportGroupCardStyles = createThemedStyles((theme) => ({
     flexWrap: "wrap",
     alignItems: "center",
     gap: 6,
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.textSecondary,
   },
   reportText: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.text,
   },
   staffLabel: {
     gap: 4,
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.textSecondary,
   },
   staffInput: {
@@ -78,14 +78,14 @@ export const useStaffReportGroupCardStyles = createThemedStyles((theme) => ({
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 8,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.text,
     backgroundColor: theme.colors.surface,
     textAlignVertical: "top",
   },
   error: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.danger,
   },
   actions: {
@@ -108,8 +108,8 @@ export const useStaffReportGroupCardStyles = createThemedStyles((theme) => ({
     opacity: 0.65,
   },
   actionButtonText: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.text,
   },
   actionButtonTextDanger: {
@@ -123,8 +123,8 @@ export const useStaffReportGroupCardStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surfaceMuted,
   },
   caption: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.textSecondary,
   },
 }));

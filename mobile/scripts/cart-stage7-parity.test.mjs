@@ -23,8 +23,11 @@ test("cart dock metrics: total gap 6, unitPrice 17, disabledOpacity 0.55, sticky
   assert.match(catalog, /stickyFooterShadow:[\s\S]*shadowRadius: 18/);
   assert.match(catalog, /stickyFooterShadow:[\s\S]*height: 10/);
   assert.match(catalog, /stickyFooterShadow:[\s\S]*elevation: 16/);
-  assert.match(commerce, /unitPrice:[\s\S]*fontSize: 17/);
-  assert.match(commerce, /unitPrice:[\s\S]*fontWeight: "700"/);
+  assert.match(commerce, /unitPrice:[\s\S]*fontSize: theme\.typography\.fontXl/);
+  assert.match(
+    commerce,
+    /unitPrice:[\s\S]*fontWeight: theme\.typography\.fontWeightBold/,
+  );
   assert.match(tokens, /disabledOpacity: 0\.55/);
   assert.match(
     commerce,

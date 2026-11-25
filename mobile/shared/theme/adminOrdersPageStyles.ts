@@ -11,7 +11,7 @@ export const useAdminOrdersPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   listFlex: {
     flex: 1,
@@ -53,7 +53,7 @@ export const useAdminOrdersPageStyles = createThemedStyles((theme, layout) => ({
   toolbarHeading: {
     flex: 1,
     fontSize: 15.2,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   ordersCount: {
@@ -74,7 +74,7 @@ export const useAdminOrdersPageStyles = createThemedStyles((theme, layout) => ({
   },
   statusChipText: {
     fontSize: 14.4,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     lineHeight: 18.7,
     color: theme.colors.textSecondary,
   },
@@ -83,7 +83,7 @@ export const useAdminOrdersPageStyles = createThemedStyles((theme, layout) => ({
   },
   state: {
     fontSize: 15.2,
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textSecondary,
   },
   stateError: {
@@ -95,11 +95,11 @@ export const useAdminOrdersPageStyles = createThemedStyles((theme, layout) => ({
     justifyContent: "center",
     gap: 12,
     paddingHorizontal: layout.contentPaddingHorizontal,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
 }));
 
-export const useOrderStatusSelectStyles = createThemedStyles((theme) => ({
+export const useOrderStatusSelectStyles = createThemedStyles((theme, layout) => ({
   root: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -132,12 +132,12 @@ export const useOrderStatusSelectStyles = createThemedStyles((theme) => ({
   },
   optionText: {
     fontSize: 13.6,
-    fontWeight: "500",
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.text,
   },
   optionTextSelected: {
     color: theme.colors.link,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   pending: {
     fontSize: 12.8,
@@ -146,7 +146,7 @@ export const useOrderStatusSelectStyles = createThemedStyles((theme) => ({
   error: {
     width: "100%",
     fontSize: 12.8,
-    lineHeight: 18,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.danger,
   },
 }));

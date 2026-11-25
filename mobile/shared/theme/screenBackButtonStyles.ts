@@ -35,11 +35,7 @@ export const useScreenBackButtonStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useScreenWithBackStyles = createThemedStyles((theme) => ({
-  root: {
-    flex: 1,
-    backgroundColor: theme.colors.bg,
-  },
+export const useScreenWithBackStyles = createThemedStyles(() => ({
   content: {
     flex: 1,
   },

@@ -51,7 +51,7 @@ const useProductCompactCardBaseStyles = createThemedStyles((theme) => {
       paddingVertical: 2,
       borderRadius: 4,
       fontSize: 10,
-      fontWeight: "700",
+      fontWeight: theme.typography.fontWeightBold,
       lineHeight: 12,
       color: theme.colors.onContrast,
       backgroundColor: "rgba(15, 23, 42, 0.72)",
@@ -71,9 +71,9 @@ const useProductCompactCardBaseStyles = createThemedStyles((theme) => {
       justifyContent: "center",
     },
     thumbNavText: {
-      fontSize: 16,
-      fontWeight: "700",
-      lineHeight: 18,
+      fontSize: theme.typography.fontLg,
+      fontWeight: theme.typography.fontWeightBold,
+      lineHeight: theme.typography.leadingSm,
       color: theme.colors.onContrast,
       textShadowColor: "rgba(0, 0, 0, 0.45)",
       textShadowOffset: { width: 0, height: 1 },
@@ -111,8 +111,8 @@ const useProductCompactCardBaseStyles = createThemedStyles((theme) => {
       backgroundColor: `${theme.colors.danger}14`,
     },
     statusPillText: {
-      fontSize: 11,
-      fontWeight: "600",
+      fontSize: theme.typography.font2xs,
+      fontWeight: theme.typography.fontWeightSemibold,
       lineHeight: 14,
       color: theme.colors.warningText,
     },
@@ -123,9 +123,9 @@ const useProductCompactCardBaseStyles = createThemedStyles((theme) => {
       color: theme.colors.danger,
     },
     title: {
-      fontSize: 15,
-      fontWeight: "600",
-      lineHeight: 20,
+      fontSize: theme.typography.fontMd,
+      fontWeight: theme.typography.fontWeightSemibold,
+      lineHeight: theme.typography.leadingBase,
       color: theme.colors.text,
     },
     priceRow: {
@@ -141,8 +141,8 @@ const useProductCompactCardBaseStyles = createThemedStyles((theme) => {
       backgroundColor: `${theme.colors.danger}14`,
     },
     discountPillText: {
-      fontSize: 11,
-      fontWeight: "600",
+      fontSize: theme.typography.font2xs,
+      fontWeight: theme.typography.fontWeightSemibold,
       lineHeight: 14,
       color: theme.colors.danger,
     },
@@ -161,8 +161,8 @@ const useProductCompactCardBaseStyles = createThemedStyles((theme) => {
       backgroundColor: BC.promotionBannerBg,
     },
     promotionPillText: {
-      fontSize: 11,
-      fontWeight: "600",
+      fontSize: theme.typography.font2xs,
+      fontWeight: theme.typography.fontWeightSemibold,
       lineHeight: 14,
     },
     promotionPillTextBoost: {
@@ -180,8 +180,8 @@ const useProductCompactCardBaseStyles = createThemedStyles((theme) => {
       borderRadius: 999,
     },
     featurePillText: {
-      fontSize: 11,
-      fontWeight: "600",
+      fontSize: theme.typography.font2xs,
+      fontWeight: theme.typography.fontWeightSemibold,
       lineHeight: 14,
     },
     featurePillAuction: {
@@ -227,8 +227,8 @@ const useProductCompactCardBaseStyles = createThemedStyles((theme) => {
       backgroundColor: `${theme.colors.action}14`,
     },
     loyaltyPillText: {
-      fontSize: 11,
-      fontWeight: "600",
+      fontSize: theme.typography.font2xs,
+      fontWeight: theme.typography.fontWeightSemibold,
       lineHeight: 14,
       color: theme.colors.action,
     },
@@ -240,23 +240,23 @@ const useProductCompactCardBaseStyles = createThemedStyles((theme) => {
       marginTop: 2,
     },
     metaMuted: {
-      fontSize: 12,
-      lineHeight: 16,
+      fontSize: theme.typography.fontXs,
+      lineHeight: theme.typography.leading2xs,
       color: theme.colors.textMuted,
     },
     metaHint: {
-      fontSize: 12,
-      lineHeight: 16,
+      fontSize: theme.typography.fontXs,
+      lineHeight: theme.typography.leading2xs,
       color: theme.colors.textSecondary,
     },
     rejectionComment: {
-      fontSize: 12,
-      lineHeight: 16,
+      fontSize: theme.typography.fontXs,
+      lineHeight: theme.typography.leading2xs,
       color: theme.colors.danger,
     },
     description: {
-      fontSize: 13,
-      lineHeight: 18,
+      fontSize: theme.typography.fontSm,
+      lineHeight: theme.typography.leadingSm,
       color: theme.colors.textSecondary,
     },
     divider: {

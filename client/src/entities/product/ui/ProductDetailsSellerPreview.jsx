@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { isSellerSafeDealApproved } from "@molha/api-contract";
 import { buildMarketplaceNotSellerNotice } from "@izibuy/shared-lib";
-import { ChevronRight, Package, Star, Users, Wallet } from "lucide-react";
+import { ChevronRight, Package, Star, Users } from "lucide-react";
 
 import { formatSearchRowRatingCompact } from "../../user/lib/formatSearchRowRating.js";
-import { formatSearchRowTotalSales } from "../../user/lib/formatSearchRowTotalSales.js";
 import {
   formatProfileImageObjectPosition,
   getUserAvatarFocus,
@@ -16,7 +15,6 @@ import { DEFAULT_USER_AVATAR_URL } from "../../user/model/userConstants.js";
 import {
   PRODUCT_SELLER_PREVIEW_UI,
   USER_LIST_ROW_UI,
-  USER_PROFILE_COPY,
 } from "../../../shared/config/appUiCopy.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 
@@ -84,12 +82,6 @@ export function ProductDetailsSellerPreview({ seller, onOpenProfile }) {
       label: USER_LIST_ROW_UI.RATING_LABEL,
       value: ratingText,
       icon: Star,
-    },
-    {
-      key: "totalSales",
-      label: USER_PROFILE_COPY.LABELS.totalSalesAmount,
-      value: formatSearchRowTotalSales(sellerObj.totalSalesAmount),
-      icon: Wallet,
     },
     {
       key: "listed",

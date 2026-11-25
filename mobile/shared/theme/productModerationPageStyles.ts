@@ -6,7 +6,7 @@ export const useProductModerationPageStyles = createThemedStyles((theme, layout)
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   list: {
     paddingHorizontal: layout.contentPaddingHorizontal,
@@ -22,7 +22,7 @@ export const useProductModerationPageStyles = createThemedStyles((theme, layout)
   state: {
     marginBottom: 16,
     fontSize: 15.2,
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textSecondary,
   },
   stateError: {
@@ -30,7 +30,7 @@ export const useProductModerationPageStyles = createThemedStyles((theme, layout)
   },
   empty: {
     fontSize: 15.2,
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textSecondary,
     textAlign: "center",
     paddingVertical: 8,
@@ -39,7 +39,7 @@ export const useProductModerationPageStyles = createThemedStyles((theme, layout)
     flex: 1,
     paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 12,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   idleMessageWrap: {
     flex: 1,
@@ -53,6 +53,6 @@ export const useProductModerationPageStyles = createThemedStyles((theme, layout)
     justifyContent: "center",
     gap: 12,
     paddingHorizontal: layout.contentPaddingHorizontal,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
 }));

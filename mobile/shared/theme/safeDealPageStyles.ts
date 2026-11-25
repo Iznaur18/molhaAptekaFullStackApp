@@ -6,7 +6,7 @@ export const useSafeDealPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   scroll: {
     flexGrow: 1,
@@ -26,7 +26,7 @@ export const useSafeDealPageStyles = createThemedStyles((theme, layout) => ({
     justifyContent: "center",
     gap: 12,
     paddingHorizontal: layout.contentPaddingHorizontal,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   /** web `.safe-deal-page { gap: 1rem }` */
   root: {
@@ -47,8 +47,8 @@ export const useSafeDealPageStyles = createThemedStyles((theme, layout) => ({
     backgroundColor: theme.colors.surface,
   },
   title: {
-    fontSize: 22,
-    fontWeight: "700",
+    fontSize: theme.typography.font4xl,
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: -0.32,
     color: theme.colors.text,
   },
@@ -70,8 +70,8 @@ export const useSafeDealPageStyles = createThemedStyles((theme, layout) => ({
     backgroundColor: theme.colors.dangerSurface,
   },
   statusText: {
-    fontSize: 12,
-    fontWeight: "700",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: 0.24,
     textTransform: "uppercase",
     color: theme.colors.textSecondary,
@@ -86,18 +86,18 @@ export const useSafeDealPageStyles = createThemedStyles((theme, layout) => ({
     backgroundColor: theme.colors.surface,
   },
   text: {
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     lineHeight: 22.5,
     color: theme.colors.text,
   },
   muted: {
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     lineHeight: 22.5,
     color: theme.colors.textSecondary,
   },
   sectionTitle: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   bulletRow: {
@@ -105,17 +105,17 @@ export const useSafeDealPageStyles = createThemedStyles((theme, layout) => ({
     gap: 8,
   },
   bullet: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     lineHeight: 20.3,
     color: theme.colors.textSecondary,
   },
   approved: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     lineHeight: 20.3,
     color: theme.colors.successText,
   },
   rejection: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     lineHeight: 20.3,
     color: theme.colors.dangerText,
   },
@@ -123,8 +123,8 @@ export const useSafeDealPageStyles = createThemedStyles((theme, layout) => ({
     gap: 5.6,
   },
   fieldLabel: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   segment: {
@@ -148,8 +148,8 @@ export const useSafeDealPageStyles = createThemedStyles((theme, layout) => ({
     opacity: 0.55,
   },
   segmentText: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   segmentTextActive: {
@@ -161,7 +161,7 @@ export const useSafeDealPageStyles = createThemedStyles((theme, layout) => ({
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 12,
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     color: theme.colors.text,
     backgroundColor: theme.colors.surface,
     fontVariant: ["tabular-nums"],

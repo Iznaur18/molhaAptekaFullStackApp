@@ -1,6 +1,10 @@
 import { Platform, StyleSheet, type ViewStyle } from "react-native";
 
-import { PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO } from "@izibuy/design-tokens";
+import {
+  izProductBadgeColors,
+  izSocialBrandColors,
+  PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO,
+} from "@izibuy/design-tokens";
 
 import {
   PRODUCT_CARD_BADGE_LAYOUT as BL,
@@ -77,13 +81,14 @@ export const MEDIA_NAV_SCRIM = "rgba(0,0,0,0.45)";
 export const useFeedScreenStyles = createThemedStyles((theme, layout) => ({
   flex: {
     flex: 1,
-    backgroundColor: theme.colors.bg,
+    // Custom: page canvas = `--iz-page-bg-custom`, не `colors.bg` (#DEDEDE).
+    backgroundColor: layout.pageBackground,
   },
   homeFeedScene: {
     // Фон сцены совпадает с foreground-цветом листа: фиолетовая шапка —
     // обычный первый ряд FlatList (HomeCatalogPrimaryBackdrop), поэтому
     // любые недорисованные зоны списка сливаются с контентом без полос.
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
     width: "100%",
     alignSelf: "stretch",
   },
@@ -115,7 +120,7 @@ export const useFeedScreenStyles = createThemedStyles((theme, layout) => ({
   homeFeedSheet: {
     flex: 1,
     overflow: "hidden",
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   homeFeedListContent: {
     width: "100%",
@@ -125,6 +130,7 @@ export const useFeedScreenStyles = createThemedStyles((theme, layout) => ({
   },
   homeFeedSearchHeader: {
     width: "100%",
+    // Web: `padding-top` clearance включает один `space-2` между panel и banner.
     marginBottom: HOME_FEED_SECTION_GAP,
   },
   homeFeedInsetContent: {
@@ -135,8 +141,8 @@ export const useFeedScreenStyles = createThemedStyles((theme, layout) => ({
   },
   homeFeedForeground: {
     // Единый передний фон ленты; совпадает со сценой (homeFeedScene) и с
-    // фоном остальных экранов — карточки товаров (surface) читаются на нём.
-    backgroundColor: theme.colors.bg,
+    // page canvas web (`resolvePageBackground`) — карточки (surface) читаются на нём.
+    backgroundColor: layout.pageBackground,
   },
   homeFeedRowSurface: {
     alignSelf: "stretch",
@@ -227,7 +233,7 @@ const catalogBreadcrumbTitleBase = {
   marginBottom: HOME_FEED_DISPLAY_TITLE.marginBottom,
 } as const;
 
-export const useCatalogBreadcrumbStyles = createThemedStyles((theme) => ({
+export const useCatalogBreadcrumbStyles = createThemedStyles((theme, layout) => ({
   toolbar: {
     paddingTop: 16,
     marginBottom: 14,
@@ -251,12 +257,13 @@ export const useCatalogBreadcrumbStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useProductCardStyles = createThemedStyles((theme) => {
+export const useProductCardStyles = createThemedStyles((theme, layout) => {
   const BC = resolveProductCardBadgeColors(theme.colors);
   const soft = resolveProductCardSoftElevationShadow(theme.colors);
   return {
     card: {
-      flex: 1,
+      // Без `flex` shorthand: на RN-web `flex:N` → `flex-basis:0%` + overflow:hidden
+      // схлопывает catalog-grid до ~19px (виден только heart). Stretch — `cardStretch`.
       position: "relative",
       margin: 3,
       paddingBottom: 7,
@@ -271,9 +278,11 @@ export const useProductCardStyles = createThemedStyles((theme) => {
       ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
       ...(Platform.OS === "web" ? ({ cornerShape: "squircle" } as const) : null),
     },
+    /** Equal-height fill outside catalog-grid (row of cards). */
+    cardStretch: {
+      flex: 1,
+    },
     cardCatalogGrid: {
-      flexGrow: 0,
-      flexShrink: 0,
       width: "100%",
       margin: 0,
       paddingTop: 0,
@@ -282,8 +291,6 @@ export const useProductCardStyles = createThemedStyles((theme) => {
     },
     /** Шире 1023px: padding 0.55rem 0.75rem 0.65rem, gap 0.4rem. */
     cardCatalogDesktop: {
-      flexGrow: 0,
-      flexShrink: 0,
       width: "100%",
       margin: 0,
       paddingTop: PCD.paddingTop,
@@ -301,7 +308,9 @@ export const useProductCardStyles = createThemedStyles((theme) => {
       ...(Platform.OS === "web" ? ({ filter: "grayscale(1)" } as const) : null),
     },
     imageWrapCatalogGrid: {
-      marginHorizontal: -MCL.contentInsetX,
+      // Web `--product-card-image-bleed-x: 0`: фото edge-to-edge по карточке,
+      // без −inset (у нас image не внутри padded details-surface).
+      marginHorizontal: 0,
       aspectRatio: PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO,
       borderTopLeftRadius: MCL.imageTopRadius,
       borderTopRightRadius: MCL.imageTopRadius,
@@ -499,7 +508,7 @@ export const useProductCardStyles = createThemedStyles((theme) => {
   };
 });
 
-export const useProductCardRatingRowStyles = createThemedStyles((theme) => ({
+export const useProductCardRatingRowStyles = createThemedStyles((theme, layout) => ({
   root: {
     flexDirection: "row",
     alignItems: "center",
@@ -548,7 +557,7 @@ export const useProductCardRatingRowStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useProductCardBannerStyles = createThemedStyles((theme) => {
+export const useProductCardBannerStyles = createThemedStyles((theme, layout) => {
   const BANNER = resolveProductCardBannerChrome(theme.colors);
   return {
     frame: {
@@ -639,7 +648,7 @@ export const useProductCardBannerStyles = createThemedStyles((theme) => {
   };
 });
 
-export const useProductCardSellerToolbarStyles = createThemedStyles((theme) => ({
+export const useProductCardSellerToolbarStyles = createThemedStyles((theme, layout) => ({
   toolbar: {
     flexDirection: "column",
     gap: 7.2,
@@ -703,7 +712,7 @@ export const useProductCardSellerToolbarStyles = createThemedStyles((theme) => (
   },
 }));
 
-export const useListPageFilterBarStyles = createThemedStyles((theme) => ({
+export const useListPageFilterBarStyles = createThemedStyles((theme, layout) => ({
   bar: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -804,7 +813,7 @@ export const useListPageFilterBarStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useProductCardMediaStyles = createThemedStyles((theme) => ({
+export const useProductCardMediaStyles = createThemedStyles((theme, layout) => ({
   frame: {
     width: "100%",
     height: "100%",
@@ -830,7 +839,7 @@ export const useProductCardMediaStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useProductCardOutOfStockOverlayStyles = createThemedStyles((theme) => {
+export const useProductCardOutOfStockOverlayStyles = createThemedStyles((theme, layout) => {
   const O = resolveProductCardOutOfStockOverlayColors(theme.colors);
   return {
     overlay: {
@@ -855,7 +864,7 @@ export const useProductCardOutOfStockOverlayStyles = createThemedStyles((theme) 
   };
 });
 
-export const useProductCardMediaGalleryNavStyles = createThemedStyles((theme) => ({
+export const useProductCardMediaGalleryNavStyles = createThemedStyles((theme, layout) => ({
   navRow: {
     position: "absolute",
     top: "50%",
@@ -900,7 +909,7 @@ export const useProductCardMediaGalleryNavStyles = createThemedStyles((theme) =>
   },
 }));
 
-export const useProductCardGalleryDotsStyles = createThemedStyles((theme) => ({
+export const useProductCardGalleryDotsStyles = createThemedStyles((theme, layout) => ({
   root: {
     position: "absolute",
     left: 0,
@@ -920,7 +929,7 @@ export const useProductCardGalleryDotsStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useProductInstagramPostMediaButtonStyles = createThemedStyles((theme) => ({
+export const useProductInstagramPostMediaButtonStyles = createThemedStyles((theme, layout) => ({
   root: {
     width: 32,
     height: 32,
@@ -947,7 +956,7 @@ export const useProductInstagramPostMediaButtonStyles = createThemedStyles((them
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#dd2a7b",
+    backgroundColor: izSocialBrandColors.instagramMediaGradient.mid,
   },
   igBadgeDetail: {
     width: 16,
@@ -960,9 +969,11 @@ export const useProductInstagramPostMediaOverlayStyles = createThemedStyles(() =
     position: "absolute",
     right: 8,
     bottom: 8,
-    zIndex: 4,
+    zIndex: 6,
+    elevation: 6,
   },
   slotDetail: {
+    // Web `.product-media-gallery-readonly__hero .product-instagram-post-media-slot`
     right: 10,
     bottom: 10,
   },
@@ -979,7 +990,7 @@ export const useProductCardWishlistBurstStyles = createThemedStyles(() => ({
   },
 }));
 
-export const useProductCardSellerRowStyles = createThemedStyles((theme) => ({
+export const useProductCardSellerRowStyles = createThemedStyles((theme, layout) => ({
   root: {
     minHeight: 14,
     maxHeight: 14,
@@ -1014,7 +1025,7 @@ export const useProductCardSellerRowStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useProductLoyaltyPointsBadgeStyles = createThemedStyles((theme) => {
+export const useProductLoyaltyPointsBadgeStyles = createThemedStyles((theme, layout) => {
   const BC = resolveProductCardBadgeColors(theme.colors);
   const BO = resolveProductCardImageBadgeOverlay(theme.colors);
   return {
@@ -1069,7 +1080,7 @@ export const useProductLoyaltyPointsBadgeStyles = createThemedStyles((theme) => 
   };
 });
 
-export const useProductPriceStyles = createThemedStyles((theme) => {
+export const useProductPriceStyles = createThemedStyles((theme, layout) => {
   const BC = resolveProductCardBadgeColors(theme.colors);
   const BO = resolveProductCardImageBadgeOverlay(theme.colors);
   return {
@@ -1257,7 +1268,8 @@ export const useProductPriceStyles = createThemedStyles((theme) => {
   };
 });
 
-const PRODUCT_DETAILS_GAP = 12;
+/** Web `--product-details-section-gap: 6px`. */
+const PRODUCT_DETAILS_GAP = 6;
 const DETAIL_SPEC_PADDING_H = 16;
 const DETAIL_DOCK_SCROLL_PADDING = PRODUCT_DETAIL_DOCK_SCROLL_PADDING;
 
@@ -1277,7 +1289,7 @@ export const PRODUCT_DETAIL_PURCHASE_DOCK_BOTTOM_INSET = 0;
 const PRODUCT_DETAILS_STAT_GRID_GAP = 2;
 const PRODUCT_DETAILS_STAT_ROW_GAP = 12;
 
-export const useProductDetailFieldStyles = createThemedStyles((theme) => ({
+export const useProductDetailFieldStyles = createThemedStyles((theme, layout) => ({
   statsGrid: {
     gap: PRODUCT_DETAILS_STAT_GRID_GAP,
     width: "100%",
@@ -1436,7 +1448,7 @@ export const useProductDetailFieldStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useProductDetailsSellerPreviewStyles = createThemedStyles((theme) => ({
+export const useProductDetailsSellerPreviewStyles = createThemedStyles((theme, layout) => ({
   root: {
     alignSelf: "stretch",
     marginTop: SP.rootMarginTop,
@@ -1501,14 +1513,14 @@ export const useProductDetailsSellerPreviewStyles = createThemedStyles((theme) =
     Platform.OS === "web"
       ? ({
           display: "grid",
-          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+          gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
           gap: SP.metricsGap,
           width: "100%",
           minWidth: 0,
         } as unknown as ViewStyle)
       : {
           flexDirection: "row",
-          flexWrap: "wrap",
+          flexWrap: "nowrap",
           gap: SP.metricsGap,
           width: "100%",
         },
@@ -1524,7 +1536,7 @@ export const useProductDetailsSellerPreviewStyles = createThemedStyles((theme) =
     ...(Platform.OS === "web"
       ? null
       : {
-          width: "48%",
+          flex: 1,
         }),
   },
   metricIcon: {
@@ -1621,11 +1633,12 @@ export const useProductDetailsSellerStorefrontButtonStyles = createThemedStyles(
   }),
 );
 
+/** Паритет web `.product-details-seller-stack` — gap section, без marginTop. */
 export const useProductDetailsSellerStackStyles = createThemedStyles(() => ({
   root: {
     alignSelf: "stretch",
-    gap: 10,
-    marginTop: SP.rootMarginTop,
+    gap: PRODUCT_DETAILS_GAP,
+    marginTop: 0,
     marginHorizontal: SP.rootMarginHorizontal,
   },
   rootSplit: {
@@ -1635,7 +1648,7 @@ export const useProductDetailsSellerStackStyles = createThemedStyles(() => ({
   },
 }));
 
-export const useProductCharacteristicsDetailsStyles = createThemedStyles((theme) => ({
+export const useProductCharacteristicsDetailsStyles = createThemedStyles((theme, layout) => ({
   root: {
     marginTop: 12,
   },
@@ -1685,7 +1698,7 @@ export const useProductCharacteristicsDetailsStyles = createThemedStyles((theme)
   },
 }));
 
-export const useProductSellerPreviewStyles = createThemedStyles((theme) => ({
+export const useProductSellerPreviewStyles = createThemedStyles((theme, layout) => ({
   section: {
     marginTop: theme.spacing[5],
     padding: 14,
@@ -1715,7 +1728,7 @@ export const useProductSellerPreviewStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useProductDetailHeroChromeStyles = createThemedStyles((theme) => ({
+export const useProductDetailHeroChromeStyles = createThemedStyles((theme, layout) => ({
   backButton: {
     position: "absolute",
     top: PRODUCT_DETAIL_HERO_CHROME.inset,
@@ -1758,7 +1771,7 @@ export const useProductDetailHeroChromeStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useProductMediaGalleryStyles = createThemedStyles((theme) => ({
+export const useProductMediaGalleryStyles = createThemedStyles((theme, layout) => ({
   root: {
     width: "100%",
   },
@@ -2000,7 +2013,7 @@ export const useProductMediaGalleryStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useProductDetailScreenStyles = createThemedStyles((theme) => ({
+export const useProductDetailScreenStyles = createThemedStyles((theme, layout) => ({
   screen: {
     flex: 1,
     backgroundColor: theme.colors.surface,
@@ -2201,19 +2214,19 @@ export const useProductDetailScreenStyles = createThemedStyles((theme) => ({
     color: theme.colors.action,
   },
   buyNFreeStatusReady: {
-    color: "#1f7a4d",
+    color: izProductBadgeColors.buyNFreeReady,
   },
   buyNFreeBadge: {
     minWidth: 52,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 999,
-    backgroundColor: "#1f7a4d",
+    backgroundColor: izProductBadgeColors.buyNFreeReady,
     alignItems: "center",
     justifyContent: "center",
   },
   buyNFreeBadgeText: {
-    color: "#fff",
+    color: izSocialBrandColors.onBrand,
     fontSize: 14,
     fontWeight: "800",
   },
@@ -2285,8 +2298,8 @@ export const useProductDetailScreenStyles = createThemedStyles((theme) => ({
   },
   buyNFreeGiftUnlocked: {
     borderStyle: "solid",
-    borderColor: "#1f7a4d",
-    backgroundColor: "#1f7a4d",
+    borderColor: izProductBadgeColors.buyNFreeReady,
+    backgroundColor: izProductBadgeColors.buyNFreeReady,
   },
   buyNFreeGiftLabel: {
     fontSize: 9,
@@ -2368,16 +2381,13 @@ export const useProductDetailScreenStyles = createThemedStyles((theme) => ({
   detailSellerExtras: {
     gap: PRODUCT_DETAILS_GAP,
   },
+  // Web `.product-details-modal__feature-cards`: только колонка + gap, без chrome.
+  // Иначе пустой wrapper (все тизеры null) даёт пустую «карточку» ~26px.
   featureCards: {
     flexDirection: "column",
-    gap: FC.gridGap,
+    gap: PRODUCT_DETAILS_GAP,
     width: "100%",
-    padding: FC.gridPadding,
-    borderRadius: FC.gridBorderRadius,
-    borderWidth: FC.gridBorderWidth,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surfaceMuted,
-    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+    minWidth: 0,
   },
   metaInfoChip: {
     flexShrink: 0,
@@ -2594,7 +2604,7 @@ export const useProductDetailScreenStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useProductDetailsFeatureCardStyles = createThemedStyles((theme) => ({
+export const useProductDetailsFeatureCardStyles = createThemedStyles((theme, layout) => ({
   card: {
     flexDirection: "row",
     alignItems: "center",
@@ -2658,7 +2668,7 @@ export const useProductDetailsFeatureCardStyles = createThemedStyles((theme) => 
   },
 }));
 
-export const useProductPickupDetailsPanelStyles = createThemedStyles((theme) => ({
+export const useProductPickupDetailsPanelStyles = createThemedStyles((theme, layout) => ({
   panel: {
     gap: PL.panelGap,
     minWidth: 0,
@@ -2735,7 +2745,7 @@ export const useProductPickupDetailsPanelStyles = createThemedStyles((theme) => 
 }));
 
 /** Паритет с web `ProductPriceOffer.css` + `product-details-modal__auction-section`. */
-export const useProductPriceOfferStyles = createThemedStyles((theme) => ({
+export const useProductPriceOfferStyles = createThemedStyles((theme, layout) => ({
   root: {
     gap: 12,
   },
@@ -2875,7 +2885,7 @@ export const useProductPriceOfferStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useProductDetailTabBarStyles = createThemedStyles((theme) => ({
+export const useProductDetailTabBarStyles = createThemedStyles((theme, layout) => ({
   root: {
     alignSelf: "stretch",
     width: "100%",
@@ -2930,7 +2940,7 @@ export const useProductDetailTabBarStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useProductDetailPurchaseActionsStyles = createThemedStyles((theme) => ({
+export const useProductDetailPurchaseActionsStyles = createThemedStyles((theme, layout) => ({
   root: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -2971,7 +2981,7 @@ export const useProductDetailPurchaseActionsStyles = createThemedStyles((theme) 
   },
 }));
 
-export const useProductDetailTabStyles = createThemedStyles((theme) => ({
+export const useProductDetailTabStyles = createThemedStyles((theme, layout) => ({
   root: {
     width: "100%",
     minWidth: 0,
@@ -3587,18 +3597,18 @@ export const useProductDetailTabStyles = createThemedStyles((theme) => ({
 export const useCartScreenStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   list: {
     flexGrow: 1,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   centered: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     padding: theme.spacing[6],
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   message: {
     fontSize: 16,
@@ -3699,7 +3709,7 @@ export const useCartScreenStyles = createThemedStyles((theme, layout) => ({
   },
 }));
 
-export const useCuratedProductCompactCardStyles = createThemedStyles((theme) => {
+export const useCuratedProductCompactCardStyles = createThemedStyles((theme, layout) => {
   const C = resolveCuratedCompactCardColors(theme.colors);
   return {
     card: {
@@ -3742,20 +3752,22 @@ export const useCuratedProductCompactCardStyles = createThemedStyles((theme) => 
   };
 });
 
-export const useCuratedCategoryCompactCardStyles = createThemedStyles((theme) => {
+export const useCuratedCategoryCompactCardStyles = createThemedStyles((theme, layout) => {
   const C = resolveCuratedCompactCardColors(theme.colors);
   return {
     card: {
       flexGrow: 0,
       flexShrink: 0,
+      // Web image-wrap: border-radius 1.4rem (~22), squircle 1.5rem.
       borderWidth: 1,
       borderColor: C.border,
-      borderRadius: 16,
+      borderRadius: 22,
       overflow: "hidden",
       backgroundColor: "transparent",
     },
     imageWrap: {
       width: "100%",
+      // Default sheet 2:1; карусель переопределяет через prop (4:3).
       aspectRatio: 2,
       backgroundColor: C.imageBg,
       alignItems: "center",
@@ -3768,7 +3780,7 @@ export const useCuratedCategoryCompactCardStyles = createThemedStyles((theme) =>
   };
 });
 
-export const useHomeCuratedListsStyles = createThemedStyles((theme) => ({
+export const useHomeCuratedListsStyles = createThemedStyles((theme, layout) => ({
   section: {
     gap: CURATED_PRODUCT_LIST_HOME_SECTION_MARGIN_BOTTOM,
   },
@@ -3814,7 +3826,7 @@ export const useHomeCuratedListsStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useUserStoriesStripStyles = createThemedStyles((theme) => ({
+export const useUserStoriesStripStyles = createThemedStyles((theme, layout) => ({
   root: {
     marginBottom: USER_STORY_STRIP_LAYOUT.marginBottom,
     paddingTop: USER_STORY_STRIP_LAYOUT.paddingTop,
@@ -3927,7 +3939,7 @@ export const useUserStoriesStripStyles = createThemedStyles((theme) => ({
 export const useCatalogBrowserPageStyles = createThemedStyles((theme, layout) => ({
   // Фон во всю ширину — под центрированным контентом на планшетах.
   scroll: {
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   // Центрируем контентную колонку; ширину ограничивает centeredContentStyle.
   scrollContent: {
@@ -3939,7 +3951,7 @@ export const useCatalogBrowserPageStyles = createThemedStyles((theme, layout) =>
     padding: layout.contentPaddingHorizontal,
     paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
     // Без gap: отступы секций = web `.catalog-feed-tiles` / `__categories`.
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   emptyWrap: {
     alignItems: "center",
@@ -3960,7 +3972,7 @@ export const useCatalogSubcategoryPickerStyles = createThemedStyles((theme, layo
     padding: layout.contentPaddingHorizontal,
     paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
     gap: 16,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   header: {
     flexDirection: "row",
@@ -4013,7 +4025,7 @@ export const useCatalogSubcategoryPickerStyles = createThemedStyles((theme, layo
   },
 }));
 
-export const useCatalogBrowserSectionStyles = createThemedStyles((theme) => ({
+export const useCatalogBrowserSectionStyles = createThemedStyles((theme, layout) => ({
   sectionFeed: {
     marginTop: 0,
     marginBottom: CATALOG_BROWSER_LANDING_LAYOUT.feedMarginBottom,
@@ -4051,7 +4063,7 @@ export const useCatalogBrowserSectionStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useCatalogBrowserTileStyles = createThemedStyles((theme) => ({
+export const useCatalogBrowserTileStyles = createThemedStyles((theme, layout) => ({
   wrap: {
     position: "relative",
   },

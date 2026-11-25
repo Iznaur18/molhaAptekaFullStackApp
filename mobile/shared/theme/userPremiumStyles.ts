@@ -35,8 +35,8 @@ export const useUserPremiumDisplayNameStyles = createThemedStyles((theme) => ({
   },
   text: {
     flexShrink: 1,
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   textSingleLine: {

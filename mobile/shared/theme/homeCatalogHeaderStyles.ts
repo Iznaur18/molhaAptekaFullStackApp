@@ -108,7 +108,7 @@ export const useHomeCatalogHeaderStyles = createThemedStyles((theme) => ({
     paddingRight: HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_RIGHT,
     paddingVertical: HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_VERTICAL,
     fontSize: HOME_CATALOG_HEADER_SEARCH_INPUT_FONT_SIZE,
-    lineHeight: 20,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.text,
     backgroundColor: theme.colors.surface,
     shadowColor: theme.colors.text,

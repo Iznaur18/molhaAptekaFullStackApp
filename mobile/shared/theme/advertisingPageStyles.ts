@@ -12,7 +12,7 @@ export const useAdvertisingPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   scroll: {
     flexGrow: 1,
@@ -45,7 +45,7 @@ export const useAdvertisingPageStyles = createThemedStyles((theme, layout) => ({
   },
   heroCaption: {
     fontSize: HERO.captionFontSize,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     textTransform: "uppercase",
     letterSpacing: HERO.captionLetterSpacing,
     color: theme.colors.onContrast,
@@ -64,14 +64,14 @@ export const useAdvertisingPageStyles = createThemedStyles((theme, layout) => ({
     fontVariant: ["tabular-nums"],
   },
   heroUnit: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
     opacity: 0.85,
   },
   heroInfo: {
     marginTop: 8,
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     lineHeight: 19,
     color: theme.colors.onContrast,
     opacity: 0.8,
@@ -93,7 +93,7 @@ export const useAdvertisingPageStyles = createThemedStyles((theme, layout) => ({
     justifyContent: "center",
     gap: 12,
     paddingHorizontal: layout.contentPaddingHorizontal,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   hint: {
     fontSize: 14.4,
@@ -109,12 +109,12 @@ export const useAdvertisingPageStyles = createThemedStyles((theme, layout) => ({
   },
   loginButtonText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     fontSize: 15.2,
   },
 }));
 
-export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
+export const useAdvertisingCardStyles = createThemedStyles((theme, layout) => ({
   ...cancelButtonStyleBlock(theme),
   card: {
     gap: 13.6,
@@ -156,7 +156,7 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
   cardTitle: {
     flex: 1,
     fontSize: 16.8,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.ink,
   },
   cardBadge: {
@@ -165,8 +165,8 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
     borderRadius: 999,
     backgroundColor: theme.colors.actionSoft,
     color: theme.colors.action,
-    fontSize: 12,
-    fontWeight: "700",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightBold,
     overflow: "hidden",
   },
   cardBadgeDisabled: {
@@ -181,7 +181,7 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
   unavailableNotice: {
     fontSize: 14.4,
     lineHeight: 20.8,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.textMuted,
   },
   state: {
@@ -206,19 +206,19 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
   },
   metaLabel: {
     fontSize: 10.88,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: 0.8,
     textTransform: "uppercase",
     color: theme.colors.action,
   },
   metaValue: {
     fontSize: 14.72,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.ink,
     fontVariant: ["tabular-nums"],
   },
   metaList: {
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textMuted,
   },
   statusPanel: {
@@ -257,7 +257,7 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
   },
   panelTitle: {
     fontSize: 13.12,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: 0.48,
     textTransform: "uppercase",
     color: theme.colors.textMuted,
@@ -270,7 +270,7 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
   },
   fieldLabel: {
     fontSize: 14.08,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   input: {
@@ -279,13 +279,13 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
     borderRadius: 14,
     paddingHorizontal: 10.4,
     paddingVertical: 8,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.text,
     backgroundColor: theme.colors.surface,
   },
   timingLegend: {
     fontSize: 14.08,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.textSecondary,
   },
   timingHint: {
@@ -322,7 +322,7 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
   },
   tariffTitle: {
     fontSize: 13.12,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   tariffPrice: {
@@ -346,7 +346,7 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
   },
   primaryButtonText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     fontSize: 15.2,
   },
   secondaryButton: {
@@ -363,7 +363,7 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
   },
   secondaryButtonText: {
     color: theme.colors.action,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     fontSize: 15.2,
   },
   error: {

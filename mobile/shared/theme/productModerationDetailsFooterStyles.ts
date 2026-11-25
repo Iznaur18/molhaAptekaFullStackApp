@@ -10,19 +10,19 @@ export const useProductModerationDetailsFooterStyles = createThemedStyles((theme
     gap: 8,
   },
   error: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.danger,
   },
   rejectLabel: {
     gap: 5.6,
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.textSecondary,
   },
   rejectInputCompact: {
     minHeight: 40,
     paddingVertical: 6,
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
   },
   rejectInput: {
     minHeight: 72,
@@ -31,7 +31,7 @@ export const useProductModerationDetailsFooterStyles = createThemedStyles((theme
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 8,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.text,
     backgroundColor: theme.colors.surface,
     textAlignVertical: "top",
@@ -82,13 +82,13 @@ export const useProductModerationDetailsFooterStyles = createThemedStyles((theme
     opacity: 0.65,
   },
   approveText: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.onContrast,
   },
   rejectText: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.danger,
   },
   deleteButton: {
@@ -105,21 +105,21 @@ export const useProductModerationDetailsFooterStyles = createThemedStyles((theme
     alignItems: "center",
   },
   deleteText: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.danger,
   },
   openSalesHint: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.textSecondary,
   },
   deleteConfirm: {
     gap: 8,
   },
   deleteConfirmQuestion: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.text,
   },
 }));

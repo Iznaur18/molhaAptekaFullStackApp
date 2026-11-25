@@ -13,7 +13,7 @@ export const useSubscriptionsPageStyles = createThemedStyles((theme, layout) => 
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   listContent: {
     paddingHorizontal: layout.contentPaddingHorizontal,
@@ -50,7 +50,7 @@ export const useSubscriptionsPageStyles = createThemedStyles((theme, layout) => 
   },
   heroCaption: {
     fontSize: HERO.captionFontSize,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     textTransform: "uppercase",
     letterSpacing: HERO.captionLetterSpacing,
     color: theme.colors.onContrast,
@@ -69,14 +69,14 @@ export const useSubscriptionsPageStyles = createThemedStyles((theme, layout) => 
     fontVariant: ["tabular-nums"],
   },
   heroUnit: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
     opacity: 0.85,
   },
   heroInfo: {
     marginTop: 8,
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     lineHeight: 19,
     color: theme.colors.onContrast,
     opacity: 0.8,
@@ -126,7 +126,7 @@ export const useSubscriptionsPageStyles = createThemedStyles((theme, layout) => 
     justifyContent: "center",
     gap: 12,
     paddingHorizontal: layout.contentPaddingHorizontal,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   hint: {
     fontSize: 14.72,
@@ -148,12 +148,12 @@ export const useSubscriptionsPageStyles = createThemedStyles((theme, layout) => 
   },
   loginButtonText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     fontSize: 14.4,
   },
 }));
 
-export const useSubscriptionUserRowStyles = createThemedStyles((theme) => ({
+export const useSubscriptionUserRowStyles = createThemedStyles((theme, layout) => ({
   pressable: {
     width: "100%",
   },
@@ -195,7 +195,7 @@ export const useSubscriptionUserRowStyles = createThemedStyles((theme) => ({
   },
   nameText: {
     fontSize: 15.68,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   metrics: {
@@ -211,13 +211,13 @@ export const useSubscriptionUserRowStyles = createThemedStyles((theme) => ({
     maxWidth: "100%",
   },
   metricLabel: {
-    fontSize: 11,
-    fontWeight: "600",
+    fontSize: theme.typography.font2xs,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textMuted,
   },
   metricValue: {
     fontSize: 12.5,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     fontVariant: ["tabular-nums"],
   },

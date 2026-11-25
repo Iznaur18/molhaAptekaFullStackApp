@@ -212,7 +212,7 @@ test("mobile product description panel matches web content-switcher chrome", () 
   assert.match(layout, /tabPaddingVertical: 6\.4/);
   assert.match(layout, /tabPaddingHorizontal: 13\.6/);
   assert.match(layout, /tabsGap: 8/);
-  assert.match(layout, /sectionGap: 9/);
+  assert.match(layout, /sectionGap: 6/);
   assert.match(webTabsCss, /padding: 0\.4rem 0\.85rem/);
   assert.match(webCss, /product-details-content-switcher__panel/);
   assert.match(webCss, /border:\s*1px solid/);

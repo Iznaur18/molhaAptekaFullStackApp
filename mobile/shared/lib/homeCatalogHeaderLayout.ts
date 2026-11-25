@@ -19,11 +19,15 @@ export const HOME_CATALOG_HEADER_PANEL_PADDING = {
   bottom: 8,
 } as const;
 
-/** Web v2 `.app-shell__header-panel` `padding: 0 var(--app-shell-content-inline-padding)` — на телефоне 0.5rem. */
+/**
+ * Web v2 `.app-shell__header-panel` `padding: 0 var(--app-shell-content-inline-padding)`.
+ * Вертикаль = 0: top даёт sticky/list inset (`0.5rem`), зазор до баннера —
+ * `HOME_CATALOG_HEADER_BANNER_BELOW_PANEL_MARGIN` / `homeFeedSearchHeader.marginBottom`.
+ */
 export const HOME_CATALOG_HEADER_PANEL_FLOATING_PADDING = {
-  top: 8,
+  top: 0,
   horizontal: 8,
-  bottom: 8,
+  bottom: 0,
 } as const;
 
 /** Web `.app-shell--header-v2 .app-shell__header--v2` sticky `top: 0.5rem`. */
