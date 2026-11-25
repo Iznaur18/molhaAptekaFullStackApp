@@ -1,25 +1,24 @@
 import { StyleSheet } from "react-native";
 
 import { MY_ORDERS_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const CHIP_PADDING_VERTICAL = 4;
 const CHIP_PADDING_HORIZONTAL = 8;
 const OVERVIEW_TILE_RADIUS = 16;
 
-export const useMyOrdersPageStyles = createThemedStyles((theme) => ({
+export const useMyOrdersPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   listFlex: {
     flex: 1,
     minHeight: 0,
   },
   list: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     flexGrow: 1,
   },
   /** Desktop hub: shell уже даёт pad; gutter 0 как web `.my-orders-page`. */
@@ -58,7 +57,7 @@ export const useMyOrdersPageStyles = createThemedStyles((theme) => ({
   toolbarHeading: {
     flex: 1,
     fontSize: 15.2,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   ordersCount: {
@@ -81,7 +80,7 @@ export const useMyOrdersPageStyles = createThemedStyles((theme) => ({
   },
   statusMoreText: {
     fontSize: 14.4,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     lineHeight: 18.7,
     color: theme.colors.textSecondary,
   },
@@ -95,7 +94,7 @@ export const useMyOrdersPageStyles = createThemedStyles((theme) => ({
   },
   statusChipText: {
     fontSize: 14.4,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     lineHeight: 18.7,
     color: theme.colors.textSecondary,
   },
@@ -111,12 +110,16 @@ export const useMyOrdersPageStyles = createThemedStyles((theme) => ({
     fontSize: 15.2,
     lineHeight: 21,
   },
+  emptyWrap: {
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 8,
+  },
   emptyState: {
     fontSize: 14.7,
     lineHeight: 21,
     textAlign: "center",
     color: theme.colors.textSecondary,
-    paddingVertical: 8,
   },
   /** Guest: как web/cart `.cart-page--centered` + message (live ≤640). */
   centered: {
@@ -126,8 +129,8 @@ export const useMyOrdersPageStyles = createThemedStyles((theme) => ({
     padding: theme.spacing[6],
   },
   hint: {
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: theme.typography.fontLg,
+    lineHeight: theme.typography.leadingXl,
     textAlign: "center",
     color: theme.colors.textMuted,
     marginBottom: theme.spacing[4],
@@ -162,14 +165,14 @@ export const useMyOrdersPageStyles = createThemedStyles((theme) => ({
   },
   overviewLabel: {
     fontSize: 11.2,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: 0.4,
     textTransform: "uppercase",
     color: theme.colors.textMuted,
   },
   overviewValue: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     fontVariant: ["tabular-nums"],
   },

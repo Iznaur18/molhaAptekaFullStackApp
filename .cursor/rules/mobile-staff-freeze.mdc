@@ -9,9 +9,9 @@ alwaysApply: false
 
 - **Не добавлять** новые staff/moderation/admin экраны в `mobile/` (RN).
 - Новые staff-фичи — **только web** (`client/`).
-- В hub-меню staff-пункты открывают web: `openProfileStaffWebSection` + `PROFILE_SECTION_WEB_PATH` из `@izibuy/shared-lib`.
+- Меню: `PROFILE_STAFF_IN_APP_SECTION_IDS` → `/hub/<section>` (G.2 legacy); `PROFILE_STAFF_WEB_ONLY_SECTION_IDS` → `openProfileStaffWebSection` + `PROFILE_SECTION_WEB_PATH`.
 - Пути web: `EXPO_PUBLIC_WEB_APP_URL` (dev: `http://127.0.0.1:5173` или staging).
-- Deep link buyer: `izibuy://` / `https://izibuy.ru/...` — in-app. Staff profile sections — browser/web SPA.
+- Deep link buyer: in-app. Web-only staff — браузер; in-app staff deep links — hub.
 - Существующие in-app staff экраны — **maintenance** (G.2), не расширять. Список: `mobile/README.md` § Staff inventory.
 - Buyer-critical path — **активная разработка** (G.3): `mobile/docs/BUYER-CRITICAL-PATH.md`.
 

@@ -99,7 +99,8 @@ export const MY_PROFILE_SIDEBAR_LAYOUT = {
   itemPaddingY: 8,
   itemPaddingX: 10,
   itemRadius: 10,
-  titleFontSize: 18,
+  /** Web `.my-profile-page__title { font-size: 1.12rem }` → 17.92 */
+  titleFontSize: 17.92,
 } as const;
 
 /** Паритет `MyProductsShelvesPanel.css` + `__main { gap: 0.75rem }` stack. */

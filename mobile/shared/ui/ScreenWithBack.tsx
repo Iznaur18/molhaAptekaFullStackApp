@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { resolveScreenBackContentPaddingTop } from "@/shared/lib/screenBackButtonLayout";
 import { useScreenWithBackStyles } from "@/shared/theme/screenBackButtonStyles";
+import { PageCanvas } from "@/shared/ui/PageCanvas";
 import { ScreenBackButton } from "@/shared/ui/ScreenBackButton";
 
 type ScreenWithBackProps = {
@@ -16,11 +17,11 @@ export const ScreenWithBack = ({ children }: ScreenWithBackProps) => {
   const contentPaddingTop = resolveScreenBackContentPaddingTop(insets.top);
 
   return (
-    <View style={styles.root}>
+    <PageCanvas>
       <ScreenBackButton />
       <View style={[styles.content, { paddingTop: contentPaddingTop }]}>
         {children}
       </View>
-    </View>
+    </PageCanvas>
   );
 };

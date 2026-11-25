@@ -7,6 +7,7 @@ import { Pressable, Share, Text, View } from "react-native";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useMyReferralProgramQuery } from "@/entities/user/model/useMyReferralProgramQuery";
 import { AffiliateEarningsPanel } from "@/features/affiliate-listings-page/ui/AffiliateEarningsPanel";
+import { AffiliateSalesPanel } from "@/features/affiliate-listings-page/ui/AffiliateSalesPanel";
 import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
 import { ProfileAccountScrollBody } from "@/features/profile-tab/ui/ProfileAccountScrollBody";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
@@ -16,7 +17,18 @@ import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayou
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { usePartnerProgramPageStyles } from "@/shared/theme/partnerProgramPageStyles";
 import { AppButton } from "@/shared/ui/AppButton";
+import { ModalSectionTabs } from "@/shared/ui/ModalSectionTabs";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
+
+const TAB_REFERRALS = "referrals";
+const TAB_EARNINGS = "earnings";
+const TAB_SALES = "sales";
+
+const PARTNER_PROGRAM_TABS = [
+  { id: TAB_REFERRALS, label: PARTNER_PROGRAM_PAGE_UI.TAB_REFERRALS },
+  { id: TAB_EARNINGS, label: PARTNER_PROGRAM_PAGE_UI.TAB_EARNINGS },
+  { id: TAB_SALES, label: PARTNER_PROGRAM_PAGE_UI.TAB_SALES },
+] as const;
 
 export const PartnerProgramPage = () => {
   const router = useRouter();
@@ -29,6 +41,7 @@ export const PartnerProgramPage = () => {
   const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [feedbackIsError, setFeedbackIsError] = useState(false);
+  const [activeTabId, setActiveTabId] = useState(TAB_REFERRALS);
 
   useFocusEffect(
     useCallback(() => {
@@ -201,16 +214,28 @@ export const PartnerProgramPage = () => {
           ) : null}
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>{PARTNER_PROGRAM_PAGE_UI.LIST_TITLE}</Text>
-          {data.referrals.length === 0 ? (
-            <Text style={styles.empty}>{PARTNER_PROGRAM_PAGE_UI.LIST_EMPTY}</Text>
-          ) : (
-            referralRows
-          )}
-        </View>
+        <ModalSectionTabs
+          tabs={PARTNER_PROGRAM_TABS}
+          activeTabId={activeTabId}
+          onTabChange={setActiveTabId}
+          ariaLabel={PARTNER_PROGRAM_PAGE_UI.TABS_ARIA}
+          variant="segment"
+        />
 
-        <AffiliateEarningsPanel />
+        {activeTabId === TAB_REFERRALS ? (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>{PARTNER_PROGRAM_PAGE_UI.LIST_TITLE}</Text>
+            {data.referrals.length === 0 ? (
+              <Text style={styles.empty}>{PARTNER_PROGRAM_PAGE_UI.LIST_EMPTY}</Text>
+            ) : (
+              referralRows
+            )}
+          </View>
+        ) : null}
+
+        {activeTabId === TAB_EARNINGS ? <AffiliateEarningsPanel enabled /> : null}
+
+        {activeTabId === TAB_SALES ? <AffiliateSalesPanel enabled /> : null}
       </ProfileAccountScrollBody>
 
       <ProfileMobileNavSheet

@@ -9,6 +9,8 @@ export type ProductCategorySearchResult = {
   isLeaf: boolean;
   /** Ключи характеристик категории — мастер подставляет их продавцу. */
   defaultCharacteristicKeys: string[];
+  /** Итоговый тип сделки категории (goods/viewing/service). */
+  dealType?: string;
 };
 
 const normalizeSearchNode = (
@@ -21,6 +23,7 @@ const normalizeSearchNode = (
   defaultCharacteristicKeys: Array.isArray(raw.defaultCharacteristicKeys)
     ? raw.defaultCharacteristicKeys.map(String)
     : [],
+  dealType: typeof raw.dealType === "string" ? raw.dealType : undefined,
 });
 
 export const fetchProductCategorySearch = async (

@@ -1,16 +1,15 @@
 import { StyleSheet } from "react-native";
 
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-export const useProductModerationPageStyles = createThemedStyles((theme) => ({
+export const useProductModerationPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   list: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 12,
   },
   listInAccountShell: {
@@ -23,7 +22,7 @@ export const useProductModerationPageStyles = createThemedStyles((theme) => ({
   state: {
     marginBottom: 16,
     fontSize: 15.2,
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textSecondary,
   },
   stateError: {
@@ -31,16 +30,16 @@ export const useProductModerationPageStyles = createThemedStyles((theme) => ({
   },
   empty: {
     fontSize: 15.2,
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textSecondary,
     textAlign: "center",
     paddingVertical: 8,
   },
   idleShell: {
     flex: 1,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 12,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   idleMessageWrap: {
     flex: 1,
@@ -53,7 +52,7 @@ export const useProductModerationPageStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
-    backgroundColor: theme.colors.bg,
+    paddingHorizontal: layout.contentPaddingHorizontal,
+    backgroundColor: layout.pageBackground,
   },
 }));

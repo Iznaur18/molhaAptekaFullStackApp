@@ -438,10 +438,10 @@ npx eas submit --platform ios
 
 ### Навигация и рост
 
-- [ ] Deep links: `gitorg://product/:id`, Universal Links (iOS) + App Links (Android)
-- [ ] Файлы на сервере/CDN: `apple-app-site-association`, `.well-known/assetlinks.json`
-- [ ] Push-уведомления: FCM + APNs, server-side очередь (новый заказ, статус заказа)
-- [ ] `expo-notifications` + permissions
+- [x] Deep links: `gitorg://` + https prefixes, `parseAppDeepLink`, intent filters / associatedDomains (client)
+- [x] Universal/App Links files v1: `client/public/.well-known/` + nginx `^~ /.well-known/` (placeholders Team ID / SHA256; live verify после деплоя + credentials)
+- [x] Push: `expo-notifications` + `PUT/DELETE /auth/me/push-token` + Expo Push API при in-app notify
+- [x] Cold-start / tap routing из push (`useRemotePushRegistration`)
 
 ### Продукт (фичи web → mobile)
 
@@ -477,7 +477,7 @@ npx eas submit --platform ios
 
 ### Compliance и сторы
 
-- [ ] GDPR / удаление аккаунта из приложения (требование Google)
+- [x] GDPR / удаление аккаунта: mobile `DeleteAccountSection` (edit profile) + web `ProfileSidebarDeleteAccount`; API `DELETE /user/:id`
 - [ ] In-App Purchases — только если появятся цифровые товары внутри app (иначе — внешняя оплата/web)
 - [ ] Детский контент / возрастной рейтинг в сторах
 - [ ] Экспорт compliance (encryption) — стандартная декларация Apple
@@ -945,16 +945,20 @@ Disputes/reports reject → `AppButton` danger/primary/success.
 
 ## Post-mobile — следующий фокус
 
-WF + WS закрыты. Дальше по `docs/clients/mobile-development.md`:
+WF + WS закрыты. Статус (dig 21.11.2026):
 
-| Приоритет | Задача |
-|-----------|--------|
-| P0 | Samsung manual smoke § WF-7.2 (чеклисты `- [ ]`) |
-| P0 | `eas build --profile preview` (MP § Store readiness) |
-| P1 | Push ветки `security/p0-hardening` + review |
-| P2 | MP backlog: push notifications, deep links universal links, GDPR delete account |
+| Приоритет | Задача | Статус |
+|-----------|--------|--------|
+| P0 | Samsung manual smoke § WF-7.2 | **ОТЛОЖЕН** (чеклисты `- [ ]`) |
+| P0 | `eas build --profile preview` | ✅ APK 21.11.2026 — [build 22699959](https://expo.dev/accounts/iznaur18/projects/izibuy/builds/22699959-cc4b-42bd-8c77-40fc7b65b825); slug EAS=`izibuy` |
+| P1 | Universal/App Links: AASA + `assetlinks.json` | ✅ scaffold в репо + nginx; placeholders; live verify после деплоя |
+| — | Remote push (MP-5) | ✅ done |
+| — | GDPR delete account | ✅ done (mobile + web UI) |
+
+Гайд links: `mobile/docs/UNIVERSAL-APP-LINKS.md`. Preview EAS: `mobile/docs/EAS-DEV-BUILD.md` § Preview.  
+SKIP п.10 (seller services nav / partner sales / raffle CTA visual) — не трогать без отдельного запроса.
 
 *WF ✅ · WS-0…WS-6 ✅ — стилевой слой mobile завершён.*
 
 
-*Последнее обновление: июнь 2026.*
+*Последнее обновление: 21.11.2026 (P0/P1 scaffold).*

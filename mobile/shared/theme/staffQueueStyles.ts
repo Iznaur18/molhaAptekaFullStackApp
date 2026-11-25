@@ -19,35 +19,35 @@ export const useStaffQueueStyles = createThemedStyles((theme) => ({
     borderBottomColor: theme.colors.border,
   },
   title: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   titleAccent: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.link,
   },
   meta: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
   },
   link: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.link,
   },
   linkLarge: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.link,
   },
   heading: {
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: theme.typography.font2xl,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   count: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
   },
   header: {
@@ -55,8 +55,8 @@ export const useStaffQueueStyles = createThemedStyles((theme) => ({
     marginBottom: theme.spacing[2],
   },
   sectionTitle: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     marginTop: theme.spacing[2],
     marginBottom: 4,
     color: theme.colors.text,
@@ -67,14 +67,14 @@ export const useStaffQueueStyles = createThemedStyles((theme) => ({
   },
   error: {
     color: theme.colors.danger,
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
   },
   caption: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textSecondary,
   },
   reportText: {
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.textMuted,
   },
   mediaWrap: {
@@ -123,16 +123,16 @@ export const useStaffFilterChipStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.actionSurface,
   },
   chipText: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.text,
   },
   chipTextSmall: {
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.text,
   },
   chipTextSelected: {
     color: theme.colors.action,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   disabled: {
     opacity: 0.5,

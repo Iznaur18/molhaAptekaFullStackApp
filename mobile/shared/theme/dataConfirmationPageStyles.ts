@@ -2,21 +2,20 @@ import { StyleSheet } from "react-native";
 
 import { MODAL_BACKDROP_SCRIM } from "@/shared/theme/formChromeStyles";
 import { PROFILE_ACCOUNT_STACK_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-export const useDataConfirmationPageStyles = createThemedStyles((theme) => ({
+export const useDataConfirmationPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   scroll: {
     flexGrow: 1,
   },
   content: {
     gap: L.stackGap,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 12,
   },
   /** Desktop hub: shell уже даёт gutter. */
@@ -34,11 +33,10 @@ export const useDataConfirmationPageStyles = createThemedStyles((theme) => ({
     padding: 20,
     borderRadius: 18,
     backgroundColor: theme.colors.info,
-    shadowColor: theme.colors.ink,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.16,
-    shadowRadius: 14,
-    elevation: 5,
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 0,
   },
   heroTextBlock: {
     flex: 1,
@@ -46,14 +44,14 @@ export const useDataConfirmationPageStyles = createThemedStyles((theme) => ({
     gap: 2,
   },
   heroTitle: {
-    fontSize: 22,
+    fontSize: theme.typography.font4xl,
     fontWeight: "800",
     letterSpacing: -0.3,
     color: theme.colors.onContrast,
   },
   heroInfo: {
     marginTop: 8,
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     lineHeight: 19,
     color: theme.colors.onContrast,
     opacity: 0.8,
@@ -75,8 +73,8 @@ export const useDataConfirmationPageStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
   },
   benefitsTitle: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   benefitRow: {
@@ -96,12 +94,12 @@ export const useDataConfirmationPageStyles = createThemedStyles((theme) => ({
     flex: 1,
     minWidth: 0,
     fontSize: 14.5,
-    lineHeight: 20,
+    lineHeight: theme.typography.leadingBase,
     paddingTop: 6,
     color: theme.colors.textSecondary,
   },
   planNote: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     lineHeight: 18.5,
     color: theme.colors.textMuted,
   },
@@ -150,11 +148,11 @@ export const useDataConfirmationPageStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
-    backgroundColor: theme.colors.bg,
+    paddingHorizontal: layout.contentPaddingHorizontal,
+    backgroundColor: layout.pageBackground,
   },
   hint: {
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     color: theme.colors.textMuted,
     textAlign: "center",
   },
@@ -166,122 +164,124 @@ export const useDataConfirmationPageStyles = createThemedStyles((theme) => ({
   },
   loginButtonText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     fontSize: 15.2,
   },
 }));
 
 /** Fullscreen dialog: fade + тап по затемнению. */
-export const useDataConfirmationRequestModalStyles = createThemedStyles((theme) => ({
-  root: {
-    flex: 1,
-  },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  keyboardHost: {
-    flex: 1,
-    width: "100%",
-    maxHeight: "100%",
-  },
-  card: {
-    flex: 1,
-    width: "100%",
-    maxHeight: "100%",
-    borderRadius: 0,
-    backgroundColor: theme.colors.surface,
-    overflow: "hidden",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: theme.spacing[4],
-    paddingTop: theme.spacing[4],
-    paddingBottom: theme.spacing[3],
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: theme.colors.border,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "700",
-    flex: 1,
-    color: theme.colors.text,
-  },
-  intro: {
-    fontSize: 14,
-    lineHeight: 20,
-    marginBottom: theme.spacing[2],
-    color: theme.colors.textMuted,
-  },
-  form: {
-    paddingHorizontal: theme.spacing[4],
-    paddingTop: theme.spacing[3],
-    paddingBottom: theme.spacing[5],
-    gap: 10,
-  },
-  passportInput: {
-    borderWidth: 1,
-    borderColor: theme.colors.borderStrong,
-    borderRadius: theme.radius.button,
-    paddingHorizontal: theme.spacing[3],
-    paddingVertical: 12,
-    fontSize: 16,
-    backgroundColor: theme.colors.bg,
-    color: theme.colors.text,
-  },
-  stepMeta: {
-    gap: 4,
-    marginBottom: theme.spacing[1],
-  },
-  stepProgress: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: theme.colors.textMuted,
-  },
-  stepTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: theme.colors.text,
-  },
-  stepActions: {
-    flexDirection: "row",
-    gap: theme.spacing[2],
-    marginTop: theme.spacing[2],
-  },
-  stepActionFlex: {
-    flex: 1,
-  },
-  selfieSection: {
-    gap: theme.spacing[2],
-    marginTop: theme.spacing[1],
-  },
-  selfieHint: {
-    fontSize: 13,
-    color: theme.colors.textMuted,
-  },
-  preview: {
-    width: "100%",
-    height: 180,
-    borderRadius: theme.radius.sm,
-    backgroundColor: theme.colors.surfaceMuted,
-  },
-  fileName: {
-    fontSize: 13,
-    color: theme.colors.textMuted,
-  },
-  rejectBlock: {
-    paddingHorizontal: theme.spacing[4],
-    paddingVertical: theme.spacing[3],
-    gap: 6,
-  },
-  staffNote: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: theme.colors.textMuted,
-  },
-  statusPadding: {
-    paddingHorizontal: theme.spacing[4],
-    paddingVertical: theme.spacing[3],
-  },
-}));
+export const useDataConfirmationRequestModalStyles = createThemedStyles(
+  (theme, layout) => ({
+    root: {
+      flex: 1,
+    },
+    backdrop: {
+      ...StyleSheet.absoluteFillObject,
+    },
+    keyboardHost: {
+      flex: 1,
+      width: "100%",
+      maxHeight: "100%",
+    },
+    card: {
+      flex: 1,
+      width: "100%",
+      maxHeight: "100%",
+      borderRadius: 0,
+      backgroundColor: theme.colors.surface,
+      overflow: "hidden",
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: theme.spacing[4],
+      paddingTop: theme.spacing[4],
+      paddingBottom: theme.spacing[3],
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: theme.colors.border,
+    },
+    title: {
+      fontSize: theme.typography.font2xl,
+      fontWeight: theme.typography.fontWeightBold,
+      flex: 1,
+      color: theme.colors.text,
+    },
+    intro: {
+      fontSize: theme.typography.fontBase,
+      lineHeight: theme.typography.leadingBase,
+      marginBottom: theme.spacing[2],
+      color: theme.colors.textMuted,
+    },
+    form: {
+      paddingHorizontal: theme.spacing[4],
+      paddingTop: theme.spacing[3],
+      paddingBottom: theme.spacing[5],
+      gap: 10,
+    },
+    passportInput: {
+      borderWidth: 1,
+      borderColor: theme.colors.borderStrong,
+      borderRadius: theme.radius.button,
+      paddingHorizontal: theme.spacing[3],
+      paddingVertical: 12,
+      fontSize: theme.typography.fontLg,
+      backgroundColor: theme.colors.bg,
+      color: theme.colors.text,
+    },
+    stepMeta: {
+      gap: 4,
+      marginBottom: theme.spacing[1],
+    },
+    stepProgress: {
+      fontSize: theme.typography.fontXs,
+      fontWeight: theme.typography.fontWeightSemibold,
+      color: theme.colors.textMuted,
+    },
+    stepTitle: {
+      fontSize: theme.typography.fontLg,
+      fontWeight: theme.typography.fontWeightBold,
+      color: theme.colors.text,
+    },
+    stepActions: {
+      flexDirection: "row",
+      gap: theme.spacing[2],
+      marginTop: theme.spacing[2],
+    },
+    stepActionFlex: {
+      flex: 1,
+    },
+    selfieSection: {
+      gap: theme.spacing[2],
+      marginTop: theme.spacing[1],
+    },
+    selfieHint: {
+      fontSize: theme.typography.fontSm,
+      color: theme.colors.textMuted,
+    },
+    preview: {
+      width: "100%",
+      height: 180,
+      borderRadius: theme.radius.sm,
+      backgroundColor: theme.colors.surfaceMuted,
+    },
+    fileName: {
+      fontSize: theme.typography.fontSm,
+      color: theme.colors.textMuted,
+    },
+    rejectBlock: {
+      paddingHorizontal: theme.spacing[4],
+      paddingVertical: theme.spacing[3],
+      gap: 6,
+    },
+    staffNote: {
+      fontSize: theme.typography.fontBase,
+      lineHeight: theme.typography.leadingBase,
+      color: theme.colors.textMuted,
+    },
+    statusPadding: {
+      paddingHorizontal: theme.spacing[4],
+      paddingVertical: theme.spacing[3],
+    },
+  }),
+);

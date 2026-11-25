@@ -37,7 +37,8 @@ test("login screen matches web AuthPage layout tokens", () => {
   assert.match(login, /styles\.column[\s\S]*ScreenBackButton/);
   assert.match(styles, /column:[\s\S]*position: "relative"/);
   assert.match(login, /AUTH_PAGE_LAYOUT/);
-  assert.match(login, /channelBtn/);
+  assert.match(login, /AuthContactChannelToggle/);
+  assert.match(styles, /channelBtn:/);
   assert.match(login, /LOGIN_SUBMIT_LOADING/);
   assert.match(login, /LayoutAnimation/);
   assert.match(login, /router\.replace\("\/\(tabs\)\/me"\)/);

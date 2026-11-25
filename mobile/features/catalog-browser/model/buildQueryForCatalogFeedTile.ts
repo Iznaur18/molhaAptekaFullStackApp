@@ -16,11 +16,13 @@ import {
   type CatalogFeedTile,
 } from "@/entities/product-category-display/lib/catalogFeedTiles";
 
-export const buildQueryForCatalogFeedTile = (
-  tile: CatalogFeedTile,
-): Pick<
+/** Паритет с web `buildQueryForCatalogFeedTile.js` — сбрасываем категорию. */
+const baseFeedQuery = (): Pick<
   CatalogListFilters,
   | "sort"
+  | "productCategory"
+  | "categoryId"
+  | "sellerPersonalCategoryId"
   | "followingOnly"
   | "auctionOnly"
   | "installmentOnly"
@@ -32,38 +34,35 @@ export const buildQueryForCatalogFeedTile = (
   | "originalOnly"
   | "flashSaleOnly"
   | "near"
-> => {
+> => ({
+  sort: CATALOG_SORT_NEWEST as CatalogListFilters["sort"],
+  productCategory: undefined,
+  categoryId: undefined,
+  sellerPersonalCategoryId: undefined,
+  followingOnly: false,
+  auctionOnly: false,
+  installmentOnly: false,
+  saleOnly: false,
+  rentalOnly: false,
+  affiliateOnly: false,
+  wholesaleOnly: false,
+  buyNFreeOnly: false,
+  originalOnly: false,
+  flashSaleOnly: false,
+  near: false,
+});
+
+export const buildQueryForCatalogFeedTile = (
+  tile: CatalogFeedTile,
+): ReturnType<typeof baseFeedQuery> => {
   if (tile.kind === "sort") {
     return {
+      ...baseFeedQuery(),
       sort: tile.value as CatalogListFilters["sort"],
-      followingOnly: false,
-      auctionOnly: false,
-      installmentOnly: false,
-      saleOnly: false,
-      rentalOnly: false,
-      affiliateOnly: false,
-      wholesaleOnly: false,
-      buyNFreeOnly: false,
-      originalOnly: false,
-      flashSaleOnly: false,
-      near: false,
     };
   }
 
-  const base = {
-    sort: CATALOG_SORT_NEWEST as CatalogListFilters["sort"],
-    followingOnly: false,
-    auctionOnly: false,
-    installmentOnly: false,
-    saleOnly: false,
-    rentalOnly: false,
-    affiliateOnly: false,
-    wholesaleOnly: false,
-    buyNFreeOnly: false,
-    originalOnly: false,
-    flashSaleOnly: false,
-    near: false,
-  };
+  const base = baseFeedQuery();
 
   if (tile.value === CATALOG_FILTER_NEAR) {
     return { ...base, near: true };

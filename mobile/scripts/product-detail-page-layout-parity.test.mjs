@@ -113,6 +113,12 @@ test("product detail hero chrome matches web gallery readonly sizes", () => {
   assert.match(thumbLayout, /thumbSize: 64/);
   assert.match(thumbLayout, /thumbGap: 6\.4/);
   assert.match(thumbLayout, /thumbBorderWidth: 2/);
+  assert.match(thumbLayout, /heroSquircleRadius: 44/);
+  assert.match(thumbLayout, /heroFallbackRadius: 25/);
+  assert.match(styles, /GRL\.heroSquircleRadius/);
+  assert.match(styles, /cornerShape: "squircle"/);
+  assert.match(webCss, /border-radius: var\(--product-media-hero-squircle-radius\)/);
+  assert.match(webCss, /border-radius: 2\.75rem/);
   assert.match(webCss, /width: var\(--product-image-thumb-side\)/);
   assert.match(webCss, /gap: 0\.4rem/);
   assert.match(webCss, /border-color: var\(--iz-color-link\)/);

@@ -1,31 +1,37 @@
 import { StyleSheet } from "react-native";
 
 import { AUCTION_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const SECTION_GAP = 4;
-const ROW_GAP = 8;
-const ROW_PADDING = 8;
-const ROW_RADIUS = 20;
+/** web `.auction-dashboard-row { gap: 0.65rem }` */
+const ROW_GAP = 10.4;
+/** web `.auction-dashboard-row { padding: 0.75rem }` */
+const ROW_PADDING = 12;
+/** web `.auction-dashboard-row { border-radius: 18px }` */
+const ROW_RADIUS = 18;
 const VIEW_CHIP_PADDING_VERTICAL = 4;
 const VIEW_CHIP_PADDING_HORIZONTAL = 8;
 const OVERVIEW_TILE_RADIUS = 16;
+/** web `.auction-dashboard-row__thumb` 3.25rem / r12 */
 const THUMB_SIZE = 52;
-const THUMB_RADIUS = 14;
+const THUMB_RADIUS = 12;
+/** web `.auction-dashboard-row__btn { border-radius: 12px; min-height: 2.5rem }` */
+const DECISION_BTN_RADIUS = 12;
+const DECISION_BTN_MIN_HEIGHT = 40;
 
-export const useAuctionPageStyles = createThemedStyles((theme) => ({
+export const useAuctionPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   listFlex: {
     flex: 1,
     minHeight: 0,
   },
   list: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     flexGrow: 1,
   },
   /** Desktop hub: shell уже даёт pad; gutter 0 как web `.auction-page`. */
@@ -61,7 +67,7 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
   toolbarHeading: {
     flex: 1,
     fontSize: 15.2,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   toolbarCounts: {
@@ -73,7 +79,7 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
   },
   toolbarCount: {
     fontSize: 12.48,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textMuted,
   },
   section: {
@@ -88,7 +94,7 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
   sectionTitle: {
     flex: 1,
     fontSize: 13.12,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: 0.48,
     textTransform: "uppercase",
     color: theme.colors.textMuted,
@@ -99,14 +105,14 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 6.4,
     borderRadius: 999,
     backgroundColor: theme.colors.surface,
-    fontSize: 12,
-    fontWeight: "700",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.textSecondary,
     textAlign: "center",
     overflow: "hidden",
   },
   emptyState: {
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     color: theme.colors.textMuted,
   },
   centered: {
@@ -114,10 +120,10 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
   },
   hint: {
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     color: theme.colors.textMuted,
     textAlign: "center",
   },
@@ -129,7 +135,7 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
   },
   buttonText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   viewChips: {
     flexDirection: "row",
@@ -145,18 +151,19 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.border,
     backgroundColor: theme.colors.surface,
   },
+  /** web `.auction-page__chip_active` — soft warning, не solid fill. */
   viewChipActive: {
-    borderColor: theme.colors.warning,
-    backgroundColor: theme.colors.warning,
+    borderColor: "rgba(217, 119, 6, 0.42)",
+    backgroundColor: theme.colors.warningSurface,
   },
   viewChipText: {
     fontSize: 14.4,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     lineHeight: 18.7,
     color: theme.colors.textSecondary,
   },
   viewChipTextActive: {
-    color: theme.colors.onContrast,
+    color: theme.colors.warningText,
   },
   overview: {
     flexDirection: "row",
@@ -183,14 +190,14 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
   },
   overviewLabel: {
     fontSize: 11.2,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: 0.4,
     textTransform: "uppercase",
     color: theme.colors.textMuted,
   },
   overviewValue: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     fontVariant: ["tabular-nums"],
   },
@@ -203,25 +210,18 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
+export const useAuctionDashboardRowStyles = createThemedStyles((theme, layout) => ({
   row: {
     gap: ROW_GAP,
     padding: ROW_PADDING,
     borderWidth: StyleSheet.hairlineWidth,
-    borderLeftWidth: 3,
     borderRadius: ROW_RADIUS,
     borderColor: theme.colors.border,
-    borderLeftColor: theme.colors.border,
     backgroundColor: theme.colors.surface,
-    shadowColor: theme.colors.ink,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 0,
-    elevation: 1,
   },
+  /** web `.auction-dashboard-row_attention` — warning border, без left strip. */
   rowAttention: {
-    borderLeftColor: theme.colors.warning,
-    shadowOpacity: 0.1,
+    borderColor: "rgba(217, 119, 6, 0.6)",
   },
   headLine: {
     flexDirection: "row",
@@ -274,13 +274,13 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
   },
   title: {
     fontSize: 15.2,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
     flexShrink: 1,
   },
   titleStatic: {
     fontSize: 15.2,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
     flexShrink: 1,
   },
@@ -295,12 +295,12 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
   },
   metaBuyerName: {
     fontSize: 13.6,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   metaBuyerNameLink: {
     fontSize: 13.6,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   metaDate: {
@@ -326,8 +326,8 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.successSurface,
   },
   statusPillText: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightSemibold,
     lineHeight: 14.4,
     flexShrink: 1,
     color: theme.colors.text,
@@ -350,7 +350,7 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
   },
   priceLabel: {
     fontSize: 11.52,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: 0.48,
     textTransform: "uppercase",
     color: theme.colors.text,
@@ -367,7 +367,7 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
   },
   editorLabel: {
     fontSize: 11.52,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: 0.48,
     textTransform: "uppercase",
     color: theme.colors.text,
@@ -386,7 +386,7 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
     paddingRight: 8.8,
     justifyContent: "center",
     fontSize: 15.2,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.textMuted,
   },
   composerInput: {
@@ -394,8 +394,8 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
     minWidth: 0,
     paddingVertical: 8.8,
     paddingHorizontal: 5.6,
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     fontVariant: ["tabular-nums"],
   },
@@ -408,7 +408,7 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
   },
   composerSubmitText: {
     fontSize: 13.12,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.onContrast,
   },
   editorCancel: {
@@ -420,43 +420,44 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
   },
   editorCancelText: {
     fontSize: 13.12,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
     textDecorationLine: "none",
   },
   decision: {
     flexDirection: "row",
-    gap: 7.2,
+    gap: 8,
   },
   decisionBtn: {
     flex: 1,
     minWidth: 0,
-    minHeight: 40.8,
+    minHeight: DECISION_BTN_MIN_HEIGHT,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 8.8,
-    paddingHorizontal: 10.4,
-    borderRadius: 14,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: DECISION_BTN_RADIUS,
     borderWidth: StyleSheet.hairlineWidth,
   },
   decisionBtnAccept: {
     borderColor: "transparent",
     backgroundColor: theme.colors.success,
   },
+  /** web `.auction-dashboard-row__btn_secondary` — reject = secondary, не danger. */
   decisionBtnReject: {
-    borderColor: "rgba(180, 35, 24, 0.7)",
+    borderColor: theme.colors.borderStrong,
     backgroundColor: theme.colors.surface,
   },
   decisionBtnTextAccept: {
     fontSize: 14.08,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.onContrast,
     textAlign: "center",
   },
   decisionBtnTextReject: {
     fontSize: 14.08,
-    fontWeight: "700",
-    color: theme.colors.danger,
+    fontWeight: theme.typography.fontWeightBold,
+    color: theme.colors.textSecondary,
     textAlign: "center",
   },
   cta: {
@@ -470,7 +471,7 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
   },
   ctaText: {
     fontSize: 14.72,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.onContrast,
   },
   checkout: {

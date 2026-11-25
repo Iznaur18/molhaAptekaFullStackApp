@@ -6,21 +6,15 @@ import { Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 
 import { formatSearchRowRatingCompact } from "@/entities/user/lib/formatSearchRowRating";
-import { formatSearchRowTotalSales } from "@/entities/user/lib/formatSearchRowTotalSales";
 import { pickUserProfilePhotoUrl } from "@/entities/user/lib/pickUserProfilePhotoUrl";
 import { getUserAvatarFocus } from "@/entities/user/lib/profileImageFocus";
 import { DEFAULT_USER_AVATAR_URL } from "@/entities/user/model/constants";
 import { UserPremiumAvatar } from "@/entities/user/ui/UserPremiumAvatar";
 import { UserPremiumDisplayName } from "@/entities/user/ui/UserPremiumDisplayName";
 import { PRODUCT_DETAILS_SELLER_PREVIEW_LAYOUT as SP } from "@/entities/product/lib/productDetailsSellerPreviewLayout";
-import {
-  PRODUCT_SELLER_PREVIEW_UI,
-  USER_LIST_ROW_UI,
-  USER_PROFILE_COPY,
-} from "@/shared/config";
+import { PRODUCT_SELLER_PREVIEW_UI, USER_LIST_ROW_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductDetailsSellerPreviewStyles } from "@/shared/theme/catalogProductStyles";
-import { ProductDetailsSellerStorefrontButton } from "@/entities/product/ui/ProductDetailsSellerStorefrontButton";
 
 type SellerObject = {
   _id: string;
@@ -32,14 +26,12 @@ type SellerObject = {
   userRatingByVotes?: { countVotes?: number; totalRating?: number };
   sellerListedProductCount?: number;
   sellerListedProductsCount?: number;
-  totalSalesAmount?: number;
   followersCount?: number;
 };
 
 type ProductDetailsSellerPreviewProps = {
   seller: unknown;
   presentation?: "default" | "split-rest" | "stack";
-  showStorefrontButton?: boolean;
 };
 
 const formatFollowersCount = (value?: number): string => {
@@ -53,7 +45,6 @@ const formatFollowersCount = (value?: number): string => {
 export const ProductDetailsSellerPreview = ({
   seller,
   presentation = "default",
-  showStorefrontButton = false,
 }: ProductDetailsSellerPreviewProps) => {
   const router = useRouter();
   const theme = useAppTheme();
@@ -95,12 +86,6 @@ export const ProductDetailsSellerPreview = ({
       label: USER_LIST_ROW_UI.RATING_LABEL,
       value: formatSearchRowRatingCompact(sellerObj.userRatingByVotes),
       icon: "star" as const,
-    },
-    {
-      key: "totalSales",
-      label: USER_PROFILE_COPY.LABELS.totalSalesAmount,
-      value: formatSearchRowTotalSales(sellerObj.totalSalesAmount),
-      icon: "credit-card" as const,
     },
     {
       key: "listed",
@@ -159,10 +144,6 @@ export const ProductDetailsSellerPreview = ({
           style={styles.chevron}
         />
       </Pressable>
-
-      {showStorefrontButton ? (
-        <ProductDetailsSellerStorefrontButton sellerId={sellerId} embedded />
-      ) : null}
 
       <View style={styles.metrics}>
         {metrics.map((row) => (

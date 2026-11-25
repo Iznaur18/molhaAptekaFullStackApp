@@ -27,7 +27,7 @@ const useStyles = createThemedStyles((theme) => ({
     borderRadius: theme.radius.input,
     padding: theme.spacing[3],
     minHeight: 44,
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     backgroundColor: theme.colors.surface,
     color: theme.colors.text,
   },
@@ -52,12 +52,12 @@ const useStyles = createThemedStyles((theme) => ({
   },
   actionText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
-    fontSize: 14,
+    fontWeight: theme.typography.fontWeightSemibold,
+    fontSize: theme.typography.fontBase,
   },
   error: {
     color: theme.colors.danger,
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
   },
 }));
 

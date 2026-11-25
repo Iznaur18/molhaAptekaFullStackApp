@@ -1,6 +1,8 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useRef } from "react";
 
+import { reportClientIssue } from "@/shared/lib/reportClientIssue";
+
 import { useInAppNotifications } from "./useInAppNotifications";
 import { useMarkInAppNotificationsReadMutation } from "./useMarkInAppNotificationsReadMutation";
 
@@ -32,7 +34,8 @@ export const useMarkInAppNotificationsReadOnView = (enabled: boolean): void => {
 
       markedReadRef.current = true;
 
-      void markReadMutation.mutateAsync().catch(() => {
+      void markReadMutation.mutateAsync().catch((error) => {
+        reportClientIssue("useMarkInAppNotificationsReadOnView", error);
         markedReadRef.current = false;
       });
     }, [enabled, markReadMutation, notifications.length]),

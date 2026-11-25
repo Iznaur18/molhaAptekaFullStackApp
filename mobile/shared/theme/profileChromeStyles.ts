@@ -3,18 +3,18 @@ import { Platform, StyleSheet } from "react-native";
 import {
   GUEST_PROFILE_LAYOUT as G,
   MY_PROFILE_LAYOUT_GAP,
+  MY_PROFILE_SECTION_GAP,
   MY_PROFILE_SHELL_PAD_X,
   MY_PROFILE_SIDEBAR_LAYOUT as S,
   MY_PROFILE_SIDEBAR_WIDTH,
   PROFILE_OVERVIEW_LAYOUT as O,
 } from "@/shared/lib/guestProfileLayout";
 import { PRODUCT_DETAILS_SELLER_PRODUCTS_CAROUSEL_LAYOUT as SPC } from "@/entities/product/lib/productDetailsSellerProductsCarouselLayout";
+import { USER_PROFILE_PURCHASES_LAYOUT as UPP } from "@/entities/user/lib/userProfilePurchasesLayout";
+export { USER_PROFILE_PURCHASES_TRACK_HEIGHT } from "@/entities/user/lib/userProfilePurchasesLayout";
 import { PROFILE_CONTENT_MAX_WIDTH_PHONE } from "@/shared/lib/screenBreakpoints";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
-import {
-  SCREEN_CONTENT_PADDING_BOTTOM,
-  SCREEN_CONTENT_PADDING_HORIZONTAL,
-} from "@/shared/theme/screenContentLayout";
+import { SCREEN_CONTENT_PADDING_BOTTOM } from "@/shared/theme/screenContentLayout";
 
 /** @deprecated используйте resolveProfileContentMaxWidth / useScreenLayout */
 export const PROFILE_CONTENT_MAX_WIDTH = PROFILE_CONTENT_MAX_WIDTH_PHONE;
@@ -37,18 +37,32 @@ export const PROFILE_BANNER_MARGIN_BOTTOM = 0;
 export const PROFILE_CARD_SQUIRCLE_RADIUS = 24;
 /** Паритет с teaser/wholesale chrome на экране товара. */
 export const PRODUCT_DETAIL_SECTION_RADIUS = 20;
+/** web `--user-details-screen-gap: 6px` */
+export const USER_DETAILS_SCREEN_GAP = MY_PROFILE_SECTION_GAP;
 
-export const useProfileScreenStyles = createThemedStyles((theme) => ({
+/**
+ * web `--iz-color-ink` / `--iz-color-on-contrast` —
+ * заголовки «Список товаров», «ОСНОВНОЕ», «КОНТАКТЫ», …
+ */
+export const resolveProfileSectionHeaderChrome = (theme: {
+  colors: { ink: string; onContrast: string };
+}) => ({
+  backgroundColor: theme.colors.ink,
+  borderBottomColor: theme.colors.ink,
+  color: theme.colors.onContrast,
+});
+
+export const useProfileScreenStyles = createThemedStyles((theme, layout) => ({
   safeArea: {
     flex: 1,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   pageLayout: {
     flexDirection: "row",
     alignItems: "stretch",
     width: "100%",
     gap: MY_PROFILE_LAYOUT_GAP,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   pageScrollContent: {
     flexGrow: 1,
@@ -76,7 +90,7 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
   mainColumn: {
     flex: 1,
     minWidth: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   /** Контент колонки overview: gap как web `__main { gap: var(--my-profile-section-gap) }`. */
   mainColumnContent: {
@@ -86,7 +100,7 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
     paddingTop: O.scrollPaddingTop,
     paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
     gap: O.mainGap,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   guestSafeArea: {
     flex: 1,
@@ -110,7 +124,7 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
     paddingTop: O.scrollPaddingTop,
     paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
     gap: O.mainGap,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   bodyCard: {
     borderWidth: 1,
@@ -151,7 +165,7 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
   },
   title: {
     fontSize: G.titleFontSize,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     textAlign: "center",
   },
@@ -170,7 +184,7 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.warningBorder,
   },
   emailBannerText: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.warningText,
     textAlign: "center",
   },
@@ -206,7 +220,7 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useProfileOverviewSectionStyles = createThemedStyles((theme) => ({
+export const useProfileOverviewSectionStyles = createThemedStyles((theme, layout) => ({
   root: {
     width: "100%",
     gap: O.mainGap,
@@ -238,8 +252,8 @@ export const useProfileOverviewSectionStyles = createThemedStyles((theme) => ({
   storefrontBtnText: {
     flexShrink: 1,
     color: theme.colors.action,
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   notificationsBtn: {
     flex: 1,
@@ -267,7 +281,7 @@ export const useProfileOverviewSectionStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useProfileOverviewBannerStyles = createThemedStyles((theme) => ({
+export const useProfileOverviewBannerStyles = createThemedStyles((theme, layout) => ({
   wrap: {
     width: "100%",
     marginBottom: PROFILE_BANNER_MARGIN_BOTTOM,
@@ -352,7 +366,7 @@ const PROFILE_MOBILE_NAV_TOGGLE = {
 export const PROFILE_MOBILE_NAV_TOGGLE_BORDER_RADIUS =
   PROFILE_MOBILE_NAV_TOGGLE.borderRadius;
 
-export const useProfileMobileNavToggleStyles = createThemedStyles((theme) => ({
+export const useProfileMobileNavToggleStyles = createThemedStyles((theme, layout) => ({
   outer: {
     alignSelf: "stretch",
   },
@@ -410,7 +424,7 @@ export const useProfileMobileNavToggleStyles = createThemedStyles((theme) => ({
   },
   caption: {
     fontSize: PROFILE_MOBILE_NAV_TOGGLE.captionSize,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     textTransform: "uppercase",
     letterSpacing: PROFILE_MOBILE_NAV_TOGGLE.letterSpacing,
     color: theme.colors.onContrast,
@@ -420,12 +434,12 @@ export const useProfileMobileNavToggleStyles = createThemedStyles((theme) => ({
   },
   label: {
     fontSize: PROFILE_MOBILE_NAV_TOGGLE.labelSize,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.onContrast,
   },
   labelTablet: {
     color: theme.colors.primary,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
   },
 }));
 
@@ -435,7 +449,7 @@ export const PROFILE_MOBILE_NAV_SHEET_ANIMATION = {
   slideDistance: 320,
 } as const;
 
-export const useProfileMobileNavSheetStyles = createThemedStyles((theme) => ({
+export const useProfileMobileNavSheetStyles = createThemedStyles((theme, layout) => ({
   backdrop: {
     flex: 1,
     flexDirection: "row",
@@ -478,15 +492,15 @@ export const useProfileMobileNavSheetStyles = createThemedStyles((theme) => ({
   },
   logoutError: {
     color: theme.colors.danger,
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     textAlign: "center",
   },
   logoutConfirm: {
     gap: theme.spacing[3],
   },
   logoutQuestion: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
     textAlign: "center",
   },
@@ -495,7 +509,7 @@ export const useProfileMobileNavSheetStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useProfileHubMenuStyles = createThemedStyles((theme) => ({
+export const useProfileHubMenuStyles = createThemedStyles((theme, layout) => ({
   root: {
     width: "100%",
     marginTop: theme.spacing[5],
@@ -524,7 +538,7 @@ export const useProfileHubMenuStyles = createThemedStyles((theme) => ({
     gap: S.navGap,
   },
   heading: {
-    fontSize: 18,
+    fontSize: S.titleFontSize,
     fontWeight: "800",
     letterSpacing: -0.3,
     textAlign: "center",
@@ -551,7 +565,7 @@ export const useProfileHubMenuStyles = createThemedStyles((theme) => ({
     borderTopColor: theme.colors.border,
   },
   groupLabel: {
-    fontSize: 11,
+    fontSize: theme.typography.font2xs,
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 0.7,
@@ -582,8 +596,8 @@ export const useProfileHubMenuStyles = createThemedStyles((theme) => ({
   },
   itemLabel: {
     flex: 1,
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   itemLabelDisabled: {
@@ -599,8 +613,8 @@ export const useProfileHubMenuStyles = createThemedStyles((theme) => ({
   },
   badgeText: {
     color: theme.colors.onContrast,
-    fontSize: 12,
-    fontWeight: "700",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightBold,
   },
   alertDot: {
     width: 8,
@@ -610,7 +624,7 @@ export const useProfileHubMenuStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useThemePreferenceToggleStyles = createThemedStyles((theme) => ({
+export const useThemePreferenceToggleStyles = createThemedStyles((theme, layout) => ({
   root: {
     width: "100%",
     gap: theme.spacing[2],
@@ -623,8 +637,8 @@ export const useThemePreferenceToggleStyles = createThemedStyles((theme) => ({
     marginTop: 0,
   },
   label: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   labelCentered: {
@@ -653,8 +667,8 @@ export const useThemePreferenceToggleStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.borderStrong,
   },
   chipText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   chipTextActive: {
     color: theme.colors.onContrast,
@@ -664,11 +678,12 @@ export const useThemePreferenceToggleStyles = createThemedStyles((theme) => ({
   },
 }));
 
-const USER_PROFILE_THUMB_SIZE = SPC.thumbSize;
+const USER_PROFILE_THUMB_SIZE = UPP.thumbSize;
 export { USER_PROFILE_THUMB_SIZE };
+/** Product-detail carousel (squircle). Profile purchases — `UPP.thumbRadius` (14). */
 export const USER_PROFILE_THUMB_SQUIRCLE_RADIUS = SPC.thumbRadius;
-export const USER_PROFILE_THUMB_GAP = SPC.trackGap;
-/** Паритет `.user-profile-purchases__list` / seller carousel track — фиксирует высоту на RN Web. */
+export const USER_PROFILE_THUMB_GAP = UPP.tileGap;
+/** Паритет product-detail carousel track — pad внутри трека. */
 export const USER_PROFILE_THUMB_TRACK_HEIGHT =
   SPC.thumbSize + SPC.trackPaddingTop + SPC.trackPaddingBottom;
 /** До первого onLayout — запасной размер ряда. */
@@ -688,206 +703,256 @@ export const resolveUserProfileThumbColumns = (contentWidth: number): number => 
   );
 };
 
-export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
-  root: {
-    marginBottom: theme.spacing[4],
-    backgroundColor: theme.colors.surface,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    flexGrow: 0,
-    flexShrink: 0,
-    alignSelf: "stretch",
-  },
-  rootHorizontal: {
-    marginBottom: 0,
-    backgroundColor: theme.colors.surfaceMuted,
-    borderColor: theme.colors.border,
-    borderWidth: SPC.borderWidth,
-  },
-  rootHorizontalRadius: {
-    borderRadius: SPC.borderRadius,
-    overflow: "hidden",
-    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: theme.spacing[2],
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    backgroundColor: theme.colors.ink,
-    borderBottomColor: theme.colors.ink,
-  },
-  headerHorizontal: {
-    backgroundColor: "transparent",
-    borderBottomWidth: 0,
-    paddingTop: SPC.headingPaddingTop,
-    paddingHorizontal: SPC.headingPaddingHorizontal,
-    paddingBottom: SPC.headingPaddingBottom,
-    paddingVertical: 0,
-  },
-  headerTitle: {
-    flex: 1,
-    minWidth: 0,
-    fontSize: 11,
-    fontWeight: "800",
-    letterSpacing: 0.9,
-    textTransform: "uppercase",
-    color: theme.colors.onContrast,
-  },
-  headerTitleHorizontal: {
-    fontSize: SPC.headingFontSize,
-    fontWeight: SPC.headingFontWeight,
-    letterSpacing: SPC.headingLetterSpacing,
-    lineHeight: SPC.headingLineHeight,
-    textTransform: "none",
-    color: theme.colors.text,
-  },
-  headerTitlePressable: {
-    flex: 1,
-    minWidth: 0,
-  },
-  headerAction: {
-    flexShrink: 0,
-    fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 0.4,
-    color: theme.colors.onContrast,
-    opacity: 0.82,
-  },
-  body: {
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    gap: theme.spacing[2],
-  },
-  bodyProfileScrollRow: {
-    flexGrow: 0,
-    flexShrink: 0,
-    overflow: "hidden",
-    gap: 0,
-  },
-  bodyHorizontal: {
-    paddingHorizontal: 0,
-    paddingVertical: 0,
-    paddingTop: 0,
-    paddingBottom: 0,
-    gap: 0,
-    backgroundColor: "transparent",
-  },
-  state: {
-    fontSize: 14,
-    textAlign: "center",
-    color: theme.colors.textMuted,
-  },
-  stateError: {
-    color: theme.colors.danger,
-  },
-  stateErrorHorizontal: {
-    margin: 0,
-    paddingHorizontal: SPC.errorPaddingHorizontal,
-    paddingBottom: SPC.errorPaddingBottom,
-    fontSize: SPC.errorFontSize,
-    lineHeight: SPC.errorFontSize * 1.35,
-    textAlign: "left",
-  },
-  grid: {
-    gap: 10,
-  },
-  gridRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  gridRowPartial: {
-    justifyContent: "flex-start",
-    gap: USER_PROFILE_THUMB_GAP,
-  },
-  scrollRowContent: {
-    flexDirection: "row",
-    flexWrap: "nowrap",
-    alignItems: "center",
-    gap: USER_PROFILE_THUMB_GAP,
-    paddingTop: SPC.trackPaddingTop,
-    paddingHorizontal: SPC.trackPaddingHorizontal,
-    paddingBottom: SPC.trackPaddingBottom,
-    flexGrow: 0,
-    flexShrink: 0,
-  },
-  thumbButton: {
-    width: USER_PROFILE_THUMB_SIZE,
-    height: USER_PROFILE_THUMB_SIZE,
-    flex: 0,
-    flexShrink: 0,
-    flexGrow: 0,
-    overflow: "hidden",
-    ...(Platform.OS === "web"
-      ? ({
-          flexBasis: USER_PROFILE_THUMB_SIZE,
-          minWidth: USER_PROFILE_THUMB_SIZE,
-          maxWidth: USER_PROFILE_THUMB_SIZE,
-          minHeight: USER_PROFILE_THUMB_SIZE,
-          maxHeight: USER_PROFILE_THUMB_SIZE,
-          alignSelf: "center",
-        } as const)
-      : null),
-  },
-  thumbButtonUnavailable: {
-    opacity: SPC.thumbUnavailableOpacity,
-  },
-  thumbClip: {
-    width: USER_PROFILE_THUMB_SIZE,
-    height: USER_PROFILE_THUMB_SIZE,
-    backgroundColor: theme.colors.surfaceMuted,
-    borderWidth: SPC.thumbBorderWidth,
-    borderColor: theme.colors.border,
-  },
-  thumbClipCurrent: {
-    borderWidth: SPC.thumbCurrentOutlineWidth,
-    borderColor: theme.colors.action,
-  },
-  thumbImageHost: {
-    width: USER_PROFILE_THUMB_SIZE,
-    height: USER_PROFILE_THUMB_SIZE,
-    overflow: "hidden",
-    position: "relative",
-  },
-  thumbImage: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  thumbPlaceholder: {
-    width: USER_PROFILE_THUMB_SIZE,
-    height: USER_PROFILE_THUMB_SIZE,
-    backgroundColor: theme.colors.surfaceMuted,
-  },
-  hint: {
-    fontSize: 13,
-    textAlign: "center",
-    color: theme.colors.warningText,
-  },
-}));
+export const useUserProfileThumbListStyles = createThemedStyles((theme, layout) => {
+  const sectionHeader = resolveProfileSectionHeaderChrome(theme);
 
-export const useUserDetailsPageStyles = createThemedStyles((theme) => ({
+  return {
+    root: {
+      marginBottom: theme.spacing[4],
+      backgroundColor: theme.colors.surface,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: theme.colors.border,
+      flexGrow: 0,
+      flexShrink: 0,
+      alignSelf: "stretch",
+    },
+    /** web `--user-profile-purchases-section-radius: 24px` (не squircle). */
+    rootProfileRadius: {
+      marginBottom: 0,
+      borderRadius: PROFILE_CARD_SQUIRCLE_RADIUS,
+      overflow: "hidden",
+      ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+    },
+    rootHorizontal: {
+      marginBottom: 0,
+      backgroundColor: theme.colors.surfaceMuted,
+      borderColor: theme.colors.border,
+      borderWidth: SPC.borderWidth,
+    },
+    rootHorizontalRadius: {
+      borderRadius: SPC.borderRadius,
+      overflow: "hidden",
+      ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: theme.spacing[2],
+      paddingVertical: UPP.headingPaddingY,
+      paddingHorizontal: UPP.headingPaddingX,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      backgroundColor: sectionHeader.backgroundColor,
+      borderBottomColor: sectionHeader.borderBottomColor,
+    },
+    headerHorizontal: {
+      backgroundColor: "transparent",
+      borderBottomWidth: 0,
+      paddingTop: SPC.headingPaddingTop,
+      paddingHorizontal: SPC.headingPaddingHorizontal,
+      paddingBottom: SPC.headingPaddingBottom,
+      paddingVertical: 0,
+    },
+    headerTitle: {
+      flex: 1,
+      minWidth: 0,
+      fontSize: theme.typography.font2xs,
+      fontWeight: "800",
+      letterSpacing: 0.9,
+      textTransform: "uppercase",
+      color: sectionHeader.color,
+    },
+    headerTitleHorizontal: {
+      fontSize: SPC.headingFontSize,
+      fontWeight: SPC.headingFontWeight,
+      letterSpacing: SPC.headingLetterSpacing,
+      lineHeight: SPC.headingLineHeight,
+      textTransform: "none",
+      color: theme.colors.text,
+    },
+    headerTitlePressable: {
+      flex: 1,
+      minWidth: 0,
+    },
+    headerAction: {
+      flexShrink: 0,
+      fontSize: theme.typography.font2xs,
+      fontWeight: theme.typography.fontWeightBold,
+      letterSpacing: 0.4,
+      color: theme.colors.onContrast,
+      opacity: 0.82,
+    },
+    body: {
+      paddingHorizontal: UPP.bodyPaddingX,
+      paddingVertical: UPP.bodyPaddingY,
+      gap: theme.spacing[2],
+    },
+    /**
+     * Vertical pad как web `0.75rem`. Horizontal 0 — трек full-bleed до края карточки;
+     * боковой inset даёт spacer в `UserProfileThumbScrollRow` (скроллится вместе с thumbs).
+     */
+    bodyProfileScrollRow: {
+      flexGrow: 0,
+      flexShrink: 0,
+      overflow: "hidden",
+      gap: 0,
+      paddingVertical: UPP.bodyPaddingY,
+      paddingHorizontal: 0,
+    },
+    bodyHorizontal: {
+      paddingHorizontal: 0,
+      paddingVertical: 0,
+      paddingTop: 0,
+      paddingBottom: 0,
+      gap: 0,
+      backgroundColor: "transparent",
+    },
+    state: {
+      fontSize: theme.typography.fontBase,
+      textAlign: "center",
+      color: theme.colors.textMuted,
+    },
+    stateError: {
+      color: theme.colors.danger,
+    },
+    stateErrorHorizontal: {
+      margin: 0,
+      paddingHorizontal: SPC.errorPaddingHorizontal,
+      paddingBottom: SPC.errorPaddingBottom,
+      fontSize: SPC.errorFontSize,
+      lineHeight: SPC.errorFontSize * 1.35,
+      textAlign: "left",
+    },
+    grid: {
+      gap: 10,
+    },
+    gridRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+    },
+    gridRowPartial: {
+      justifyContent: "flex-start",
+      gap: USER_PROFILE_THUMB_GAP,
+    },
+    scrollRowContent: {
+      flexDirection: "row",
+      flexWrap: "nowrap",
+      alignItems: "center",
+      gap: USER_PROFILE_THUMB_GAP,
+      paddingTop: SPC.trackPaddingTop,
+      paddingHorizontal: SPC.trackPaddingHorizontal,
+      paddingBottom: SPC.trackPaddingBottom,
+      flexGrow: 0,
+      flexShrink: 0,
+    },
+    /** Profile purchases: трек без pad — inset на inner (скроллится → thumbs в край). */
+    scrollRowContentProfile: {
+      flexDirection: "row",
+      flexWrap: "nowrap",
+      alignItems: "center",
+      gap: 0,
+      paddingTop: 0,
+      paddingLeft: 0,
+      paddingRight: 0,
+      paddingBottom: 0,
+      flexGrow: 0,
+      flexShrink: 0,
+    },
+    /** web `padding: 0.75rem 0.875rem` по горизонтали — внутри скролла. */
+    scrollRowInnerProfile: {
+      flexDirection: "row",
+      flexWrap: "nowrap",
+      alignItems: "center",
+      gap: UPP.tileGap,
+      paddingHorizontal: UPP.bodyPaddingX,
+      flexGrow: 0,
+      flexShrink: 0,
+    },
+    thumbButton: {
+      width: USER_PROFILE_THUMB_SIZE,
+      height: USER_PROFILE_THUMB_SIZE,
+      flex: 0,
+      flexShrink: 0,
+      flexGrow: 0,
+      overflow: "hidden",
+      ...(Platform.OS === "web"
+        ? ({
+            flexBasis: USER_PROFILE_THUMB_SIZE,
+            minWidth: USER_PROFILE_THUMB_SIZE,
+            maxWidth: USER_PROFILE_THUMB_SIZE,
+            minHeight: USER_PROFILE_THUMB_SIZE,
+            maxHeight: USER_PROFILE_THUMB_SIZE,
+            alignSelf: "center",
+          } as const)
+        : null),
+    },
+    thumbButtonUnavailable: {
+      opacity: SPC.thumbUnavailableOpacity,
+    },
+    thumbClip: {
+      width: USER_PROFILE_THUMB_SIZE,
+      height: USER_PROFILE_THUMB_SIZE,
+      backgroundColor: theme.colors.surfaceMuted,
+      borderWidth: SPC.thumbBorderWidth,
+      borderColor: theme.colors.border,
+    },
+    /** web `--user-profile-purchases-thumb-radius: 14px` */
+    thumbClipProfile: {
+      width: USER_PROFILE_THUMB_SIZE,
+      height: USER_PROFILE_THUMB_SIZE,
+      borderRadius: UPP.thumbRadius,
+      overflow: "hidden",
+      backgroundColor: theme.colors.surfaceMuted,
+      borderWidth: UPP.thumbBorderWidth,
+      borderColor: theme.colors.border,
+    },
+    thumbClipCurrent: {
+      borderWidth: SPC.thumbCurrentOutlineWidth,
+      borderColor: theme.colors.action,
+    },
+    thumbImageHost: {
+      width: USER_PROFILE_THUMB_SIZE,
+      height: USER_PROFILE_THUMB_SIZE,
+      overflow: "hidden",
+      position: "relative",
+    },
+    thumbImage: {
+      ...StyleSheet.absoluteFillObject,
+    },
+    thumbPlaceholder: {
+      width: USER_PROFILE_THUMB_SIZE,
+      height: USER_PROFILE_THUMB_SIZE,
+      backgroundColor: theme.colors.surfaceMuted,
+    },
+    hint: {
+      fontSize: theme.typography.fontSm,
+      textAlign: "center",
+      color: theme.colors.warningText,
+    },
+  };
+});
+
+export const useUserDetailsPageStyles = createThemedStyles((theme, layout) => ({
   screen: {
     flex: 1,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: theme.spacing[3],
     paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
-    gap: theme.spacing[2],
+    gap: USER_DETAILS_SCREEN_GAP,
   },
   header: {
-    gap: theme.spacing[2],
+    gap: USER_DETAILS_SCREEN_GAP,
   },
   titleRow: {
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: theme.spacing[2],
+    gap: USER_DETAILS_SCREEN_GAP,
   },
   titleLeading: {
     flex: 1,
@@ -901,15 +966,37 @@ export const useUserDetailsPageStyles = createThemedStyles((theme) => ({
     minWidth: 0,
   },
   titleText: {
-    fontSize: 22,
-    fontWeight: "700",
+    fontSize: theme.typography.font4xl,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   profileBody: {
+    gap: USER_DETAILS_SCREEN_GAP,
+  },
+  storefrontBtn: {
+    width: "100%",
+    minHeight: 44,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: theme.spacing[2],
+    paddingHorizontal: theme.spacing[3],
+    borderRadius: theme.radius.pill,
+    borderWidth: 1,
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.action,
+  },
+  storefrontBtnPressed: {
+    opacity: 0.88,
+  },
+  storefrontBtnText: {
+    flexShrink: 1,
+    color: theme.colors.onContrast,
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   footer: {
     gap: theme.spacing[3],
-    marginTop: theme.spacing[2],
+    marginTop: USER_DETAILS_SCREEN_GAP,
   },
 }));

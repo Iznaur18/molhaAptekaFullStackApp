@@ -42,4 +42,14 @@ test("card price colors follow theme action token (web ProductPriceDisplay parit
     webCss,
     /product-price-display__old[\s\S]*color-mix\(in srgb, currentColor 52%, transparent\)/,
   );
+
+  const webCatalogCss = readFileSync(
+    join(
+      MOBILE_ROOT,
+      "..",
+      "client/src/entities/product/ui/product-card/ProductCardMobileCatalog.css",
+    ),
+    "utf8",
+  );
+  assert.doesNotMatch(webCatalogCss, /#93c5fd/);
 });

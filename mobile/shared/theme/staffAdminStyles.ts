@@ -22,14 +22,14 @@ export const useStaffAdminStyles = createThemedStyles((theme) => ({
     marginBottom: 4,
   },
   section: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     marginTop: theme.spacing[2],
     color: theme.colors.text,
   },
   sectionTitle: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   search: {
@@ -37,7 +37,7 @@ export const useStaffAdminStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.border,
     borderRadius: theme.radius.button,
     padding: 10,
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     backgroundColor: theme.colors.surface,
     color: theme.colors.text,
   },
@@ -46,7 +46,7 @@ export const useStaffAdminStyles = createThemedStyles((theme) => ({
   },
   toggleCreateText: {
     color: theme.colors.action,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   panel: {
     gap: theme.spacing[2],
@@ -55,17 +55,17 @@ export const useStaffAdminStyles = createThemedStyles((theme) => ({
     borderRadius: 10,
   },
   label: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   labelLarge: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   hint: {
-    fontSize: 11,
+    fontSize: theme.typography.font2xs,
     color: theme.colors.textMuted,
   },
   input: {
@@ -73,7 +73,7 @@ export const useStaffAdminStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.border,
     borderRadius: theme.radius.button,
     padding: 10,
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     backgroundColor: theme.colors.surface,
     color: theme.colors.text,
   },
@@ -84,21 +84,21 @@ export const useStaffAdminStyles = createThemedStyles((theme) => ({
     borderBottomColor: theme.colors.border,
   },
   path: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   token: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   badge: {
-    fontSize: 11,
+    fontSize: theme.typography.font2xs,
     color: theme.colors.textMuted,
   },
   meta: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
   },
   switchRow: {
@@ -124,7 +124,7 @@ export const useStaffAdminStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.actionSurface,
   },
   pickerChipText: {
-    fontSize: 11,
+    fontSize: theme.typography.font2xs,
     color: theme.colors.text,
   },
   actions: {
@@ -153,7 +153,7 @@ export const useStaffAdminStyles = createThemedStyles((theme) => ({
   },
   primaryButtonText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   secondaryButton: {
     backgroundColor: theme.colors.surfaceMuted,
@@ -170,7 +170,7 @@ export const useStaffAdminStyles = createThemedStyles((theme) => ({
     alignItems: "center",
   },
   secondaryButtonText: {
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   ghostButton: {
@@ -191,12 +191,12 @@ export const useStaffAdminStyles = createThemedStyles((theme) => ({
   },
   deleteText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   deleteTextSmall: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
-    fontSize: 12,
+    fontWeight: theme.typography.fontWeightSemibold,
+    fontSize: theme.typography.fontXs,
   },
   orderButton: {
     backgroundColor: theme.colors.surfaceMuted,
@@ -209,14 +209,14 @@ export const useStaffAdminStyles = createThemedStyles((theme) => ({
   },
   error: {
     color: theme.colors.danger,
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
   },
   success: {
     color: theme.colors.success,
   },
   link: {
     color: theme.colors.link,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   empty: {
     textAlign: "center",
@@ -249,18 +249,18 @@ export const useStaffAdminStyles = createThemedStyles((theme) => ({
     borderBottomColor: theme.colors.border,
   },
   productId: {
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.text,
     flex: 1,
     marginRight: theme.spacing[2],
   },
   removeText: {
     color: theme.colors.danger,
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   emptyList: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
     fontStyle: "italic",
   },

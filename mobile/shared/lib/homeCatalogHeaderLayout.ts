@@ -19,11 +19,15 @@ export const HOME_CATALOG_HEADER_PANEL_PADDING = {
   bottom: 8,
 } as const;
 
-/** Web v2 `.app-shell__header-panel` `padding: 0 var(--app-shell-content-inline-padding)` — на телефоне 0.5rem. */
+/**
+ * Web v2 `.app-shell__header-panel` `padding: 0 var(--app-shell-content-inline-padding)`.
+ * Вертикаль = 0: top даёт sticky/list inset (`0.5rem`), зазор до баннера —
+ * `HOME_CATALOG_HEADER_BANNER_BELOW_PANEL_MARGIN` / `homeFeedSearchHeader.marginBottom`.
+ */
 export const HOME_CATALOG_HEADER_PANEL_FLOATING_PADDING = {
-  top: 8,
+  top: 0,
   horizontal: 8,
-  bottom: 8,
+  bottom: 0,
 } as const;
 
 /** Web `.app-shell--header-v2 .app-shell__header--v2` sticky `top: 0.5rem`. */
@@ -80,13 +84,16 @@ export const HOME_CATALOG_HEADER_TOP_ROW_GAP = 8;
 /** Отступ между glass-панелью шапки и каруселью баннера (sibling, не внутри panel). */
 export const HOME_CATALOG_HEADER_BANNER_BELOW_PANEL_MARGIN = 8;
 
-/** Ozon-стиль: крупное поле поиска. */
+/** Web `.app-shell__header-search .search-input__field` min-height 2.75rem. */
 export const HOME_CATALOG_HEADER_SEARCH_INPUT_MIN_HEIGHT = 44;
 
 /** Web `.app-shell__header--v1::before` height. */
 export const HOME_CATALOG_HEADER_ACCENT_HEIGHT = 3;
 
-/** Круглые кнопки шапки — высота как у поля поиска. */
+/**
+ * Круглые кнопки у поиска home v2 — высота как у поля (2.75rem), не
+ * generic `.header-circle-button` 2.25rem (`HEADER_CIRCLE_ICON_BUTTON_SIZE`).
+ */
 export const HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE =
   HOME_CATALOG_HEADER_SEARCH_INPUT_MIN_HEIGHT;
 
@@ -139,14 +146,18 @@ export const HOME_CATALOG_HEADER_USERS_PILL_PADDING = 0;
 /** Web `.app-shell__auth-actions--mobile-top` gap `0.3rem` @640. */
 export const HOME_CATALOG_HEADER_USERS_PILL_GAP = 4.8;
 
-/** Web v2 `.app-shell__header-search .search-input__field`: 1rem, pad `2.375rem`. */
-export const HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_VERTICAL = 8;
+/**
+ * Web `.app-shell__header-search .search-input__field`:
+ * min-height 2.75rem, border-radius 14px; leading-icon pad-left 2.375rem;
+ * font наследует SearchInput 0.95rem (=15.2).
+ */
+export const HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_VERTICAL = 8.8;
 export const HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_LEFT = 38;
 export const HOME_CATALOG_HEADER_SEARCH_ICON_SIZE = 20;
 export const HOME_CATALOG_HEADER_SEARCH_ICON_LEFT = 14;
 export const HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_RIGHT = 36;
-export const HOME_CATALOG_HEADER_SEARCH_INPUT_BORDER_RADIUS = 999;
-export const HOME_CATALOG_HEADER_SEARCH_INPUT_FONT_SIZE = 16;
+export const HOME_CATALOG_HEADER_SEARCH_INPUT_BORDER_RADIUS = 14;
+export const HOME_CATALOG_HEADER_SEARCH_INPUT_FONT_SIZE = 15.2;
 
 /** Кнопки у поиска на сайте v2: 2.75rem, radius 14px, не круг. */
 export const HOME_CATALOG_HEADER_CTA_BUTTON_RADIUS = 14;

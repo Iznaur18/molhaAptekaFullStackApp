@@ -17,8 +17,8 @@ export const useSellerPersonalCategoryModerationCampaignCardStyles = createTheme
     },
     meta: {
       margin: 0,
-      fontSize: 14,
-      lineHeight: 20,
+      fontSize: theme.typography.fontBase,
+      lineHeight: theme.typography.leadingBase,
       color: theme.colors.textSecondary,
     },
     preview: {
@@ -36,7 +36,7 @@ export const useSellerPersonalCategoryModerationCampaignCardStyles = createTheme
       borderRadius: 8,
       paddingHorizontal: 10,
       paddingVertical: 8,
-      fontSize: 15,
+      fontSize: theme.typography.fontMd,
       color: theme.colors.text,
       backgroundColor: theme.colors.surface,
       textAlignVertical: "top",
@@ -66,13 +66,13 @@ export const useSellerPersonalCategoryModerationCampaignCardStyles = createTheme
       opacity: 0.65,
     },
     primaryButtonText: {
-      fontSize: 14,
-      fontWeight: "500",
+      fontSize: theme.typography.fontBase,
+      fontWeight: theme.typography.fontWeightMedium,
       color: theme.colors.onContrast,
     },
     secondaryButtonText: {
-      fontSize: 14,
-      fontWeight: "500",
+      fontSize: theme.typography.fontBase,
+      fontWeight: theme.typography.fontWeightMedium,
       color: theme.colors.text,
     },
     dangerButton: {
@@ -84,13 +84,13 @@ export const useSellerPersonalCategoryModerationCampaignCardStyles = createTheme
       backgroundColor: theme.colors.surface,
     },
     dangerButtonText: {
-      fontSize: 14,
-      fontWeight: "500",
+      fontSize: theme.typography.fontBase,
+      fontWeight: theme.typography.fontWeightMedium,
       color: DANGER_STRONG,
     },
     error: {
-      fontSize: 14,
-      lineHeight: 20,
+      fontSize: theme.typography.fontBase,
+      lineHeight: theme.typography.leadingBase,
       color: DANGER_STRONG,
     },
   }),

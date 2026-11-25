@@ -13,8 +13,8 @@ export const useIntroAdModerationCampaignCardStyles = createThemedStyles((theme)
   },
   meta: {
     margin: 0,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.textSecondary,
   },
   actions: {
@@ -56,28 +56,28 @@ export const useIntroAdModerationCampaignCardStyles = createThemedStyles((theme)
     opacity: 0.65,
   },
   secondaryButtonText: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.text,
   },
   primaryButtonText: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.onContrast,
   },
   dangerButtonText: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.danger,
   },
   cancelButtonText: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.onContrast,
   },
   rejectLabel: {
     gap: 6,
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.textSecondary,
   },
   rejectInput: {
@@ -87,7 +87,7 @@ export const useIntroAdModerationCampaignCardStyles = createThemedStyles((theme)
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 8,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.text,
     backgroundColor: theme.colors.surface,
     textAlignVertical: "top",

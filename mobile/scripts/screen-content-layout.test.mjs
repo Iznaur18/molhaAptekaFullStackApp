@@ -18,7 +18,11 @@ const resolveScreenContentPaddingHorizontal = (insets = {}) =>
 test("mobile content padding constants increased for edge safety", () => {
   const source = readFile(MOBILE_ROOT, "shared/theme/screenContentLayout.ts");
 
-  assert.match(source, /SCREEN_CONTENT_PADDING_HORIZONTAL = 8/);
+  assert.match(
+    source,
+    /SCREEN_CONTENT_PADDING_HORIZONTAL\s*=\s*\n?\s*izLayout\.contentPaddingHorizontalPhone/,
+  );
+  assert.match(source, /izLayout\.contentPaddingHorizontalPhone/);
   assert.match(source, /SCREEN_CONTENT_PADDING_BOTTOM = 18/);
   assert.match(source, /resolveScreenContentPaddingBottom/);
   assert.match(source, /resolveScreenContentPaddingHorizontal/);
@@ -62,6 +66,8 @@ test("mobile bottom nav uses floating liquid-glass pill (web parity)", () => {
   assert.match(source, /MOBILE_BOTTOM_NAV_MIN_EDGE_GAP/);
   assert.match(source, /resolveMobileBottomNavPaddingBottom/);
   assert.match(source, /MOBILE_BOTTOM_NAV_BORDER_RADIUS = 999/);
+  assert.match(source, /MOBILE_BOTTOM_NAV_BLUR_INTENSITY_WEB = 18/);
+  assert.match(source, /MOBILE_BOTTOM_NAV_BLUR_INTENSITY_NATIVE = 40/);
   assert.match(source, /resolveMobileBottomNavLayoutHeight/);
   assert.match(source, /resolveMobileBottomNavOverlayContentInset/);
   assert.match(tabBar, /resolveMobileBottomNavHorizontalInset/);
@@ -70,6 +76,20 @@ test("mobile bottom nav uses floating liquid-glass pill (web parity)", () => {
   assert.match(tabBar, /liquidOverlay/);
   assert.match(tabBar, /resolveContentMaxWidth/);
   assert.match(tabBar, /pointerEvents: "box-none"/);
+  assert.match(tabBar, /lineHeight:\s*8\.8/);
+  assert.match(tabBar, /useSoftKeyboardOpen/);
+  assert.match(
+    readFile(MOBILE_ROOT, "shared/lib/useSoftKeyboardOpen.ts"),
+    /useVisualViewportKeyboardBottomInset/,
+  );
+  assert.match(
+    readFile(MOBILE_ROOT, "shared/lib/headerCircleIconButtonLayout.ts"),
+    /HEADER_CIRCLE_ICON_BUTTON_SIZE = 36/,
+  );
+  assert.match(
+    readFile(MOBILE_ROOT, "shared/lib/screenBackButtonLayout.ts"),
+    /SCREEN_BACK_BUTTON_SIZE = 40/,
+  );
   assert.match(tabsLayout, /tabBarStyle:\s*\{[\s\S]*bottom:\s*0/);
   assert.match(tabsLayout, /position:\s*"absolute"/);
   assert.match(tabsLayout, /height:\s*0/);

@@ -5,8 +5,12 @@
   --bnf-surface: color-mix(in srgb, var(--iz-color-action) 7%, var(--iz-color-surface));
   --bnf-accent: var(--iz-color-action);
   --bnf-on-accent: var(--iz-color-on-contrast);
-  --bnf-ready: #1f7a4d;
-  --bnf-ready-soft: color-mix(in srgb, #1f7a4d 12%, var(--iz-color-surface));
+  --bnf-ready: var(--iz-badge-buy-n-free-ready);
+  --bnf-ready-soft: color-mix(
+    in srgb,
+    var(--iz-badge-buy-n-free-ready) 12%,
+    var(--iz-color-surface)
+  );
 
   position: relative;
   box-sizing: border-box;

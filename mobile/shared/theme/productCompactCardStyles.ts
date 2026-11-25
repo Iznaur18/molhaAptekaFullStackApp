@@ -1,31 +1,34 @@
-import { StyleSheet } from "react-native";
+import { useMemo } from "react";
+import { StyleSheet, useWindowDimensions } from "react-native";
 
 import { resolveProductCardBadgeColors } from "@/entities/product/lib/productCardBadgePalette";
+import {
+  PRODUCT_COMPACT_CARD_LAYOUT as L,
+  resolveProductCompactCardThumbSize,
+} from "@/entities/product/lib/productCompactCardLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const THUMB_SIZE = 88;
-const THUMB_RADIUS = 16;
-
-export const useProductCompactCardStyles = createThemedStyles((theme) => {
+const useProductCompactCardBaseStyles = createThemedStyles((theme) => {
   const BC = resolveProductCardBadgeColors(theme.colors);
   return {
     card: {
-      gap: 10,
-      padding: 12,
-      borderRadius: 20,
+      gap: L.cardGap,
+      paddingVertical: L.paddingVertical,
+      paddingHorizontal: L.paddingHorizontal,
+      borderRadius: L.cardRadius,
       backgroundColor: theme.colors.surface,
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: theme.colors.border,
     },
     topRow: {
       flexDirection: "row",
-      gap: 12,
+      gap: L.topRowGap,
       alignItems: "flex-start",
     },
     thumbWrap: {
-      width: THUMB_SIZE,
-      height: THUMB_SIZE,
-      borderRadius: THUMB_RADIUS,
+      width: L.thumbSize,
+      height: L.thumbSize,
+      borderRadius: L.thumbRadius,
       overflow: "hidden",
       backgroundColor: theme.colors.surfaceMuted,
       position: "relative",
@@ -48,7 +51,7 @@ export const useProductCompactCardStyles = createThemedStyles((theme) => {
       paddingVertical: 2,
       borderRadius: 4,
       fontSize: 10,
-      fontWeight: "700",
+      fontWeight: theme.typography.fontWeightBold,
       lineHeight: 12,
       color: theme.colors.onContrast,
       backgroundColor: "rgba(15, 23, 42, 0.72)",
@@ -68,9 +71,9 @@ export const useProductCompactCardStyles = createThemedStyles((theme) => {
       justifyContent: "center",
     },
     thumbNavText: {
-      fontSize: 16,
-      fontWeight: "700",
-      lineHeight: 18,
+      fontSize: theme.typography.fontLg,
+      fontWeight: theme.typography.fontWeightBold,
+      lineHeight: theme.typography.leadingSm,
       color: theme.colors.onContrast,
       textShadowColor: "rgba(0, 0, 0, 0.45)",
       textShadowOffset: { width: 0, height: 1 },
@@ -108,8 +111,8 @@ export const useProductCompactCardStyles = createThemedStyles((theme) => {
       backgroundColor: `${theme.colors.danger}14`,
     },
     statusPillText: {
-      fontSize: 11,
-      fontWeight: "600",
+      fontSize: theme.typography.font2xs,
+      fontWeight: theme.typography.fontWeightSemibold,
       lineHeight: 14,
       color: theme.colors.warningText,
     },
@@ -120,9 +123,9 @@ export const useProductCompactCardStyles = createThemedStyles((theme) => {
       color: theme.colors.danger,
     },
     title: {
-      fontSize: 15,
-      fontWeight: "600",
-      lineHeight: 20,
+      fontSize: theme.typography.fontMd,
+      fontWeight: theme.typography.fontWeightSemibold,
+      lineHeight: theme.typography.leadingBase,
       color: theme.colors.text,
     },
     priceRow: {
@@ -138,8 +141,8 @@ export const useProductCompactCardStyles = createThemedStyles((theme) => {
       backgroundColor: `${theme.colors.danger}14`,
     },
     discountPillText: {
-      fontSize: 11,
-      fontWeight: "600",
+      fontSize: theme.typography.font2xs,
+      fontWeight: theme.typography.fontWeightSemibold,
       lineHeight: 14,
       color: theme.colors.danger,
     },
@@ -158,8 +161,8 @@ export const useProductCompactCardStyles = createThemedStyles((theme) => {
       backgroundColor: BC.promotionBannerBg,
     },
     promotionPillText: {
-      fontSize: 11,
-      fontWeight: "600",
+      fontSize: theme.typography.font2xs,
+      fontWeight: theme.typography.fontWeightSemibold,
       lineHeight: 14,
     },
     promotionPillTextBoost: {
@@ -177,8 +180,8 @@ export const useProductCompactCardStyles = createThemedStyles((theme) => {
       borderRadius: 999,
     },
     featurePillText: {
-      fontSize: 11,
-      fontWeight: "600",
+      fontSize: theme.typography.font2xs,
+      fontWeight: theme.typography.fontWeightSemibold,
       lineHeight: 14,
     },
     featurePillAuction: {
@@ -224,8 +227,8 @@ export const useProductCompactCardStyles = createThemedStyles((theme) => {
       backgroundColor: `${theme.colors.action}14`,
     },
     loyaltyPillText: {
-      fontSize: 11,
-      fontWeight: "600",
+      fontSize: theme.typography.font2xs,
+      fontWeight: theme.typography.fontWeightSemibold,
       lineHeight: 14,
       color: theme.colors.action,
     },
@@ -237,23 +240,23 @@ export const useProductCompactCardStyles = createThemedStyles((theme) => {
       marginTop: 2,
     },
     metaMuted: {
-      fontSize: 12,
-      lineHeight: 16,
+      fontSize: theme.typography.fontXs,
+      lineHeight: theme.typography.leading2xs,
       color: theme.colors.textMuted,
     },
     metaHint: {
-      fontSize: 12,
-      lineHeight: 16,
+      fontSize: theme.typography.fontXs,
+      lineHeight: theme.typography.leading2xs,
       color: theme.colors.textSecondary,
     },
     rejectionComment: {
-      fontSize: 12,
-      lineHeight: 16,
+      fontSize: theme.typography.fontXs,
+      lineHeight: theme.typography.leading2xs,
       color: theme.colors.danger,
     },
     description: {
-      fontSize: 13,
-      lineHeight: 18,
+      fontSize: theme.typography.fontSm,
+      lineHeight: theme.typography.leadingSm,
       color: theme.colors.textSecondary,
     },
     divider: {
@@ -262,6 +265,27 @@ export const useProductCompactCardStyles = createThemedStyles((theme) => {
     },
   };
 });
+
+/** Паритет web `.product-card--list`: thumb 112 / 96@≤640. */
+export const useProductCompactCardStyles = () => {
+  const base = useProductCompactCardBaseStyles();
+  const { width } = useWindowDimensions();
+  const thumbSize = resolveProductCompactCardThumbSize(width);
+
+  return useMemo(() => {
+    if (thumbSize === L.thumbSize) {
+      return base;
+    }
+    return {
+      ...base,
+      thumbWrap: {
+        ...base.thumbWrap,
+        width: thumbSize,
+        height: thumbSize,
+      },
+    };
+  }, [base, thumbSize]);
+};
 
 /** @deprecated use useProductCompactCardStyles */
 export const useProductModerationQueueCardStyles = useProductCompactCardStyles;

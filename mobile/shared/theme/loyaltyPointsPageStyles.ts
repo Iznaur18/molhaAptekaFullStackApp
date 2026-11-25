@@ -1,21 +1,24 @@
 import { StyleSheet } from "react-native";
 
 import { PROFILE_ACCOUNT_STACK_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
+import {
+  PROFILE_LIST_HERO_CHROME as HERO,
+  PROFILE_LIST_HERO_NO_SHADOW,
+} from "@/shared/lib/profileListHeroChrome";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-export const useLoyaltyPointsPageStyles = createThemedStyles((theme) => ({
+export const useLoyaltyPointsPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   scroll: {
     flexGrow: 1,
   },
   content: {
     gap: L.stackGap,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 12,
   },
   contentInAccountShell: {
@@ -28,15 +31,11 @@ export const useLoyaltyPointsPageStyles = createThemedStyles((theme) => ({
   balanceCard: {
     flexDirection: "row",
     alignItems: "flex-start",
-    gap: 14,
-    padding: 20,
-    borderRadius: 18,
+    gap: HERO.gap,
+    padding: HERO.padding,
+    borderRadius: HERO.radiusDefault,
     backgroundColor: theme.colors.primary,
-    shadowColor: theme.colors.ink,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.16,
-    shadowRadius: 14,
-    elevation: 5,
+    ...PROFILE_LIST_HERO_NO_SHADOW,
   },
   balanceTextBlock: {
     flex: 1,
@@ -44,10 +43,10 @@ export const useLoyaltyPointsPageStyles = createThemedStyles((theme) => ({
     gap: 2,
   },
   balanceCaption: {
-    fontSize: 12,
-    fontWeight: "700",
+    fontSize: HERO.captionFontSize,
+    fontWeight: theme.typography.fontWeightBold,
     textTransform: "uppercase",
-    letterSpacing: 0.8,
+    letterSpacing: HERO.captionLetterSpacing,
     color: theme.colors.onContrast,
     opacity: 0.72,
   },
@@ -57,29 +56,29 @@ export const useLoyaltyPointsPageStyles = createThemedStyles((theme) => ({
     gap: 6,
   },
   balanceValue: {
-    fontSize: 34,
-    fontWeight: "800",
-    letterSpacing: -0.5,
+    fontSize: HERO.valueFontSize,
+    fontWeight: HERO.valueFontWeight,
+    letterSpacing: HERO.valueLetterSpacing,
     color: theme.colors.onContrast,
     fontVariant: ["tabular-nums"],
   },
   balanceUnit: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
     opacity: 0.85,
   },
   balanceInfo: {
     marginTop: 8,
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     lineHeight: 19,
     color: theme.colors.onContrast,
     opacity: 0.8,
   },
   balanceIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: HERO.iconSize,
+    height: HERO.iconSize,
+    borderRadius: HERO.iconSize / 2,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "rgba(255, 255, 255, 0.16)",
@@ -93,8 +92,8 @@ export const useLoyaltyPointsPageStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
   },
   usesTitle: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   useRow: {
@@ -113,7 +112,7 @@ export const useLoyaltyPointsPageStyles = createThemedStyles((theme) => ({
   useText: {
     flex: 1,
     fontSize: 14.5,
-    lineHeight: 20,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.textSecondary,
   },
   purchase: {
@@ -125,13 +124,13 @@ export const useLoyaltyPointsPageStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
   },
   purchaseTitle: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   purchaseLabel: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   purchaseInput: {
@@ -140,14 +139,14 @@ export const useLoyaltyPointsPageStyles = createThemedStyles((theme) => ({
     borderWidth: 1,
     borderRadius: 12,
     borderColor: theme.colors.borderStrong,
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: theme.typography.font2xl,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
     backgroundColor: theme.colors.surface,
     fontVariant: ["tabular-nums"],
   },
   purchaseHint: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
     lineHeight: 19,
   },
@@ -158,15 +157,15 @@ export const useLoyaltyPointsPageStyles = createThemedStyles((theme) => ({
     borderRadius: theme.radius.pill,
     backgroundColor: theme.colors.successSurface,
     color: theme.colors.successText,
-    fontSize: 14,
-    fontWeight: "700",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightBold,
     fontVariant: ["tabular-nums"],
     overflow: "hidden",
   },
   purchaseError: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.danger,
-    lineHeight: 20,
+    lineHeight: theme.typography.leadingBase,
   },
   buyButton: {
     width: "100%",
@@ -180,19 +179,19 @@ export const useLoyaltyPointsPageStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.actionBorder,
     backgroundColor: theme.colors.actionSoft,
     color: theme.colors.infoDeep,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
   },
   centered: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
-    backgroundColor: theme.colors.bg,
+    paddingHorizontal: layout.contentPaddingHorizontal,
+    backgroundColor: layout.pageBackground,
   },
   hint: {
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     color: theme.colors.textMuted,
     textAlign: "center",
   },
@@ -204,7 +203,7 @@ export const useLoyaltyPointsPageStyles = createThemedStyles((theme) => ({
   },
   loginButtonText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     fontSize: 15.2,
   },
 }));

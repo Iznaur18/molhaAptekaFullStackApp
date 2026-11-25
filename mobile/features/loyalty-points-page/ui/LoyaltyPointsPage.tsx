@@ -5,8 +5,9 @@ import {
 } from "@molha/api-contract";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  Linking,
   Pressable,
   Text,
   TextInput,
@@ -15,18 +16,31 @@ import {
 } from "react-native";
 
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
+import {
+  forgetPendingPaymentId,
+  readPendingPaymentId,
+  rememberPendingPaymentId,
+} from "@/entities/payment/lib/pendingPaymentStorage";
+import { useCreateLoyaltyPointsPaymentMutation } from "@/entities/payment/model/useCreateLoyaltyPointsPaymentMutation";
+import { useMyPaymentQuery } from "@/entities/payment/model/useMyPaymentQuery";
+import { usePaymentConfigQuery } from "@/entities/payment/model/usePaymentConfigQuery";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useAdminCreditOwnLoyaltyPointsMutation } from "@/entities/user/model/useAdminCreditOwnLoyaltyPointsMutation";
 import { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyaltyPointsStatusQuery";
 import {
   LOYALTY_POINTS_PURCHASE_MAX_RUB,
   LOYALTY_POINTS_PURCHASE_MIN_RUB,
+  LOYALTY_POINTS_RETURN_PATH,
 } from "@/features/loyalty-points-page/model/loyaltyPointsPurchaseConstants";
 import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
 import { ProfileAccountScrollBody } from "@/features/profile-tab/ui/ProfileAccountScrollBody";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
-import { LOYALTY_POINTS_PAGE_UI, MY_PROFILE_PAGE_UI } from "@/shared/config";
+import {
+  LOYALTY_POINTS_PAGE_UI,
+  MY_PROFILE_PAGE_UI,
+  PAYMENT_UI,
+} from "@/shared/config";
 import { rublesToLoyaltyPoints } from "@/shared/config/loyaltyPointsConstants";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { pluralizeRuBall } from "@/shared/lib/pluralizeRuBall";
@@ -60,18 +74,41 @@ export const LoyaltyPointsPage = () => {
   const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [purchaseAmountInput, setPurchaseAmountInput] = useState("");
   const [purchaseValidationError, setPurchaseValidationError] = useState("");
+  const [paymentError, setPaymentError] = useState("");
   const [comingSoonMessage, setComingSoonMessage] = useState("");
+  const [watchedPaymentId, setWatchedPaymentId] = useState("");
   const [adminAmountInput, setAdminAmountInput] = useState("");
   const [adminValidationError, setAdminValidationError] = useState("");
   const [adminSuccessMessage, setAdminSuccessMessage] = useState("");
+
+  const paymentConfigQuery = usePaymentConfigQuery({ enabled: isAuthorized });
+  const createPaymentMutation = useCreateLoyaltyPointsPaymentMutation();
+  const isCardPaymentEnabled = paymentConfigQuery.data?.cardPaymentEnabled === true;
+
+  const watchedPaymentQuery = useMyPaymentQuery({
+    paymentId: watchedPaymentId || null,
+  });
+  const watchedPayment = watchedPaymentQuery.data;
 
   useFocusEffect(
     useCallback(() => {
       if (isAuthorized) {
         void statusQuery.refetch();
       }
+      void (async () => {
+        const pendingId = await readPendingPaymentId();
+        if (pendingId) {
+          setWatchedPaymentId(pendingId);
+        }
+      })();
     }, [isAuthorized, statusQuery.refetch]),
   );
+
+  useEffect(() => {
+    if (watchedPayment && watchedPayment.status !== "created") {
+      void forgetPendingPaymentId();
+    }
+  }, [watchedPayment]);
 
   const purchaseAmountRub = useMemo(
     () => parseRubPriceInput(purchaseAmountInput),
@@ -94,6 +131,7 @@ export const LoyaltyPointsPage = () => {
     setPurchaseAmountInput(formatRubPriceInput(value));
     setPurchaseValidationError("");
     setComingSoonMessage("");
+    setPaymentError("");
   };
 
   const handleAdminAmountChange = (value: string) => {
@@ -102,8 +140,9 @@ export const LoyaltyPointsPage = () => {
     setAdminSuccessMessage("");
   };
 
-  const handlePurchaseSubmit = () => {
+  const handlePurchaseSubmit = async () => {
     setComingSoonMessage("");
+    setPaymentError("");
     if (purchaseAmountRub == null) {
       setPurchaseValidationError(LOYALTY_POINTS_PAGE_UI.PURCHASE_AMOUNT_MIN(1));
       return;
@@ -121,12 +160,37 @@ export const LoyaltyPointsPage = () => {
       return;
     }
     setPurchaseValidationError("");
-    setComingSoonMessage(
-      LOYALTY_POINTS_PAGE_UI.COMING_SOON_AMOUNT(
-        purchaseAmountRub,
-        purchasePointsPreview,
-      ),
-    );
+
+    if (!isCardPaymentEnabled) {
+      setComingSoonMessage(
+        LOYALTY_POINTS_PAGE_UI.COMING_SOON_AMOUNT(
+          purchaseAmountRub,
+          purchasePointsPreview,
+        ),
+      );
+      return;
+    }
+
+    try {
+      const payment = await createPaymentMutation.mutateAsync({
+        amountRub: purchaseAmountRub,
+        returnUrl: `${LOYALTY_POINTS_RETURN_PATH}?paid=1`,
+      });
+      await rememberPendingPaymentId(payment.paymentId);
+      if (!payment.confirmationUrl) {
+        setPaymentError(LOYALTY_POINTS_PAGE_UI.PAY_ERROR);
+        return;
+      }
+      try {
+        await Linking.openURL(payment.confirmationUrl);
+      } catch (openError) {
+        console.warn("[payment] open confirmation url failed", openError);
+        setPaymentError(PAYMENT_UI.OPEN_URL_ERROR);
+        return;
+      }
+    } catch (error) {
+      setPaymentError(formatApiErrorMessage(error, LOYALTY_POINTS_PAGE_UI.PAY_ERROR));
+    }
   };
 
   const handleAdminFreeCreditSubmit = async () => {
@@ -211,7 +275,8 @@ export const LoyaltyPointsPage = () => {
   const canSubmitPurchase =
     purchaseAmountRub != null &&
     purchaseAmountRub >= LOYALTY_POINTS_PURCHASE_MIN_RUB &&
-    purchaseAmountRub <= LOYALTY_POINTS_PURCHASE_MAX_RUB;
+    purchaseAmountRub <= LOYALTY_POINTS_PURCHASE_MAX_RUB &&
+    !createPaymentMutation.isPending;
   const canSubmitAdminCredit =
     adminAmountPoints != null &&
     adminAmountPoints >= LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN &&
@@ -291,15 +356,43 @@ export const LoyaltyPointsPage = () => {
               </Text>
             ) : null}
             <AppButton
-              label={LOYALTY_POINTS_PAGE_UI.BUY}
+              label={
+                createPaymentMutation.isPending
+                  ? LOYALTY_POINTS_PAGE_UI.PAY_REDIRECT
+                  : LOYALTY_POINTS_PAGE_UI.BUY
+              }
               variant="primary"
               style={styles.buyButton}
-              onPress={handlePurchaseSubmit}
+              onPress={() => {
+                void handlePurchaseSubmit();
+              }}
               disabled={!canSubmitPurchase}
             />
             {comingSoonMessage ? (
               <Text style={styles.soon} accessibilityRole="text">
                 {comingSoonMessage}
+              </Text>
+            ) : null}
+            {paymentError ? (
+              <Text style={styles.purchaseError} accessibilityRole="alert">
+                {paymentError}
+              </Text>
+            ) : null}
+            {watchedPayment?.status === "created" ? (
+              <Text style={styles.soon} accessibilityRole="text">
+                {LOYALTY_POINTS_PAGE_UI.PAY_PENDING}
+              </Text>
+            ) : null}
+            {watchedPayment?.status === "succeeded" ? (
+              <Text style={styles.soon} accessibilityRole="text">
+                {LOYALTY_POINTS_PAGE_UI.PAY_SUCCESS(
+                  watchedPayment.creditedPoints ?? purchasePointsPreview,
+                )}
+              </Text>
+            ) : null}
+            {watchedPayment?.status === "canceled" ? (
+              <Text style={styles.purchaseError} accessibilityRole="alert">
+                {LOYALTY_POINTS_PAGE_UI.PAY_CANCELED}
               </Text>
             ) : null}
           </View>

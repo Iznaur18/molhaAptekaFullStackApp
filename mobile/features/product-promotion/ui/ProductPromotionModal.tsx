@@ -27,6 +27,8 @@ import type {
   ProductPromotionDuration,
   ProductPromotionTier,
 } from "@/entities/product/api/fetchProductPromotionTariffs";
+import { applyPromoReturnStreakDiscount } from "@/entities/promo-return-streak/lib/promoReturnStreakPricing";
+import { useActivePromoReturnStreakDiscountPercent } from "@/entities/promo-return-streak/model/useActivePromoReturnStreakDiscountPercent";
 import { useProductPromotionModalTab } from "@/features/product-promotion/model/useProductPromotionModalTab";
 import { ProductPromotionManageTab } from "@/features/product-promotion/ui/ProductPromotionManageTab";
 import { InstallmentProgramModal } from "@/entities/installment/ui/InstallmentProgramModal";
@@ -278,6 +280,16 @@ export const ProductPromotionModal = ({
     });
   }, [resolvedProductPrice, selectedDuration, selectedTier]);
 
+  const streakDiscountPercent = useActivePromoReturnStreakDiscountPercent({
+    enabled: visible,
+  });
+  const chargeAmountRub = useMemo(
+    () => applyPromoReturnStreakDiscount(selectedAmountRub, streakDiscountPercent),
+    [selectedAmountRub, streakDiscountPercent],
+  );
+  const showStreakDiscount =
+    streakDiscountPercent > 0 && chargeAmountRub < selectedAmountRub;
+
   // Баланс баллов продвижение не оплачивает с перехода на СБП: счёт приходит
   // после заявки. С прежней проверкой продавец без баллов не мог даже её
   // отправить.
@@ -366,11 +378,15 @@ export const ProductPromotionModal = ({
           <Text style={styles.sectionTitle}>{PRODUCT_PROMOTION_UI.DURATION_LABEL}</Text>
           <View style={styles.durationRow}>
             {durations.map((duration) => {
-              const amountRub = calculateProductPromotionAmountRub({
+              const listAmountRub = calculateProductPromotionAmountRub({
                 productPrice: resolvedProductPrice,
                 tier: selectedTier,
                 durationCode: duration.code,
               });
+              const amountRub = applyPromoReturnStreakDiscount(
+                listAmountRub,
+                streakDiscountPercent,
+              );
               const isSelected = selectedDurationCode === duration.code;
               const durationStyle = resolveProductPromotionDurationChipStyle(
                 isSelected,
@@ -421,9 +437,19 @@ export const ProductPromotionModal = ({
                     },
                   ]}
                 >
-                  {PRODUCT_PROMOTION_UI.TOTAL_RUB(selectedAmountRub)}
+                  {PRODUCT_PROMOTION_UI.TOTAL_RUB(chargeAmountRub)}
                 </Text>
               </View>
+              {showStreakDiscount ? (
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>
+                    {PRODUCT_PROMOTION_UI.STREAK_DISCOUNT_BADGE(streakDiscountPercent)}
+                  </Text>
+                  <Text style={styles.summaryValueStrong}>
+                    {PRODUCT_PROMOTION_UI.STREAK_LIST_PRICE(selectedAmountRub, "руб.")}
+                  </Text>
+                </View>
+              ) : null}
             </>
           ) : null}
         </View>

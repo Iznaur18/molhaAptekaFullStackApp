@@ -6,8 +6,12 @@ import {
   IZ_COLOR_COMPAT_KEYS,
   izColors,
 } from "../packages/design-tokens/src/colors.ts";
+import { izInteraction } from "../packages/design-tokens/src/interaction.ts";
+import { izPageBgCustom } from "../packages/design-tokens/src/pageBg.ts";
 import { izRadius } from "../packages/design-tokens/src/radius.ts";
+import { izModalBackdropScrimCss } from "../packages/design-tokens/src/scrim.ts";
 import { izSpacing } from "../packages/design-tokens/src/spacing.ts";
+import { izTypography } from "../packages/design-tokens/src/typography.ts";
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const cssPath = path.resolve(scriptDir, "../client/src/shared/styles/designTokens.css");
@@ -106,6 +110,63 @@ for (const [tokenKey, tokenValue] of Object.entries(izSpacing)) {
       `spacing mismatch ${varName}: css=${cssValue} tokens=${tokenValue}px`,
     );
   }
+}
+
+const FONT_SCALE = [
+  ["2xs", izTypography.font2xs],
+  ["xs", izTypography.fontXs],
+  ["sm", izTypography.fontSm],
+  ["base", izTypography.fontBase],
+  ["md", izTypography.fontMd],
+  ["lg", izTypography.fontLg],
+  ["xl", izTypography.fontXl],
+  ["2xl", izTypography.font2xl],
+  ["3xl", izTypography.font3xl],
+  ["4xl", izTypography.font4xl],
+  ["5xl", izTypography.font5xl],
+  ["6xl", izTypography.font6xl],
+  ["7xl", izTypography.font7xl],
+];
+for (const [suffix, tokenValue] of FONT_SCALE) {
+  const varName = `--iz-font-${suffix}`;
+  const cssValue = cssVars.get(varName);
+  if (!cssValue) {
+    violations.push(`missing font var ${varName}`);
+    continue;
+  }
+  const cssPx = parseCssLengthToPx(cssValue);
+  if (!Number.isFinite(cssPx) || Math.abs(cssPx - tokenValue) > FLOAT_TOLERANCE) {
+    violations.push(`font mismatch ${varName}: css=${cssValue} tokens=${tokenValue}px`);
+  }
+}
+
+const modalScrimCss = cssVars.get("--iz-color-modal-scrim");
+if (!modalScrimCss) {
+  violations.push("missing --iz-color-modal-scrim");
+} else if (
+  modalScrimCss.replace(/\s+/g, " ") !== izModalBackdropScrimCss.replace(/\s+/g, " ")
+) {
+  violations.push(
+    `modal scrim mismatch: css=${modalScrimCss} tokens=${izModalBackdropScrimCss}`,
+  );
+}
+
+const disabledOpacityCss = cssVars.get("--iz-state-disabled-opacity");
+if (!disabledOpacityCss) {
+  violations.push("missing --iz-state-disabled-opacity");
+} else if (
+  Math.abs(Number.parseFloat(disabledOpacityCss) - izInteraction.disabledOpacity) >
+  0.001
+) {
+  violations.push(
+    `disabled opacity mismatch: css=${disabledOpacityCss} tokens=${izInteraction.disabledOpacity}`,
+  );
+}
+
+const indexCssPath = path.resolve(scriptDir, "../client/src/index.css");
+const indexCss = await fs.readFile(indexCssPath, "utf8");
+if (!indexCss.includes(`--iz-page-bg-custom: ${izPageBgCustom}`)) {
+  violations.push(`custom page bg missing in index.css (expected ${izPageBgCustom})`);
 }
 
 if (violations.length > 0) {

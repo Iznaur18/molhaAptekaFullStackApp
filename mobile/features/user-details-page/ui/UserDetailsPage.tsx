@@ -12,13 +12,14 @@ import { USER_DETAILS_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useUserDetailsPageStyles } from "@/shared/theme/profileChromeStyles";
+import { MobileBottomNavOverlay } from "@/shared/ui/MobileBottomNavOverlay";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 import { ScreenWithBack } from "@/shared/ui/ScreenWithBack";
 
 export const UserDetailsPage = () => {
   const router = useRouter();
   const styles = useUserDetailsPageStyles();
-  const { centeredContentStyle } = useScreenLayout();
+  const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
   const {
     userId,
     user,
@@ -79,7 +80,10 @@ export const UserDetailsPage = () => {
       <View style={[styles.screen, centeredContentStyle]}>
         <ScrollView
           style={styles.screen}
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[
+            styles.scrollContent,
+            { paddingBottom: contentPaddingBottom },
+          ]}
           refreshControl={
             <ThemedRefreshControl
               refreshing={profileQuery.isRefetching}
@@ -128,6 +132,8 @@ export const UserDetailsPage = () => {
           />
         </ScrollView>
       </View>
+      {/* Паритет web AppShell: bottom nav на `/user/:id` (вне product details). */}
+      <MobileBottomNavOverlay />
     </View>
   );
 };

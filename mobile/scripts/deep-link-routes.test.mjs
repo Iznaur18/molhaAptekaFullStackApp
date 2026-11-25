@@ -54,6 +54,8 @@ test("динамические разделы разбираются по id", (
   assert.equal(resolveWebPathToMobileRoute("/seller/64ab"), "/seller/64ab");
   assert.equal(resolveWebPathToMobileRoute("/user/64ab"), "/user/64ab");
   assert.equal(resolveWebPathToMobileRoute("/hub/my-sales"), "/hub/my-sales");
+  assert.equal(resolveWebPathToMobileRoute("/orders/64ab"), "/orders/64ab");
+  assert.equal(resolveWebPathToMobileRoute("/my-orders/64ab"), "/orders/64ab");
 });
 
 test("служебные сегменты /user/* не считаются профилем", () => {
@@ -62,8 +64,9 @@ test("служебные сегменты /user/* не считаются про
 });
 
 test("вложенный путь схлопывается к своему разделу", () => {
-  assert.equal(resolveWebPathToMobileRoute("/orders/64ab"), "/orders");
   assert.equal(resolveWebPathToMobileRoute("/notifications/64ab"), "/notifications");
+  assert.equal(resolveWebPathToMobileRoute("/orders"), "/orders");
+  assert.equal(resolveWebPathToMobileRoute("/my-orders"), "/hub/my-orders");
 });
 
 test("легаси-пути веба ведут туда же, куда ведёт редирект в вебе", () => {
@@ -86,6 +89,7 @@ test("разделы, которых на мобилке нет, отдают nu
   assert.equal(resolveWebPathToMobileRoute("/staff-audit-log-admin"), null);
   assert.equal(resolveWebPathToMobileRoute("/broadcast-notifications-admin"), null);
   assert.equal(resolveWebPathToMobileRoute("/profile/onec-integration"), null);
+  assert.equal(resolveWebPathToMobileRoute("/profile/delivery-payment"), null);
 });
 
 test("каждый путь HOME_MAIN_VIEW_PATH веба либо открывается, либо помечен web-only", () => {
@@ -100,6 +104,7 @@ test("каждый путь HOME_MAIN_VIEW_PATH веба либо открыва
 
   const knownWebOnly = new Set([
     "/profile/onec-integration",
+    "/profile/delivery-payment",
     "/staff-audit-log-admin",
     "/broadcast-notifications-admin",
     "/admin-analytics",

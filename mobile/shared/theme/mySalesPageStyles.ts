@@ -1,7 +1,6 @@
 import { StyleSheet } from "react-native";
 
 import { MY_SALES_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const CHIP_PADDING_VERTICAL = 4;
@@ -9,18 +8,18 @@ const CHIP_PADDING_HORIZONTAL = 8;
 const OVERVIEW_TILE_RADIUS = 16;
 const SEARCH_RADIUS = 12;
 
-export const useMySalesPageStyles = createThemedStyles((theme) => ({
+export const useMySalesPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   listFlex: {
     flex: 1,
     minHeight: 0,
   },
   list: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     flexGrow: 1,
   },
   /** Desktop hub: shell уже даёт pad; gutter 0 как web `.my-sales-page`. */
@@ -63,12 +62,12 @@ export const useMySalesPageStyles = createThemedStyles((theme) => ({
   toolbarHeading: {
     flex: 1,
     fontSize: 15.2,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   totalSalesCount: {
     fontSize: 13.6,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     fontVariant: ["tabular-nums"],
   },
@@ -92,7 +91,7 @@ export const useMySalesPageStyles = createThemedStyles((theme) => ({
   },
   statusMoreText: {
     fontSize: 14.4,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     lineHeight: 18.7,
     color: theme.colors.textSecondary,
   },
@@ -106,7 +105,7 @@ export const useMySalesPageStyles = createThemedStyles((theme) => ({
   },
   statusChipText: {
     fontSize: 14.4,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     lineHeight: 18.7,
     color: theme.colors.textSecondary,
   },
@@ -126,8 +125,8 @@ export const useMySalesPageStyles = createThemedStyles((theme) => ({
   searchField: {
     flex: 1,
     minWidth: 0,
-    fontSize: 16,
-    lineHeight: 20,
+    fontSize: theme.typography.fontLg,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.text,
     paddingVertical: 10,
     paddingHorizontal: 12,
@@ -137,8 +136,8 @@ export const useMySalesPageStyles = createThemedStyles((theme) => ({
     paddingVertical: 8,
   },
   searchClearText: {
-    fontSize: 20,
-    lineHeight: 22,
+    fontSize: theme.typography.font3xl,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textMuted,
   },
   searchSpinner: {
@@ -151,29 +150,19 @@ export const useMySalesPageStyles = createThemedStyles((theme) => ({
     color: theme.colors.textSecondary,
     paddingVertical: 8,
   },
+  /** Guest: как orders/cart centered + AppButton. */
   centered: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     padding: theme.spacing[6],
-    gap: theme.spacing[4],
   },
   hint: {
-    fontSize: 15,
+    fontSize: theme.typography.fontLg,
+    lineHeight: theme.typography.leadingXl,
     textAlign: "center",
-    lineHeight: 22,
     color: theme.colors.textMuted,
-  },
-  button: {
-    borderRadius: 16,
-    paddingVertical: theme.spacing[3],
-    paddingHorizontal: theme.spacing[6],
-    backgroundColor: theme.colors.action,
-  },
-  buttonText: {
-    color: theme.colors.onContrast,
-    fontSize: 15,
-    fontWeight: "600",
+    marginBottom: theme.spacing[4],
   },
   overview: {
     flexDirection: "row",
@@ -204,14 +193,14 @@ export const useMySalesPageStyles = createThemedStyles((theme) => ({
   },
   overviewLabel: {
     fontSize: 11.2,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: 0.4,
     textTransform: "uppercase",
     color: theme.colors.textMuted,
   },
   overviewValue: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     fontVariant: ["tabular-nums"],
   },

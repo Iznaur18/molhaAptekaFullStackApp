@@ -10,6 +10,7 @@ import {
 import { setProductInstallmentEnabled } from "@/entities/installment/lib/setProductInstallmentEnabled";
 import { useMyProductMutations } from "@/entities/product/model/useMyProductMutations";
 import { useRequestProductPromotionMutation } from "@/entities/product/model/useRequestProductPromotionMutation";
+import { invalidatePromoReturnStreak } from "@/entities/promo-return-streak/model/usePromoReturnStreak";
 import { useProductPromotionManageSupport } from "@/features/product-promotion/model/useProductPromotionManageSupport";
 import { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyaltyPointsStatusQuery";
 import { API_CLIENT_UI, PRODUCT_PROMOTION_UI } from "@/shared/config";
@@ -124,6 +125,7 @@ export const useMyProductsPageActions = () => {
           queryClient.invalidateQueries({ queryKey: myProductsQueryKeys.all }),
           queryClient.invalidateQueries({ queryKey: catalogQueryKeys.all }),
           queryClient.invalidateQueries({ queryKey: loyaltyPointsQueryKeys.status() }),
+          invalidatePromoReturnStreak(queryClient),
         ]);
         setCatalogNotice(result.message ?? PRODUCT_PROMOTION_UI.SUCCESS_DEFAULT);
         handleClosePromotionModal();

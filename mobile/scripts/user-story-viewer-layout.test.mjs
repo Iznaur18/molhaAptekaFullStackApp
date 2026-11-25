@@ -34,6 +34,9 @@ test("story viewer modal is fullscreen with web-like frame", () => {
     source,
     /<View style=\{\[styles\.frame, frameSize\]\}>[\s\S]*styles\.edgePrev/,
   );
+  assert.match(source, /router\.push\("\/hub\/my-products"\)/);
+  assert.match(source, /router\.push\(`\/user\/\$\{authorKey\}`\)/);
+  assert.doesNotMatch(source, /router\.push\(`\/seller\/\$\{authorKey\}`\)/);
   assert.match(styles, /footer:[\s\S]*zIndex: 4/);
   assert.match(styles, /edgePrev:[\s\S]*zIndex: 1/);
 });

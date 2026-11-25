@@ -1,17 +1,16 @@
 import { StyleSheet } from "react-native";
 
 import { MY_SALES_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
+export const useIntroAdModerationPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   scroll: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 12,
     gap: L.stackGap,
   },
@@ -46,7 +45,7 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
   toolbarHeading: {
     flex: 1,
     fontSize: 15.2,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   queueCount: {
@@ -67,7 +66,7 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
   },
   refreshText: {
     fontSize: 12.8,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   sectionChips: {
@@ -88,7 +87,7 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
   },
   sectionChipText: {
     fontSize: 14.4,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   sectionChipTextActive: {
@@ -185,14 +184,14 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
   },
   overviewLabel: {
     fontSize: 11.5,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     letterSpacing: 0.3,
     textTransform: "uppercase",
     color: theme.colors.textMuted,
   },
   overviewValue: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     fontVariant: ["tabular-nums"],
     color: theme.colors.text,
   },
@@ -200,8 +199,8 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
     color: theme.colors.warningText,
   },
   overviewValueMuted: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.textMuted,
   },
   listActions: {
@@ -220,7 +219,7 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
   },
   listActionText: {
     fontSize: 13.2,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   filterHint: {
@@ -240,8 +239,8 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
   },
   sectionTitle: {
     margin: 0,
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   sectionBadge: {
@@ -254,8 +253,8 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
     justifyContent: "center",
   },
   sectionBadgeText: {
-    fontSize: 12,
-    fontWeight: "700",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.onContrast,
   },
   list: {
@@ -326,12 +325,12 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
   },
   collapsedTitle: {
     fontSize: 14.8,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   collapsedPreview: {
     fontSize: 12.8,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.warningText,
   },
   collapsedMeta: {
@@ -343,18 +342,18 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
     color: theme.colors.textMuted,
   },
   collapsedChevron: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.textMuted,
   },
   collapsedExpandLabel: {
     fontSize: 10.5,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textMuted,
   },
   state: {
     marginBottom: 16,
     fontSize: 15.2,
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textSecondary,
   },
   stateError: {
@@ -362,7 +361,7 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
   },
   empty: {
     fontSize: 15.2,
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textSecondary,
     textAlign: "center",
     paddingVertical: 8,
@@ -372,7 +371,7 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
-    backgroundColor: theme.colors.bg,
+    paddingHorizontal: layout.contentPaddingHorizontal,
+    backgroundColor: layout.pageBackground,
   },
 }));

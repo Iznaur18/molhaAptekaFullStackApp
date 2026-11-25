@@ -1,13 +1,12 @@
 import { StyleSheet } from "react-native";
 
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 
 /**
  * Окна витрины «QR-код» и «Соцсети и сайт» — паритет web `SellerQrSheet.css`
  * (каркас) и `SellerSocialLinksSheet.css` (строки).
  */
-export const useSellerStorefrontSheetStyles = createThemedStyles((theme) => ({
+export const useSellerStorefrontSheetStyles = createThemedStyles((theme, layout) => ({
   overlay: {
     flex: 1,
     justifyContent: "flex-end",
@@ -31,24 +30,24 @@ export const useSellerStorefrontSheetStyles = createThemedStyles((theme) => ({
     justifyContent: "space-between",
     gap: 12,
     paddingTop: 16,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingBottom: 12,
   },
   title: {
     flexShrink: 1,
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: theme.typography.font2xl,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   close: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textMuted,
   },
   body: {
     gap: 12,
     paddingTop: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     borderTopWidth: 1,
     borderTopColor: theme.colors.border,
   },
@@ -84,7 +83,7 @@ export const useSellerStorefrontSheetStyles = createThemedStyles((theme) => ({
   },
   cardCaption: {
     fontSize: 12.8,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: "#6b7280",
     textAlign: "center",
   },
@@ -103,17 +102,17 @@ export const useSellerStorefrontSheetStyles = createThemedStyles((theme) => ({
   },
   statsTitle: {
     fontSize: 14.4,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   statsValue: {
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     fontWeight: "800",
     color: theme.colors.text,
   },
   statsNote: {
     fontSize: 12.5,
-    lineHeight: 17,
+    lineHeight: theme.typography.leadingXs,
     color: theme.colors.textMuted,
   },
   list: {
@@ -143,19 +142,19 @@ export const useSellerStorefrontSheetStyles = createThemedStyles((theme) => ({
     minWidth: 0,
   },
   rowLabel: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     lineHeight: 19,
     color: theme.colors.text,
   },
   rowValue: {
-    fontSize: 13,
-    lineHeight: 17,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingXs,
     color: theme.colors.textMuted,
   },
   addTitle: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
 }));

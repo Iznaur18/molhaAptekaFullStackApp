@@ -1,3 +1,5 @@
+import { izTypography } from "@izibuy/design-tokens";
+
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 export const useCancelButtonStyles = createThemedStyles((theme) => ({
@@ -28,13 +30,13 @@ export const useCancelButtonStyles = createThemedStyles((theme) => ({
   },
   cancelButtonText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     fontSize: 15.2,
   },
   cancelButtonTextCompact: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
-    fontSize: 14,
+    fontWeight: theme.typography.fontWeightSemibold,
+    fontSize: theme.typography.fontBase,
   },
   cancelButtonDisabled: {
     opacity: 0.55,
@@ -55,7 +57,7 @@ export const cancelButtonStyleBlock = (theme: {
   },
   cancelButtonText: {
     color: theme.colors.onContrast,
-    fontWeight: "600" as const,
+    fontWeight: izTypography.fontWeightSemibold,
     fontSize: 15.2,
   },
   cancelButtonDisabled: {

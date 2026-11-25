@@ -1,7 +1,5 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
-import { Pressable } from "react-native";
-
 import { isCurrentUserProductSeller } from "@/entities/product/lib/isCurrentUserProductSeller";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
@@ -11,6 +9,7 @@ import { PRODUCT_DETAIL_HERO_CHROME } from "@/shared/lib/productDetailHeroChrome
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductDetailHeroChromeStyles } from "@/shared/theme/catalogProductStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
+import { PressableScale } from "@/shared/ui/PressableScale";
 
 type WishlistToggleButtonProps = {
   productId: string;
@@ -77,7 +76,7 @@ export const WishlistToggleButton = ({
   };
 
   return (
-    <Pressable
+    <PressableScale
       style={[
         isHeroInline ? heroChromeStyles.actionButton : styles.root,
         variant === "card" && styles.card,
@@ -103,6 +102,6 @@ export const WishlistToggleButton = ({
         }
         color={active ? theme.colors.onContrast : theme.colors.text}
       />
-    </Pressable>
+    </PressableScale>
   );
 };

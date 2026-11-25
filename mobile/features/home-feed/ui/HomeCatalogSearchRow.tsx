@@ -5,10 +5,7 @@ import { HomeCatalogFiltersButton } from "@/features/home-feed/ui/HomeCatalogFil
 import { HomeCatalogHeaderPanel } from "@/features/home-feed/ui/HomeCatalogHeaderPanel";
 import { HomeCatalogHeaderSearch } from "@/features/home-feed/ui/HomeCatalogHeaderSearch";
 import { HomeCatalogUsersButton } from "@/features/home-feed/ui/HomeCatalogUsersButton";
-import {
-  HOME_CATALOG_HEADER_PANEL_FLOATING_PADDING,
-  resolveHomeCatalogHeaderPanelPaddingTop,
-} from "@/shared/lib/homeCatalogHeaderLayout";
+import { resolveHomeCatalogHeaderPanelPaddingTop } from "@/shared/lib/homeCatalogHeaderLayout";
 import { resolveScreenContentInlinePadding } from "@/shared/lib/screenBreakpoints";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useHomeCatalogHeaderStyles } from "@/shared/theme/homeCatalogHeaderStyles";
@@ -36,14 +33,17 @@ export const HomeCatalogSearchRow = ({
   const insets = useSafeAreaInsets();
   const { width } = useScreenLayout();
   const styles = useHomeCatalogHeaderStyles();
+  // Embedded: top уже в `homeFeedScrollTopInset` (safe-area + 8), как web
+  // `padding-top: fixed-top + 2.75rem + space-2` — без второго paddingTop на панели.
   const paddingTop = embeddedInForegroundSheet
-    ? HOME_CATALOG_HEADER_PANEL_FLOATING_PADDING.top
+    ? 0
     : resolveHomeCatalogHeaderPanelPaddingTop(insets.top);
   const inlinePadding = resolveScreenContentInlinePadding(width);
 
   return (
     <HomeCatalogHeaderPanel
       paddingTop={paddingTop}
+      flatSheet={embeddedInForegroundSheet}
       style={{
         paddingHorizontal: embeddedInForegroundSheet ? 0 : inlinePadding,
       }}

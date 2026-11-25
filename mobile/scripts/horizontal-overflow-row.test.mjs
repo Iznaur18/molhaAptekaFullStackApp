@@ -23,10 +23,13 @@ test("horizontal overflow row avoids RN Web scroll stretch", () => {
 
   assert.match(row, /flexGrow: 0/);
   assert.match(row, /flexShrink: 0/);
+  assert.match(row, /minHeight: height/);
   assert.match(row, /overflowY: "hidden"/);
   assert.match(row, /isReactNativeWeb/);
   assert.match(row, /domTrackBaseStyle/);
   assert.doesNotMatch(row, /FlatList/);
+  // Shorthand в StyleSheet схлопывает track на RN Web (`0 1 0%`).
+  assert.doesNotMatch(row, /^\s*flex:\s*0[,}]/m);
   assert.match(profileSection, /HorizontalOverflowRow/);
   assert.match(profileSection, /USER_PROFILE_THUMB_TRACK_HEIGHT/);
   assert.match(gallery, /HorizontalOverflowRow/);

@@ -1,18 +1,17 @@
 import { StyleSheet } from "react-native";
 
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const THUMB_SIZE = 72;
 
-export const useRafflesStaffPageStyles = createThemedStyles((theme) => ({
+export const useRafflesStaffPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   scroll: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 12,
     gap: 12,
   },
@@ -24,8 +23,8 @@ export const useRafflesStaffPageStyles = createThemedStyles((theme) => ({
     marginBottom: 4,
   },
   sectionTitle: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   list: {
@@ -76,18 +75,18 @@ export const useRafflesStaffPageStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surfaceMuted,
   },
   title: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   meta: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.textSecondary,
   },
   rowError: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.danger,
   },
   actions: {
@@ -121,28 +120,28 @@ export const useRafflesStaffPageStyles = createThemedStyles((theme) => ({
     opacity: 0.65,
   },
   actionPrimaryText: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.onContrast,
   },
   actionDangerText: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.danger,
   },
   actionEditText: {
-    fontSize: 14,
-    fontWeight: "700",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.link,
   },
   state: {
     fontSize: 15.2,
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textSecondary,
   },
   empty: {
     fontSize: 15.2,
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textSecondary,
   },
   centered: {
@@ -150,7 +149,7 @@ export const useRafflesStaffPageStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
-    backgroundColor: theme.colors.bg,
+    paddingHorizontal: layout.contentPaddingHorizontal,
+    backgroundColor: layout.pageBackground,
   },
 }));

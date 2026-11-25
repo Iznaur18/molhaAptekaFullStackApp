@@ -77,7 +77,7 @@ export const useSiteHeaderBannerCarouselStyles = createThemedStyles((theme) => (
   adBadgeText: {
     color: theme.colors.ink,
     fontSize: SITE_HEADER_BANNER_LAYOUT.adBadgeFontSize,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     letterSpacing: SITE_HEADER_BANNER_LAYOUT.adBadgeLetterSpacing,
   },
   viewportEdgeToEdge: {

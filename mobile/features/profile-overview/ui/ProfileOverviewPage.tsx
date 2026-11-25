@@ -9,10 +9,10 @@ import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 import { ScrollView, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
-const useStyles = createThemedStyles((theme) => ({
+const useStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   content: {
     padding: theme.spacing[4],

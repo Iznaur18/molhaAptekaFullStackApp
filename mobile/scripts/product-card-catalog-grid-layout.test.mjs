@@ -32,10 +32,7 @@ const resolveContentBelowImageHeight = (layout) =>
   layout.sellerRowHeight;
 
 const resolveTotalHeight = (tileWidth, layout = LAYOUT) =>
-  tileWidth +
-  2 * layout.contentInsetX +
-  resolveContentBelowImageHeight(layout) +
-  layout.bottomPadding;
+  tileWidth + resolveContentBelowImageHeight(layout) + layout.bottomPadding;
 
 test("product media display aspect ratio is square", () => {
   assert.equal(PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO, 1);
@@ -47,8 +44,10 @@ test("catalog-grid text stack height unchanged", () => {
 });
 
 test("catalog-grid total height follows tile width", () => {
-  assert.equal(resolveTotalHeight(180), 321);
-  assert.equal(resolveTotalHeight(238), 379);
+  // Фото 1:1 = tileWidth (без +2×inset bleed), как web bleed-x: 0.
+  assert.equal(resolveTotalHeight(180), 301);
+  assert.equal(resolveTotalHeight(238), 359);
+  assert.equal(resolveTotalHeight(258), 379);
 });
 
 test("catalogProductStyles uses shared product media aspect ratio for catalog grid", () => {
@@ -58,10 +57,7 @@ test("catalogProductStyles uses shared product media aspect ratio for catalog gr
   );
 
   assert.match(source, /PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO/);
-  assert.match(
-    source,
-    /imageWrapCatalogGrid:[\s\S]*marginHorizontal: -MCL\.contentInsetX/,
-  );
+  assert.match(source, /imageWrapCatalogGrid:[\s\S]*marginHorizontal: 0/);
   assert.match(
     source,
     /imageWrapCatalogGrid:[\s\S]*aspectRatio: PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO/,

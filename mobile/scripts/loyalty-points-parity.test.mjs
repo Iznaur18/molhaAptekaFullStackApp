@@ -21,6 +21,9 @@ test("loyalty points page mirrors web balance and purchase panel", () => {
   assert.match(page, /parseRubPriceInput/);
   assert.match(page, /canSubmitPurchase/);
   assert.match(page, /COMING_SOON_AMOUNT/);
+  assert.match(page, /useCreateLoyaltyPointsPaymentMutation/);
+  assert.match(page, /useMyPaymentQuery/);
+  assert.match(page, /rememberPendingPaymentId/);
   assert.match(page, /activeSectionId="loyalty-points"/);
   assert.match(page, /TAB_LOYALTY_POINTS/);
   assert.doesNotMatch(page, /accountFeatureStyles/);
@@ -36,6 +39,6 @@ test("loyalty points ui copy matches web page", () => {
 
   assert.match(copy, /PAGE_ARIA: "Баллы"/);
   assert.match(copy, /pluralizeRuBall/);
-  assert.match(copy, /COMING_SOON: "Пополнение картой и по QR — скоро."/);
+  assert.match(copy, /COMING_SOON: "Пополнение по СБП — скоро."/);
   assert.match(copy, /Продвижение товаров в каталоге/);
 });

@@ -35,6 +35,7 @@ import { useRaffleStaffMutations } from "@/entities/raffle/model/useRaffleStaffM
 import type { RaffleFromApi } from "@/entities/raffle/model/types";
 import { FeaturedRaffleWinnerCard } from "@/entities/raffle/ui/FeaturedRaffleWinnerCard";
 import { RaffleManageActions } from "@/entities/raffle/ui/RaffleManageActions";
+import { RaffleParticipantsSheet } from "@/entities/raffle/ui/RaffleParticipantsSheet";
 import {
   RafflePrizeMedia,
   RafflePrizeMediaSoundToggle,
@@ -94,10 +95,12 @@ const RaffleProductsProgressBlock = ({
   progressUi,
   raffle,
   isWide,
+  onOpenParticipants,
 }: {
   progressUi: ProgressUi;
   raffle: RaffleFromApi | null;
   isWide: boolean;
+  onOpenParticipants: () => void;
 }) => {
   const styles = useRaffleProductsPageStyles();
   return (
@@ -134,12 +137,19 @@ const RaffleProductsProgressBlock = ({
             )}
           </Text>
         </View>
-        <View style={[styles.stat, isWide && styles.statWide]}>
+        <Pressable
+          style={[styles.stat, isWide && styles.statWide]}
+          accessibilityRole="button"
+          accessibilityLabel={RAFFLE_PRODUCTS_PAGE_UI.PARTICIPANTS_OPEN_ARIA(
+            progressUi.participantsCount,
+          )}
+          onPress={onOpenParticipants}
+        >
           <Text style={styles.statLabel}>
             {RAFFLE_FEATURED_BANNER_UI.STAT_PARTICIPANTS}
           </Text>
           <Text style={styles.statValue}>{progressUi.participantsCount}</Text>
-        </View>
+        </Pressable>
         <View style={[styles.stat, isWide && styles.statWide]}>
           <Text style={styles.statLabel}>{RAFFLE_FEATURED_BANNER_UI.STAT_GOAL}</Text>
           <Text style={styles.statValue}>{progressUi.target}</Text>
@@ -193,6 +203,7 @@ export const RaffleProductsPage = () => {
   const [editingRaffle, setEditingRaffle] = useState<RaffleFromApi | null>(null);
   const [editUseStaffApi, setEditUseStaffApi] = useState(false);
   const [isRaffleMediaMuted, setIsRaffleMediaMuted] = useState(true);
+  const [isParticipantsOpen, setIsParticipantsOpen] = useState(false);
 
   const swipeListRef = useRef<FlatList<RaffleFromApi>>(null);
   const activeRaffleIdRef = useRef(activeRaffleId);
@@ -392,6 +403,9 @@ export const RaffleProductsPage = () => {
     })();
   }, [handleRefresh, pauseMyMutation, raffle]);
 
+  const openParticipants = useCallback(() => setIsParticipantsOpen(true), []);
+  const closeParticipants = useCallback(() => setIsParticipantsOpen(false), []);
+
   const manageProps = useMemo(() => {
     if (!canManage || !raffle) {
       return null;
@@ -512,6 +526,7 @@ export const RaffleProductsPage = () => {
               progressUi={progressUi}
               raffle={raffle}
               isWide={isWide}
+              onOpenParticipants={openParticipants}
             />
             {isWide ? (
               <View style={[styles.headerCard, styles.headerCardWide]}>
@@ -630,6 +645,13 @@ export const RaffleProductsPage = () => {
         useStaffApi={editUseStaffApi}
         onClose={() => setEditingRaffle(null)}
         onSuccess={handleRefresh}
+      />
+
+      <RaffleParticipantsSheet
+        visible={isParticipantsOpen}
+        raffleId={activeRaffleId}
+        participantsCount={progressUi?.participantsCount ?? 0}
+        onClose={closeParticipants}
       />
     </CatalogScrollAnimationProvider>
   );

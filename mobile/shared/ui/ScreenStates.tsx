@@ -8,6 +8,7 @@ type ScreenLoadingStateProps = {
   message?: string;
 };
 
+/** Паритет buyer empty/error: pad 24 (`--iz-space-6`), message 15 (`fontMd`). */
 const useStyles = createThemedStyles((theme) => ({
   centered: {
     flex: 1,
@@ -17,12 +18,12 @@ const useStyles = createThemedStyles((theme) => ({
   },
   message: {
     marginTop: theme.spacing[3],
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.textMuted,
     textAlign: "center",
   },
   error: {
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.danger,
     textAlign: "center",
   },

@@ -57,12 +57,12 @@ export const useUserListRowStyles = createThemedStyles((theme) => ({
   },
   nameText: {
     textAlign: "center",
-    fontSize: 13,
-    fontWeight: "700",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   email: {
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.textMuted,
     textAlign: "center",
   },
@@ -88,8 +88,8 @@ export const useUserListRowStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.warningText,
   },
   badgeText: {
-    fontSize: 11,
-    fontWeight: "600",
+    fontSize: theme.typography.font2xs,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textMuted,
   },
   badgePodiumText: {
@@ -126,23 +126,23 @@ export const useUserListRowStyles = createThemedStyles((theme) => ({
   },
   metricLabel: {
     fontSize: 10,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textMuted,
     lineHeight: 13,
     textAlign: "center",
   },
   metricValue: {
-    fontSize: 13,
-    fontWeight: "700",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     fontVariant: ["tabular-nums"],
     textAlign: "center",
   },
   metricValueAmount: {
-    fontSize: 20,
+    fontSize: theme.typography.font3xl,
   },
   metricValueMuted: {
-    fontSize: 11,
-    fontWeight: "600",
+    fontSize: theme.typography.font2xs,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
 }));

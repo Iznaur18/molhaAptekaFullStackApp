@@ -118,6 +118,8 @@ export const raffleQueryKeys = {
   my: () => [...raffleQueryKeys.all, "my"] as const,
   createAdvertising: () => [...raffleQueryKeys.all, "create-advertising"] as const,
   detail: (raffleId: string) => [...raffleQueryKeys.all, "detail", raffleId] as const,
+  participants: (raffleId: string) =>
+    [...raffleQueryKeys.all, "detail", raffleId, "participants"] as const,
   products: (raffleId: string, params: { limit?: number } = {}) =>
     [...raffleQueryKeys.all, "detail", raffleId, "products", params] as const,
   staffQueue: () => [...raffleQueryKeys.all, "staff", "queue"] as const,

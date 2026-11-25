@@ -469,7 +469,6 @@ export const ProductDetailsDetailsTab = ({
         <ProductDetailsSellerPreview
           seller={product.productSeller}
           presentation={isSplitRest ? "split-rest" : "stack"}
-          showStorefrontButton={Boolean(sellerId)}
         />
       </View>
 

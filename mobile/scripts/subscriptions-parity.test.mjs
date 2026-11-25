@@ -44,7 +44,8 @@ test("subscription user row mirrors web row layout", () => {
 test("subscriptions ui copy matches web page", () => {
   const copy = readMobileFile("shared/config/appUiCopy.ts");
 
-  assert.match(copy, /Загрузка подписок…/);
+  assert.match(copy, /TAB_FOLLOWERS/);
+  assert.match(copy, /Загрузка…/);
   assert.match(copy, /Найдите продавцов в разделе «Пользователи»/);
   assert.match(copy, /Войдите, чтобы видеть список подписок./);
 });

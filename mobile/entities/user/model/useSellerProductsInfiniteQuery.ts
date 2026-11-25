@@ -14,16 +14,19 @@ type UseSellerProductsInfiniteQueryOptions = {
   sellerId: string;
   enabled: boolean;
   shelfId?: string | null;
+  onecGroupId?: string | null;
 };
 
 export const useSellerProductsInfiniteQuery = ({
   sellerId,
   enabled,
   shelfId = null,
+  onecGroupId = null,
 }: UseSellerProductsInfiniteQueryOptions) => {
   const shelfKey = shelfId != null ? String(shelfId).trim() : "";
+  const onecKey = onecGroupId != null ? String(onecGroupId).trim() : "";
   const query = useInfiniteQuery({
-    queryKey: sellerProductsQueryKeys.list(sellerId, shelfKey || null),
+    queryKey: sellerProductsQueryKeys.list(sellerId, shelfKey || null, onecKey || null),
     enabled: enabled && Boolean(sellerId),
     initialPageParam: 1,
     retry: 1,
@@ -33,6 +36,7 @@ export const useSellerProductsInfiniteQuery = ({
         page,
         limit: USER_PROFILE_PRODUCTS_API_LIMIT_MAX,
         shelfId: shelfKey || null,
+        onecGroupId: onecKey || null,
       });
     },
     getNextPageParam: (lastPage) => {

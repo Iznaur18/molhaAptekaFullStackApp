@@ -16,6 +16,18 @@
 | 2 | Розыгрыши и личные категории открывали чужую модерацию | **А.** Прямой адрес открывает свой экран. Пункт меню остаётся один: intro (как на сайте). |
 | 3 | С чего начать визуал | **А.** Сначала нижняя панель, потом шапка. |
 
+## Решения catalog path v1 (20.11.2026, «дефолты ок»)
+
+| # | Вопрос | Решение |
+| - | ------ | ------- |
+| 1 | Scope | Browser landing + drill→home + residual home + filters dig |
+| 2 | Personal tiles на `/(tabs)/catalog` | **А.** Убрать (как web landing); личные — вкладка «Продавцы» на home |
+| 3 | Drill | **А.** → `/(tabs)` + pending filters |
+| 4 | Boost-ряд на home | **А.** SKIP v1 → **снят** (п.6 хвоста: порт на home) |
+| 5 | Filters sheet | **А.** Dig parity (убрать mobile-only ranking link) |
+| 6 | Staff edit modals на browser | **А.** Не трогать |
+| 7 | DoD | Static parity tests + `regression:wf72` |
+
 Карточка товара, чекаут и часть экранов профиля уже закрыты `mobile/scripts/*-parity.test.mjs`.
 
 ---
@@ -34,7 +46,7 @@
 - [x] **Аналитика** `/admin-analytics` — `WEB_ONLY_PATHS`.
 - [x] **Журнал действий staff** `/staff-audit-log-admin` — `WEB_ONLY_PATHS`.
 - [x] **Рассылка уведомлений** `/broadcast-notifications-admin` — `WEB_ONLY_PATHS`.
-- [ ] **Доставка и оплата продавца** `/profile/delivery-payment`. Своего экрана нет. Deep link схлопывается в `/profile` → «Мой профиль», потому что первый сегмент `profile` есть в таблице. Надо либо `null`, либо оставить как есть — отдельно не решали.
+- [x] **Доставка и оплата продавца** `/profile/delivery-payment` — `WEB_ONLY_PATHS` → `null` (меню hub не раздували; thin in-app — seller dig).
 
 Пункт меню в приложении по-прежнему может открыть web SPA (`openProfileStaffWebSection`) или заглушку hub. Это не deep link.
 
@@ -43,7 +55,7 @@
 - [x] **Розыгрыши staff** `/staff-raffles` → `/hub/raffles` → `RafflesStaffPage`. Редирект на intro снят.
 - [x] **Модерация личных категорий** `/moderation-seller-categories` → `/hub/seller-personal-category-moderation` → `SellerPersonalCategoryModerationPage`. Редирект на intro снят.
 - [x] **Продвижения товаров (staff)** `/product-promotions`. Сайт и приложение оба уводят на модерацию товаров. Отдельную страницу не подключаем.
-- [ ] **Заказ целиком**. `/orders/<id>` схлопывается в список. Отдельного экрана заказа нет.
+- [x] **Заказ целиком**. `/orders/[id]` + `OrderDetailPage` (OrderCard + buyer CTA). Deep link `/orders/:id` и `/my-orders/:id`. Tap шапки в списке → деталь.
 
 ## C. Дизайн: нижняя панель
 
@@ -76,7 +88,7 @@
 ## E. Дизайн: ещё не сверено
 
 - [x] Gutter ленты и каталога. Сайт: ≤640 — 8px (`0.5rem`), 641–667 — 12px (`0.75rem` в `@media 667`), шире — 16px (`--iz-space-4`). `resolveScreenContentInlinePadding` + `useScreenLayout`. Сетка товаров на главной берёт этот padding.
-- [ ] Остальные экраны. `paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL` в StyleSheet по-прежнему 8px на любой ширине. Хук их не переписывает.
+- [x] Остальные экраны. Page gutter через `createThemedStyles` → `layout.contentPaddingHorizontal` (8 / 12 / 16 + safe-area). Shell-нули (`listInAccountShell`) не трогали.
 - [x] Сетка товаров шире 903px — 16px (`1rem`), `resolveProductGridGap`. Телефон ≤667 — 2px: на сайте 2px включает `@media 640`, который перекрывает `0.1rem`.
 - [x] Карточка каталога. До 1023px сайт ставит `padding: 0 0 10px` и inset 10px (`ProductCardMobileCatalog.css` перекрывает `0.55rem 0.75rem 0.65rem`). Приложение: `cardCatalogGrid`. Шире 1023px — padding 8.8 / 12 / 10.4, gap карточки 6.4, gap тела 5.12, bleed картинки 8 / 6.08.
 
@@ -92,5 +104,20 @@
 
 ## Дальше
 
-1. Статичный gutter 8px на экранах вне ленты (последний открытый пункт E).
-2. Блок A и экран заказа — только по отдельной команде.
+1. ~~Статичный gutter 8px на экранах вне ленты (E)~~ — закрыто: `layout.contentPaddingHorizontal`.
+2. ~~Boost-ряд на home~~ — закрыто: `BoostProductsHomeSection` + `useProductPromotionBoostProductsQuery` (порядок stories→boost→curated).
+3. ~~Orphan catalog chips~~ — удалены `CatalogCategoryChips` / `CatalogSubcategoryChips` / `CatalogSearchBar` + стили/`CATALOG_FILTER_UI`.
+4. ~~Экран заказа `/orders/:id`~~ — закрыто.
+5. ~~delivery-payment (gap-todo A)~~ — закрыто: `WEB_ONLY` → `null`.
+6. ~~п.10 dig~~ — закрыто v1: story viewer → `/user/:id` (+ self my-products); `create-raffle-parity` под reveal-only home; staff docs = гибрид 15 in-app + 3 web-only. SKIP: seller services nav, partner sales-tab, raffle CTA visual.
+7. ~~п.11 Store/MP docs sync~~ — закрыто v1: privacy copy ↔ `privacy.html`; Post-mobile таблица (push/GDPR ✅; AASA/EAS/Samsung open/отложен). Код фич не трогали.
+8. ~~P1 Universal/App Links scaffold~~ — `client/public/.well-known/` + nginx `^~ /.well-known/` + `mobile/docs/UNIVERSAL-APP-LINKS.md`. Placeholders Team ID / SHA256. Live verify / деплой — отдельно.
+9. ~~P0 EAS preview~~ — APK готов: https://expo.dev/accounts/iznaur18/projects/izibuy/builds/22699959-cc4b-42bd-8c77-40fc7b65b825 (`slug` выровнен на `izibuy` под projectId).
+10. ~~Raffle CTA visual (#1)~~ — gradient pill + Gift + ChevronRight (`HomeFeaturedRafflesRevealButton` ↔ web). SKIP п.10 снят для этого пункта.
+11. ~~Catalog browser spacing (#2)~~ — `CATALOG_BROWSER_LANDING_LAYOUT` ↔ `CatalogFeedTilesGrid.css` (rem×16).
+12. ~~Catalog section titles (#3)~~ — `CatalogSectionTitleAccent` gradient 180° action→accent ↔ web `::before`.
+13. ~~Boost error UI (#4)~~ — `InlineErrorBanner` на home ↔ web.
+14. ~~Promo return streak dock~~ — mobile `PromoReturnStreakDock` над tab bar ↔ web (claim API).
+15. ~~Stories strip visible~~ — `HorizontalOverflowRow`: убран flex-shorthand (RN Web схлопывал track в 0); ringAdd soft как web.
+16. ~~Promo streak prices on services~~ — mobile promotion / banner / category / raffle: charge + «было» / badge после claim ↔ web; invalidate streak после оплаты.
+17. ~~Home colors v1~~ — section tabs idle `textSecondary`; sellers search `surface`+`border` ↔ web SearchInput.

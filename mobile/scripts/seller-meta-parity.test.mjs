@@ -29,8 +29,8 @@ test("seller meta row matches web layout tokens", () => {
     "src/entities/user/ui/SellerShareLinkButton.css",
   );
 
-  assert.match(layout, /metaZoneBorderRadius: 20/);
-  assert.match(layout, /metaZonePaddingVertical: 12/);
+  assert.doesNotMatch(layout, /metaZoneBorderRadius/);
+  assert.doesNotMatch(layout, /metaZonePaddingVertical/);
   assert.match(layout, /shareMetaSize: 34/);
   assert.match(page, /layout="sellerMeta"/);
   assert.match(page, /singleLine/);
@@ -43,8 +43,16 @@ test("seller meta row matches web layout tokens", () => {
   assert.match(share, /width: L\.shareMetaSize/);
   assert.match(share, /flexShrink: 0/);
   assert.match(follow, /layout === "sellerMeta"/);
-  assert.match(webCss, /padding: 12px 14px/);
-  assert.match(webCss, /border-radius: 1\.25rem/);
+  assert.match(webCss, /padding: 0 14px/);
+  assert.doesNotMatch(webCss, /\.seller-products-page__seller-meta\s*\{[^}]*\bborder:/);
+  assert.doesNotMatch(
+    webCss,
+    /\.seller-products-page__seller-meta\s*\{[^}]*\bbackground:/,
+  );
+  assert.doesNotMatch(
+    webCss,
+    /\.seller-products-page__seller-meta\s*\{[^}]*\bborder-radius:/,
+  );
   assert.match(webShareCss, /width: 2\.125rem/);
   assert.match(webShareCss, /height: 2\.125rem/);
 });

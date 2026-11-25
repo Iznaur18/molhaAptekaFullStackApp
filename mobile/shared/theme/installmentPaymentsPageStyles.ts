@@ -1,25 +1,24 @@
 import { StyleSheet } from "react-native";
 
 import { INSTALLMENT_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const CHIP_PADDING_VERTICAL = 4;
 const CHIP_PADDING_HORIZONTAL = 8;
 const OVERVIEW_TILE_RADIUS = 16;
 
-export const useInstallmentPaymentsPageStyles = createThemedStyles((theme) => ({
+export const useInstallmentPaymentsPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   listFlex: {
     flex: 1,
     minHeight: 0,
   },
   list: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     flexGrow: 1,
   },
   /** Desktop hub: shell уже даёт pad; gutter 0 как web `.installment-page`. */
@@ -54,7 +53,7 @@ export const useInstallmentPaymentsPageStyles = createThemedStyles((theme) => ({
   toolbarHeading: {
     flex: 1,
     fontSize: 15.2,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   contractsCount: {
@@ -77,7 +76,7 @@ export const useInstallmentPaymentsPageStyles = createThemedStyles((theme) => ({
   },
   statusChipText: {
     fontSize: 14.4,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     lineHeight: 18.7,
     color: theme.colors.textSecondary,
   },
@@ -85,7 +84,7 @@ export const useInstallmentPaymentsPageStyles = createThemedStyles((theme) => ({
     color: theme.colors.onContrast,
   },
   emptyState: {
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     color: theme.colors.textMuted,
   },
   centered: {
@@ -93,10 +92,10 @@ export const useInstallmentPaymentsPageStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
   },
   hint: {
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     color: theme.colors.textMuted,
     textAlign: "center",
   },
@@ -108,7 +107,7 @@ export const useInstallmentPaymentsPageStyles = createThemedStyles((theme) => ({
   },
   buttonText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   overview: {
     flexDirection: "row",
@@ -138,14 +137,14 @@ export const useInstallmentPaymentsPageStyles = createThemedStyles((theme) => ({
   },
   overviewLabel: {
     fontSize: 11.2,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: 0.4,
     textTransform: "uppercase",
     color: theme.colors.textMuted,
   },
   overviewValue: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     fontVariant: ["tabular-nums"],
   },
@@ -168,7 +167,7 @@ export const useInstallmentPaymentsPageStyles = createThemedStyles((theme) => ({
   },
   listActionText: {
     fontSize: 13.1,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   filterHint: {

@@ -44,6 +44,7 @@ const EXPECTED_APP_ROUTES = [
   "app/edit-product/[id].tsx",
   "app/(tabs)/hub/[section].tsx",
   "app/(tabs)/orders.tsx",
+  "app/orders/[id].tsx",
   "app/(tabs)/users.tsx",
   "app/legal/privacy.tsx",
   "app/notifications/index.tsx",
@@ -92,7 +93,16 @@ const matchNamedRoute = (pathname) => {
   const hubMatch = pathname.match(HUB_PATH_RE);
   if (hubMatch?.[1]) return `/hub/${decodeURIComponent(hubMatch[1])}`;
 
-  if (pathname === "/orders" || pathname.startsWith("/orders/")) return "/orders";
+  const orderDetailMatch = pathname.match(/^\/orders\/([^/?#]+)$/i);
+  if (orderDetailMatch?.[1]) {
+    return `/orders/${decodeURIComponent(orderDetailMatch[1])}`;
+  }
+  const myOrdersDetailMatch = pathname.match(/^\/my-orders\/([^/?#]+)$/i);
+  if (myOrdersDetailMatch?.[1]) {
+    return `/orders/${decodeURIComponent(myOrdersDetailMatch[1])}`;
+  }
+
+  if (pathname === "/orders") return "/orders";
   if (pathname === "/notifications" || pathname.startsWith("/notifications/"))
     return "/notifications";
   if (pathname === "/catalog" || pathname === "/catalog-browser")
@@ -139,6 +149,7 @@ const DEEP_LINK_CASES = [
   ["https://gitorg.ru/product/abc123", "/product/abc123"],
   ["gitorg://hub/wishlist", "/hub/wishlist"],
   ["gitorg://orders", "/orders"],
+  ["gitorg://orders/abc123", "/orders/abc123"],
   ["izibuy://product/abc123", "/product/abc123"],
 ];
 
@@ -197,6 +208,7 @@ const BUYER_CRITICAL_ROUTES = [
   "app/product/[id].tsx",
   "app/(tabs)/cart.tsx",
   "app/(tabs)/orders.tsx",
+  "app/orders/[id].tsx",
   "app/(tabs)/me.tsx",
   "app/(tabs)/hub/[section].tsx",
   "app/profile/edit.tsx",
@@ -251,7 +263,7 @@ const HUB_TAB_BAR_CHECKS = [
 const PROFILE_NAV_CHROME_CHECKS = [
   {
     file: "../packages/shared-lib/src/profileNavTones.ts",
-    mustInclude: ['overview: "indigo"', "resolveProfileNavSectionTone"],
+    mustInclude: ['overview: "blue"', "resolveProfileNavSectionTone"],
   },
   {
     file: "features/profile-hub/lib/enrichProfileNavItem.ts",
@@ -287,7 +299,7 @@ const SCREEN_LAYOUT_CHECKS = [
       "SCREEN_PRODUCT_GRID_2_COL_MAX_WIDTH",
       "SCREEN_PRODUCT_GRID_4_COL_MIN_WIDTH",
       "PRODUCT_GRID_COLUMNS_COMPACT",
-      "PRODUCT_GRID_GAP = 6",
+      "PRODUCT_GRID_GAP = 8",
       "resolveLayoutContentWidth",
       "resolveScreenWidthTier",
     ],
@@ -396,12 +408,16 @@ const PRODUCT_PREVIEW_VIDEO_CHECKS = [
   {
     file: "entities/product/ui/ProductCard.tsx",
     mustInclude: [
-      "ProductCardMediaSlide",
+      "ProductMediaSlideContent",
       "styles.imagePressable",
       "styles.contentPressable",
       "useProductCardMediaState",
     ],
     mustNotInclude: ['from "@/entities/product/ui/ProductCardMedia"'],
+  },
+  {
+    file: "entities/product/ui/ProductCardBanner.tsx",
+    mustInclude: ["ProductCardMediaSlide", "useProductCardMediaState"],
   },
   {
     file: "entities/product/ui/ProductMediaSlideContent.tsx",
@@ -448,7 +464,7 @@ const STORY_MEDIA_WIRING_CHECKS = [
     mustInclude: ["pickUserProfilePhotoUrl"],
   },
   {
-    file: "features/home-feed/ui/UserStoriesStrip.tsx",
+    file: "features/home-feed/ui/UserStoryStripItems.tsx",
     mustInclude: ["resolveUserStoryAvatarUrl"],
   },
   {
@@ -504,7 +520,7 @@ const PREVIEW_VIDEO_MIME_CASES = [
 const BUYER_UI_WIRING_CHECKS = [
   {
     file: "entities/product/ui/ProductCard.tsx",
-    mustInclude: ['pathname: "/product/[id]"', "ProductCardMediaSlide"],
+    mustInclude: ['pathname: "/product/[id]"', "ProductMediaSlideContent"],
   },
   {
     file: "features/product-detail/ui/ProductDetailPurchaseActions.tsx",

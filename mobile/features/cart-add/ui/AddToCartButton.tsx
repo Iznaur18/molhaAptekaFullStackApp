@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
-import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Text, View } from "react-native";
 
 import { useCartActions } from "@/entities/cart/model/useCartActions";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
@@ -18,6 +18,7 @@ import {
   useAddToCartButtonStyles,
 } from "@/shared/theme/uploadFieldStyles";
 import { ShoppingCart } from "@/shared/ui/productDetailsLucideIcons";
+import { PressableScale } from "@/shared/ui/PressableScale";
 import { SquircleView } from "@/shared/ui/SquircleView";
 
 type AddToCartButtonProps = {
@@ -114,7 +115,7 @@ export const AddToCartButton = ({
       accessibilityLabel = ADD_TO_CART_UI.ADD,
     }: { disabled?: boolean; accessibilityLabel?: string } = {},
   ) => (
-    <Pressable
+    <PressableScale
       style={styles.bannerPressable}
       onPress={onPress}
       disabled={disabled}
@@ -131,7 +132,7 @@ export const AddToCartButton = ({
           </>
         )}
       </View>
-    </Pressable>
+    </PressableScale>
   );
 
   if (!isAuthorized) {
@@ -145,7 +146,7 @@ export const AddToCartButton = ({
 
     if (isDetailDock) {
       return (
-        <Pressable
+        <PressableScale
           style={styles.detailDockPressable}
           onPress={handleLogin}
           accessibilityRole="button"
@@ -159,13 +160,13 @@ export const AddToCartButton = ({
               {ADD_TO_CART_UI.LOGIN_TO_ADD}
             </Text>
           </SquircleView>
-        </Pressable>
+        </PressableScale>
       );
     }
 
     if (isCard) {
       return (
-        <Pressable
+        <PressableScale
           style={styles.addButtonPressable}
           onPress={handleLogin}
           accessibilityRole="button"
@@ -179,12 +180,12 @@ export const AddToCartButton = ({
               {ADD_TO_CART_UI.ADD}
             </Text>
           </SquircleView>
-        </Pressable>
+        </PressableScale>
       );
     }
 
     return (
-      <Pressable
+      <PressableScale
         style={styles.loginButtonPressable}
         onPress={handleLogin}
         accessibilityRole="button"
@@ -198,7 +199,7 @@ export const AddToCartButton = ({
             {ADD_TO_CART_UI.LOGIN_TO_ADD}
           </Text>
         </SquircleView>
-      </Pressable>
+      </PressableScale>
     );
   }
 
@@ -212,7 +213,7 @@ export const AddToCartButton = ({
 
     if (isDetailDock) {
       return (
-        <Pressable
+        <PressableScale
           style={styles.detailDockPressable}
           onPress={handleAdd}
           disabled={disabled}
@@ -229,12 +230,12 @@ export const AddToCartButton = ({
               </Text>
             )}
           </SquircleView>
-        </Pressable>
+        </PressableScale>
       );
     }
 
     return (
-      <Pressable
+      <PressableScale
         style={styles.addButtonPressable}
         onPress={handleAdd}
         disabled={disabled}
@@ -258,13 +259,13 @@ export const AddToCartButton = ({
             </Text>
           )}
         </SquircleView>
-      </Pressable>
+      </PressableScale>
     );
   }
 
   if (isDetailDock) {
     return (
-      <Pressable
+      <PressableScale
         style={styles.detailDockPressable}
         onPress={() => {
           router.push("/(tabs)/cart");
@@ -278,7 +279,7 @@ export const AddToCartButton = ({
             {ADD_TO_CART_UI.GO_TO_CART}
           </Text>
         </SquircleView>
-      </Pressable>
+      </PressableScale>
     );
   }
 
@@ -292,7 +293,7 @@ export const AddToCartButton = ({
         isBanner && styles.bannerStepper,
       ]}
     >
-      <Pressable
+      <PressableScale
         style={styles.stepButton}
         onPress={handleDecrease}
         disabled={isUpdating}
@@ -301,11 +302,11 @@ export const AddToCartButton = ({
         <Text style={[styles.stepButtonText, isBanner && styles.bannerStepButtonText]}>
           −
         </Text>
-      </Pressable>
+      </PressableScale>
       <Text style={styles.quantity} accessibilityLabel={ADD_TO_CART_UI.QUANTITY_ARIA}>
         {quantity}
       </Text>
-      <Pressable
+      <PressableScale
         style={[styles.stepButton, increaseDisabled && styles.buttonDisabled]}
         onPress={handleIncrease}
         disabled={increaseDisabled}
@@ -314,7 +315,7 @@ export const AddToCartButton = ({
         <Text style={[styles.stepButtonText, isBanner && styles.bannerStepButtonText]}>
           +
         </Text>
-      </Pressable>
+      </PressableScale>
     </View>
   );
 };

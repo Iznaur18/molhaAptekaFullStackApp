@@ -3,6 +3,8 @@ export type ProfileRow = {
   label: string;
   value: string;
   href?: string;
+  needsPhoneReveal?: boolean;
+  needsEmailReveal?: boolean;
 };
 
 export type ProfileRowSection = {

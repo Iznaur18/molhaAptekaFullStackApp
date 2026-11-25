@@ -14,6 +14,12 @@
   transition: box-shadow 0.15s ease;
 }
 
+@supports (corner-shape: squircle) {
+  .product-card {
+    corner-shape: squircle;
+  }
+}
+
 .product-card:hover {
   box-shadow: var(--iz-shadow-card);
 }

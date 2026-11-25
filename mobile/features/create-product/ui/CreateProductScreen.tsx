@@ -1,6 +1,9 @@
 import {
   getRuRegionByCode,
+  isCartDealType,
   isRuRegionCode,
+  normalizeCategoryDealType,
+  parseInstagramPostUrl,
   PRODUCT_CHARACTERISTIC_KEY_MAX_CHARS,
   PRODUCT_CHARACTERISTIC_VALUE_MAX_CHARS,
   PRODUCT_CHARACTERISTICS_MAX_ITEMS,
@@ -8,6 +11,7 @@ import {
   PRODUCT_DESCRIPTION_MIN_CHARS,
   PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE,
   PRODUCT_IMAGE_URLS_MAX,
+  PRODUCT_LISTING_ORIGIN_OWN,
   PRODUCT_NAME_MAX_LENGTH,
   PRODUCT_PICKUP_ADDRESS_MIN_LENGTH,
   syncLegacyPickupFieldsFromLocations,
@@ -15,6 +19,7 @@ import {
   PRODUCT_PRICE_RUB_MAX,
   PRODUCT_STOCK_QUANTITY_MAX,
   PRODUCT_STOCK_QUANTITY_MIN,
+  validateInstagramPostUrlInput,
 } from "@molha/api-contract";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
@@ -33,6 +38,7 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useCreateProductMutation } from "@/entities/product/model/useCreateProductMutation";
+import { buildProductDealTermsFields } from "@/entities/product/lib/buildProductDealTermsFields";
 import { createProductPickupFieldsFromUser } from "@/entities/product/lib/createProductPickupFieldsFromUser";
 import { createProductWizardFormFromCopiedProduct } from "@/entities/product/lib/createProductWizardFormFromCopiedProduct";
 import { createProductWizardFormFromProduct } from "@/entities/product/lib/createProductWizardFormFromProduct";
@@ -74,7 +80,14 @@ import { ProductPickupLocationFields } from "@/entities/product/ui/ProductPickup
 import { ProductDescriptionField } from "@/entities/product/ui/ProductDescriptionField";
 import { ProductPhotoGrid } from "@/features/image-upload/ui/ProductPhotoGrid";
 import { ProductPreviewVideoUploadField } from "@/features/image-upload/ui/ProductPreviewVideoUploadField";
+import {
+  CREATE_PRODUCT_WIZARD_STEP_IDS,
+  resolveProductWizardStepIds,
+  type CreateProductWizardStepId,
+} from "@/features/create-product/lib/resolveProductWizardStepIds";
 import { CreateProductCategoryPicker } from "@/features/create-product/ui/CreateProductCategoryPicker";
+import { CreateProductDealTermsFields } from "@/features/create-product/ui/CreateProductDealTermsFields";
+import { CreateProductWizardInstagramLinkCard } from "@/features/create-product/ui/CreateProductWizardInstagramLinkCard";
 import {
   getCreateProductLaunchSeq,
   peekCreateProductLaunch,
@@ -88,6 +101,7 @@ import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 import { textInputFocusScrollProps } from "@/shared/lib/scrollTextInputIntoViewOnFocus";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
+import { usePageBackground } from "@/shared/theme/usePageBackground";
 import { resolveWizardFooterPaddingBottom } from "@/shared/theme/screenContentLayout";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -95,17 +109,7 @@ import { resolveWizardFooterPaddingBottom } from "@/shared/theme/screenContentLa
 /** Паритет web: `@media (min-width: 40rem)` в CreateProductWizard.css. */
 const WIZARD_COLUMN_MAX_WIDTH = 640;
 
-const WIZARD_STEPS = [
-  "category",
-  "basic",
-  "originality",
-  "media",
-  "pickup",
-  "commerce",
-  "returns",
-  "review",
-] as const;
-type WizardStepId = (typeof WIZARD_STEPS)[number];
+type WizardStepId = CreateProductWizardStepId;
 
 const STEP_COPY: Record<
   WizardStepId,
@@ -169,9 +173,14 @@ type WizardForm = {
   characteristicsAutoAppliedForCategoryId: string | null;
   imageUrls: string[];
   productPreviewVideoUrl: string;
+  productInstagramPostUrl: string;
   productCategoryId: string | null;
   productCategoryLabel: string;
   productCategory: string; // legacy fallback, mirrors web default
+  categoryDealType: string;
+  productServicePriceMode: string;
+  productServicePriceUnit: string;
+  productServiceLocations: string[];
   productRegionCode: string;
   productPickupAddress: string;
   productPickupLat: number | null;
@@ -203,9 +212,14 @@ const INITIAL_FORM: WizardForm = {
   characteristicsAutoAppliedForCategoryId: null,
   imageUrls: [],
   productPreviewVideoUrl: "",
+  productInstagramPostUrl: "",
   productCategoryId: null,
   productCategoryLabel: "",
   productCategory: DEFAULT_PRODUCT_CATEGORY,
+  categoryDealType: "",
+  productServicePriceMode: "",
+  productServicePriceUnit: "",
+  productServiceLocations: [],
   productRegionCode: "",
   productPickupAddress: "",
   productPickupLat: null,
@@ -260,6 +274,12 @@ function validateStep(
       const imageCount = form.imageUrls.filter(Boolean).length;
       if (imageCount === 0) {
         return CREATE_PRODUCT_UI.ERROR_IMAGE_REQUIRED;
+      }
+      const instagramError = validateInstagramPostUrlInput(
+        form.productInstagramPostUrl,
+      );
+      if (instagramError) {
+        return instagramError;
       }
       return null;
     }
@@ -346,15 +366,13 @@ function validateStep(
     }
     case "review": {
       const reviewOptions = { showCatalogAvailabilityToggle };
-      return (
-        validateStep("basic", form, reviewOptions) ??
-        validateStep("originality", form, reviewOptions) ??
-        validateStep("media", form, reviewOptions) ??
-        validateStep("category", form, reviewOptions) ??
-        validateStep("pickup", form, reviewOptions) ??
-        validateStep("commerce", form, reviewOptions) ??
-        validateStep("returns", form, reviewOptions)
-      );
+      const stepIds = resolveProductWizardStepIds(form.categoryDealType);
+      for (const id of stepIds) {
+        if (id === "review") continue;
+        const stepError = validateStep(id, form, reviewOptions);
+        if (stepError) return stepError;
+      }
+      return null;
     }
     default:
       return null;
@@ -397,6 +415,7 @@ export const ProductWizardScreen = ({
   );
   const router = useRouter();
   const theme = useAppTheme();
+  const pageBackground = usePageBackground();
   const styles = useStyles();
   const insets = useSafeAreaInsets();
   // Мастер в вебе ограничен не общей лесенкой, а собственными 40rem
@@ -424,7 +443,7 @@ export const ProductWizardScreen = ({
   // Чтение синхронное, поэтому черновик попадает в самый первый рендер и
   // автосейву нечего затирать пустой формой.
   const initialDraft = draftEnabled
-    ? readCreateProductFormDraft<WizardForm>(WIZARD_STEPS.length)
+    ? readCreateProductFormDraft<WizardForm>(CREATE_PRODUCT_WIZARD_STEP_IDS.length)
     : null;
   const [form, setForm] = useState<WizardForm>(() => {
     if (initialLaunch?.kind === "copy") {
@@ -461,7 +480,9 @@ export const ProductWizardScreen = ({
       setForm(createProductWizardFormFromCopiedProduct(launch.product));
       profilePickupSeededRef.current = true;
     } else {
-      const draft = readCreateProductFormDraft<WizardForm>(WIZARD_STEPS.length);
+      const draft = readCreateProductFormDraft<WizardForm>(
+        CREATE_PRODUCT_WIZARD_STEP_IDS.length,
+      );
       if (draft) {
         setForm(draft.form);
         profilePickupSeededRef.current = true;
@@ -526,9 +547,18 @@ export const ProductWizardScreen = ({
     setStepError("");
   }, [user]);
 
-  const stepId = WIZARD_STEPS[stepIndex];
+  const stepIds = useMemo(
+    () => resolveProductWizardStepIds(form.categoryDealType),
+    [form.categoryDealType],
+  );
+
+  useEffect(() => {
+    setStepIndex((prev) => Math.min(prev, Math.max(0, stepIds.length - 1)));
+  }, [stepIds]);
+
+  const stepId = stepIds[stepIndex] ?? stepIds[0];
   const isFirstStep = stepIndex === 0;
-  const isLastStep = stepIndex === WIZARD_STEPS.length - 1;
+  const isLastStep = stepIndex === stepIds.length - 1;
   const copy = STEP_COPY[stepId];
   const showStepHeadline =
     !isEdit ||
@@ -541,8 +571,8 @@ export const ProductWizardScreen = ({
       return;
     }
     setStepError("");
-    setStepIndex(Math.min(stepIndex + 1, WIZARD_STEPS.length - 1));
-  }, [form, stepId, stepIndex, validateOptions]);
+    setStepIndex(Math.min(stepIndex + 1, stepIds.length - 1));
+  }, [form, stepId, stepIndex, stepIds.length, validateOptions]);
 
   const goBack = useCallback(() => {
     setStepError("");
@@ -557,10 +587,13 @@ export const ProductWizardScreen = ({
     router.replace("/(tabs)");
   }, [router]);
 
-  const goToStep = useCallback((index: number) => {
-    setStepError("");
-    setStepIndex(Math.max(0, Math.min(index, WIZARD_STEPS.length - 1)));
-  }, []);
+  const goToStep = useCallback(
+    (index: number) => {
+      setStepError("");
+      setStepIndex(Math.max(0, Math.min(index, stepIds.length - 1)));
+    },
+    [stepIds.length],
+  );
 
   const handleSubmit = async () => {
     const error = validateStep("review", form, validateOptions);
@@ -574,6 +607,18 @@ export const ProductWizardScreen = ({
       const price = parseRubPriceInput(form.productPrice) ?? 0;
       const oldPriceRaw = form.productOldPrice.trim();
       const oldPrice = oldPriceRaw ? parseRubPriceInput(form.productOldPrice) : null;
+      const isCartDeal = isCartDealType(form.categoryDealType);
+      const productListingOrigin =
+        !isCartDeal && !isProductListingOrigin(form.productListingOrigin)
+          ? PRODUCT_LISTING_ORIGIN_OWN
+          : form.productListingOrigin!;
+      const instagramPostUrlRaw = form.productInstagramPostUrl.trim();
+      const productInstagramPostUrl = instagramPostUrlRaw
+        ? (parseInstagramPostUrl(instagramPostUrlRaw)?.postUrl ?? "")
+        : "";
+      const dealTermsFields = buildProductDealTermsFields(
+        form as unknown as Record<string, unknown>,
+      );
 
       // Непустой список точек на сервере перебивает легаси-поля: он собирает
       // их из основной точки. Шлём то же самое, иначе товар сохранится с
@@ -592,7 +637,7 @@ export const ProductWizardScreen = ({
           productId,
           body: {
             productName: form.productName.trim(),
-            productListingOrigin: form.productListingOrigin!,
+            productListingOrigin,
             productDescription: form.productDescription.trim(),
             productPrice: price,
             productOldPrice: oldPriceRaw ? oldPrice : null,
@@ -614,6 +659,7 @@ export const ProductWizardScreen = ({
             productStockQuantity: Math.floor(Number(form.productStockQuantity)),
             productImageUrls: form.imageUrls.filter(Boolean),
             productPreviewVideoUrl: form.productPreviewVideoUrl.trim() || undefined,
+            productInstagramPostUrl,
             productCharacteristics: serializeProductCharacteristicRows(
               form.characteristicRows,
             ),
@@ -622,6 +668,7 @@ export const ProductWizardScreen = ({
               form.productReturnEnabled === true
                 ? serializeProductReturnTermRows(form.returnTermRows)
                 : [],
+            ...dealTermsFields,
           },
         });
         handleCancel();
@@ -630,7 +677,7 @@ export const ProductWizardScreen = ({
 
       await createMutation.mutateAsync({
         productName: form.productName.trim(),
-        productListingOrigin: form.productListingOrigin!,
+        productListingOrigin,
         productIsOriginal: false,
         productDescription: form.productDescription.trim(),
         productPrice: price,
@@ -645,6 +692,7 @@ export const ProductWizardScreen = ({
           : undefined,
         productImageUrls: form.imageUrls.filter(Boolean),
         productPreviewVideoUrl: form.productPreviewVideoUrl.trim() || undefined,
+        productInstagramPostUrl: productInstagramPostUrl || undefined,
         ...(isRuRegionCode(form.productRegionCode.trim())
           ? { productRegionCode: form.productRegionCode.trim() }
           : {}),
@@ -666,6 +714,7 @@ export const ProductWizardScreen = ({
           form.productReturnEnabled === true
             ? serializeProductReturnTermRows(form.returnTermRows)
             : [],
+        ...dealTermsFields,
       });
 
       // Товар создан — черновику больше незачем жить, иначе следующий вход
@@ -789,7 +838,7 @@ export const ProductWizardScreen = ({
 
   const renderWizardBody = () => (
     <>
-      <WizardProgress steps={WIZARD_STEPS} stepIndex={stepIndex} theme={theme} />
+      <WizardProgress steps={stepIds} stepIndex={stepIndex} theme={theme} />
       {draftRestored ? (
         <View
           style={[
@@ -1003,10 +1052,10 @@ export const ProductWizardScreen = ({
   return (
     <SafeAreaView
       edges={["top"]}
-      style={[styles.root, { backgroundColor: theme.colors.bg }]}
+      style={[styles.root, { backgroundColor: pageBackground }]}
     >
       <ScrollView
-        style={[styles.body, { backgroundColor: theme.colors.bg }]}
+        style={[styles.body, { backgroundColor: pageBackground }]}
         contentContainerStyle={[styles.bodyContent, wizardColumnStyle, { flexGrow: 1 }]}
         keyboardShouldPersistTaps="handled"
         automaticallyAdjustKeyboardInsets
@@ -1040,17 +1089,20 @@ function WizardProgress({
         progressStyles.card,
         {
           backgroundColor: theme.colors.actionSurface,
-          borderColor: theme.colors.action + "1f", // 12% opacity
+          borderColor: theme.colors.action + "1f",
         },
       ]}
+      accessibilityLabel={CREATE_PRODUCT_UI.WIZARD_PROGRESS_ARIA}
     >
-      {/* "Шаг X из Y" caption */}
       <Text style={[progressStyles.caption, { color: theme.colors.primaryBright }]}>
-        {`ШАГ ${stepIndex + 1} ИЗ ${steps.length}`}
+        {CREATE_PRODUCT_UI.WIZARD_STEP_OF(stepIndex + 1, steps.length).toUpperCase()}
       </Text>
 
-      {/* Step circles row */}
-      <View style={progressStyles.stepsRow}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={progressStyles.stepsRow}
+      >
         {steps.map((id, i) => {
           const isActive = i === stepIndex;
           const isComplete = i < stepIndex;
@@ -1058,7 +1110,6 @@ function WizardProgress({
 
           return (
             <View key={id} style={[progressStyles.stepCol, { opacity }]}>
-              {/* Circle with number */}
               <View
                 style={[
                   progressStyles.circle,
@@ -1067,7 +1118,7 @@ function WizardProgress({
                     borderColor: theme.colors.action,
                   },
                   isComplete && {
-                    backgroundColor: theme.colors.success + "24", // 14%
+                    backgroundColor: theme.colors.success + "24",
                     borderColor: theme.colors.success,
                   },
                   !isActive &&
@@ -1088,20 +1139,22 @@ function WizardProgress({
                   {isComplete ? "✓" : String(i + 1)}
                 </Text>
               </View>
-              {/* Step label */}
               <Text
                 style={[
                   progressStyles.stepLabel,
-                  { color: theme.colors.textSecondary },
+                  {
+                    color: isActive ? theme.colors.text : theme.colors.textSecondary,
+                    fontWeight: isActive ? "600" : "400",
+                  },
                 ]}
-                numberOfLines={1}
+                numberOfLines={2}
               >
                 {STEP_COPY[id].label}
               </Text>
             </View>
           );
         })}
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -1109,28 +1162,33 @@ function WizardProgress({
 const progressStyles = StyleSheet.create({
   card: {
     borderWidth: 1,
-    borderRadius: 14, // 0.85rem
-    paddingHorizontal: 14, // 0.85rem
-    paddingTop: 10, // 0.65rem
-    paddingBottom: 12, // 0.75rem
-    gap: 9, // 0.55rem
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingTop: 10,
+    paddingBottom: 12,
+    gap: 9,
   },
   caption: {
-    fontSize: 11, // 0.72rem
+    fontSize: 11,
     fontWeight: "700",
-    letterSpacing: 0.9, // 0.06em at 15px base
+    letterSpacing: 0.9,
+    textTransform: "uppercase",
   },
   stepsRow: {
     flexDirection: "row",
-    gap: 6,
+    alignItems: "flex-start",
+    gap: 16,
+    paddingBottom: 3,
   },
   stepCol: {
-    flex: 1,
+    flexGrow: 0,
+    flexShrink: 0,
+    minWidth: 72,
     alignItems: "center",
-    gap: 3, // 0.2rem
+    gap: 4.5,
   },
   circle: {
-    width: 26, // 1.65rem
+    width: 26,
     height: 26,
     borderRadius: 13,
     borderWidth: 1,
@@ -1138,11 +1196,11 @@ const progressStyles = StyleSheet.create({
     justifyContent: "center",
   },
   circleText: {
-    fontSize: 11, // 0.72rem
+    fontSize: 11,
     fontWeight: "700",
   },
   stepLabel: {
-    fontSize: 10, // 0.62rem
+    fontSize: 10,
     lineHeight: 12,
     textAlign: "center",
   },
@@ -1384,6 +1442,14 @@ function MediaStep({ form, setForm, disabled, theme, styles }: StepProps) {
         }
         disabled={disabled}
       />
+
+      <CreateProductWizardInstagramLinkCard
+        value={form.productInstagramPostUrl}
+        onChange={(productInstagramPostUrl) =>
+          setForm((prev) => ({ ...prev, productInstagramPostUrl }))
+        }
+        disabled={disabled}
+      />
     </View>
   );
 }
@@ -1401,13 +1467,14 @@ function CategoryStep({ form, setForm, disabled, theme, styles }: StepProps) {
       <CreateProductCategoryPicker
         selectedCategoryId={form.productCategoryId}
         selectedCategoryLabel={form.productCategoryLabel}
-        onSelect={(id, label, defaultCharacteristicKeys) =>
+        onSelect={(id, label, defaultCharacteristicKeys, dealType) =>
           setForm((prev) => {
             const next = {
               ...prev,
               productCategoryId: id,
               productCategoryLabel: label,
               productCategory: "", // clear legacy when tree category is selected
+              categoryDealType: normalizeCategoryDealType(dealType),
               categoryDefaultCharacteristicKeys: defaultCharacteristicKeys,
             };
             // Заготовки характеристик по категории — только пока продавец не
@@ -1507,6 +1574,7 @@ function CommerceStep({
   isEdit = false,
 }: StepProps & { showCatalogAvailabilityToggle?: boolean; isEdit?: boolean }) {
   const discountPercent = computeDiscount(form.productPrice, form.productOldPrice);
+  const dealType = normalizeCategoryDealType(form.categoryDealType);
 
   return (
     <View style={styles.section}>
@@ -1571,6 +1639,13 @@ function CommerceStep({
           />
         </View>
       </View>
+
+      <CreateProductDealTermsFields
+        dealType={dealType}
+        form={form as unknown as Record<string, unknown>}
+        setForm={setForm}
+        disabled={disabled}
+      />
 
       {/* Discount preview — mirrors .create-product-section__discount-preview */}
       {discountPercent != null ? (

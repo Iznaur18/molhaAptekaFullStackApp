@@ -1,19 +1,19 @@
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-export const useFaqPageStyles = createThemedStyles((theme) => ({
+export const useFaqPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     padding: theme.spacing[4],
     paddingBottom: theme.spacing[8],
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   title: {
-    fontSize: 22,
-    fontWeight: "700",
+    fontSize: theme.typography.font4xl,
+    fontWeight: theme.typography.fontWeightBold,
     marginBottom: theme.spacing[2],
     color: theme.colors.text,
   },
   meta: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
     marginBottom: theme.spacing[4],
   },
@@ -24,8 +24,8 @@ export const useFaqPageStyles = createThemedStyles((theme) => ({
     gap: theme.spacing[2],
   },
   sectionTitle: {
-    fontSize: 17,
-    fontWeight: "700",
+    fontSize: theme.typography.fontXl,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   list: {
@@ -51,14 +51,14 @@ export const useFaqPageStyles = createThemedStyles((theme) => ({
   },
   questionText: {
     flex: 1,
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
     lineHeight: 21,
   },
   answer: {
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: theme.typography.fontMd,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textSecondary,
   },
   answerBlock: {
@@ -72,8 +72,8 @@ export const useFaqPageStyles = createThemedStyles((theme) => ({
     paddingVertical: theme.spacing[1],
   },
   linkButtonText: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.action,
     textDecorationLine: "underline",
   },
@@ -87,12 +87,12 @@ export const useFaqPageStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surfaceMuted,
   },
   linkAdminLabel: {
-    fontSize: 13,
-    fontWeight: "700",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   linkAdminHint: {
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.textMuted,
   },
   linkAdminInput: {
@@ -101,7 +101,7 @@ export const useFaqPageStyles = createThemedStyles((theme) => ({
     borderRadius: theme.radius.sm,
     paddingHorizontal: theme.spacing[3],
     paddingVertical: theme.spacing[2],
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.text,
     backgroundColor: theme.colors.surface,
   },
@@ -117,8 +117,8 @@ export const useFaqPageStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.action,
   },
   linkAdminSaveText: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
   },
   linkAdminClear: {
@@ -129,25 +129,25 @@ export const useFaqPageStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.border,
   },
   linkAdminClearText: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   linkAdminButtonDisabled: {
     opacity: 0.6,
   },
   linkAdminError: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.danger,
   },
   linkAdminNotice: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.success,
   },
   contact: {
     marginTop: theme.spacing[6],
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.textSecondary,
   },
 }));

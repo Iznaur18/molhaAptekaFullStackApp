@@ -38,7 +38,8 @@ const MENU_GAP_INLINE = 4;
 /** @deprecated Секция без внешней обёртки — оставлено для совместимости импортов. */
 export const RAFFLE_SECTION_CARD_BORDER_RADIUS = 36;
 
-export const RAFFLE_REVEAL_BUTTON_BORDER_RADIUS = 16;
+/** Web `--iz-radius-pill` на `.raffle-featured-home-section__reveal`. */
+export const RAFFLE_REVEAL_BUTTON_BORDER_RADIUS = 999;
 
 export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
   root: {
@@ -152,7 +153,7 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
   badgeLabel: {
     color: theme.colors.ink,
     fontSize: BADGE_FONT_SIZE,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     lineHeight: BADGE_LINE_HEIGHT,
   },
   visualTopControls: {
@@ -204,14 +205,14 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     backgroundColor: "rgba(0,0,0,0.78)",
   },
   infoTitle: {
-    fontSize: 17,
-    lineHeight: 22,
-    fontWeight: "700",
+    fontSize: theme.typography.fontXl,
+    lineHeight: theme.typography.leadingLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: P.onContrast,
   },
   infoDescription: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     color: P.onContrast,
   },
   footerCard: {
@@ -249,7 +250,7 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
   progressLabel: {
     fontSize: 13.6,
     lineHeight: L.progressLabelLineHeight,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
     flexShrink: 1,
   },
@@ -271,7 +272,7 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
   },
   btnPrimaryText: {
     fontSize: 13.2,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: P.onContrast,
   },
   btnPrimaryTextCompleted: {
@@ -287,12 +288,12 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
   },
   btnInstagramText: {
     fontSize: 13.2,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: P.accentPinkDeep,
   },
   completedLabel: {
-    fontSize: 13,
-    fontWeight: "700",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightBold,
     color: P.successDeep,
   },
 }));
@@ -329,18 +330,18 @@ export const useRaffleManageActionsStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
   },
   btnEditText: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.text,
   },
   btnDeleteText: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.onContrast,
   },
   btnPauseText: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.text,
   },
 }));
@@ -442,8 +443,8 @@ export const useRaffleFeaturedBannerManageMenuStyles = createThemedStyles((theme
     backgroundColor: P.warningPeach,
   },
   menuItemText: {
-    fontSize: 14,
-    fontWeight: "700",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightBold,
   },
   menuItemTextEdit: {
     color: P.accentPurpleText,
@@ -465,23 +466,30 @@ export const useRaffleFeaturedSectionStyles = createThemedStyles((theme) => ({
     width: "100%",
   },
   revealButton: {
+    position: "relative",
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",
     paddingVertical: 14,
     paddingHorizontal: 16,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.action,
   },
   revealButtonPressed: {
     opacity: 0.92,
   },
+  revealLabel: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  revealChevron: {
+    position: "absolute",
+    right: 16,
+  },
   revealButtonText: {
-    fontSize: 15,
-    lineHeight: 20,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    lineHeight: theme.typography.leadingBase,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.onContrast,
   },
 }));
@@ -510,8 +518,8 @@ export const useFeaturedRaffleWinnerCardStyles = createThemedStyles((theme) => (
     backgroundColor: theme.colors.successSurface,
   },
   title: {
-    fontSize: 11,
-    fontWeight: "700",
+    fontSize: theme.typography.font2xs,
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: 0.4,
     textTransform: "uppercase",
     color: theme.colors.successText,
@@ -530,8 +538,8 @@ export const useFeaturedRaffleWinnerCardStyles = createThemedStyles((theme) => (
   name: {
     flex: 1,
     minWidth: 0,
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
 }));

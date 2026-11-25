@@ -36,6 +36,7 @@ web-build/
 tmp/
 *.tmp
 tmp-*.txt
+server/.dev-mongo-uri
 
 # ОС и редакторы
 .DS_Store

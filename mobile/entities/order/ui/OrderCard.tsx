@@ -171,6 +171,8 @@ type OrderCardProps = {
   }) => void | Promise<void>;
   /** Покупатель оплачивает заказ с предоплатой по СБП. */
   onPayOrder?: (ctx: { orderId: string }) => void | Promise<void>;
+  /** Tap по шапке карточки → экран деталей заказа. */
+  onOpenOrder?: (orderId: string) => void;
   pendingActionKey?: string | null;
   itemActionErrors?: Record<string, string>;
   collapsible?: boolean;
@@ -403,6 +405,7 @@ export const OrderCard = ({
   onMarkDelivered,
   onAdvanceShipment,
   onPayOrder,
+  onOpenOrder,
   pendingActionKey = null,
   itemActionErrors = {},
   collapsible = false,
@@ -808,7 +811,15 @@ export const OrderCard = ({
         style,
       ]}
     >
-      <View style={[styles.header, compact ? styles.headerCompact : null]}>
+      <Pressable
+        style={[styles.header, compact ? styles.headerCompact : null]}
+        onPress={onOpenOrder ? () => onOpenOrder(order._id) : undefined}
+        disabled={!onOpenOrder}
+        accessibilityRole={onOpenOrder ? "button" : undefined}
+        accessibilityLabel={
+          onOpenOrder ? MY_ORDERS_PAGE_UI.OPEN_ORDER_DETAIL_ARIA : undefined
+        }
+      >
         <View style={styles.headerMain}>
           <View style={styles.headerBadges}>
             <Text
@@ -843,7 +854,7 @@ export const OrderCard = ({
             ? formatLoyaltyPointsAmount(summarizeOrderItems(order.items).pointsTotal)
             : formatPriceRub(summarizeOrderItems(order.items).totalAmount)}
         </Text>
-      </View>
+      </Pressable>
 
       {collapsedPreview ? (
         <Text style={styles.collapsedPreview}>{collapsedPreview}</Text>

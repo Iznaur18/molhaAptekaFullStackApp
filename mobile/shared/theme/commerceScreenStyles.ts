@@ -1,3 +1,4 @@
+import { izTypography } from "@izibuy/design-tokens";
 import { Platform, StyleSheet } from "react-native";
 
 import { ORDER_CARD_ITEM_THUMB_SIZE } from "@/entities/product/model/constants";
@@ -14,7 +15,7 @@ const ORDER_CARD_HEADER_BADGE_GAP = 4.8;
 
 const orderCardHeaderBadgeBase = {
   fontSize: ORDER_CARD_HEADER_BADGE_FONT_SIZE,
-  fontWeight: "600" as const,
+  fontWeight: izTypography.fontWeightSemibold,
   paddingHorizontal: ORDER_CARD_HEADER_BADGE_PADDING_H,
   paddingVertical: ORDER_CARD_HEADER_BADGE_PADDING_V,
   borderRadius: 999,
@@ -89,12 +90,12 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     color: theme.colors.link,
   },
   total: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   meta: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
     marginBottom: 4,
   },
@@ -161,37 +162,37 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
   },
   itemLine: {
     flex: 1,
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.text,
   },
   itemNameLink: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.link,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   itemQuantity: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.textMuted,
   },
   itemPrice: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textSecondary,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   itemLoyalty: {
     marginTop: 4,
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.success,
   },
   itemAffiliate: {
     marginTop: 4,
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.success,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   itemStatus: {
     marginTop: 4,
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.textMuted,
   },
   // Отменённая позиция остаётся в списке как история заказа, но читаться как
@@ -210,13 +211,13 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
     backgroundColor: theme.colors.surface,
-    fontSize: 11,
-    fontWeight: "700",
+    fontSize: theme.typography.font2xs,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.textSecondary,
   },
   itemTimestamp: {
     marginTop: 2,
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.textMuted,
   },
   itemActions: {
@@ -249,11 +250,11 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.danger,
   },
   actionDisabled: {
-    opacity: 0.6,
+    opacity: theme.interaction.disabledOpacity,
   },
   actionButtonText: {
     fontSize: 13.1,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
   },
   actionButtonTextCancel: {
@@ -261,7 +262,7 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
   },
   itemError: {
     marginTop: 6,
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.danger,
   },
   // Web: `.order-card__awaiting-prepayment`.
@@ -277,20 +278,20 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
   },
   awaitingPrepaymentTitle: {
     fontSize: 13.6,
-    lineHeight: 20,
-    fontWeight: "700",
+    lineHeight: theme.typography.leadingBase,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.warningText,
   },
   awaitingPrepaymentHint: {
     fontSize: 13.6,
-    lineHeight: 20,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.warningText,
   },
   // Web: `.order-card__prepayment-due`.
   prepaymentDue: {
     fontSize: 13.6,
-    lineHeight: 20,
-    fontWeight: "700",
+    lineHeight: theme.typography.leadingBase,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.warningText,
   },
   // Web: `.order-card__pay-now`.
@@ -307,8 +308,8 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
   payNowButtonText: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.onContrast,
     textAlign: "center",
   },
@@ -319,18 +320,18 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     marginBottom: 4,
   },
   metaLabel: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
   },
   metaValue: {
     flex: 1,
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.text,
   },
   buyerLink: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.link,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   counterpartyValue: {
     flex: 1,
@@ -350,14 +351,14 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     alignItems: "baseline",
   },
   counterpartyPhone: {
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.link,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   counterpartyPhoneText: {
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.textSecondary,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   /** web `.order-card__details-fold` — muted surface box r14. */
   detailsFold: {
@@ -370,7 +371,7 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
   /** web `.order-card__details-fold-summary` pad 0.28/0.55rem fs 0.8rem. */
   detailsFoldSummary: {
     fontSize: 12.8,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     lineHeight: 19.2,
     color: theme.colors.textSecondary,
     paddingVertical: 4.48,
@@ -389,8 +390,8 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     gap: 4,
   },
   itemExtrasName: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   footer: {
@@ -412,25 +413,25 @@ export const useBuyerPassportSharePanelStyles = createThemedStyles((theme) => ({
     gap: theme.spacing[2],
   },
   title: {
-    fontSize: 14,
-    fontWeight: "700",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   field: {
     gap: 2,
   },
   label: {
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.textMuted,
   },
   value: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.text,
   },
   selfieTitle: {
     marginTop: theme.spacing[1],
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   selfieImage: {
@@ -442,12 +443,12 @@ export const useBuyerPassportSharePanelStyles = createThemedStyles((theme) => ({
     marginTop: theme.spacing[1],
   },
   selfieLink: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.link,
     marginTop: theme.spacing[1],
   },
   selfieMissing: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
   },
 }));
@@ -463,8 +464,8 @@ export const useCartSelectAllRowStyles = createThemedStyles((theme) => ({
     paddingRight: 12,
   },
   count: {
-    fontSize: 13,
-    fontWeight: "500",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.textMuted,
   },
   toggle: {
@@ -474,8 +475,8 @@ export const useCartSelectAllRowStyles = createThemedStyles((theme) => ({
     paddingVertical: 6,
   },
   toggleLabel: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
 }));
@@ -526,15 +527,16 @@ export const useCartLineItemStyles = createThemedStyles((theme) => ({
     gap: 8,
   },
   unitPrice: {
-    fontSize: 18,
-    fontWeight: "700",
-    lineHeight: 22,
+    /** Web cart line current ≈ 1.0625rem (17) / 700 */
+    fontSize: theme.typography.fontXl,
+    fontWeight: theme.typography.fontWeightBold,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.text,
   },
   unitPriceOld: {
-    fontSize: 14,
-    fontWeight: "500",
-    lineHeight: 18,
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightMedium,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.textMuted,
     textDecorationLine: "line-through",
   },
@@ -544,26 +546,26 @@ export const useCartLineItemStyles = createThemedStyles((theme) => ({
     right: 12,
   },
   stockHint: {
-    fontSize: 12,
-    fontWeight: "500",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightMedium,
     color: semanticColors.warning,
   },
   wholesaleBadge: {
-    fontSize: 12,
-    fontWeight: "700",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightBold,
     lineHeight: 14,
     color: theme.colors.action,
   },
   name: {
-    fontSize: 14,
-    fontWeight: "400",
-    lineHeight: 18,
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightRegular,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.text,
   },
   nameLink: {
-    fontSize: 14,
-    fontWeight: "400",
-    lineHeight: 18,
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightRegular,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.text,
   },
   actionRow: {
@@ -601,21 +603,21 @@ export const useCartLineItemStyles = createThemedStyles((theme) => ({
     opacity: 0.35,
   },
   stepButtonText: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: theme.typography.font2xl,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
   },
   quantity: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     minWidth: 22,
     textAlign: "center",
     color: theme.colors.text,
   },
   lineTotal: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     minWidth: 72,
     textAlign: "right",
@@ -631,8 +633,8 @@ export const useOrdersScreenStyles = createThemedStyles((theme) => ({
     marginBottom: theme.spacing[2],
   },
   countLabel: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textMuted,
   },
   filters: {
@@ -651,8 +653,8 @@ export const useOrdersScreenStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.nearBlack,
   },
   filterChipText: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   filterChipTextActive: {
@@ -665,15 +667,15 @@ export const useOrdersScreenStyles = createThemedStyles((theme) => ({
     padding: theme.spacing[6],
   },
   message: {
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     color: theme.colors.textMuted,
     textAlign: "center",
     marginBottom: theme.spacing[4],
   },
   hint: {
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     textAlign: "center",
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textMuted,
   },
   button: {
@@ -684,8 +686,8 @@ export const useOrdersScreenStyles = createThemedStyles((theme) => ({
   },
   buttonText: {
     color: theme.colors.onContrast,
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   loyaltyFlash: {
     marginBottom: theme.spacing[3],
@@ -693,8 +695,8 @@ export const useOrdersScreenStyles = createThemedStyles((theme) => ({
     borderRadius: 10,
     backgroundColor: theme.colors.actionSurface,
     color: theme.colors.success,
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     textAlign: "center",
   },
 }));
@@ -708,9 +710,9 @@ export const useSimpleProductListStyles = createThemedStyles((theme) => ({
     gap: theme.spacing[4],
   },
   hint: {
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     textAlign: "center",
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textMuted,
   },
   button: {
@@ -721,8 +723,8 @@ export const useSimpleProductListStyles = createThemedStyles((theme) => ({
   },
   buttonText: {
     color: theme.colors.onContrast,
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   list: {
     padding: theme.spacing[4],
@@ -755,13 +757,13 @@ export const useSimpleProductListStyles = createThemedStyles((theme) => ({
     gap: 4,
   },
   title: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   price: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   remove: {
@@ -769,9 +771,9 @@ export const useSimpleProductListStyles = createThemedStyles((theme) => ({
     paddingVertical: 20,
   },
   removeText: {
-    fontSize: 24,
+    fontSize: theme.typography.font5xl,
     color: theme.colors.textMuted,
-    lineHeight: 24,
+    lineHeight: theme.typography.leadingXl,
   },
 }));
 
@@ -787,17 +789,18 @@ export const useCachedProductImageStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surfaceMuted,
   },
   fallbackText: {
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.textMuted,
     textAlign: "center",
     padding: theme.spacing[2],
   },
 }));
 
-export const useRaffleProductsPageStyles = createThemedStyles((theme) => ({
+export const useRaffleProductsPageStyles = createThemedStyles((theme, layout) => ({
   flex: {
     flex: 1,
-    backgroundColor: theme.colors.bg,
+    // Custom: page canvas = web `--iz-page-bg-custom`, не `colors.bg` (#DEDEDE).
+    backgroundColor: layout.pageBackground,
   },
   list: {
     flexGrow: 1,
@@ -849,7 +852,7 @@ export const useRaffleProductsPageStyles = createThemedStyles((theme) => ({
     width: "100%",
     marginBottom: L.mediaMarginBottom,
     overflow: "hidden",
-    borderRadius: 22,
+    borderRadius: L.mediaRadius,
     backgroundColor: theme.colors.surfaceMuted,
   },
   mediaWide: {
@@ -905,24 +908,24 @@ export const useRaffleProductsPageStyles = createThemedStyles((theme) => ({
   },
   eyebrow: {
     fontSize: 11.5,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: 1.4,
     lineHeight: 14,
     textTransform: "uppercase",
     color: theme.colors.action,
   },
   title: {
-    fontSize: 20,
+    fontSize: theme.typography.font3xl,
     fontWeight: "800",
     letterSpacing: -0.4,
-    lineHeight: 24,
+    lineHeight: theme.typography.leadingXl,
     color: theme.colors.text,
   },
   description: {
     marginBottom: L.descriptionMarginBottom,
     paddingHorizontal: 2.4,
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: theme.typography.fontMd,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.text,
     opacity: 0.9,
   },
@@ -997,16 +1000,16 @@ export const useRaffleProductsPageStyles = createThemedStyles((theme) => ({
   },
   statLabel: {
     fontSize: 10.5,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: 0.4,
     textTransform: "uppercase",
     color: theme.colors.textMuted,
     textAlign: "center",
   },
   statValue: {
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     fontWeight: "800",
-    lineHeight: 18,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.text,
     textAlign: "center",
   },
@@ -1018,7 +1021,7 @@ export const useRaffleProductsPageStyles = createThemedStyles((theme) => ({
     alignItems: "center",
   },
   emptyText: {
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.textMuted,
   },
   footer: {

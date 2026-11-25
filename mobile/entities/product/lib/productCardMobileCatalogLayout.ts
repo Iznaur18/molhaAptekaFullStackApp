@@ -60,11 +60,15 @@ export const resolveProductCardCatalogGridContentBelowImageHeight = (
   layout.bodyGap +
   layout.sellerRowHeight;
 
-/** Высота квадратного фото с bleed (−inset по X → width = tile + 2×inset). */
+/**
+ * Высота квадратного фото 1:1 по ширине тайла.
+ * Web mobile: `--product-card-image-bleed-x: 0` — превью = ширина карточки
+ * (negative margin только гасит padding текста, наружу не вылезает).
+ */
 export const resolveProductCardCatalogGridImageHeight = (
   tileWidth: number,
-  layout: ProductCardMobileCatalogLayout = PRODUCT_CARD_MOBILE_CATALOG_LAYOUT,
-): number => Math.max(0, tileWidth) + 2 * layout.contentInsetX;
+  _layout: ProductCardMobileCatalogLayout = PRODUCT_CARD_MOBILE_CATALOG_LAYOUT,
+): number => Math.max(0, tileWidth);
 
 /** Место под кнопку покупки или заявки на карточке главного экрана. */
 export const resolveProductCardCatalogGridActionSlotHeight = (

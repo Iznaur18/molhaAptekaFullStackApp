@@ -234,7 +234,7 @@
     .product-card__price
     .product-price-display__old {
     font-size: 11.5px;
-    color: #93c5fd;
+    /* color наследует ProductPriceDisplay.css color-mix(currentColor 52%) */
   }
 
   .product-card:not(.product-card--banner-layout):not(.product-card--list)

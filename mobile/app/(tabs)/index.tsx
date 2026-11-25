@@ -45,6 +45,7 @@ import { CatalogGridSkeleton } from "@/features/catalog-grid/ui/CatalogGridSkele
 import { CatalogAnimatedFlatList } from "@/features/catalog-grid/ui/CatalogAnimatedFlatList";
 import { CatalogScrollAnimationProvider } from "@/features/catalog-grid/model/CatalogScrollAnimationContext";
 import { useCatalogBreadcrumbLabel } from "@/features/catalog-filter/model/useCatalogBreadcrumbLabel";
+import { CATALOG_BROWSER_TOOLBAR_MARGIN_BOTTOM } from "@/features/catalog-filter/ui/CatalogBreadcrumb";
 import { consumePendingCatalogFilters } from "@/features/catalog-browser/model/pendingCatalogFilters";
 import type { HomeCuratedCategory } from "@/entities/curated-category-list/api/fetchHomeCuratedCategoryLists";
 import { isHomeCuratedProductListsVisible } from "@/entities/curated-product-list/lib/isHomeCuratedProductListsVisible";
@@ -412,6 +413,12 @@ export default function CatalogScreen() {
     setFeedFilters(EMPTY_FEED_FILTERS);
   }, []);
 
+  /** Web `handleCatalogMenuClick`: «Каталог» в breadcrumb → лендинг категорий. */
+  const handleCatalogRootPress = useCallback(() => {
+    resetToHomeMainView();
+    router.replace("/(tabs)/catalog");
+  }, [resetToHomeMainView, router]);
+
   /**
    * Клик по кураторской подборке категорий (паритет с web
    * `useHomeCuratedCategoryClick`): personal-категория продавца → страница
@@ -578,7 +585,11 @@ export default function CatalogScreen() {
     />
   );
 
-  const searchRow = (
+  /**
+   * Search+filters — только curated home (web AppShell на `/` без query).
+   * Категория / отбор (`saleOnly` и др.): только breadcrumb, как web catalog-product-shell.
+   */
+  const homeFeedSearchRow = showHomeFeed ? (
     <>
       <HomeCatalogSearchRow
         value={searchInput}
@@ -587,10 +598,24 @@ export default function CatalogScreen() {
         filtersOpen={isFiltersSheetOpen}
         filtersActive={filtersActive}
         onOpenFilters={openFiltersSheet}
-        embeddedInForegroundSheet={showHomeFeed}
+        embeddedInForegroundSheet
       />
       {filtersSheet}
     </>
+  ) : null;
+
+  const categoryViewContentStyle = useMemo(
+    (): ViewStyle => ({
+      ...centeredContentStyle,
+      paddingTop: insets.top,
+    }),
+    [centeredContentStyle, insets.top],
+  );
+
+  /** FlatList `contentContainer.gap` уже даёт часть зазора — добиваем до web 1rem. */
+  const catalogBreadcrumbToolbarMarginBottom = Math.max(
+    0,
+    CATALOG_BROWSER_TOOLBAR_MARGIN_BOTTOM - productGrid.gap,
   );
 
   const listHeader = (
@@ -606,6 +631,8 @@ export default function CatalogScreen() {
       sellerSearch={searchInput}
       onSellerSearchChange={handleSearchInputChange}
       onOpenCuratedCategory={handleOpenCuratedCategory}
+      onCatalogRootPress={handleCatalogRootPress}
+      catalogBreadcrumbToolbarMarginBottom={catalogBreadcrumbToolbarMarginBottom}
     />
   );
 
@@ -623,6 +650,7 @@ export default function CatalogScreen() {
         sellerSearch={searchInput}
         onSellerSearchChange={handleSearchInputChange}
         onOpenCuratedCategory={handleOpenCuratedCategory}
+        onCatalogRootPress={handleCatalogRootPress}
       />
     ),
     [
@@ -630,6 +658,7 @@ export default function CatalogScreen() {
       catalogBreadcrumbLabel,
       catalogEmptyLabel,
       catalogGridRows.length,
+      handleCatalogRootPress,
       handleOpenCuratedCategory,
       handleSearchInputChange,
       searchInput,
@@ -803,7 +832,7 @@ export default function CatalogScreen() {
                   },
                 ]}
               >
-                {searchRow}
+                {homeFeedSearchRow}
                 {listHeader}
                 <CatalogGridSkeleton
                   columns={productGrid.columns}
@@ -819,8 +848,7 @@ export default function CatalogScreen() {
     }
 
     return (
-      <View style={[styles.flex, centeredContentStyle]}>
-        {searchRow}
+      <View style={[styles.flex, categoryViewContentStyle]}>
         <View
           style={[
             styles.listContent,
@@ -857,7 +885,7 @@ export default function CatalogScreen() {
                   },
                 ]}
               >
-                {searchRow}
+                {homeFeedSearchRow}
                 {listHeader}
                 <ScreenErrorState
                   message={formatApiErrorMessage(
@@ -874,8 +902,7 @@ export default function CatalogScreen() {
     }
 
     return (
-      <View style={styles.flex}>
-        {searchRow}
+      <View style={[styles.flex, categoryViewContentStyle]}>
         {listHeader}
         <ScreenErrorState
           message={formatApiErrorMessage(
@@ -984,8 +1011,7 @@ export default function CatalogScreen() {
   return (
     <CatalogScrollAnimationProvider>
       <VisibleRowsProvider store={rowVisibility.store}>
-        <View style={[styles.flex, centeredContentStyle]}>
-          {searchRow}
+        <View style={[styles.flex, categoryViewContentStyle]}>
           <CatalogAnimatedFlatList<CatalogGridRow>
             ref={catalogListRef as Ref<Animated.FlatList<CatalogGridRow>>}
             key={`${productGrid.listKey}-${catalogListScopeKey}`}

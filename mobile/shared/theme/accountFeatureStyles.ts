@@ -3,23 +3,23 @@ import { StyleSheet } from "react-native";
 import { SELLER_PRODUCTS_PAGE_LAYOUT as L } from "@/features/seller-products-page/lib/sellerProductsPageLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-export const useAccountPageChromeStyles = createThemedStyles((theme) => ({
+export const useAccountPageChromeStyles = createThemedStyles((theme, layout) => ({
   centered: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     padding: theme.spacing[6],
     gap: theme.spacing[4],
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   hint: {
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     textAlign: "center",
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textMuted,
   },
   message: {
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     color: theme.colors.textMuted,
     textAlign: "center",
   },
@@ -32,12 +32,12 @@ export const useAccountPageChromeStyles = createThemedStyles((theme) => ({
   },
   buttonText: {
     color: theme.colors.onContrast,
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   createButtonText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   disabled: {
     opacity: 0.6,
@@ -49,7 +49,7 @@ export const useAccountPageChromeStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useUserFollowButtonStyles = createThemedStyles((theme) => ({
+export const useUserFollowButtonStyles = createThemedStyles((theme, layout) => ({
   root: {
     marginTop: 4,
     gap: 4,
@@ -63,7 +63,9 @@ export const useUserFollowButtonStyles = createThemedStyles((theme) => ({
     alignSelf: "flex-start",
     paddingVertical: theme.spacing[2],
     paddingHorizontal: 14,
-    borderRadius: theme.radius.button,
+    borderRadius: theme.radius.pill,
+    borderWidth: 1,
+    borderColor: theme.colors.action,
     backgroundColor: theme.colors.action,
     alignItems: "center",
   },
@@ -88,8 +90,8 @@ export const useUserFollowButtonStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.action,
   },
   buttonText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
   },
   buttonTextFollowing: {
@@ -100,14 +102,15 @@ export const useUserFollowButtonStyles = createThemedStyles((theme) => ({
   },
   error: {
     marginTop: 4,
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.danger,
   },
 }));
 
-export const useUserVoteRatingStyles = createThemedStyles((theme) => ({
+export const useUserVoteRatingStyles = createThemedStyles((theme, layout) => ({
   root: {
-    marginTop: theme.spacing[4],
+    /** web `.user-details-page .user-vote-rating-form__details { margin: 0 }` — gap даёт parent. */
+    marginTop: 0,
     borderWidth: 1,
     borderRadius: theme.radius.sm,
     overflow: "hidden",
@@ -127,8 +130,8 @@ export const useUserVoteRatingStyles = createThemedStyles((theme) => ({
     gap: 4,
   },
   summaryText: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   summaryMeta: {
@@ -138,7 +141,7 @@ export const useUserVoteRatingStyles = createThemedStyles((theme) => ({
     gap: 6,
   },
   summaryAvg: {
-    fontSize: 20,
+    fontSize: theme.typography.font3xl,
     fontWeight: "800",
     color: theme.colors.text,
     letterSpacing: -0.3,
@@ -147,17 +150,17 @@ export const useUserVoteRatingStyles = createThemedStyles((theme) => ({
     color: theme.colors.textMuted,
   },
   summaryOutOf: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textMuted,
   },
   summaryVotes: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
   },
   chevron: {
     color: theme.colors.textMuted,
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
   },
   body: {
     paddingHorizontal: 14,
@@ -168,8 +171,8 @@ export const useUserVoteRatingStyles = createThemedStyles((theme) => ({
     paddingTop: 14,
   },
   title: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   aggregateHero: {
@@ -189,17 +192,17 @@ export const useUserVoteRatingStyles = createThemedStyles((theme) => ({
     gap: 2,
   },
   aggregateOutOf: {
-    fontSize: 14,
-    fontWeight: "700",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.textMuted,
   },
   aggregateVotes: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
   },
   rangeLabel: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   scaleEdgeRow: {
@@ -208,8 +211,8 @@ export const useUserVoteRatingStyles = createThemedStyles((theme) => ({
     alignItems: "center",
   },
   scaleEdgeLabel: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textMuted,
   },
   scoreGrid: {
@@ -231,7 +234,7 @@ export const useUserVoteRatingStyles = createThemedStyles((theme) => ({
   },
 
   scoreChipText: {
-    fontSize: 17,
+    fontSize: theme.typography.fontXl,
     fontWeight: "800",
   },
   scoreChipSelectedRing: {
@@ -242,9 +245,9 @@ export const useUserVoteRatingStyles = createThemedStyles((theme) => ({
     elevation: 3,
   },
   hint: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.textMuted,
-    lineHeight: 20,
+    lineHeight: theme.typography.leadingBase,
   },
   button: {
     alignSelf: "stretch",
@@ -259,8 +262,8 @@ export const useUserVoteRatingStyles = createThemedStyles((theme) => ({
   },
   buttonText: {
     color: theme.colors.onContrast,
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
   },
   ratedCard: {
     borderRadius: theme.radius.button,
@@ -273,34 +276,34 @@ export const useUserVoteRatingStyles = createThemedStyles((theme) => ({
     gap: 6,
   },
   ratedCheck: {
-    fontSize: 28,
-    fontWeight: "700",
+    fontSize: theme.typography.font7xl,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.success,
     lineHeight: 32,
   },
   ratedTitle: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.successText,
   },
   ratedScore: {
-    fontSize: 22,
+    fontSize: theme.typography.font4xl,
     fontWeight: "800",
     color: theme.colors.text,
   },
   error: {
     color: theme.colors.danger,
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
   },
   flash: {
     color: theme.colors.success,
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightSemibold,
     textAlign: "center",
   },
 }));
 
-export const useInstallmentContractCardStyles = createThemedStyles((theme) => ({
+export const useInstallmentContractCardStyles = createThemedStyles((theme, layout) => ({
   card: {
     padding: theme.spacing[4],
     marginBottom: theme.spacing[3],
@@ -311,31 +314,31 @@ export const useInstallmentContractCardStyles = createThemedStyles((theme) => ({
     gap: theme.spacing[2],
   },
   product: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   productLink: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.link,
   },
   meta: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
   },
   paymentsTitle: {
     marginTop: theme.spacing[1],
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   paymentText: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.text,
   },
   paymentDue: {
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.textMuted,
   },
   paymentRow: {
@@ -360,8 +363,8 @@ export const useInstallmentContractCardStyles = createThemedStyles((theme) => ({
   },
   actionText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
-    fontSize: 14,
+    fontWeight: theme.typography.fontWeightSemibold,
+    fontSize: theme.typography.fontBase,
   },
   rejectButton: {
     backgroundColor: theme.colors.surface,
@@ -370,20 +373,20 @@ export const useInstallmentContractCardStyles = createThemedStyles((theme) => ({
   },
   rejectText: {
     color: theme.colors.danger,
-    fontWeight: "600",
-    fontSize: 14,
+    fontWeight: theme.typography.fontWeightSemibold,
+    fontSize: theme.typography.fontBase,
   },
   error: {
     color: theme.colors.danger,
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
   },
 }));
 
-export const useLegalPageStyles = createThemedStyles((theme) => ({
+export const useLegalPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     padding: theme.spacing[4],
     paddingBottom: theme.spacing[8],
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   documentTabBarRoot: {
     marginBottom: theme.spacing[4],
@@ -412,34 +415,34 @@ export const useLegalPageStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.action,
   },
   documentTabText: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.action,
   },
   documentTabTextActive: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   title: {
-    fontSize: 22,
-    fontWeight: "700",
+    fontSize: theme.typography.font4xl,
+    fontWeight: theme.typography.fontWeightBold,
     marginBottom: theme.spacing[4],
     color: theme.colors.text,
   },
   paragraph: {
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: theme.typography.fontMd,
+    lineHeight: theme.typography.leadingLg,
     marginBottom: theme.spacing[3],
     color: theme.colors.textSecondary,
   },
   meta: {
     marginTop: theme.spacing[2],
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
   },
   operator: {
     marginTop: theme.spacing[3],
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.danger,
     fontStyle: "italic",
   },
@@ -447,14 +450,14 @@ export const useLegalPageStyles = createThemedStyles((theme) => ({
     marginTop: 20,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     marginBottom: theme.spacing[2],
   },
   contact: {
     marginTop: theme.spacing[6],
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.textSecondary,
   },
   webLink: {
@@ -462,20 +465,20 @@ export const useLegalPageStyles = createThemedStyles((theme) => ({
     alignSelf: "flex-start",
   },
   webLinkText: {
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.link,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   link: {
     color: theme.colors.link,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
 }));
 
-export const useNotificationsPageStyles = createThemedStyles((theme) => ({
+export const useNotificationsPageStyles = createThemedStyles((theme, layout) => ({
   root: {
     flex: 1,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   toolbar: {
     paddingHorizontal: theme.spacing[4],
@@ -487,21 +490,23 @@ export const useNotificationsPageStyles = createThemedStyles((theme) => ({
     gap: theme.spacing[3],
   },
   count: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     flex: 1,
     color: theme.colors.textMuted,
   },
+  /** web `.notifications-page__clear` pad 0.4/0.85rem, r 0.5rem */
   clearButton: {
     borderWidth: 1,
-    borderRadius: theme.radius.button,
-    paddingVertical: theme.spacing[2],
-    paddingHorizontal: 14,
-    borderColor: theme.colors.borderStrong,
+    borderRadius: theme.radius.sm,
+    paddingVertical: 6.4,
+    paddingHorizontal: 13.6,
+    borderColor: theme.colors.actionBorder,
+    backgroundColor: "transparent",
   },
   clearText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.action,
   },
   errorBanner: {
@@ -525,16 +530,16 @@ export const useNotificationsPageStyles = createThemedStyles((theme) => ({
     justifyContent: "center",
     backgroundColor: `${theme.colors.danger}2e`,
     color: theme.colors.danger,
-    fontSize: 13,
-    fontWeight: "700",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightBold,
     overflow: "hidden",
     textAlign: "center",
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
   },
   errorBannerText: {
     flex: 1,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.dangerText,
   },
   centered: {
@@ -543,7 +548,7 @@ export const useNotificationsPageStyles = createThemedStyles((theme) => ({
     justifyContent: "center",
     padding: theme.spacing[6],
     gap: theme.spacing[4],
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   emptyWrap: {
     flex: 1,
@@ -552,7 +557,7 @@ export const useNotificationsPageStyles = createThemedStyles((theme) => ({
     padding: theme.spacing[6],
   },
   empty: {
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     textAlign: "center",
     color: theme.colors.textMuted,
   },
@@ -564,31 +569,34 @@ export const useNotificationsPageStyles = createThemedStyles((theme) => ({
   },
   loginButtonText: {
     color: theme.colors.onContrast,
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
+  /** web `.notifications-page__list { gap: 0.5rem }` */
   list: {
     padding: theme.spacing[4],
-    gap: 10,
+    gap: 8,
   },
+  /** web item-btn pad 0.75×0.85rem, r 0.5rem, action-soft */
   item: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 10,
-    padding: 14,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderRadius: theme.radius.sm,
+    paddingVertical: 12,
+    paddingHorizontal: 13.6,
+    borderColor: theme.colors.infoSoft,
+    backgroundColor: theme.colors.actionSoft,
   },
   itemStatic: {
     opacity: 0.85,
   },
   message: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: theme.colors.text,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
+    color: theme.colors.infoDeep,
   },
   createdAt: {
     marginTop: 6,
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.textMuted,
   },
 }));

@@ -44,8 +44,8 @@ export const useSavedAddressesEditorStyles = createThemedStyles((theme) => ({
     opacity: 0.55,
   },
   actionText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   editor: {
     gap: 10,
@@ -60,8 +60,8 @@ export const useSavedAddressesEditorStyles = createThemedStyles((theme) => ({
     gap: 10,
   },
   error: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
   },
   primaryButton: {
     flex: 1,
@@ -71,8 +71,8 @@ export const useSavedAddressesEditorStyles = createThemedStyles((theme) => ({
     borderRadius: theme.radius.button,
   },
   primaryButtonText: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   secondaryButton: {
     flex: 1,
@@ -83,7 +83,7 @@ export const useSavedAddressesEditorStyles = createThemedStyles((theme) => ({
     borderWidth: 1,
   },
   secondaryButtonText: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
 }));

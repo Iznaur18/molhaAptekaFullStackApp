@@ -22,20 +22,33 @@ test("catalog browser landing section gaps match web CSS", () => {
   );
 
   assert.match(webCss, /margin-bottom:\s*0\.75rem/);
+  assert.match(webCss, /padding-top:\s*0\.5rem/);
   assert.match(webCss, /margin-top:\s*1\.15rem/);
+  assert.match(webCss, /padding-top:\s*0\.35rem/);
   assert.match(webCss, /margin:\s*0\.65rem 0 0\.95rem/);
+  assert.match(webCss, /gap:\s*0\.55rem/);
+  assert.match(webCss, /width:\s*0\.22rem/);
+  assert.match(webCss, /height:\s*1\.05em/);
+  assert.match(webCss, /linear-gradient\(\s*180deg/);
 
-  assert.match(layout, /feedMarginBottom: 0/);
-  assert.match(layout, /feedPaddingTop: 4/);
-  assert.match(layout, /categoriesMarginTop: 10/);
-  assert.match(layout, /categoriesPaddingTop: 0/);
-  assert.match(layout, /titleMarginTop: 0/);
-  assert.match(layout, /titleMarginBottom: 8/);
+  assert.match(layout, /feedPaddingTop: 8/);
+  assert.match(layout, /feedMarginBottom: 12/);
+  assert.match(layout, /categoriesMarginTop: 18\.4/);
+  assert.match(layout, /categoriesPaddingTop: 5\.6/);
+  assert.match(layout, /titleMarginTop: 10\.4/);
+  assert.match(layout, /titleMarginBottom: 15\.2/);
+  assert.match(layout, /titleGap: 8\.8/);
+  assert.match(layout, /titleAccentWidth: 3\.5/);
+  assert.match(layout, /titleAccentHeightFeed: 23\.1/);
+  assert.match(layout, /titleAccentHeightCategories: 21/);
 
   assert.match(styles, /sectionFeed:/);
   assert.match(styles, /sectionCategories:/);
+  assert.match(styles, /sectionTitleRow:/);
   assert.match(styles, /CATALOG_BROWSER_LANDING_LAYOUT\.feedMarginBottom/);
   assert.match(styles, /CATALOG_BROWSER_LANDING_LAYOUT\.categoriesMarginTop/);
+  assert.match(styles, /CATALOG_BROWSER_LANDING_LAYOUT\.titleGap/);
+  assert.doesNotMatch(styles, /borderLeftWidth:\s*CATALOG_BROWSER_LANDING_LAYOUT/);
 
   const pageStylesBlock = styles.slice(
     styles.indexOf("export const useCatalogBrowserPageStyles"),
@@ -45,6 +58,22 @@ test("catalog browser landing section gaps match web CSS", () => {
 
   assert.match(grid, /variant = "categories"/);
   assert.match(grid, /sectionFeed/);
+  assert.match(grid, /CatalogSectionTitleAccent/);
+  assert.match(grid, /sectionTitleRow/);
   assert.match(page, /variant="feed"/);
   assert.match(page, /variant="categories"/);
+  assert.doesNotMatch(page, /personalCategoryTiles/);
+  assert.doesNotMatch(page, /SELLER_PERSONAL_CATEGORY_PAGE_UI/);
+});
+
+test("catalog section title accent uses vertical action→accent gradient", () => {
+  const accent = readMobile(
+    "features/catalog-browser/ui/CatalogSectionTitleAccent.tsx",
+  );
+  assert.match(
+    accent,
+    /mixHexColors\(theme\.colors\.action, theme\.colors\.accent, 0\.55\)/,
+  );
+  assert.match(accent, /x1="0" y1="0" x2="0" y2="1"/);
+  assert.match(accent, /LinearGradient/);
 });

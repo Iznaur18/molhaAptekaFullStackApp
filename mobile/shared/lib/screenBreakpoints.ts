@@ -1,23 +1,28 @@
+import { izLayout } from "@izibuy/design-tokens";
+
 /** ≤359dp — узкие телефоны */
 export const SCREEN_NARROW_MAX_WIDTH = 359;
 
 /** ≥600dp — малый планшет / большой телефон */
-export const SCREEN_SMALL_TABLET_MIN_WIDTH = 600;
+export const SCREEN_SMALL_TABLET_MIN_WIDTH = izLayout.smallTabletMinWidth;
 
 /** ≥768dp — iPad portrait (768×1024) и аналоги */
-export const SCREEN_MEDIUM_TABLET_MIN_WIDTH = 768;
+export const SCREEN_MEDIUM_TABLET_MIN_WIDTH = izLayout.mediumTabletMinWidth;
 
 /** ≥1024dp — iPad Pro 12.9" (1024×1366) и аналоги */
-export const SCREEN_LARGE_TABLET_MIN_WIDTH = 1024;
+export const SCREEN_LARGE_TABLET_MIN_WIDTH = izLayout.largeTabletMinWidth;
 
 /** @deprecated используйте SCREEN_SMALL_TABLET_MIN_WIDTH */
 export const SCREEN_TABLET_MIN_WIDTH = SCREEN_SMALL_TABLET_MIN_WIDTH;
 
-export const SCREEN_CONTENT_MAX_WIDTH_SMALL_TABLET = 520;
-export const SCREEN_CONTENT_MAX_WIDTH_MEDIUM_TABLET = 720;
-export const SCREEN_CONTENT_MAX_WIDTH_LARGE_TABLET = 960;
-/** ≥1280: 960 × 1.25, паритет с web `--app-shell-max-width` */
-export const SCREEN_CONTENT_MAX_WIDTH_WIDE = 1200;
+export const SCREEN_CONTENT_MAX_WIDTH_SMALL_TABLET =
+  izLayout.contentMaxWidthSmallTablet;
+export const SCREEN_CONTENT_MAX_WIDTH_MEDIUM_TABLET =
+  izLayout.contentMaxWidthMediumTablet;
+export const SCREEN_CONTENT_MAX_WIDTH_LARGE_TABLET =
+  izLayout.contentMaxWidthLargeTablet;
+/** ≥1280: паритет с web `--app-shell-max-width` / `izLayout.contentMaxWidthWide` */
+export const SCREEN_CONTENT_MAX_WIDTH_WIDE = izLayout.contentMaxWidthWide;
 
 /** @deprecated используйте SCREEN_CONTENT_MAX_WIDTH_SMALL_TABLET */
 export const SCREEN_CONTENT_MAX_WIDTH_TABLET = SCREEN_CONTENT_MAX_WIDTH_SMALL_TABLET;
@@ -36,11 +41,15 @@ export const PRODUCT_GRID_GAP = 8;
  * `--app-shell-content-inline-padding`.
  * ≤640: 0.5rem. 641–667: 0.75rem (`@media max-width 667`). Шире: `--iz-space-4` 1rem.
  */
-export const SCREEN_CONTENT_INLINE_PADDING_PHONE_MAX_WIDTH = 640;
-export const SCREEN_CONTENT_INLINE_PADDING_COMPACT_MAX_WIDTH = 667;
-export const SCREEN_CONTENT_INLINE_PADDING_PHONE = 8;
-export const SCREEN_CONTENT_INLINE_PADDING_COMPACT = 12;
-export const SCREEN_CONTENT_INLINE_PADDING_WIDE = 16;
+export const SCREEN_CONTENT_INLINE_PADDING_PHONE_MAX_WIDTH =
+  izLayout.contentInlinePaddingPhoneMaxWidth;
+export const SCREEN_CONTENT_INLINE_PADDING_COMPACT_MAX_WIDTH =
+  izLayout.contentInlinePaddingCompactMaxWidth;
+export const SCREEN_CONTENT_INLINE_PADDING_PHONE =
+  izLayout.contentPaddingHorizontalPhone;
+export const SCREEN_CONTENT_INLINE_PADDING_COMPACT =
+  izLayout.contentPaddingHorizontalCompact;
+export const SCREEN_CONTENT_INLINE_PADDING_WIDE = izLayout.contentPaddingHorizontalWide;
 
 export const resolveScreenContentInlinePadding = (width: number): number => {
   if (width <= SCREEN_CONTENT_INLINE_PADDING_PHONE_MAX_WIDTH) {
@@ -59,7 +68,7 @@ export const SCREEN_PRODUCT_GRID_2_COL_MAX_WIDTH = 667;
 export const SCREEN_PRODUCT_GRID_3_COL_MAX_WIDTH = 903;
 
 /** ≥1280dp — 4 колонки на главной ленте товаров */
-export const SCREEN_PRODUCT_GRID_4_COL_MIN_WIDTH = 1280;
+export const SCREEN_PRODUCT_GRID_4_COL_MIN_WIDTH = izLayout.wideMinWidth;
 
 export const PRODUCT_GRID_COLUMNS_COMPACT = 2;
 export const PRODUCT_GRID_COLUMNS_MEDIUM = 3;

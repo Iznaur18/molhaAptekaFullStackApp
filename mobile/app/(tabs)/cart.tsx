@@ -1,7 +1,7 @@
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
@@ -51,6 +51,10 @@ import { fetchMyAppliedProductPromos } from "@/entities/product-promo-code/api/p
 import { productPromoCodeQueryKeys } from "@/entities/product-promo-code/model/productPromoCodeQueryKeys";
 import type { MyPriceOfferBid } from "@/entities/product-price-offer/api/incomingPriceOffersApi";
 import { useMyAcceptedBidsQuery } from "@/entities/product-price-offer/model/useMyAcceptedBidsQuery";
+import { mergeLuckyBoxWinsIntoAppliedPromos } from "@/entities/seller-lucky-box/lib/mergeLuckyBoxWinsIntoAppliedPromos";
+import { useMyLuckyBoxWinsQuery } from "@/entities/seller-lucky-box/model/useMyLuckyBoxWinsQuery";
+import { mergeFortuneWheelWinsIntoAppliedPromos } from "@/entities/seller-fortune-wheel/lib/mergeFortuneWheelWinsIntoAppliedPromos";
+import { useMyFortuneWheelWinsQuery } from "@/entities/seller-fortune-wheel/model/useMyFortuneWheelWinsQuery";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { CartAuctionSection } from "@/features/cart-auction/ui/CartAuctionSection";
 import { CheckoutForm } from "@/features/checkout/ui/CheckoutForm";
@@ -88,7 +92,7 @@ export default function CartScreen() {
   const isAuthorized = useIsAuthorized();
   const sessionQuery = useAuthSessionQuery();
   const cartQuery = useMyCartQuery();
-  const { clearCart, removeItems, isUpdating } = useCartActions();
+  const { clearCart, removeItems, addItem, isUpdating } = useCartActions();
   const createOrderMutation = useCreateOrderMutation();
 
   /** Открытая корзина продавца; null — общий список продавцов. */
@@ -166,21 +170,80 @@ export default function CartScreen() {
     productsQuery.products ?? [],
   );
 
+  const luckyBoxWinsQuery = useMyLuckyBoxWinsQuery({ enabled: isAuthorized });
+  const fortuneWheelWinsQuery = useMyFortuneWheelWinsQuery({
+    enabled: isAuthorized,
+  });
+
+  // Товар-приз из игр: автодобавление 1 шт (зеркало web CartPage).
+  const prizeAutoAddedRef = useRef(new Set<string>());
+  const cartItems = cartQuery.data ?? {};
+  useEffect(() => {
+    const productWins = [
+      ...(luckyBoxWinsQuery.data ?? []),
+      ...(fortuneWheelWinsQuery.data ?? []),
+    ].filter((win) => win?.prizeProductId);
+    for (const win of productWins) {
+      const productId = String(win.prizeProductId);
+      if (prizeAutoAddedRef.current.has(productId) || cartItems[productId]) {
+        continue;
+      }
+      prizeAutoAddedRef.current.add(productId);
+      void addItem(productId, 1);
+    }
+  }, [luckyBoxWinsQuery.data, fortuneWheelWinsQuery.data, cartItems, addItem]);
+
+  const prizeFreeUnitsByProductId = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const win of [
+      ...(luckyBoxWinsQuery.data ?? []),
+      ...(fortuneWheelWinsQuery.data ?? []),
+    ]) {
+      if (!win?.prizeProductId) {
+        continue;
+      }
+      const productId = String(win.prizeProductId);
+      map[productId] = (map[productId] ?? 0) + 1;
+    }
+    return map;
+  }, [luckyBoxWinsQuery.data, fortuneWheelWinsQuery.data]);
+
+  const appliedPromosWithGameWins = useMemo(
+    () =>
+      mergeFortuneWheelWinsIntoAppliedPromos(
+        mergeLuckyBoxWinsIntoAppliedPromos(
+          appliedPromosQuery.data?.appliedPromos ?? [],
+          luckyBoxWinsQuery.data ?? [],
+          productsQuery.products ?? [],
+        ),
+        fortuneWheelWinsQuery.data ?? [],
+        productsQuery.products ?? [],
+      ),
+    [
+      appliedPromosQuery.data,
+      luckyBoxWinsQuery.data,
+      fortuneWheelWinsQuery.data,
+      productsQuery.products,
+    ],
+  );
+
   const { lines } = useMemo(
     () =>
       selectCartLines(
         cartQuery.data ?? {},
         productsQuery.products,
-        appliedPromosQuery.data?.appliedPromos ?? [],
+        appliedPromosWithGameWins,
         buyNFreeProgressByProductId,
         cartPriceNowMs,
+        prizeFreeUnitsByProductId,
       ),
     [
       cartQuery.data,
       productsQuery.products,
-      appliedPromosQuery.data,
+      appliedPromosWithGameWins,
       buyNFreeProgressByProductId,
       cartPriceNowMs,
+      prizeFreeUnitsByProductId,
     ],
   );
 
@@ -763,7 +826,7 @@ export default function CartScreen() {
                     submitSuccess={submitState.success}
                     isDisabled={!canCheckoutActive}
                     showHeading={false}
-                    fieldsStyle={fulfillmentStyles.checkoutFormFields}
+                    fulfillmentCardsLayout
                     onSubmit={handleCheckoutSubmit}
                     renderFooter={(footer) => (
                       <CartCheckoutDock

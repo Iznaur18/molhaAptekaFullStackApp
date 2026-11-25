@@ -19,6 +19,7 @@ import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayou
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useWishlistPageStyles } from "@/shared/theme/wishlistPageStyles";
+import { AppButton } from "@/shared/ui/AppButton";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 type WishlistProduct = {
@@ -103,12 +104,11 @@ export const WishlistPage = () => {
     return (
       <View style={styles.centered}>
         <Text style={styles.hint}>{WISHLIST_PAGE_UI.LOGIN_HINT}</Text>
-        <Pressable
-          style={styles.loginButton}
+        <AppButton
+          label={WISHLIST_PAGE_UI.LOGIN_BUTTON}
+          variant="primary"
           onPress={() => router.push("/(auth)/login")}
-        >
-          <Text style={styles.loginButtonText}>{WISHLIST_PAGE_UI.LOGIN_BUTTON}</Text>
-        </Pressable>
+        />
       </View>
     );
   }

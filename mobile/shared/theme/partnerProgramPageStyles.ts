@@ -2,20 +2,19 @@ import { StyleSheet } from "react-native";
 
 import { PROFILE_ACCOUNT_STACK_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 
-export const usePartnerProgramPageStyles = createThemedStyles((theme) => ({
+export const usePartnerProgramPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   scroll: {
     flexGrow: 1,
   },
   content: {
     gap: L.stackGap,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 12,
   },
   contentInAccountShell: {
@@ -26,8 +25,8 @@ export const usePartnerProgramPageStyles = createThemedStyles((theme) => ({
     gap: 14,
   },
   intro: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.textMuted,
   },
   card: {
@@ -39,12 +38,12 @@ export const usePartnerProgramPageStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
   },
   cardTitle: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   cardHint: {
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     lineHeight: 19,
     color: theme.colors.textMuted,
   },
@@ -63,12 +62,12 @@ export const usePartnerProgramPageStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surfaceMuted,
   },
   statLabel: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   statValue: {
-    fontSize: 18,
+    fontSize: theme.typography.font2xl,
     fontWeight: "800",
     color: theme.colors.text,
     fontVariant: ["tabular-nums"],
@@ -81,8 +80,8 @@ export const usePartnerProgramPageStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.border,
     backgroundColor: theme.colors.surfaceMuted,
     color: theme.colors.textSecondary,
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
   },
   actionsRow: {
     flexDirection: "row",
@@ -94,8 +93,8 @@ export const usePartnerProgramPageStyles = createThemedStyles((theme) => ({
     minWidth: 120,
   },
   fieldLabel: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   input: {
@@ -104,8 +103,8 @@ export const usePartnerProgramPageStyles = createThemedStyles((theme) => ({
     borderWidth: 1,
     borderRadius: 12,
     borderColor: theme.colors.borderStrong,
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: theme.typography.font2xl,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
     backgroundColor: theme.colors.surfaceMuted,
     fontVariant: ["tabular-nums"],
@@ -122,8 +121,8 @@ export const usePartnerProgramPageStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.actionBorder,
     backgroundColor: theme.colors.actionSoft,
     color: theme.colors.infoDeep,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
   },
   feedbackError: {
     paddingVertical: 10,
@@ -133,12 +132,12 @@ export const usePartnerProgramPageStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.danger,
     backgroundColor: theme.colors.surfaceMuted,
     color: theme.colors.danger,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
   },
   empty: {
     fontSize: 14.5,
-    lineHeight: 20,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.textMuted,
   },
   referralRow: {
@@ -148,13 +147,13 @@ export const usePartnerProgramPageStyles = createThemedStyles((theme) => ({
     borderBottomColor: theme.colors.border,
   },
   referralName: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   referralMeta: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.textSecondary,
   },
   centered: {
@@ -162,11 +161,11 @@ export const usePartnerProgramPageStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
-    backgroundColor: theme.colors.bg,
+    paddingHorizontal: layout.contentPaddingHorizontal,
+    backgroundColor: layout.pageBackground,
   },
   hint: {
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     color: theme.colors.textMuted,
     textAlign: "center",
   },
@@ -178,7 +177,7 @@ export const usePartnerProgramPageStyles = createThemedStyles((theme) => ({
   },
   loginButtonText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     fontSize: 15.2,
   },
 }));

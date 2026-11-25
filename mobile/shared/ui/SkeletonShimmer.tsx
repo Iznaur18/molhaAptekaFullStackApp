@@ -1,5 +1,6 @@
+import { izRadius } from "@izibuy/design-tokens";
 import { useEffect, type ReactNode } from "react";
-import type { StyleProp, ViewStyle } from "react-native";
+import { StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 import Animated, {
   cancelAnimation,
   Easing,
@@ -10,31 +11,72 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
+/** Web `skeleton.css` — `animation: iz-skeleton-shimmer 1.2s`. */
+export const SKELETON_SHIMMER_DURATION_MS = 1200;
+
+/** Web `.iz-skeleton { border-radius: 8px }`. */
+export const SKELETON_BORDER_RADIUS = izRadius.sm;
+
 type SkeletonShimmerProps = {
   children?: ReactNode;
   style?: StyleProp<ViewStyle>;
 };
 
 /**
- * Оборачивает статичный скелетон в «дышащую» подсветку: плавная пульсация
- * прозрачности на UI-потоке (Reanimated worklet, 60 FPS), без нагрузки на JS
- * и без нативных зависимостей. Даёт понятный сигнал «данные грузятся, не завис».
+ * Паритет web skeleton: цикл 1.2s + горизонтальный «блик» (gradient slide),
+ * поверх opacity-пульса. Reduced-motion на RN не слушаем отдельно — блик мягкий.
  */
 export const SkeletonShimmer = ({ children, style }: SkeletonShimmerProps) => {
   const progress = useSharedValue(0);
 
   useEffect(() => {
     progress.value = withRepeat(
-      withTiming(1, { duration: 850, easing: Easing.inOut(Easing.ease) }),
+      withTiming(1, {
+        duration: SKELETON_SHIMMER_DURATION_MS,
+        easing: Easing.inOut(Easing.ease),
+      }),
       -1,
-      true,
+      false,
     );
     return () => cancelAnimation(progress);
   }, [progress]);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(progress.value, [0, 1], [0.4, 1]),
+  const pulseStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(progress.value, [0, 0.5, 1], [0.55, 1, 0.55]),
   }));
 
-  return <Animated.View style={[style, animatedStyle]}>{children}</Animated.View>;
+  const shineStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        translateX: interpolate(progress.value, [0, 1], [-80, 80]),
+      },
+    ],
+    opacity: interpolate(progress.value, [0, 0.35, 0.65, 1], [0, 0.35, 0.35, 0]),
+  }));
+
+  return (
+    <Animated.View
+      style={[styles.root, style, pulseStyle]}
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+    >
+      {children}
+      <Animated.View pointerEvents="none" style={[styles.shine, shineStyle]} />
+    </Animated.View>
+  );
 };
+
+const styles = StyleSheet.create({
+  root: {
+    overflow: "hidden",
+    borderRadius: SKELETON_BORDER_RADIUS,
+  },
+  shine: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    width: "42%",
+    backgroundColor: "rgba(255,255,255,0.35)",
+  },
+});

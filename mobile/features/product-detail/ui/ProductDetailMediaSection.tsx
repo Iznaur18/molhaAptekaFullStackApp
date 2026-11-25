@@ -43,6 +43,7 @@ export const ProductDetailMediaSection = ({
       variant="detail"
       previewVideoUrl={previewVideoUrl}
       imageUrls={imageUrls}
+      product={product}
       heroSize={heroSize}
       isSplitLayout={isSplitLayout}
       onBack={() => router.back()}

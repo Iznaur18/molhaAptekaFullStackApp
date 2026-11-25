@@ -111,6 +111,7 @@
     "test:shared-lib-metro-resolve": "node --test scripts/shared-lib-metro-resolve.test.mjs",
     "test:price-offer-api-parity": "node --test scripts/price-offer-api-parity.test.mjs",
     "test:deep-link-routes": "node --import tsx --test scripts/deep-link-routes.test.mjs",
+    "test:well-known-app-links": "node --test scripts/well-known-app-links.test.mjs",
     "test:flash-sale": "node --import tsx --test scripts/flash-sale.test.mjs",
     "test:product-compare-tab": "node --test scripts/product-compare-tab.test.mjs",
     "test:product-image-lightbox": "node --test scripts/product-image-lightbox.test.mjs",
@@ -125,6 +126,7 @@
     "test:product-characteristics-parity": "node --import tsx --test scripts/product-characteristics-parity.test.mjs",
     "test:product-pickup-locations": "node --import tsx --test scripts/product-pickup-locations.test.mjs",
     "test:product-details-badge-sort": "node --import tsx --test scripts/product-details-badge-sort.test.mjs",
+    "test:promo-return-streak-prices": "node --test scripts/promo-return-streak-prices.test.mjs scripts/promo-return-streak-dock.test.mjs",
     "smoke:buyer-path": "node scripts/buyer-path-api-smoke.mjs"
   },
   "private": true

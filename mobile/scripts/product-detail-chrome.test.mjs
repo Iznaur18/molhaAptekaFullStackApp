@@ -212,7 +212,7 @@ test("mobile product description panel matches web content-switcher chrome", () 
   assert.match(layout, /tabPaddingVertical: 6\.4/);
   assert.match(layout, /tabPaddingHorizontal: 13\.6/);
   assert.match(layout, /tabsGap: 8/);
-  assert.match(layout, /sectionGap: 9/);
+  assert.match(layout, /sectionGap: 6/);
   assert.match(webTabsCss, /padding: 0\.4rem 0\.85rem/);
   assert.match(webCss, /product-details-content-switcher__panel/);
   assert.match(webCss, /border:\s*1px solid/);
@@ -282,7 +282,7 @@ test("mobile seller preview matches web product-details-seller-preview chrome", 
   assert.match(layout, /rootPadding: 14/);
   assert.match(layout, /avatarSize: 56/);
   assert.match(webCss, /padding: 0\.875rem/);
-  assert.match(webCss, /grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(webCss, /grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/);
   assert.match(
     webPageCss,
     /product-details-modal--page-split \.product-details-seller-preview/,

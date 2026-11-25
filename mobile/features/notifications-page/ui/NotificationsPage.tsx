@@ -15,9 +15,11 @@ import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { API_CLIENT_UI, AUTH_UI, NOTIFICATIONS_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage, formatIsoDateTime } from "@/shared/lib";
+import { reportClientIssue } from "@/shared/lib/reportClientIssue";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useNotificationsPageStyles } from "@/shared/theme/accountFeatureStyles";
-import { ScreenLoadingState } from "@/shared/ui/ScreenStates";
+import { AppButton } from "@/shared/ui/AppButton";
+import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 const openNotificationTarget = (
   router: ReturnType<typeof useRouter>,
@@ -64,7 +66,8 @@ export const NotificationsPage = () => {
           if (!shouldMark) {
             return;
           }
-          void markReadMutation.mutateAsync().catch(() => {
+          void markReadMutation.mutateAsync().catch((error) => {
+            reportClientIssue("NotificationsPage#markReadOnBlur", error);
             void sessionQuery.refetch();
           });
         }, 400);
@@ -98,18 +101,31 @@ export const NotificationsPage = () => {
     return (
       <View style={styles.centered}>
         <Text style={styles.empty}>{NOTIFICATIONS_PAGE_UI.AUTH_REQUIRED}</Text>
-        <Pressable
-          style={styles.loginButton}
+        <AppButton
+          label={AUTH_UI.LOGIN_BUTTON}
+          variant="primary"
           onPress={() => router.push("/(auth)/login")}
-        >
-          <Text style={styles.loginButtonText}>{AUTH_UI.LOGIN_BUTTON}</Text>
-        </Pressable>
+        />
       </View>
     );
   }
 
   if (sessionQuery.isPending) {
     return <ScreenLoadingState message={NOTIFICATIONS_PAGE_UI.LOADING} />;
+  }
+
+  if (sessionQuery.isError) {
+    return (
+      <ScreenErrorState
+        message={formatApiErrorMessage(
+          sessionQuery.error,
+          API_CLIENT_UI.FETCH_ME_FALLBACK,
+        )}
+        onRetry={() => {
+          void sessionQuery.refetch();
+        }}
+      />
+    );
   }
 
   return (

@@ -16,7 +16,7 @@ export const useUsersSearchInputStyles = createThemedStyles((theme) => ({
     paddingHorizontal: theme.spacing[3],
     paddingVertical: 10,
     paddingRight: 72,
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     backgroundColor: theme.colors.surfaceMuted,
     color: theme.colors.text,
   },
@@ -29,8 +29,8 @@ export const useUsersSearchInputStyles = createThemedStyles((theme) => ({
     justifyContent: "center",
   },
   clearText: {
-    fontSize: 20,
-    lineHeight: 22,
+    fontSize: theme.typography.font3xl,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textMuted,
   },
   spinner: {

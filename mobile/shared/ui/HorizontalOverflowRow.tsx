@@ -18,22 +18,25 @@ type TrackItem = {
   node: React.ReactElement;
 };
 
+/**
+ * Не ставить flex-shorthand — на RN Web часто выходит `0 1 0%` →
+ * width/height схлопываются (сторис/boost/curated = пустой gap).
+ */
 const trackItemShellStyle: ViewStyle = {
   flexGrow: 0,
   flexShrink: 0,
-  flex: 0,
   alignSelf: "center",
 };
 
 const shellBaseStyle = (height: number): ViewStyle => ({
   height,
+  minHeight: height,
   maxHeight: height,
   width: "100%",
   maxWidth: "100%",
   minWidth: 0,
   flexGrow: 0,
   flexShrink: 0,
-  flex: 0,
   alignSelf: "stretch",
   overflow: "hidden",
 });
@@ -41,6 +44,7 @@ const shellBaseStyle = (height: number): ViewStyle => ({
 const domTrackBaseStyle = (height: number): ViewStyle =>
   ({
     height,
+    minHeight: height,
     maxHeight: height,
     width: "100%",
     flexDirection: "row",
@@ -56,11 +60,11 @@ const domTrackBaseStyle = (height: number): ViewStyle =>
 
 const nativeScrollStyle = (height: number): ViewStyle => ({
   height,
+  minHeight: height,
   maxHeight: height,
   width: "100%",
   flexGrow: 0,
   flexShrink: 0,
-  flex: 0,
 });
 
 const nativeTrackBaseStyle = (height: number): ViewStyle => ({
@@ -70,6 +74,7 @@ const nativeTrackBaseStyle = (height: number): ViewStyle => ({
   flexGrow: 0,
   flexShrink: 0,
   height,
+  minHeight: height,
   maxHeight: height,
 });
 

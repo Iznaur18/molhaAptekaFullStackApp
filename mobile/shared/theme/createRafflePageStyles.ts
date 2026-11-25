@@ -1,42 +1,42 @@
 import { StyleSheet } from "react-native";
 
 import { MODAL_BACKDROP_SCRIM } from "@/shared/theme/formChromeStyles";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
+export const useCreateRafflePageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   scroll: {
     flexGrow: 1,
   },
   content: {
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 12,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   header: {
     marginBottom: 4,
   },
+  /** web `.create-raffle-modal__form { gap: 0.65rem }` */
   form: {
-    gap: 10,
+    gap: 10.4,
   },
   wizardProgress: {
     gap: 8,
     paddingVertical: 10,
     paddingHorizontal: 12,
-    borderRadius: 12,
+    borderRadius: 11.2,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.actionBorder,
     backgroundColor: theme.colors.actionSoft,
   },
   wizardCaption: {
-    fontSize: 11,
-    fontWeight: "700",
+    fontSize: theme.typography.font2xs,
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: 0.6,
     textTransform: "uppercase",
     color: theme.colors.action,
@@ -76,8 +76,8 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.successSurface,
   },
   wizardStepIndexText: {
-    fontSize: 12,
-    fontWeight: "700",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.textSecondary,
   },
   wizardStepIndexTextActive: {
@@ -97,13 +97,13 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
     marginTop: 4,
   },
   stepTitle: {
-    fontSize: 20,
-    fontWeight: "700",
+    fontSize: theme.typography.font3xl,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.primary,
   },
   stepSubtitle: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.textSecondary,
   },
   wizardFooter: {
@@ -114,12 +114,13 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: theme.colors.border,
   },
+  /** web `.create-raffle-modal__actions .app-btn` minH 2.75rem / r 0.7rem */
   wizardSecondaryBtn: {
     flex: 1,
-    minHeight: 48,
+    minHeight: 44,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 11,
+    borderRadius: 11.2,
     borderWidth: 1,
     borderColor: theme.colors.border,
     backgroundColor: theme.colors.surface,
@@ -130,60 +131,58 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
   },
   wizardSecondaryBtnText: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: 14.72,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.textSecondary,
   },
   wizardPrimaryBtn: {
     flex: 1.4,
-    minHeight: 48,
+    minHeight: 44,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 11,
+    borderRadius: 11.2,
     borderWidth: 1,
     borderColor: theme.colors.action,
     backgroundColor: theme.colors.action,
     paddingHorizontal: 12,
   },
   wizardPrimaryBtnText: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: 14.72,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.onContrast,
   },
+  /** web `.create-raffle-modal__section` r 0.7rem, без shadow. */
   section: {
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
-    borderRadius: 12,
+    borderRadius: 11.2,
     overflow: "hidden",
     backgroundColor: theme.colors.surface,
-    shadowColor: theme.colors.ink,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 2,
   },
+  /** web title: surface-muted + text-secondary (не action fill). */
   sectionTitle: {
-    paddingVertical: 8,
+    paddingVertical: 8.8,
     paddingHorizontal: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: theme.colors.actionBorder,
-    backgroundColor: theme.colors.action,
-    fontSize: 11.5,
+    borderBottomColor: theme.colors.border,
+    backgroundColor: theme.colors.surfaceMuted,
+    fontSize: 12.48,
     fontWeight: "800",
-    letterSpacing: 0.6,
+    letterSpacing: 0.62,
     textTransform: "uppercase",
-    color: theme.colors.onContrast,
+    color: theme.colors.textSecondary,
   },
   sectionBody: {
-    gap: 12,
+    gap: 11.2,
     padding: 12,
+    backgroundColor: theme.colors.surfaceMuted,
   },
   field: {
     gap: 5.6,
   },
   fieldLabel: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   fieldHint: {
@@ -191,31 +190,34 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
     lineHeight: 17.5,
     color: theme.colors.textMuted,
   },
+  /** web input bg `--iz-color-bg`, r 8, pad 0.45/0.55rem */
   input: {
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
     borderRadius: 8,
     paddingHorizontal: 8.8,
     paddingVertical: 7.2,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.text,
-    backgroundColor: theme.colors.surfaceMuted,
+    backgroundColor: theme.colors.bg,
   },
   textarea: {
     minHeight: 96,
     textAlignVertical: "top",
   },
+  /** web `.create-raffle-modal__media-type` — border + surface-muted. */
   mediaType: {
     gap: 8,
-    padding: 10,
+    paddingVertical: 8.8,
+    paddingHorizontal: 10.4,
     borderRadius: 8,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.actionBorder,
-    backgroundColor: theme.colors.actionSoft,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surfaceMuted,
   },
   mediaTypeLegend: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   mediaTypeOptions: {
@@ -234,7 +236,7 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
     opacity: 1,
   },
   mediaTypeOptionText: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.text,
   },
   mediaTypeDot: {
@@ -262,13 +264,13 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 4,
   },
   blockNotice: {
-    gap: 10,
+    gap: 10.4,
     paddingVertical: 12,
-    paddingHorizontal: 12,
-    borderRadius: 10,
+    paddingHorizontal: 12.8,
+    borderRadius: 11.2,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.danger,
-    backgroundColor: theme.colors.surfaceMuted,
+    backgroundColor: theme.colors.dangerSurface,
   },
   blockNoticeText: {
     fontSize: 13.6,
@@ -283,8 +285,8 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.danger,
   },
   blockNoticeBtnText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
   },
   error: {
@@ -304,20 +306,21 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
     marginTop: 4,
   },
   submit: {
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 8,
+    paddingVertical: 8.8,
+    paddingHorizontal: 16,
+    borderRadius: 11.2,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.action,
     backgroundColor: theme.colors.action,
     alignSelf: "center",
+    minHeight: 44,
   },
   submitDisabled: {
     opacity: 0.55,
   },
   submitText: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
   },
   centered: {
@@ -325,8 +328,8 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
-    backgroundColor: theme.colors.bg,
+    paddingHorizontal: layout.contentPaddingHorizontal,
+    backgroundColor: layout.pageBackground,
   },
   state: {
     fontSize: 14.72,
@@ -356,12 +359,12 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
   },
   loginButtonText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     fontSize: 14.4,
   },
 }));
 
-export const useCreateRaffleModalStyles = createThemedStyles((theme) => ({
+export const useCreateRaffleModalStyles = createThemedStyles((theme, layout) => ({
   overlay: {
     flex: 1,
   },
@@ -391,8 +394,8 @@ export const useCreateRaffleModalStyles = createThemedStyles((theme) => ({
   },
   title: {
     flex: 1,
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: theme.typography.font2xl,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   closeButton: {
@@ -400,7 +403,7 @@ export const useCreateRaffleModalStyles = createThemedStyles((theme) => ({
     paddingVertical: 2,
   },
   closeText: {
-    fontSize: 28,
+    fontSize: theme.typography.font7xl,
     lineHeight: 28,
     color: theme.colors.textMuted,
   },

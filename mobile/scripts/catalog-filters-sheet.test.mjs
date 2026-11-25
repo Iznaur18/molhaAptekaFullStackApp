@@ -96,6 +96,13 @@ test("кнопка фильтров стоит в шапке главной, о�
   assert.match(read("app/(tabs)/index.tsx"), /<HomeCatalogFiltersSheet/);
 });
 
+test("saleOnly уходит в запрос ленты; search-chrome только на curated home", () => {
+  const index = read("app/(tabs)/index.tsx");
+  assert.match(index, /saleOnly: feedFilters\.saleOnly === true/);
+  assert.match(index, /homeFeedSearchRow = showHomeFeed \?/);
+  assert.doesNotMatch(index, /renderFilteredCatalogChrome/);
+});
+
 test("запрос ленты передаёт фильтры окна на сервер", () => {
   const source = read("entities/product/api/fetchCatalogProductsPage.ts");
   for (const key of [
@@ -111,4 +118,26 @@ test("запрос ленты передаёт фильтры окна на се
   ]) {
     assert.match(source, new RegExp(`\\.\\.\\.\\(${key}`), key);
   }
+});
+
+test("filters sheet dig: секции как web, без mobile-only ranking link", () => {
+  const sheet = read("features/home-feed/ui/HomeCatalogFiltersSheet.tsx");
+  const copy = read("shared/config/homePageUi.ts");
+
+  for (const title of [
+    "CATALOG_FILTERS_SHEET_SORT",
+    "CATALOG_FILTERS_SHEET_PRICE",
+    "CATALOG_FILTERS_SHEET_DELIVERY",
+    "CATALOG_FILTERS_SHEET_RATING",
+    "CATALOG_FILTERS_SHEET_BENEFIT",
+    "CATALOG_FILTERS_SHEET_SELLER",
+    "CATALOG_FILTERS_SHEET_MORE",
+  ]) {
+    assert.match(sheet, new RegExp(title));
+  }
+
+  assert.match(sheet, /CATALOG_FILTERS_SHEET_SHOW_PENDING/);
+  assert.match(sheet, /CATALOG_FILTERS_SHEET_NOTHING_FOUND/);
+  assert.doesNotMatch(sheet, /RANKING_RULES|rulesLink|\/legal\/ranking/);
+  assert.doesNotMatch(copy, /CATALOG_FILTERS_SHEET_RANKING_RULES/);
 });

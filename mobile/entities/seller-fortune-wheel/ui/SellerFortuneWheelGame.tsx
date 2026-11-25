@@ -1,3 +1,4 @@
+import { izProductBadgeColors } from "@izibuy/design-tokens";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import ChevronRight from "lucide-react-native/icons/chevron-right";
@@ -17,6 +18,8 @@ import { useSellerGamesStyles } from "@/shared/theme/sellerGamesStyles";
 import { AppButton } from "@/shared/ui/AppButton";
 import { GradientFill } from "@/shared/ui/GradientFill";
 
+const GAME_ACCENT = izProductBadgeColors.gameAccent;
+
 import type { FortuneWheelSector, FortuneWheelSpin } from "../api/fortuneWheelApi";
 import { fortuneWheelQueryKeys } from "../model/fortuneWheelQueryKeys";
 import { useSellerFortuneWheelStateQuery } from "../model/useSellerFortuneWheelStateQuery";
@@ -32,7 +35,7 @@ const SPIN_TURNS = 5;
 function FortuneWheelToggleIcon() {
   return (
     <Svg width={34} height={34} viewBox="0 0 48 48" fill="none">
-      <Circle cx={24} cy={24} r={17} stroke="#ff7a1a" strokeWidth={4} />
+      <Circle cx={24} cy={24} r={17} stroke={GAME_ACCENT} strokeWidth={4} />
       {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => {
         const rad = ((deg - 90) * Math.PI) / 180;
         return (
@@ -42,13 +45,13 @@ function FortuneWheelToggleIcon() {
             y1={24 + 5 * Math.sin(rad)}
             x2={24 + 15 * Math.cos(rad)}
             y2={24 + 15 * Math.sin(rad)}
-            stroke="#ff7a1a"
+            stroke={GAME_ACCENT}
             strokeWidth={3}
             strokeLinecap="round"
           />
         );
       })}
-      <Circle cx={24} cy={24} r={4} fill="#ff7a1a" />
+      <Circle cx={24} cy={24} r={4} fill={GAME_ACCENT} />
     </Svg>
   );
 }

@@ -1,4 +1,4 @@
-import { isDimColorScheme } from "@izibuy/design-tokens";
+import { isDimColorScheme, izIconSizes, izIconStrokeNav } from "@izibuy/design-tokens";
 /** Lucide RN ≥0.469: `Home` удалён → `House` (тот же глиф, что web `Home`). */
 import Home from "lucide-react-native/icons/house";
 import LayoutGrid from "lucide-react-native/icons/layout-grid";
@@ -25,12 +25,16 @@ import { useUnreadNotificationsCount } from "@/entities/notification/model/useIn
 import { useAppIntro } from "@/features/app-intro/model/AppIntroProvider";
 import { IS_HOME_FEED_INTRO_BACKDROP_ENABLED } from "@/features/home-feed/model/isHomeFeedIntroBackdropEnabled";
 import { usePlaceProductPress } from "@/features/place-product/model/usePlaceProductPress";
+import { PromoReturnStreakDock } from "@/features/promo-return-streak/ui/PromoReturnStreakDock";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { CART_PAGE_UI, MOBILE_BOTTOM_NAV_UI } from "@/shared/config";
 import { useCatalogCategoryView } from "@/shared/lib/catalogCategoryViewStore";
 import { isHomeTabBarRoute } from "@/shared/lib/isHomeTabBarRoute";
 import { isProfileTabBarRoute } from "@/shared/lib/isProfileTabBarRoute";
 import {
+  MOBILE_BOTTOM_NAV_BLUR_CSS_PX,
+  MOBILE_BOTTOM_NAV_BLUR_INTENSITY_NATIVE,
+  MOBILE_BOTTOM_NAV_BLUR_INTENSITY_WEB,
   MOBILE_BOTTOM_NAV_BORDER_RADIUS,
   MOBILE_BOTTOM_NAV_ITEM_MIN_HEIGHT,
   MOBILE_BOTTOM_NAV_ITEM_RADIUS,
@@ -41,14 +45,15 @@ import {
   resolveMobileBottomNavLayoutHeight,
   resolveMobileBottomNavPaddingBottom,
 } from "@/shared/lib/mobileBottomNavLayout";
+import { useSoftKeyboardOpen } from "@/shared/lib/useSoftKeyboardOpen";
 import { resolveContentMaxWidth } from "@/shared/lib/screenBreakpoints";
 import { homeCatalogTabBarRevealProgress } from "@/shared/model/homeCatalogTabBarVisibility";
 import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { AppText } from "@/shared/ui/AppText";
 
-const TAB_ICON_SIZE = 24;
-const TAB_ICON_STROKE = 2.25;
+const TAB_ICON_SIZE = izIconSizes.xl;
+const TAB_ICON_STROKE = izIconStrokeNav;
 const PLACE_PRODUCT_ROUTE = "place-product";
 const HOME_TAB_ROUTE = "index";
 /** Паритет с web `gap: 0.1rem`. */
@@ -196,7 +201,7 @@ const useTabBarStyles = createThemedStyles((theme) => ({
   label: {
     maxWidth: "100%",
     fontSize: 10.56,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     lineHeight: 12,
   },
   iconWrap: {
@@ -216,11 +221,12 @@ const useTabBarStyles = createThemedStyles((theme) => ({
     justifyContent: "center",
     backgroundColor: theme.colors.danger,
   },
+  /** Web `.mobile-bottom-nav__badge` font 0.55rem / line-height 1 → 8.8. */
   badgeText: {
     fontSize: 8.8,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.onContrast,
-    lineHeight: 11,
+    lineHeight: 8.8,
   },
 }));
 
@@ -240,6 +246,8 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
   const isProfileTabBarContext = isProfileTabBarRoute(pathname);
   const isHomeTabBarContext = isHomeTabBarRoute(pathname);
   const isCatalogCategoryView = useCatalogCategoryView();
+  /** Паритет web `:root.app-soft-keyboard-open .mobile-bottom-nav { visibility: hidden }`. */
+  const isSoftKeyboardOpen = useSoftKeyboardOpen();
 
   const cartBadge = cartCount > 0 ? formatBadge(cartCount) : null;
   const profileBadge =
@@ -437,45 +445,52 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
 
   return (
     <>
-      <View
-        accessibilityRole="tablist"
-        accessibilityLabel={MOBILE_BOTTOM_NAV_UI.NAV_ARIA}
-        pointerEvents="box-none"
-        style={[
-          styles.shell,
-          {
-            paddingHorizontal: horizontalInset,
-            paddingBottom: resolveMobileBottomNavPaddingBottom(insets.bottom),
-          },
-        ]}
-      >
-        <Animated.View
+      {isSoftKeyboardOpen ? null : <PromoReturnStreakDock />}
+      {isSoftKeyboardOpen ? null : (
+        <View
+          accessibilityRole="tablist"
+          accessibilityLabel={MOBILE_BOTTOM_NAV_UI.NAV_ARIA}
           pointerEvents="box-none"
           style={[
-            styles.pillWrap,
-            animatedShellStyle,
-            contentMaxWidth != null ? { maxWidth: contentMaxWidth } : null,
+            styles.shell,
+            {
+              paddingHorizontal: horizontalInset,
+              paddingBottom: resolveMobileBottomNavPaddingBottom(insets.bottom),
+            },
           ]}
         >
-          <View style={styles.navPill}>
-            <BlurView
-              intensity={Platform.OS === "web" ? 18 : 40}
-              tint={isDimColorScheme(colorScheme) ? "dark" : "light"}
-              style={[
-                styles.navBlur,
-                Platform.OS === "web"
-                  ? ({
-                      backdropFilter: "blur(18px) saturate(1.35)",
-                    } as object)
-                  : null,
-              ]}
-            >
-              <View style={styles.liquidOverlay} pointerEvents="none" />
-              <View style={styles.navRow}>{items}</View>
-            </BlurView>
-          </View>
-        </Animated.View>
-      </View>
+          <Animated.View
+            pointerEvents="box-none"
+            style={[
+              styles.pillWrap,
+              animatedShellStyle,
+              contentMaxWidth != null ? { maxWidth: contentMaxWidth } : null,
+            ]}
+          >
+            <View style={styles.navPill}>
+              <BlurView
+                intensity={
+                  Platform.OS === "web"
+                    ? MOBILE_BOTTOM_NAV_BLUR_INTENSITY_WEB
+                    : MOBILE_BOTTOM_NAV_BLUR_INTENSITY_NATIVE
+                }
+                tint={isDimColorScheme(colorScheme) ? "dark" : "light"}
+                style={[
+                  styles.navBlur,
+                  Platform.OS === "web"
+                    ? ({
+                        backdropFilter: `blur(${MOBILE_BOTTOM_NAV_BLUR_CSS_PX}px) saturate(1.35)`,
+                      } as object)
+                    : null,
+                ]}
+              >
+                <View style={styles.liquidOverlay} pointerEvents="none" />
+                <View style={styles.navRow}>{items}</View>
+              </BlurView>
+            </View>
+          </Animated.View>
+        </View>
+      )}
 
       <SellerProductsLimitModal
         visible={placeProduct.limitModalVisible}

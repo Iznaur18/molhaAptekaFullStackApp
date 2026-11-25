@@ -50,6 +50,9 @@ test("create raffle modal mirrors web edit flow", () => {
     "utf8",
   );
   const home = readMobileFile("features/home-feed/ui/HomeFeaturedRafflesSection.tsx");
+  const storefront = readMobileFile(
+    "features/raffle-products-page/ui/RaffleProductsPage.tsx",
+  );
   const patchMy = readMobileFile("entities/raffle/api/patchMyRaffle.ts");
   const patchStaff = readMobileFile("entities/raffle/api/patchRaffleByStaff.ts");
 
@@ -62,10 +65,13 @@ test("create raffle modal mirrors web edit flow", () => {
   assert.match(webModal, /create-raffle-modal__section/);
   assert.match(webModal, /SECTION_BASIC/);
   assert.match(webModal, /ProductWizardProgress/);
-  assert.match(home, /CreateRaffleModal/);
-  assert.match(home, /setEditingRaffle/);
-  assert.match(home, /editUseStaffApi/);
-  assert.doesNotMatch(home, /router\.push\("\/\(tabs\)\/me"/);
+  // Home — reveal-only (как web RaffleFeaturedHomeSection); edit modal на storefront/staff.
+  assert.match(home, /HomeFeaturedRafflesRevealButton/);
+  assert.doesNotMatch(home, /CreateRaffleModal/);
+  assert.doesNotMatch(home, /setEditingRaffle/);
+  assert.match(storefront, /CreateRaffleModal/);
+  assert.match(storefront, /setEditingRaffle/);
+  assert.match(storefront, /editUseStaffApi/);
   assert.match(patchMy, /\/product\/raffles\/\$\{raffleId\}/);
   assert.match(patchStaff, /\/staff/);
 });

@@ -2,6 +2,8 @@ import { type ReactNode } from "react";
 import { View, Text } from "react-native";
 
 import type { CatalogBrowserLandingSectionVariant } from "@/features/catalog-browser/lib/catalogBrowserLandingLayout";
+import { CATALOG_BROWSER_LANDING_LAYOUT as L } from "@/features/catalog-browser/lib/catalogBrowserLandingLayout";
+import { CatalogSectionTitleAccent } from "@/features/catalog-browser/ui/CatalogSectionTitleAccent";
 import { useCatalogBrowserSectionStyles } from "@/shared/theme/catalogProductStyles";
 
 type CatalogBrowserTilesGridProps = {
@@ -21,6 +23,7 @@ export const CatalogBrowserTilesGrid = ({
 }: CatalogBrowserTilesGridProps) => {
   const styles = useCatalogBrowserSectionStyles();
   const isFeed = variant === "feed";
+  const accentHeight = isFeed ? L.titleAccentHeightFeed : L.titleAccentHeightCategories;
 
   return (
     <View
@@ -28,9 +31,12 @@ export const CatalogBrowserTilesGrid = ({
       accessibilityLabel={accessibilityLabel}
       accessible={Boolean(accessibilityLabel)}
     >
-      <Text style={[styles.sectionTitle, !isFeed && styles.sectionTitleCategories]}>
-        {title}
-      </Text>
+      <View style={styles.sectionTitleRow}>
+        <CatalogSectionTitleAccent height={accentHeight} />
+        <Text style={[styles.sectionTitle, !isFeed && styles.sectionTitleCategories]}>
+          {title}
+        </Text>
+      </View>
       <View style={[styles.grid, { gap }]}>{children}</View>
     </View>
   );

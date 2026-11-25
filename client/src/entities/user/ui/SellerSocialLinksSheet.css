@@ -45,27 +45,32 @@
   height: 2.5rem;
   border-radius: 12px;
   background: var(--iz-color-text-muted);
-  color: #ffffff;
+  color: var(--iz-social-on-brand);
 }
 
 .seller-social-links__badge--socialInstagramUrl {
-  background: linear-gradient(45deg, #f9a03f 0%, #e1306c 50%, #833ab4 100%);
+  background: linear-gradient(
+    45deg,
+    var(--iz-social-instagram-badge-start) 0%,
+    var(--iz-social-instagram-badge-mid) 50%,
+    var(--iz-social-instagram-badge-end) 100%
+  );
 }
 
 .seller-social-links__badge--socialWhatsappUrl {
-  background: #25d366;
+  background: var(--iz-social-whatsapp);
 }
 
 .seller-social-links__badge--socialTelegramUrl {
-  background: #29a9eb;
+  background: var(--iz-social-telegram);
 }
 
 .seller-social-links__badge--socialYoutubeUrl {
-  background: #ff0033;
+  background: var(--iz-social-youtube);
 }
 
 .seller-social-links__badge--socialVkUrl {
-  background: #0077ff;
+  background: var(--iz-social-vk);
 }
 
 .seller-social-links__badge--socialWebsiteUrl {

@@ -4,9 +4,8 @@ import { SELLER_PRODUCTS_PAGE_LAYOUT as L } from "@/features/seller-products-pag
 import { MY_PRODUCTS_PAGE_LAYOUT } from "@/shared/lib/guestProfileLayout";
 import { MEDIA_OVERLAY_SCRIM } from "@/shared/theme/catalogProductStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 
-export const useAppIntroSplashStyles = createThemedStyles((theme) => ({
+export const useAppIntroSplashStyles = createThemedStyles((theme, layout) => ({
   overlay: {
     flex: 1,
     backgroundColor: theme.colors.ink,
@@ -30,7 +29,7 @@ export const useAppIntroSplashStyles = createThemedStyles((theme) => ({
   },
   fallbackHint: {
     color: theme.colors.textSecondary,
-    fontSize: 16,
+    fontSize: theme.typography.fontLg,
     textAlign: "center",
   },
   controls: {
@@ -43,8 +42,8 @@ export const useAppIntroSplashStyles = createThemedStyles((theme) => ({
   },
   controlText: {
     color: theme.colors.onContrast,
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     textAlign: "center",
     textShadowColor: MEDIA_OVERLAY_SCRIM,
     textShadowOffset: { width: 0, height: 1 },
@@ -61,15 +60,15 @@ export const useAppIntroSplashStyles = createThemedStyles((theme) => ({
   },
   adBadgeText: {
     color: theme.colors.onContrast,
-    fontSize: 12,
-    fontWeight: "700",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightBold,
   },
 }));
 
-export const useSellerFormStyles = createThemedStyles((theme) => ({
+export const useSellerFormStyles = createThemedStyles((theme, layout) => ({
   label: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   input: {
@@ -78,7 +77,7 @@ export const useSellerFormStyles = createThemedStyles((theme) => ({
     borderRadius: 10,
     paddingHorizontal: theme.spacing[3],
     paddingVertical: 10,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.text,
     backgroundColor: theme.colors.surface,
   },
@@ -95,8 +94,8 @@ export const useSellerFormStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.nearBlack,
   },
   mediaChipText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   mediaChipTextActive: {
@@ -112,20 +111,20 @@ export const useSellerFormStyles = createThemedStyles((theme) => ({
     minHeight: 48,
   },
   submitDisabled: {
-    opacity: 0.6,
+    opacity: theme.interaction.disabledOpacity,
   },
   submitText: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
   },
   success: {
     color: theme.colors.success,
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
   },
   error: {
     color: theme.colors.danger,
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
   },
   container: {
     padding: theme.spacing[4],
@@ -140,8 +139,8 @@ export const useSellerFormStyles = createThemedStyles((theme) => ({
     gap: theme.spacing[4],
   },
   hint: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.textMuted,
   },
   textarea: {
@@ -160,12 +159,12 @@ export const useSellerFormStyles = createThemedStyles((theme) => ({
   },
   buttonText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
-    fontSize: 16,
+    fontWeight: theme.typography.fontWeightSemibold,
+    fontSize: theme.typography.fontLg,
   },
 }));
 
-export const useAuctionPageStyles = createThemedStyles((theme) => ({
+export const useAuctionPageStyles = createThemedStyles((theme, layout) => ({
   list: {
     padding: theme.spacing[4],
     flexGrow: 1,
@@ -174,8 +173,8 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
     marginBottom: 20,
   },
   sectionTitle: {
-    fontSize: 17,
-    fontWeight: "700",
+    fontSize: theme.typography.fontXl,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     marginBottom: 10,
   },
@@ -206,21 +205,21 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
     gap: 4,
   },
   rowTitle: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.link,
   },
   rowMeta: {
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.textMuted,
   },
   rowPrice: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   accepted: {
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.success,
   },
   actions: {
@@ -237,8 +236,8 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
   },
   primaryButtonText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
-    fontSize: 13,
+    fontWeight: theme.typography.fontWeightSemibold,
+    fontSize: theme.typography.fontSm,
   },
   rejectButton: {
     borderRadius: theme.radius.button,
@@ -250,8 +249,8 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
   },
   rejectButtonText: {
     color: theme.colors.danger,
-    fontWeight: "600",
-    fontSize: 13,
+    fontWeight: theme.typography.fontWeightSemibold,
+    fontSize: theme.typography.fontSm,
   },
   bidRow: {
     padding: theme.spacing[3],
@@ -263,7 +262,7 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
   },
   error: {
     color: theme.colors.danger,
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
   },
   centered: {
     flex: 1,
@@ -273,9 +272,9 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
     gap: theme.spacing[4],
   },
   hint: {
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     textAlign: "center",
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textMuted,
   },
   button: {
@@ -286,20 +285,20 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
   },
   buttonText: {
     color: theme.colors.onContrast,
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
 }));
 
-export const useProductEditorScreenStyles = createThemedStyles((theme) => ({
+export const useProductEditorScreenStyles = createThemedStyles((theme, layout) => ({
   editorScreen: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   scroll: {
     flex: 1,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   container: {
     padding: 20,
@@ -332,8 +331,8 @@ export const useProductEditorScreenStyles = createThemedStyles((theme) => ({
     gap: 6,
   },
   label: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   input: {
@@ -342,14 +341,14 @@ export const useProductEditorScreenStyles = createThemedStyles((theme) => ({
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.text,
     backgroundColor: theme.colors.surfaceMuted,
   },
   textArea: {
     minHeight: 128,
     textAlignVertical: "top",
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
   },
   switchRow: {
     flexDirection: "row",
@@ -360,8 +359,8 @@ export const useProductEditorScreenStyles = createThemedStyles((theme) => ({
   },
   switchLabel: {
     flex: 1,
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   secondaryButton: {
@@ -374,13 +373,13 @@ export const useProductEditorScreenStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surfaceMuted,
   },
   secondaryButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   imageUrl: {
-    fontSize: 12,
-    lineHeight: 16,
+    fontSize: theme.typography.fontXs,
+    lineHeight: theme.typography.leading2xs,
     color: theme.colors.textMuted,
   },
   feedbackBox: {
@@ -399,17 +398,17 @@ export const useProductEditorScreenStyles = createThemedStyles((theme) => ({
   },
   error: {
     color: theme.colors.danger,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
   },
   success: {
     color: theme.colors.success,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.fontBase,
+    lineHeight: theme.typography.leadingBase,
   },
   hint: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.textSecondary,
   },
   returnChoiceRow: {
@@ -425,8 +424,8 @@ export const useProductEditorScreenStyles = createThemedStyles((theme) => ({
     borderWidth: 1,
   },
   returnChoiceChipText: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
   },
   returnTermBlock: {
     gap: 12,
@@ -448,8 +447,8 @@ export const useProductEditorScreenStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 10,
   },
   discountPreviewText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   charRow: {
     flexDirection: "row",
@@ -470,7 +469,7 @@ export const useProductEditorScreenStyles = createThemedStyles((theme) => ({
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 8,
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
   },
   charInputValue: {
     flexGrow: 1.5,
@@ -486,8 +485,8 @@ export const useProductEditorScreenStyles = createThemedStyles((theme) => ({
     backgroundColor: "transparent",
   },
   charRemoveText: {
-    fontSize: 13,
-    fontWeight: "700",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightBold,
   },
   charAddButton: {
     alignSelf: "flex-start",
@@ -499,8 +498,8 @@ export const useProductEditorScreenStyles = createThemedStyles((theme) => ({
     alignItems: "center",
   },
   charAddButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   footer: {
     paddingTop: 16,
@@ -549,8 +548,8 @@ export const useProductEditorScreenStyles = createThemedStyles((theme) => ({
   },
   submitText: {
     color: theme.colors.onContrast,
-    fontWeight: "700",
-    fontSize: 15,
+    fontWeight: theme.typography.fontWeightBold,
+    fontSize: theme.typography.fontMd,
   },
   deleteButton: {
     alignItems: "center",
@@ -558,34 +557,34 @@ export const useProductEditorScreenStyles = createThemedStyles((theme) => ({
   },
   deleteText: {
     color: theme.colors.danger,
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   cancelButtonText: {
     color: theme.colors.onContrast,
-    fontWeight: "700",
-    fontSize: 15,
+    fontWeight: theme.typography.fontWeightBold,
+    fontSize: theme.typography.fontMd,
   },
   buttonPressed: {
-    opacity: 0.85,
+    opacity: theme.interaction.pressedOpacity,
   },
   disabled: {
-    opacity: 0.6,
+    opacity: theme.interaction.disabledOpacity,
   },
 }));
 
-export const useMyProductsPageStyles = createThemedStyles((theme) => ({
+export const useMyProductsPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   listFlex: {
     flex: 1,
     minHeight: 0,
   },
   list: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     flexGrow: 1,
   },
   /** Desktop hub: shell уже даёт pad; gutter 0 как web `--my-profile-shell-content-gutter: 0`. */
@@ -617,7 +616,7 @@ export const useMyProductsPageStyles = createThemedStyles((theme) => ({
   createButtonText: {
     color: theme.colors.onContrast,
     fontSize: 14.4,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   banner: {
     borderRadius: 10,
@@ -642,9 +641,9 @@ export const useMyProductsPageStyles = createThemedStyles((theme) => ({
     gap: theme.spacing[4],
   },
   hint: {
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     textAlign: "center",
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textMuted,
   },
   button: {
@@ -655,18 +654,18 @@ export const useMyProductsPageStyles = createThemedStyles((theme) => ({
   },
   buttonText: {
     color: theme.colors.onContrast,
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: theme.typography.fontLg,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   footerLoader: {
     marginVertical: theme.spacing[4],
   },
 }));
 
-export const useSellerProductsPageStyles = createThemedStyles((theme) => ({
+export const useSellerProductsPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
     width: "100%",
     minWidth: 0,
     overflow: "hidden",
@@ -677,7 +676,7 @@ export const useSellerProductsPageStyles = createThemedStyles((theme) => ({
     minWidth: 0,
   },
   list: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 0,
     flexGrow: 1,
     width: "100%",
@@ -707,7 +706,7 @@ export const useSellerProductsPageStyles = createThemedStyles((theme) => ({
     flex: 1,
     minWidth: 0,
     fontSize: L.navTitleFontSize,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     lineHeight: L.navTitleLineHeight,
     color: theme.colors.text,
   },
@@ -721,13 +720,7 @@ export const useSellerProductsPageStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "space-between",
     gap: L.metaZoneGap,
-    paddingVertical: L.metaZonePaddingVertical,
     paddingHorizontal: L.metaZonePaddingHorizontal,
-    borderRadius: L.metaZoneBorderRadius,
-    /* Паритет web PR #87: белый блок, как `.seller-products-page__seller-meta`. */
-    backgroundColor: theme.colors.surface,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
   },
   sellerMetaNameHost: {
     flex: 1,
@@ -757,7 +750,7 @@ export const useSellerProductsPageStyles = createThemedStyles((theme) => ({
   hint: {
     textAlign: "center",
     marginTop: theme.spacing[6],
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.textMuted,
   },
   shelvesRow: {
@@ -767,6 +760,12 @@ export const useSellerProductsPageStyles = createThemedStyles((theme) => ({
     gap: L.shelfRowGap,
     paddingTop: L.shelfRowPaddingTop,
     paddingBottom: L.shelfRowPaddingBottom,
+  },
+  /** web `.seller-products-page__shelves--nested` */
+  shelvesRowNested: {
+    paddingLeft: 12,
+    borderLeftWidth: 2,
+    borderLeftColor: theme.colors.border,
   },
   shelfChip: {
     flexShrink: 0,
@@ -782,7 +781,7 @@ export const useSellerProductsPageStyles = createThemedStyles((theme) => ({
   },
   shelfChipText: {
     fontSize: L.shelfChipFontSize,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.action,
   },
   shelfChipTextActive: {
@@ -797,7 +796,7 @@ export const useSellerProductsPageStyles = createThemedStyles((theme) => ({
     justifyContent: "center",
     padding: theme.spacing[6],
     gap: theme.spacing[3],
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   button: {
     borderRadius: 10,
@@ -807,12 +806,12 @@ export const useSellerProductsPageStyles = createThemedStyles((theme) => ({
   },
   buttonText: {
     color: theme.colors.onContrast,
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightSemibold,
   },
 }));
 
-export const useSellerProfileQuickStatsStyles = createThemedStyles((theme) => ({
+export const useSellerProfileQuickStatsStyles = createThemedStyles((theme, layout) => ({
   root: {
     width: "100%",
   },
@@ -865,8 +864,8 @@ export const useSellerProfileQuickStatsStyles = createThemedStyles((theme) => ({
   },
   value: {
     fontSize: L.statsValueFontSize,
-    fontWeight: "700",
-    lineHeight: 18,
+    fontWeight: theme.typography.fontWeightBold,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.ink,
     textAlign: "center",
   },
@@ -876,7 +875,7 @@ export const useSellerProfileQuickStatsStyles = createThemedStyles((theme) => ({
   },
   label: {
     fontSize: L.statsLabelFontSize,
-    fontWeight: "500",
+    fontWeight: theme.typography.fontWeightMedium,
     lineHeight: 13,
     color: theme.colors.textMuted,
     textAlign: "center",
@@ -889,21 +888,21 @@ export const useSellerProfileQuickStatsStyles = createThemedStyles((theme) => ({
   },
   revealText: {
     fontSize: L.statsPhoneValueFontSize,
-    fontWeight: "600",
-    lineHeight: 16,
+    fontWeight: theme.typography.fontWeightSemibold,
+    lineHeight: theme.typography.leading2xs,
     color: theme.colors.action,
     textDecorationLine: "underline",
   },
   revealError: {
     marginTop: 4,
     fontSize: L.statsLabelFontSize,
-    fontWeight: "500",
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.danger,
     textAlign: "center",
   },
 }));
 
-export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
+export const useInstallmentProgramModalStyles = createThemedStyles((theme, layout) => ({
   embeddedRoot: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 30,
@@ -926,7 +925,7 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
     alignItems: "flex-start",
     justifyContent: "space-between",
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 16,
     paddingBottom: 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
@@ -934,9 +933,9 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
   },
   title: {
     flex: 1,
-    fontSize: 18,
-    lineHeight: 24,
-    fontWeight: "700",
+    fontSize: theme.typography.font2xl,
+    lineHeight: theme.typography.leadingXl,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
   closeButton: {
@@ -946,8 +945,8 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
     justifyContent: "center",
   },
   closeButtonText: {
-    fontSize: 24,
-    lineHeight: 24,
+    fontSize: theme.typography.font5xl,
+    lineHeight: theme.typography.leadingXl,
     color: theme.colors.textMuted,
   },
   loadingWrap: {
@@ -964,23 +963,23 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
     gap: 12,
   },
   error: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.danger,
   },
   success: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.success,
   },
   info: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.fontSm,
+    lineHeight: theme.typography.leadingSm,
     color: theme.colors.textSecondary,
   },
   retailPrice: {
     color: theme.colors.action,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
   },
   planCard: {
     borderRadius: 10,
@@ -1005,8 +1004,8 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
   },
   planTitle: {
     flex: 1,
-    fontSize: 13,
-    fontWeight: "700",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightBold,
     letterSpacing: 0.3,
     textTransform: "uppercase",
     color: theme.colors.onContrast,
@@ -1020,8 +1019,8 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
     backgroundColor: "rgba(255,255,255,0.12)",
   },
   planRemove: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.onContrast,
   },
   planBody: {
@@ -1032,8 +1031,8 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surfaceElevated,
   },
   fieldLabel: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   input: {
@@ -1042,7 +1041,7 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: Platform.OS === "ios" ? 10 : 8,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.text,
     backgroundColor: theme.colors.surface,
   },
@@ -1065,13 +1064,13 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
     gap: 4,
   },
   planTotalMeta: {
-    fontSize: 12,
-    fontWeight: "500",
+    fontSize: theme.typography.fontXs,
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.textSecondary,
   },
   planTotalMain: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   firstPaymentRow: {
@@ -1081,7 +1080,7 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
   },
   firstPaymentLabel: {
     flex: 1,
-    fontSize: 13,
+    fontSize: theme.typography.fontSm,
     color: theme.colors.text,
   },
   addPlanButton: {
@@ -1094,17 +1093,17 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
   },
   addPlanButtonText: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: theme.typography.fontSm,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.link,
   },
   maxPlansHint: {
-    fontSize: 12,
+    fontSize: theme.typography.fontXs,
     color: theme.colors.textMuted,
   },
   footer: {
     flexShrink: 0,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingVertical: 12,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: theme.colors.border,
@@ -1117,11 +1116,11 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.action,
   },
   saveButtonText: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: theme.typography.fontMd,
+    fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.onContrast,
   },
   buttonDisabled: {
-    opacity: 0.6,
+    opacity: theme.interaction.disabledOpacity,
   },
 }));

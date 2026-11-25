@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import type { z } from "zod";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
@@ -36,6 +36,7 @@ import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMob
 import { orderQueryKeys } from "@/shared/api";
 import {
   API_CLIENT_UI,
+  AUTH_UI,
   MY_PROFILE_PAGE_UI,
   MY_SALES_PAGE_UI,
   ORDER_CARD_UI,
@@ -47,6 +48,7 @@ import { useDebouncedValue } from "@/shared/lib/useDebouncedValue";
 import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useMySalesPageStyles } from "@/shared/theme/mySalesPageStyles";
+import { AppButton } from "@/shared/ui/AppButton";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 type OrderRecord = z.infer<typeof orderFromApiSchema>;
@@ -450,9 +452,11 @@ export const MySalesPage = () => {
     return (
       <View style={styles.centered}>
         <Text style={styles.hint}>{MY_SALES_PAGE_UI.LOGIN_HINT}</Text>
-        <Pressable style={styles.button} onPress={() => router.push("/(auth)/login")}>
-          <Text style={styles.buttonText}>{MY_SALES_PAGE_UI.LOGIN_BUTTON}</Text>
-        </Pressable>
+        <AppButton
+          label={AUTH_UI.LOGIN_BUTTON}
+          variant="primary"
+          onPress={() => router.push("/(auth)/login")}
+        />
       </View>
     );
   }

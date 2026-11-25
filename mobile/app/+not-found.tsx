@@ -4,13 +4,13 @@ import { Text, View } from "react-native";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { ScreenWithBack } from "@/shared/ui/ScreenWithBack";
 
-const useStyles = createThemedStyles((theme) => ({
+const useStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   title: {
     fontSize: 20,

@@ -1,14 +1,13 @@
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-export const useProductReportsPageStyles = createThemedStyles((theme) => ({
+export const useProductReportsPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   scroll: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 12,
     gap: 12,
   },
@@ -31,7 +30,7 @@ export const useProductReportsPageStyles = createThemedStyles((theme) => ({
     gap: 8,
   },
   toolbarCount: {
-    fontSize: 14,
+    fontSize: theme.typography.fontBase,
     color: theme.colors.textSecondary,
   },
   chips: {
@@ -52,8 +51,8 @@ export const useProductReportsPageStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.danger,
   },
   chipText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: theme.typography.fontBase,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   chipTextActive: {
@@ -73,7 +72,7 @@ export const useProductReportsPageStyles = createThemedStyles((theme) => ({
   },
   state: {
     fontSize: 15.2,
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textSecondary,
   },
   stateError: {
@@ -81,7 +80,7 @@ export const useProductReportsPageStyles = createThemedStyles((theme) => ({
   },
   empty: {
     fontSize: 15.2,
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textSecondary,
     textAlign: "center",
     paddingVertical: 8,
@@ -91,7 +90,7 @@ export const useProductReportsPageStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
-    backgroundColor: theme.colors.bg,
+    paddingHorizontal: layout.contentPaddingHorizontal,
+    backgroundColor: layout.pageBackground,
   },
 }));

@@ -21,6 +21,12 @@ const API_BASE = (process.env.BUYER_SMOKE_API_URL ?? "http://127.0.0.1:4444").re
   "",
 );
 
+/** Mirror mobile `apiClient` — tokens in JSON only with this header. */
+const MOBILE_AUTH_HEADERS = {
+  "Content-Type": "application/json",
+  "X-Auth-Client": "mobile",
+};
+
 const fail = (message) => {
   console.error(`✗ ${message}`);
   process.exit(1);
@@ -34,7 +40,7 @@ const requestJson = async (pathname, init = {}) => {
   const response = await fetch(`${API_BASE}${pathname}`, {
     ...init,
     headers: {
-      "Content-Type": "application/json",
+      ...MOBILE_AUTH_HEADERS,
       ...(init.headers ?? {}),
     },
   });
@@ -72,12 +78,12 @@ const run = async () => {
       `server unreachable at ${API_BASE} — start server and run e2e seed (${path.relative(SCRIPT_DIR, path.resolve(SCRIPT_DIR, "../../server/scripts/e2ePlaywrightSeed.js"))})`,
     );
   }
-  if (
-    health.response.status !== 200 ||
-    health.body?.status !== "ok" ||
-    health.body?.mongo !== "connected"
-  ) {
+  // createApp публикует только { status } — internals (mongo/git/…) не в ответе.
+  if (health.response.status !== 200 || health.body?.status !== "ok") {
     fail(`GET /health: unexpected body ${JSON.stringify(health.body)}`);
+  }
+  if (health.body?.mongo != null) {
+    fail(`GET /health: must not expose mongo (got ${JSON.stringify(health.body)})`);
   }
   ok("GET /health");
 
@@ -141,6 +147,7 @@ const run = async () => {
   assertSuccess("GET /cart", getCart);
   ok("GET /cart");
 
+  const idempotencyKey = `buyer-smoke-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
   const createOrder = await requestJson("/order", {
     method: "POST",
     headers: authHeaders(accessToken),
@@ -148,7 +155,9 @@ const run = async () => {
       items: [{ productId, quantity: 1 }],
       deliveryAddress: E2E.deliveryAddress,
       deliveryAddressFlat: E2E.deliveryAddressFlat,
-      paymentMethod: "cardPrepaid",
+      // E2E catalog fixture — не Gitorg; cardPrepaid только для Gitorg.
+      paymentMethod: "cashOnDelivery",
+      idempotencyKey,
     }),
   });
   assertSuccess("POST /order", createOrder);

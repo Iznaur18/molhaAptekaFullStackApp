@@ -1,6 +1,6 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
@@ -10,16 +10,9 @@ import { useGuestProfileLoginMenuBannerImageQuery } from "@/entities/site-header
 import { EmailVerificationModal } from "@/features/email-verify/ui/EmailVerificationModal";
 import { PROFILE_SECTION_OVERVIEW } from "@/features/profile-hub/model/profileSections";
 import { ProfileAccountShell } from "@/features/profile-tab/ui/ProfileAccountShell";
-import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
-import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { ProfileTabOverviewSection } from "@/features/profile-tab/ui/ProfileTabOverviewSection";
 import { ThemePreferenceToggle } from "@/features/theme-settings/ui/ThemePreferenceToggle";
-import {
-  AUTH_UI,
-  EMAIL_VERIFICATION_UI,
-  LEGAL_UI,
-  MY_PROFILE_PAGE_UI,
-} from "@/shared/config";
+import { AUTH_UI, EMAIL_VERIFICATION_UI, LEGAL_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
 import { useStableAuthHeroHeight } from "@/shared/lib/useStableAuthHeroHeight";
@@ -35,11 +28,10 @@ export default function ProfileScreen() {
   const scrollRef = useRef<ScrollView>(null);
   const styles = useProfileScreenStyles();
   const { contentPaddingBottom } = useScreenLayout();
-  const { isDrawerLayout, isPhoneLayout } = useProfileAdaptiveLayout();
+  const { isPhoneLayout } = useProfileAdaptiveLayout();
   const guestHeroHeight = useStableAuthHeroHeight();
   const sessionQuery = useAuthSessionQuery();
   const [emailModalVisible, setEmailModalVisible] = useState(false);
-  const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [isManualRefreshing, setIsManualRefreshing] = useState(false);
 
   const user = sessionQuery.data?.user;
@@ -62,12 +54,6 @@ export default function ProfileScreen() {
       });
     }, []),
   );
-
-  useEffect(() => {
-    if (!isDrawerLayout) {
-      setNavSheetVisible(false);
-    }
-  }, [isDrawerLayout]);
 
   const handleOverviewPress = () => {
     scrollRef.current?.scrollTo({ y: 0, animated: true });
@@ -157,12 +143,6 @@ export default function ProfileScreen() {
 
   const overviewBlocks = (
     <>
-      <ProfileMobileSectionToggle
-        activeLabel={MY_PROFILE_PAGE_UI.TAB_OVERVIEW}
-        appearance={isPhoneLayout ? "phone" : "tablet"}
-        onPress={() => setNavSheetVisible(true)}
-      />
-
       {needsEmailVerification ? (
         <View style={styles.emailBanner}>
           <Text style={styles.emailBannerText}>{EMAIL_VERIFICATION_UI.BANNER}</Text>
@@ -177,6 +157,7 @@ export default function ProfileScreen() {
 
       <ProfileTabOverviewSection
         onEditPress={() => router.push({ pathname: "/profile/edit" })}
+        onOverviewPress={handleOverviewPress}
       />
 
       {isPhoneLayout ? (
@@ -202,16 +183,6 @@ export default function ProfileScreen() {
       >
         {overviewBlocks}
       </ProfileAccountShell>
-
-      {isDrawerLayout ? (
-        <ProfileMobileNavSheet
-          visible={navSheetVisible}
-          activeSectionId={PROFILE_SECTION_OVERVIEW}
-          side={isPhoneLayout ? "right" : "left"}
-          onClose={() => setNavSheetVisible(false)}
-          onOverviewPress={handleOverviewPress}
-        />
-      ) : null}
 
       <EmailVerificationModal
         visible={emailModalVisible}

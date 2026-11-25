@@ -1,7 +1,6 @@
 import { StyleSheet } from "react-native";
 
 import { MY_SALES_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const TOOLBAR_PADDING_VERTICAL = 10.4;
@@ -9,14 +8,14 @@ const TOOLBAR_PADDING_HORIZONTAL = 12;
 const TOOLBAR_RADIUS = 10.4;
 const TOOLBAR_GAP = 8;
 
-export const useInstallmentDisputesPageStyles = createThemedStyles((theme) => ({
+export const useInstallmentDisputesPageStyles = createThemedStyles((theme, layout) => ({
   container: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   scroll: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 12,
     gap: L.stackGap,
   },
@@ -45,7 +44,7 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme) => ({
   toolbarHeading: {
     flex: 1,
     fontSize: 15.2,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   disputesCount: {
@@ -57,7 +56,7 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme) => ({
   },
   state: {
     fontSize: 15.2,
-    lineHeight: 22,
+    lineHeight: theme.typography.leadingLg,
     color: theme.colors.textSecondary,
   },
   stateError: {
@@ -68,8 +67,8 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
-    backgroundColor: theme.colors.bg,
+    paddingHorizontal: layout.contentPaddingHorizontal,
+    backgroundColor: layout.pageBackground,
   },
   card: {
     gap: 8,
@@ -84,12 +83,12 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme) => ({
   },
   cardTitle: {
     fontSize: 15.2,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   cardMeta: {
     fontSize: 13.6,
-    lineHeight: 20,
+    lineHeight: theme.typography.leadingBase,
     color: theme.colors.textSecondary,
   },
   partyRow: {
@@ -104,7 +103,7 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme) => ({
   },
   partyLink: {
     fontSize: 13.6,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.action,
     textDecorationLine: "underline",
   },
@@ -120,7 +119,7 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme) => ({
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 8,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.text,
     backgroundColor: theme.colors.surfaceMuted,
     textAlignVertical: "top",
@@ -132,7 +131,7 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme) => ({
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 8,
-    fontSize: 15,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.text,
     backgroundColor: theme.colors.surfaceMuted,
   },
@@ -166,12 +165,12 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme) => ({
   },
   actionPrimaryText: {
     fontSize: 13.6,
-    fontWeight: "500",
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.onContrast,
   },
   actionSecondaryText: {
     fontSize: 13.6,
-    fontWeight: "500",
+    fontWeight: theme.typography.fontWeightMedium,
     color: theme.colors.text,
   },
 }));

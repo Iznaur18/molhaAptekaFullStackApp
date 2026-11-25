@@ -42,7 +42,7 @@ export const useWholesalePriceSheetStyles = createThemedStyles((theme) => ({
     flex: 1,
     minWidth: 0,
     fontSize: WS.titleFontSize,
-    fontWeight: "700",
+    fontWeight: theme.typography.fontWeightBold,
     lineHeight: WS.titleLineHeight,
     color: theme.colors.text,
   },
@@ -51,7 +51,7 @@ export const useWholesalePriceSheetStyles = createThemedStyles((theme) => ({
     paddingVertical: 4,
     paddingHorizontal: 2.4,
     fontSize: WS.closeFontSize,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.link,
   },
   bodyScroll: {
@@ -73,7 +73,7 @@ export const useWholesalePriceSheetStyles = createThemedStyles((theme) => ({
   },
   label: {
     fontSize: WS.labelFontSize,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.ink,
   },
   input: {
@@ -103,7 +103,7 @@ export const useWholesalePriceSheetStyles = createThemedStyles((theme) => ({
   promoAppliedLabel: {
     flex: 1,
     fontSize: WS.promoAppliedLabelFontSize,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     lineHeight: 19.76,
     color: theme.colors.successText,
   },
@@ -121,7 +121,7 @@ export const useWholesalePriceSheetStyles = createThemedStyles((theme) => ({
   },
   promoAppliedSuccess: {
     fontSize: WS.promoAppliedLabelFontSize,
-    fontWeight: "600",
+    fontWeight: theme.typography.fontWeightSemibold,
     lineHeight: 19.76,
     color: theme.colors.successText,
   },

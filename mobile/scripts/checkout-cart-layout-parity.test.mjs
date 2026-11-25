@@ -32,6 +32,29 @@ test("checkout fulfillment section matches web cart live pad/gap/radius", () => 
   );
 });
 
+test("path G cart shell: method/details/payment cards match web portals", () => {
+  const formStyles = read(MOBILE_ROOT, "shared/theme/formChromeStyles.ts");
+  const formUi = read(MOBILE_ROOT, "features/checkout/ui/CheckoutForm.tsx");
+  const cartTab = read(MOBILE_ROOT, "app/(tabs)/cart.tsx");
+  const cartCss = read(
+    CLIENT_ROOT,
+    "src/features/checkout/ui/CheckoutFulfillmentCards.css",
+  );
+
+  assert.match(formStyles, /fulfillmentMethodCard:[\s\S]*borderRadius: 16/);
+  assert.match(formStyles, /fulfillmentPaymentCard:[\s\S]*borderRadius: 16/);
+  assert.match(formStyles, /fulfillmentDetailsCard:[\s\S]*marginHorizontal: 12/);
+  assert.match(formStyles, /fulfillmentCardsFields:[\s\S]*gap: 6/);
+  assert.match(formUi, /fulfillmentCardsLayout/);
+  assert.match(formUi, /fulfillmentMethodCard/);
+  assert.match(formUi, /fulfillmentPaymentCard/);
+  assert.match(cartTab, /fulfillmentCardsLayout/);
+  assert.match(
+    cartCss,
+    /\.cart-fulfillment__method-card,[\s\S]*\.cart-fulfillment__payment \{[\s\S]*border-radius: 16px/,
+  );
+});
+
 test("checkout payment method cards match web picker live sizes", () => {
   const layout = read(
     MOBILE_ROOT,

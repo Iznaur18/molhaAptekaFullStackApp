@@ -10,7 +10,7 @@ export const useAppCheckboxStyles = createThemedStyles((theme) => ({
     height: APP_CHECKBOX_SIZE,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 8,
+    borderRadius: theme.radius.sm,
     borderWidth: 1.5,
     borderColor: theme.colors.borderStrong,
     backgroundColor: theme.colors.surface,

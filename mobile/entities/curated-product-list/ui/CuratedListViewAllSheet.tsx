@@ -110,7 +110,6 @@ export const CuratedListViewAllSheet = ({
         />
         <SheetContainer
           style={[styles.panel, sheetAnimatedStyle]}
-          accessibilityRole="dialog"
           accessibilityLabel={CURATED_LIST_CAROUSEL_UI.SHEET_ARIA}
           accessibilityViewIsModal
         >

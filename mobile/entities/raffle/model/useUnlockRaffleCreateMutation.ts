@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { invalidatePromoReturnStreak } from "@/entities/promo-return-streak/model/usePromoReturnStreak";
 import { loyaltyPointsQueryKeys, raffleQueryKeys } from "@/shared/api";
 
 import { unlockRaffleCreate } from "../api/unlockRaffleCreate";
@@ -21,6 +22,7 @@ export const useUnlockRaffleCreateMutation = () => {
           queryKey: raffleQueryKeys.createAdvertising(),
         }),
         queryClient.invalidateQueries({ queryKey: loyaltyPointsQueryKeys.all }),
+        invalidatePromoReturnStreak(queryClient),
       ]);
     },
   });

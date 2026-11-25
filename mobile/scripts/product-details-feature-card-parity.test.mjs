@@ -54,7 +54,10 @@ test("product details feature cards match web chrome and lucide icons", () => {
   assert.match(webCss, /width: 2\.75rem/);
   assert.match(webCompare, /GitCompareArrows/);
   assert.match(webPriceCss, /\.product-details-modal__feature-cards/);
-  assert.match(webPriceCss, /padding: 12px/);
+  assert.match(webCss, /padding:\s*0\.75rem 0\.875rem/);
+  assert.match(layout, /cardPaddingVertical: 12/);
+  assert.match(layout, /cardPaddingHorizontal: 14/);
+  assert.match(layout, /titleFontSize: 15\.2/);
   assert.match(detailsTab, /styles\.featureCards/);
   assert.match(detailsTab, /ProductDetailsCompareTeaser/);
   assert.match(detailsTab, /ProductDetailsQaTeaser/);

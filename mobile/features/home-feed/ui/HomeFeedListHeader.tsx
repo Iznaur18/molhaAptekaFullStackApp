@@ -26,6 +26,9 @@ type HomeFeedListHeaderProps = {
   sellerSearch: string;
   onSellerSearchChange: (next: string) => void;
   onOpenCuratedCategory: (category: HomeCuratedCategory) => void;
+  onCatalogRootPress?: () => void;
+  /** Category FlatList: `16 - gridGap` → итог breadcrumb→сетка = web 1rem. */
+  catalogBreadcrumbToolbarMarginBottom?: number;
 };
 
 export const HomeFeedListHeader = memo(
@@ -41,6 +44,8 @@ export const HomeFeedListHeader = memo(
     sellerSearch,
     onSellerSearchChange,
     onOpenCuratedCategory,
+    onCatalogRootPress,
+    catalogBreadcrumbToolbarMarginBottom,
   }: HomeFeedListHeaderProps) => {
     const showSectionTabs = showHomeFeed && showCuratedLists;
     const activeTab: HomeFeedSectionTab = showSectionTabs ? sectionTab : "home";
@@ -51,7 +56,12 @@ export const HomeFeedListHeader = memo(
           <HomeCatalogSiteHeaderBannerRow visible={showHomeFeed} />
         ) : null}
         {!showHomeFeed && catalogBreadcrumbLabel ? (
-          <CatalogBreadcrumb label={catalogBreadcrumbLabel} />
+          <CatalogBreadcrumb
+            variant="trail"
+            label={catalogBreadcrumbLabel}
+            onCatalogRootPress={onCatalogRootPress}
+            toolbarMarginBottom={catalogBreadcrumbToolbarMarginBottom}
+          />
         ) : null}
         {showHomeFeed ? (
           <HomeFeedHeader enabled={showHomeFeed} showCuratedLists={showCuratedLists} />
@@ -70,7 +80,11 @@ export const HomeFeedListHeader = memo(
             ) : null}
           </>
         ) : showHomeFeed ? (
-          <CatalogBreadcrumb label={HOME_PAGE_UI.BREADCRUMB_HOME} compactTop />
+          <CatalogBreadcrumb
+            variant="display"
+            label={HOME_PAGE_UI.BREADCRUMB_HOME}
+            compactTop
+          />
         ) : null}
         {showHomeFeed && activeTab === "home" && isCatalogEmpty ? (
           <View style={styles.centered}>

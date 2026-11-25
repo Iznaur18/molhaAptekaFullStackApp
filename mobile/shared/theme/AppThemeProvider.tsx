@@ -23,7 +23,7 @@ type AppThemeContextValue = {
   setPreference: (preference: ThemePreference) => void;
 };
 
-const AppThemeContext = createContext<AppThemeContextValue | null>(null);
+export const AppThemeContext = createContext<AppThemeContextValue | null>(null);
 
 const resolveColorScheme = (preference: ThemePreference): ColorScheme => {
   if (preference === "light") {

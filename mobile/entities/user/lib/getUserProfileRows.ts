@@ -19,16 +19,11 @@ import {
   USER_ROLE_LABEL_RU,
   USER_ROLE_USER,
 } from "@/entities/user/model/constants";
+import type { ProfileRow } from "@/entities/user/lib/groupProfileRows";
 import { USER_PROFILE_COPY } from "@/shared/config";
 import { formatIsoDateTime } from "@/shared/lib";
 
-export type ProfileRow = {
-  id: string;
-  label: string;
-  value: string;
-  href?: string;
-  needsPhoneReveal?: boolean;
-};
+export type { ProfileRow };
 
 const EM_DASH = "—";
 
@@ -187,6 +182,10 @@ export const getUserProfileRows = (
       id: "email",
       label: USER_PROFILE_COPY.LABELS.email,
       value: dashIfEmpty(user.email),
+      // Чужой профиль: сама почта не приходит, только признак — покажем кнопку.
+      needsEmailReveal:
+        Boolean(user.hasEmail) &&
+        (user.email === undefined || user.email === null || user.email === ""),
     },
     {
       id: "userBirthDate",

@@ -1,18 +1,17 @@
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 
-export const useUsersPageStyles = createThemedStyles((theme) => ({
+export const useUsersPageStyles = createThemedStyles((theme, layout) => ({
   screen: {
     flex: 1,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: layout.pageBackground,
   },
   searchBar: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     paddingTop: 10,
     paddingBottom: 8,
   },
   list: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     flexGrow: 1,
   },
   cell: {
@@ -26,14 +25,14 @@ export const useUsersPageStyles = createThemedStyles((theme) => ({
     justifyContent: "center",
     alignItems: "stretch",
     gap: 14,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingHorizontal: layout.contentPaddingHorizontal,
     marginTop: 24,
   },
   state: {
     textAlign: "center",
     marginTop: 24,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
-    fontSize: 15,
+    paddingHorizontal: layout.contentPaddingHorizontal,
+    fontSize: theme.typography.fontMd,
     color: theme.colors.textMuted,
   },
   stateError: {

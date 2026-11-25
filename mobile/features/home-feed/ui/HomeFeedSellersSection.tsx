@@ -1,6 +1,6 @@
 import { filterSellerStoreTilesBySearch } from "@izibuy/shared-lib";
 import { useRouter } from "expo-router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { ActivityIndicator, Text, TextInput, View } from "react-native";
 
 import { PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE } from "@/entities/product-category-display/lib/resolveProductCategoryDisplay";
@@ -24,6 +24,7 @@ export const HomeFeedSellersSection = ({
 }: HomeFeedSellersSectionProps) => {
   const styles = useHomeFeedSectionTabStyles();
   const theme = useAppTheme();
+  const [searchFocused, setSearchFocused] = useState(false);
   const router = useRouter();
   const { viewerRegionCode } = useViewerRegion();
   const grid = useCatalogBrowserGridLayout();
@@ -70,9 +71,11 @@ export const HomeFeedSellersSection = ({
   return (
     <View style={styles.sellers}>
       <TextInput
-        style={styles.searchInput}
+        style={[styles.searchInput, searchFocused && styles.searchInputFocused]}
         value={searchTerm}
         onChangeText={onSearchChange}
+        onFocus={() => setSearchFocused(true)}
+        onBlur={() => setSearchFocused(false)}
         placeholder={HOME_PAGE_UI.CATALOG_HOME_SECTION_SELLERS_SEARCH_PLACEHOLDER}
         placeholderTextColor={theme.colors.textMuted}
         accessibilityLabel={HOME_PAGE_UI.CATALOG_HOME_SECTION_SELLERS_SEARCH_ARIA}

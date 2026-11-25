@@ -3,8 +3,19 @@ export const MOBILE_BOTTOM_NAV_HORIZONTAL_INSET = 12;
 
 /**
  * Зазор над safe-area. Паритет с web `--mobile-bottom-nav-float-offset: 0.125rem`.
+ * (Не путать с AppShell content clearance `--app-shell-mobile-bottom-nav-float-offset: 0.625rem`.)
  */
 export const MOBILE_BOTTOM_NAV_FLOAT_OFFSET = 2;
+
+/**
+ * Blur glass.
+ * Web CSS: `blur(18px)` — RN-web BlurView intensity 18 + backdropFilter.
+ * Native: intensity 40 — platform-исключение (expo-blur intensity ≠ CSS px;
+ * 18 на iOS визуально слабее web 18px).
+ */
+export const MOBILE_BOTTOM_NAV_BLUR_INTENSITY_WEB = 18;
+export const MOBILE_BOTTOM_NAV_BLUR_INTENSITY_NATIVE = 40;
+export const MOBILE_BOTTOM_NAV_BLUR_CSS_PX = 18;
 
 /**
  * Мин. расстояние от нижнего края экрана до pill, когда `safeAreaBottom === 0`

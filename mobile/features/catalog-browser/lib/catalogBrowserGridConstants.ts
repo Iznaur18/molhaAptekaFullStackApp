@@ -4,11 +4,11 @@ export const CATALOG_BROWSER_PAGE_PADDING = SCREEN_CONTENT_PADDING_HORIZONTAL;
 
 /**
  * Паритет с `client/.../CatalogCategoriesGrid.css`:
- *   < 640px  → 3 колонки
- *   640-899px → 4 колонки
+ *   < 641px  → 3 колонки
+ *   ≥ 641px  → 4 колонки
  *   ≥ 900px  → 6 колонок
  */
-const CATALOG_BROWSER_TILE_BREAKPOINT_4_COL = 640;
+const CATALOG_BROWSER_TILE_BREAKPOINT_4_COL = 641;
 const CATALOG_BROWSER_TILE_BREAKPOINT_6_COL = 900;
 
 /** gap: 0.375rem = 6px — паритет с web */

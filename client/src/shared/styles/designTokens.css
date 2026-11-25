@@ -326,7 +326,8 @@
 
   --iz-radius-sm: 8px;
   --iz-radius-md: 12px;
-  --iz-radius-lg: calc(14px * 1.2);
+  /* Целое 17px — паритет packages/design-tokens izRadius.lg (было calc(14px*1.2)≈16.8) */
+  --iz-radius-lg: 17px;
   --iz-radius-pill: 999px;
   --iz-radius-button: 10px;
   --iz-radius-input: 0.5rem;
@@ -384,6 +385,27 @@
   /* Для многострочного текста без фикс. высоты в мобиле */
   --iz-leading-relaxed: 1.35;
 
+  /* --- Social brands + product badge accents (packages/design-tokens) --- */
+  --iz-social-whatsapp: #25d366;
+  --iz-social-telegram: #29a9eb;
+  --iz-social-youtube: #ff0033;
+  --iz-social-vk: #0077ff;
+  --iz-social-on-brand: #ffffff;
+  --iz-social-instagram-badge-start: #f9a03f;
+  --iz-social-instagram-badge-mid: #e1306c;
+  --iz-social-instagram-badge-end: #833ab4;
+  --iz-social-instagram-media-start: #f58529;
+  --iz-social-instagram-media-mid: #dd2a7b;
+  --iz-social-instagram-media-end: #8134af;
+  --iz-badge-raffle-bg: #fdf2f8;
+  --iz-badge-raffle-text: #be185d;
+  --iz-badge-flash-sale-bg: #fff3e8;
+  --iz-badge-flash-sale-text: #c2410c;
+  --iz-badge-affiliate-bg: #ecfdf5;
+  --iz-badge-affiliate-text: #047857;
+  --iz-badge-buy-n-free-ready: #1f7a4d;
+  --iz-game-accent: #ff7a1a;
+
   --iz-weight-regular: 400;
   --iz-weight-medium: 500;
   --iz-weight-semibold: 600;
@@ -434,9 +456,8 @@
   --iz-transition-base: 150ms ease;
 
   /**
-   * Затемнение под модалкой. В мобиле это КОНСТАНТА `MODAL_BACKDROP_SCRIM`
-   * (`rgba(0,0,0,0.45)` в modalChromeStyles.ts) — она не меняется вместе с темой,
-   * поэтому здесь тоже не токен-производная, а фиксированное значение.
+   * Затемнение под модалкой. Канон: `izModalBackdropScrim` / `izModalBackdropScrimCss`
+   * в packages/design-tokens/src/scrim.ts — не зависит от темы.
    */
   --iz-color-modal-scrim: rgb(0 0 0 / 45%);
 

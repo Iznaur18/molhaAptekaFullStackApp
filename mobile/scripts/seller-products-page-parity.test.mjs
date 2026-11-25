@@ -38,6 +38,20 @@ test("seller products page includes web header blocks", () => {
   assert.match(page, /SellerProfileQuickStats/);
   assert.match(page, /styles\.sellerMetaZone/);
   assert.match(page, /styles\.shelfChip/);
+  {
+    const stylesSource = readFile(MOBILE_ROOT, "shared/theme/sellerFlowStyles.ts");
+    const metaZoneMatch = stylesSource.match(/sellerMetaZone:\s*\{([^}]*)\}/);
+    assert.ok(metaZoneMatch, "sellerMetaZone style missing");
+    assert.doesNotMatch(metaZoneMatch[1], /backgroundColor/);
+    assert.doesNotMatch(metaZoneMatch[1], /borderWidth/);
+    assert.doesNotMatch(metaZoneMatch[1], /borderColor/);
+    assert.doesNotMatch(metaZoneMatch[1], /borderRadius/);
+  }
+  assert.doesNotMatch(webCss, /\.seller-products-page__seller-meta\s*\{[^}]*\bborder:/);
+  assert.doesNotMatch(
+    webCss,
+    /\.seller-products-page__seller-meta\s*\{[^}]*\bbackground:/,
+  );
   assert.match(stats, /gridCompact/);
   assert.match(stats, /itemCompactHalf/);
   assert.match(stats, /itemCompactFull/);
@@ -61,6 +75,17 @@ test("seller products page includes web header blocks", () => {
   );
   assert.match(webCss, /overflow-x: clip/);
   assert.match(page, /contentWidth=\{productGrid\.contentWidth\}/);
+  assert.match(page, /MobileBottomNavOverlay/);
+  assert.match(page, /paddingBottom: contentPaddingBottom/);
+  assert.doesNotMatch(page, /contentPaddingBottom \+ insets\.bottom/);
+  assert.match(
+    readFile(MOBILE_ROOT, "shared/ui/MobileBottomNavOverlay.tsx"),
+    /router\.navigate/,
+  );
+  assert.match(
+    readFile(CLIENT_ROOT, "src/app/ui/AppShellHeader.jsx"),
+    /MobileBottomNav/,
+  );
   assert.match(
     readFile(MOBILE_ROOT, "features/catalog-grid/ui/CatalogGridRowItem.tsx"),
     /resolveFlexGridItemWidthStyle/,

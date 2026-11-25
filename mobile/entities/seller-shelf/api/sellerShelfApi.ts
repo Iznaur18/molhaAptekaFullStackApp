@@ -32,6 +32,33 @@ export async function fetchPublicSellerShelves(sellerId: string) {
   }
 }
 
+export type PublicSellerOneCShelf = {
+  id: string;
+  name: string;
+  productCount?: number;
+  children?: PublicSellerOneCShelf[];
+};
+
+/**
+ * Полки витрины из групп номенклатуры 1С (дерево).
+ * Без zod: выгрузка чужая, строгий разбор ломал бы витрину из-за одной кривой группы.
+ */
+export async function fetchPublicSellerOneCShelves(
+  sellerId: string,
+): Promise<PublicSellerOneCShelf[]> {
+  try {
+    const { data } = await apiClient.get(
+      `/seller-shelf/seller/${encodeURIComponent(sellerId)}/onec`,
+    );
+    const shelves = (data as { data?: { shelves?: unknown } } | null)?.data?.shelves;
+    return Array.isArray(shelves) ? (shelves as PublicSellerOneCShelf[]) : [];
+  } catch (error) {
+    throw new Error(
+      formatApiErrorMessage(error, "Не удалось загрузить категории продавца"),
+    );
+  }
+}
+
 export async function createSellerShelf(name: string) {
   const body = createSellerShelfBodySchema.parse({ name });
   try {

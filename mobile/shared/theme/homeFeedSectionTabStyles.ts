@@ -1,10 +1,13 @@
+import { izShadows } from "@izibuy/design-tokens";
+
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-/** Паритет web `.home-feed-section-tabs` / `.home-feed-sellers`. */
+/** Паритет web `.home-feed-section-tabs` / `.home-feed-sellers` / SearchInput.css. */
 export const useHomeFeedSectionTabStyles = createThemedStyles((theme) => ({
   row: {
     flexDirection: "row",
-    gap: 10,
+    /** Web `.home-feed-section-tabs { gap: 0.6rem }` */
+    gap: 9.6,
     marginTop: theme.spacing[4],
     marginBottom: theme.spacing[3],
   },
@@ -13,7 +16,8 @@ export const useHomeFeedSectionTabStyles = createThemedStyles((theme) => ({
     minHeight: 40,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 12,
+    /** Web `.home-feed-section-tab { padding: 0.5rem 1rem }` */
+    paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: theme.radius.pill,
     backgroundColor: theme.colors.surfaceMuted,
@@ -22,9 +26,11 @@ export const useHomeFeedSectionTabStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.actionSoft,
   },
   tabLabel: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: theme.colors.textMuted,
+    /** Web `.home-feed-section-tabs { font-size: 0.95rem }` */
+    fontSize: 15.2,
+    fontWeight: theme.typography.fontWeightSemibold,
+    // Web `.home-feed-section-tab` → `--iz-color-text-secondary`
+    color: theme.colors.textSecondary,
   },
   tabLabelActive: {
     color: theme.colors.action,
@@ -33,15 +39,23 @@ export const useHomeFeedSectionTabStyles = createThemedStyles((theme) => ({
     gap: theme.spacing[3],
     marginBottom: theme.spacing[4],
   },
+  /** Web `.search-input__field`: pad 0.55rem/0.85rem, font 0.95rem; без minHeight 44. */
   searchInput: {
     width: "100%",
-    minHeight: 44,
-    borderRadius: theme.radius.pill,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    fontSize: 16,
+    borderRadius: theme.radius.input,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    paddingLeft: 13.6,
+    paddingRight: 13.6,
+    paddingVertical: 8.8,
+    fontSize: 15.2,
     color: theme.colors.text,
-    backgroundColor: `${theme.colors.text}12`,
+    backgroundColor: theme.colors.surface,
+  },
+  searchInputFocused: {
+    borderColor: theme.colors.action,
+    shadowColor: theme.colors.action,
+    ...izShadows.inputFocus,
   },
   empty: {
     marginTop: 6,

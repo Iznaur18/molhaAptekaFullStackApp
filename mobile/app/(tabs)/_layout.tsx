@@ -9,11 +9,11 @@ import {
   MY_PROFILE_PAGE_UI,
   USERS_PAGE_UI,
 } from "@/shared/config";
-import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
+import { usePageBackground } from "@/shared/theme/usePageBackground";
 import { MobileBottomTabBar } from "@/shared/ui/MobileBottomTabBar";
 
 export default function TabLayout() {
-  const { theme } = useAppThemeSettings();
+  const pageBackground = usePageBackground();
 
   return (
     <Tabs
@@ -36,7 +36,7 @@ export default function TabLayout() {
         tabBarBackground: () => null,
         sceneStyle: {
           flex: 1,
-          backgroundColor: theme.colors.bg,
+          backgroundColor: pageBackground,
         },
         headerShown: false,
       }}

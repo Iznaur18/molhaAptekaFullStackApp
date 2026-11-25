@@ -1,6 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query";
 
 import { curatedCategoryListQueryKeys } from "@/entities/curated-category-list/model/curatedCategoryListQueryKeys";
+import { productPromotionQueryKeys } from "@/entities/product/model/productPromotionQueryKeys";
 import { siteHeaderBannerQueryKeys } from "@/entities/site-header-banner/model/siteHeaderBannerQueryKeys";
 import {
   curatedProductListQueryKeys,
@@ -15,6 +16,9 @@ export const invalidateHomeFeedQueries = async (queryClient: QueryClient) => {
       queryKey: [...raffleQueryKeys.all, "featured"],
     }),
     queryClient.invalidateQueries({ queryKey: userStoriesQueryKeys.feed() }),
+    queryClient.invalidateQueries({
+      queryKey: productPromotionQueryKeys.all,
+    }),
     queryClient.invalidateQueries({
       queryKey: curatedProductListQueryKeys.all,
     }),
