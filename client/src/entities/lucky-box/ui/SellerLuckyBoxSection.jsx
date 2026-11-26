@@ -143,7 +143,12 @@ export function SellerLuckyBoxSection({
         <button
           type="button"
           className="lucky-box__toggle"
-          onClick={() => setSheetOpen(true)}
+          onClick={() => {
+            // Dev-replay: сброс локальных попыток, чтобы открыть снова.
+            setLocalPlays([]);
+            playMutation.reset();
+            setSheetOpen(true);
+          }}
         >
           <Gift className="lucky-box__toggle-svg" aria-hidden="true" />
           <span className="lucky-box__head">

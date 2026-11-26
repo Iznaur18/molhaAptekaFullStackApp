@@ -12,7 +12,6 @@ const ROW_PADDING = 12;
 const ROW_RADIUS = 18;
 const VIEW_CHIP_PADDING_VERTICAL = 4;
 const VIEW_CHIP_PADDING_HORIZONTAL = 8;
-const OVERVIEW_TILE_RADIUS = 16;
 /** web `.auction-dashboard-row__thumb` 3.25rem / r12 */
 const THUMB_SIZE = 52;
 const THUMB_RADIUS = 12;
@@ -49,38 +48,6 @@ export const useAuctionPageStyles = createThemedStyles((theme, layout) => ({
   },
   listItem: {
     marginTop: L.listGap,
-  },
-  toolbar: {
-    gap: L.toolbarGap,
-    padding: L.toolbarPadding,
-    borderRadius: L.toolbarRadius,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surfaceMuted,
-  },
-  toolbarHead: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    justifyContent: "space-between",
-    gap: 8,
-  },
-  toolbarHeading: {
-    flex: 1,
-    fontSize: 15.2,
-    fontWeight: theme.typography.fontWeightSemibold,
-    color: theme.colors.text,
-  },
-  toolbarCounts: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "flex-end",
-    gap: 4,
-    maxWidth: "52%",
-  },
-  toolbarCount: {
-    fontSize: 12.48,
-    fontWeight: theme.typography.fontWeightSemibold,
-    color: theme.colors.textMuted,
   },
   section: {
     gap: SECTION_GAP,
@@ -137,76 +104,38 @@ export const useAuctionPageStyles = createThemedStyles((theme, layout) => ({
     color: theme.colors.onContrast,
     fontWeight: theme.typography.fontWeightSemibold,
   },
-  viewChips: {
+  /** web `.auction-page__chips` — 2-сегментный switcher. */
+  viewSwitch: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 6,
-    paddingVertical: 2.4,
-  },
-  viewChip: {
+    gap: 3.2,
+    padding: 3.2,
     borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 999,
-    paddingVertical: VIEW_CHIP_PADDING_VERTICAL,
-    paddingHorizontal: VIEW_CHIP_PADDING_HORIZONTAL,
+    borderRadius: 12,
     borderColor: theme.colors.border,
     backgroundColor: theme.colors.surface,
   },
-  /** web `.auction-page__chip_active` — soft warning, не solid fill. */
-  viewChipActive: {
-    borderColor: "rgba(217, 119, 6, 0.42)",
-    backgroundColor: theme.colors.warningSurface,
-  },
-  viewChipText: {
-    fontSize: 14.4,
-    fontWeight: theme.typography.fontWeightSemibold,
-    lineHeight: 18.7,
-    color: theme.colors.textSecondary,
-  },
-  viewChipTextActive: {
-    color: theme.colors.warningText,
-  },
-  overview: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 7.2,
-  },
-  overviewTile: {
+  viewSwitchTab: {
     flex: 1,
     minWidth: 0,
-    gap: 2.4,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-    borderRadius: OVERVIEW_TILE_RADIUS,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
+    minHeight: 36,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: VIEW_CHIP_PADDING_VERTICAL + 2,
+    paddingHorizontal: VIEW_CHIP_PADDING_HORIZONTAL,
+    borderRadius: 10,
   },
-  overviewTileActive: {
-    borderColor: theme.colors.success,
-    backgroundColor: theme.colors.successSurface,
+  viewSwitchTabActive: {
+    backgroundColor: theme.colors.nearBlack,
   },
-  overviewTileAttention: {
-    borderColor: "rgba(217, 119, 6, 0.45)",
-  },
-  overviewLabel: {
-    fontSize: 11.2,
+  viewSwitchTabText: {
+    fontSize: 14.08,
     fontWeight: theme.typography.fontWeightBold,
-    letterSpacing: 0.4,
-    textTransform: "uppercase",
-    color: theme.colors.textMuted,
+    lineHeight: 18,
+    color: theme.colors.textSecondary,
+    textAlign: "center",
   },
-  overviewValue: {
-    fontSize: theme.typography.fontLg,
-    fontWeight: theme.typography.fontWeightBold,
-    color: theme.colors.text,
-    fontVariant: ["tabular-nums"],
-  },
-  overviewValueAttention: {
-    color: theme.colors.warningText,
-  },
-  filterHint: {
-    fontSize: 13.1,
-    color: theme.colors.textMuted,
+  viewSwitchTabTextActive: {
+    color: theme.colors.onContrast,
   },
 }));
 
@@ -266,125 +195,172 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme, layout) =
   main: {
     flex: 1,
     minWidth: 0,
-    gap: 4,
+    gap: 3.2,
   },
   titlePressable: {
-    alignSelf: "stretch",
+    flex: 1,
+    minWidth: 0,
     maxWidth: "100%",
   },
   title: {
-    fontSize: 15.2,
+    fontSize: 14.72,
     fontWeight: theme.typography.fontWeightSemibold,
+    lineHeight: 19.2,
     color: theme.colors.text,
     flexShrink: 1,
   },
   titleStatic: {
-    fontSize: 15.2,
+    fontSize: 14.72,
     fontWeight: theme.typography.fontWeightSemibold,
+    lineHeight: 19.2,
     color: theme.colors.text,
     flexShrink: 1,
   },
-  metaBlock: {
-    gap: 2,
+  metaInline: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
     maxWidth: "100%",
     alignSelf: "stretch",
   },
   metaBuyerPressable: {
-    alignSelf: "flex-start",
+    flexShrink: 1,
     maxWidth: "100%",
   },
   metaBuyerName: {
-    fontSize: 13.6,
+    fontSize: 12.8,
     fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.textSecondary,
   },
   metaBuyerNameLink: {
-    fontSize: 13.6,
+    fontSize: 12.8,
     fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
   metaDate: {
-    fontSize: 13.6,
+    fontSize: 12.8,
     color: theme.colors.textMuted,
   },
   meta: {
-    fontSize: 13.6,
+    fontSize: 12.8,
     color: theme.colors.textMuted,
     flexShrink: 1,
+  },
+  /** web `.auction-dashboard-row__price-box` */
+  priceBox: {
+    flexShrink: 0,
+    alignItems: "flex-end",
+    gap: 0.8,
+    paddingLeft: 4,
+  },
+  priceBoxValue: {
+    fontSize: 18.4,
+    fontWeight: "800",
+    lineHeight: 21.2,
+    color: theme.colors.text,
+    fontVariant: ["tabular-nums"],
+  },
+  priceBoxCaption: {
+    fontSize: 11.52,
+    color: theme.colors.textMuted,
   },
   statusPill: {
     alignSelf: "flex-start",
     maxWidth: "100%",
-    paddingVertical: 1.92,
-    paddingHorizontal: 7.2,
-    borderRadius: 999,
+    marginTop: 2.4,
+    paddingVertical: 2.4,
+    paddingHorizontal: 8,
+    borderRadius: 8,
   },
-  statusPillPending: {
+  statusPillNeutral: {
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  statusPillAttention: {
     backgroundColor: theme.colors.warningSurface,
   },
-  statusPillAccepted: {
+  statusPillSuccess: {
     backgroundColor: theme.colors.successSurface,
   },
   statusPillText: {
-    fontSize: theme.typography.fontXs,
+    fontSize: 11.84,
     fontWeight: theme.typography.fontWeightSemibold,
-    lineHeight: 14.4,
+    lineHeight: 14.8,
     flexShrink: 1,
-    color: theme.colors.text,
   },
-  statusPillTextPending: {
+  statusPillTextNeutral: {
+    color: theme.colors.textSecondary,
+  },
+  statusPillTextAttention: {
     color: theme.colors.warningText,
   },
-  statusPillTextAccepted: {
+  statusPillTextSuccess: {
     color: theme.colors.successText,
   },
-  priceStrip: {
+  /** web `.auction-dashboard-row__actions` */
+  actions: {
     flexDirection: "row",
-    alignItems: "baseline",
-    justifyContent: "space-between",
+    alignItems: "stretch",
     gap: 8,
-    paddingVertical: 7.2,
-    paddingHorizontal: 8.8,
-    borderRadius: 14,
-    backgroundColor: theme.colors.surfaceMuted,
   },
-  priceLabel: {
-    fontSize: 11.52,
+  actionBtn: {
+    flex: 1,
+    minWidth: 0,
+    minHeight: DECISION_BTN_MIN_HEIGHT,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: DECISION_BTN_RADIUS,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  actionBtnSecondary: {
+    borderColor: theme.colors.borderStrong,
+    backgroundColor: theme.colors.surface,
+  },
+  actionBtnSecondaryText: {
+    fontSize: 14.08,
     fontWeight: theme.typography.fontWeightBold,
-    letterSpacing: 0.48,
-    textTransform: "uppercase",
-    color: theme.colors.text,
+    color: theme.colors.textSecondary,
+    textAlign: "center",
   },
-  price: {
-    fontSize: 16.32,
-    fontWeight: "800",
-    color: theme.colors.text,
-    fontVariant: ["tabular-nums"],
+  textBtn: {
     flexShrink: 0,
+    alignSelf: "center",
+    paddingVertical: 6.4,
+    paddingHorizontal: 8,
+    borderRadius: 10,
   },
+  textBtnLabel: {
+    fontSize: 13.6,
+    fontWeight: theme.typography.fontWeightSemibold,
+    color: theme.colors.textSecondary,
+  },
+  textBtnDanger: {
+    fontSize: 13.6,
+    fontWeight: theme.typography.fontWeightSemibold,
+    color: theme.colors.danger,
+  },
+  /** web `.auction-dashboard-row__editor` — row: composer + close */
   editor: {
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6.4,
   },
-  editorLabel: {
-    fontSize: 11.52,
-    fontWeight: theme.typography.fontWeightBold,
-    letterSpacing: 0.48,
-    textTransform: "uppercase",
-    color: theme.colors.text,
-  },
   composer: {
+    flex: 1,
+    minWidth: 0,
     flexDirection: "row",
     alignItems: "stretch",
     overflow: "hidden",
     borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 14,
+    borderRadius: DECISION_BTN_RADIUS,
     borderColor: theme.colors.borderStrong,
-    backgroundColor: theme.colors.surfaceMuted,
+    backgroundColor: theme.colors.surface,
   },
   composerPrefix: {
     paddingLeft: 10.4,
-    paddingRight: 8.8,
-    justifyContent: "center",
+    paddingRight: 6.4,
+    alignSelf: "center",
     fontSize: 15.2,
     fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.textMuted,
@@ -392,9 +368,9 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme, layout) =
   composerInput: {
     flex: 1,
     minWidth: 0,
-    paddingVertical: 8.8,
+    paddingVertical: 8,
     paddingHorizontal: 5.6,
-    fontSize: theme.typography.fontLg,
+    fontSize: theme.typography.fontMd,
     fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
     fontVariant: ["tabular-nums"],
@@ -402,27 +378,12 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme, layout) =
   composerSubmit: {
     justifyContent: "center",
     paddingHorizontal: 13.6,
-    borderLeftWidth: StyleSheet.hairlineWidth,
-    borderLeftColor: theme.colors.borderStrong,
     backgroundColor: theme.colors.action,
   },
   composerSubmitText: {
-    fontSize: 13.12,
+    fontSize: 13.6,
     fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.onContrast,
-  },
-  editorCancel: {
-    alignSelf: "flex-start",
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 14,
-    backgroundColor: theme.colors.danger,
-  },
-  editorCancelText: {
-    fontSize: 13.12,
-    fontWeight: theme.typography.fontWeightSemibold,
-    color: theme.colors.onContrast,
-    textDecorationLine: "none",
   },
   decision: {
     flexDirection: "row",

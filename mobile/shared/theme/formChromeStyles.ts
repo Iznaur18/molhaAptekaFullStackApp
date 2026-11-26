@@ -338,6 +338,13 @@ export const useCheckoutFormStyles = createThemedStyles((theme, layout) => ({
   form: {
     gap: 14,
   },
+  /**
+   * Path Г: шаг между method/details/payment и dock только через
+   * `marginTop: 6` карточек (web `--cart-fulfillment-card-gap`), без gap родителя.
+   */
+  formCardsLayout: {
+    gap: 0,
+  },
   formPinned: {
     flex: 1,
     justifyContent: "space-between",
@@ -345,9 +352,9 @@ export const useCheckoutFormStyles = createThemedStyles((theme, layout) => ({
   fields: {
     gap: 14,
   },
-  /** web `.cart-fulfillment` card stack gap (`--cart-fulfillment-card-gap: 6px`). */
+  /** web `.cart-fulfillment` card stack: gap 0, карточки сами с margin-top 6. */
   fulfillmentCardsFields: {
-    gap: 6,
+    gap: 0,
   },
   /**
    * web `.cart-fulfillment__method-card` / `__payment`:
@@ -365,6 +372,10 @@ export const useCheckoutFormStyles = createThemedStyles((theme, layout) => ({
     backgroundColor: theme.colors.surfaceElevated,
     ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
+  /** web `.checkout-form__fulfillment` — gap внутри method-card. */
+  fulfillmentMethodInner: {
+    gap: 8,
+  },
   /** web `.cart-fulfillment__details` — gutter only; section paints the card. */
   fulfillmentDetailsCard: {
     marginHorizontal: 12,
@@ -380,7 +391,7 @@ export const useCheckoutFormStyles = createThemedStyles((theme, layout) => ({
     borderWidth: StyleSheet.hairlineWidth,
     borderRadius: 16,
     borderColor: `${theme.colors.ink}14`,
-    backgroundColor: theme.colors.surfaceElevated,
+    backgroundColor: theme.colors.surface,
     ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
   heading: {
@@ -466,11 +477,12 @@ export const useCheckoutFormStyles = createThemedStyles((theme, layout) => ({
     borderRadius: 16,
     ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
+  /** web cart pickup: `--iz-color-surface` (белый в light/custom). */
   fulfillmentSectionPickup: {
     borderColor: `${theme.colors.action}2E`,
-    backgroundColor: theme.colors.actionSoft,
+    backgroundColor: theme.colors.surface,
   },
-  /** web cart: delivery tint = pickup (action 5% / border 18%). */
+  /** web cart: delivery tint = action 5% / border 18%. */
   fulfillmentSectionDelivery: {
     borderColor: `${theme.colors.action}2E`,
     backgroundColor: theme.colors.actionSoft,
@@ -536,6 +548,14 @@ export const useCheckoutFormStyles = createThemedStyles((theme, layout) => ({
   pickupList: {
     gap: 10,
   },
+  /** Паритет saved-address / payment carousel — несколько точек в ряд. */
+  pickupListCarousel: {
+    flexDirection: "row",
+    flexWrap: "nowrap",
+    alignItems: "stretch",
+    gap: 12,
+    paddingRight: 4,
+  },
   pickupItem: {
     flexDirection: "row",
     alignItems: "flex-start",
@@ -574,7 +594,14 @@ export const useCheckoutFormStyles = createThemedStyles((theme, layout) => ({
     borderWidth: 1,
     borderColor: theme.colors.border,
     borderRadius: 12,
-    backgroundColor: theme.colors.surfaceMuted,
+    backgroundColor: theme.colors.surface,
+  },
+  pickupGroupCarousel: {
+    width: 168,
+    minHeight: 72,
+    marginBottom: 0,
+    flexGrow: 0,
+    flexShrink: 0,
   },
   pickupSelectLabel: {
     fontSize: theme.typography.fontSm,
@@ -673,7 +700,7 @@ export const useCheckoutPaymentMethodPickerStyles = createThemedStyles(
       gap: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.gap,
       paddingVertical: 0,
     },
-    /** web `.checkout-payment-method-picker__card` live: pad 8/12 minH 52 r12. */
+    /** Невыбранные — серые (`surfaceMuted`), выбранная — белая + action border. */
     card: {
       flexGrow: 0,
       flexShrink: 0,
@@ -687,7 +714,8 @@ export const useCheckoutPaymentMethodPickerStyles = createThemedStyles(
       alignItems: "center",
       justifyContent: "center",
       borderWidth: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.unselectedBorderWidth,
-      backgroundColor: theme.colors.surface,
+      backgroundColor: theme.colors.surfaceMuted,
+      borderColor: theme.colors.surfaceMuted,
     },
     cardSelected: {
       backgroundColor: theme.colors.surface,
@@ -699,6 +727,7 @@ export const useCheckoutPaymentMethodPickerStyles = createThemedStyles(
       lineHeight: theme.typography.leadingXs,
       fontWeight: theme.typography.fontWeightSemibold,
       textAlign: "center",
+      color: theme.colors.text,
     },
     cardLabelSelected: {
       color: theme.colors.text,
@@ -791,10 +820,15 @@ export const useBottomSheetFormStyles = createThemedStyles((theme, layout) => ({
     flexGrow: 1,
     flexShrink: 1,
   },
+  /**
+   * web `.checkout-sheet-modal__body`: pad iz-space-3 + `--cart-page-content-inset: 0`.
+   * Override `form.paddingHorizontal` (16) → 12; cards get inset 0 via prop.
+   */
   checkoutForm: {
     flexGrow: 1,
     gap: 16,
     paddingTop: theme.spacing[3],
+    paddingHorizontal: theme.spacing[3],
   },
   header: {
     flexDirection: "row",

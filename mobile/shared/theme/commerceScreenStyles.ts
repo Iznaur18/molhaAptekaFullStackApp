@@ -3,7 +3,10 @@ import { Platform, StyleSheet } from "react-native";
 
 import { ORDER_CARD_ITEM_THUMB_SIZE } from "@/entities/product/model/constants";
 import { RAFFLE_PRODUCTS_PAGE_LAYOUT as L } from "@/entities/raffle/lib/raffleProductsPageLayout";
-import { CART_LINE_IMAGE_SIZE } from "@/shared/config/cartConstants";
+import {
+  CART_LINE_CARD_BORDER_RADIUS,
+  CART_LINE_IMAGE_SIZE,
+} from "@/shared/config/cartConstants";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { semanticColors } from "@/shared/theme/semanticColors";
 
@@ -94,13 +97,95 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
+  /** web `.order-card--compact .order-card__total` → 1rem. */
+  totalCompact: {
+    fontSize: 16,
+  },
+  /** web `.order-card__header-totals`. */
+  headerTotals: {
+    flexDirection: "row",
+    flexShrink: 0,
+    alignItems: "baseline",
+    gap: 5.6,
+  },
+  /** web `.order-card__quantity` / compact 0.9rem. */
+  headerQuantity: {
+    color: theme.colors.textSecondary,
+    fontSize: 14.4,
+    fontWeight: theme.typography.fontWeightSemibold,
+  },
+  /** web `.order-card__order-number`. */
+  orderNumber: {
+    fontSize: 12.8,
+    fontWeight: theme.typography.fontWeightSemibold,
+    letterSpacing: 0.02 * 12.8,
+    color: theme.colors.textMuted,
+  },
+  /**
+   * web `.order-card__shipment-row`: method + actions над позициями.
+   * pad 0.65/0.75rem, r16, border.
+   */
+  shipmentRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+    marginTop: 8,
+    paddingVertical: 10.4,
+    paddingHorizontal: 12,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    borderRadius: 16,
+    /* web `--iz-color-bg-subtle` fallback → transparent поверх surface карточки */
+    backgroundColor: "transparent",
+    overflow: "visible",
+  },
+  shipmentMethod: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 9.6,
+    minWidth: 0,
+  },
+  shipmentIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: semanticColors.actionSoft,
+  },
+  shipmentMethodCopy: {
+    flexDirection: "column",
+    gap: 1,
+    minWidth: 0,
+  },
+  shipmentMethodCaption: {
+    fontSize: 12,
+    fontWeight: theme.typography.fontWeightMedium,
+    color: theme.colors.textMuted,
+  },
+  shipmentMethodValue: {
+    fontSize: 15.2,
+    fontWeight: theme.typography.fontWeightBold,
+    color: theme.colors.text,
+  },
+  shipmentActions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: 8,
+    marginLeft: "auto",
+  },
   meta: {
     fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
     marginBottom: 4,
   },
   itemsList: {
-    marginTop: theme.spacing[2],
+    marginTop: 4,
     gap: 4,
   },
   itemBlock: {
@@ -147,18 +232,20 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     gap: 4,
   },
   itemMain: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: 2,
+  },
+  itemTitleRow: {
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "center",
     gap: 4,
-  },
-  itemTitleRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: theme.spacing[2],
+    width: "100%",
   },
   itemNamePressable: {
     flex: 1,
+    minWidth: 0,
   },
   itemLine: {
     flex: 1,
@@ -178,6 +265,22 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     fontSize: theme.typography.fontSm,
     color: theme.colors.textSecondary,
     fontWeight: theme.typography.fontWeightSemibold,
+  },
+  /** web `.order-card__item-price-block` */
+  itemPriceBlock: {
+    gap: 1,
+  },
+  /** web `.order-card--compact .order-card__item-price` */
+  itemPriceCompact: {
+    fontSize: 15.2,
+    fontWeight: theme.typography.fontWeightBold,
+    color: theme.colors.text,
+  },
+  /** web `.order-card__item-price-unit` */
+  itemPriceUnit: {
+    fontSize: 12,
+    fontWeight: theme.typography.fontWeightMedium,
+    color: theme.colors.textSecondary,
   },
   itemLoyalty: {
     marginTop: 4,
@@ -227,13 +330,18 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     gap: theme.spacing[2],
   },
   itemActionsRow: {
-    marginTop: 6,
-    paddingTop: 6,
+    marginTop: 1.6,
+    paddingTop: 5.6,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: theme.colors.border,
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: theme.spacing[2],
+    gap: 4.8,
+  },
+  /** Compact item action: web pad 0.28/0.65rem. */
+  actionButtonCompact: {
+    paddingVertical: 4.48,
+    paddingHorizontal: 10.4,
   },
   actionButton: {
     paddingVertical: 5.1,
@@ -319,6 +427,20 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     gap: 4,
     marginBottom: 4,
   },
+  /**
+   * web `.order-card--compact .order-card__details-fold-body .order-card__meta`
+   * — column gap 0.35rem; rows column gap 0.1rem, без «:».
+   */
+  metaFold: {
+    gap: 5.6,
+  },
+  metaRowFold: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: 1.6,
+    marginBottom: 0,
+    width: "100%",
+  },
   metaLabel: {
     fontSize: theme.typography.fontSm,
     color: theme.colors.textMuted,
@@ -328,16 +450,30 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     fontSize: theme.typography.fontSm,
     color: theme.colors.text,
   },
+  metaValueFold: {
+    flexGrow: 0,
+    flexShrink: 1,
+    alignSelf: "stretch",
+    fontSize: 15.2,
+  },
   buyerLink: {
     fontSize: theme.typography.fontSm,
     color: theme.colors.link,
     fontWeight: theme.typography.fontWeightSemibold,
+  },
+  buyerLinkFold: {
+    fontSize: 15.2,
   },
   counterpartyValue: {
     flex: 1,
     flexDirection: "column",
     alignItems: "flex-start",
     gap: 2,
+  },
+  counterpartyValueFold: {
+    flexGrow: 0,
+    flexShrink: 1,
+    alignSelf: "stretch",
   },
   counterpartyList: {
     flex: 1,
@@ -368,14 +504,26 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surfaceMuted,
     overflow: "hidden",
   },
-  /** web `.order-card__details-fold-summary` pad 0.28/0.55rem fs 0.8rem. */
-  detailsFoldSummary: {
+  /** web `.order-card__details-fold-summary` */
+  detailsFoldSummaryPressable: {
+    flexDirection: "row",
+    alignItems: "center",
+    minHeight: 28,
+    paddingVertical: 4.48,
+    paddingHorizontal: 8.8,
+  },
+  detailsFoldChevron: {
+    marginRight: 6.4,
+    fontSize: 12.8,
+    fontWeight: theme.typography.fontWeightSemibold,
+    lineHeight: 19.2,
+    color: theme.colors.textMuted,
+  },
+  detailsFoldSummaryLabel: {
     fontSize: 12.8,
     fontWeight: theme.typography.fontWeightSemibold,
     lineHeight: 19.2,
     color: theme.colors.textSecondary,
-    paddingVertical: 4.48,
-    paddingHorizontal: 8.8,
   },
   detailsFoldBody: {
     gap: 7.2,
@@ -482,16 +630,20 @@ export const useCartSelectAllRowStyles = createThemedStyles((theme) => ({
 }));
 
 export const useCartLineItemStyles = createThemedStyles((theme) => ({
+  /** web `.cart-fulfillment .cart-line { margin-bottom: 0 }` + list gap 6. */
   rowOuter: {
     marginHorizontal: 12,
-    marginBottom: 4,
+    marginBottom: 0,
   },
+  /** web `.cart-line__card` — radius 14, без squircle. */
   row: {
     paddingHorizontal: 16,
     paddingVertical: 14,
     backgroundColor: theme.colors.surface,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
+    borderRadius: CART_LINE_CARD_BORDER_RADIUS,
+    overflow: "hidden",
   },
   rowUpdating: {
     opacity: 0.7,

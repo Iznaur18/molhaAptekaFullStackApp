@@ -15,7 +15,11 @@ export type ProductDetailPageLayout = {
   isPageSplit: boolean;
   isPageShellRounded: boolean;
   heroSize: ProductDetailHeroSize;
-  resolveScrollPaddingBottom: (bottomInset: number, showMobileDock: boolean) => number;
+  resolveScrollPaddingBottom: (
+    bottomInset: number,
+    showMobileDock: boolean,
+    navOverlayInset?: number,
+  ) => number;
   pageShellStyle: ViewStyle | null;
 };
 
@@ -33,8 +37,12 @@ export const useProductDetailPageLayout = (): ProductDetailPageLayout => {
       isPageSplit,
       isPageShellRounded,
       heroSize,
-      resolveScrollPaddingBottom: (bottomInset, showMobileDock) =>
-        resolveProductDetailDockScrollPadding(bottomInset, showMobileDock),
+      resolveScrollPaddingBottom: (bottomInset, showMobileDock, navOverlayInset) =>
+        resolveProductDetailDockScrollPadding(
+          bottomInset,
+          showMobileDock,
+          navOverlayInset,
+        ),
       pageShellStyle: isPageShellRounded
         ? ({
             borderRadius: 28,

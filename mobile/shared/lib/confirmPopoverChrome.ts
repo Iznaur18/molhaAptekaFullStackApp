@@ -1,8 +1,6 @@
 /**
  * Паритет web `ConfirmButton.css` popover.
- * Native confirm сейчас через `Alert.alert` / `window.confirm`
- * (`confirmDestructiveAction`) — platform chrome; эти константы для
- * кастомного ConfirmPopover, когда заменим Alert.
+ * Используется `shared/ui/ConfirmButton` (Modal + scrim + Нет/Да).
  */
 export const CONFIRM_POPOVER_CHROME = {
   maxWidth: 320,

@@ -155,7 +155,6 @@ export const ProfileTabOverviewSection = ({
         <ProfileMobileNavSheet
           visible={navSheetVisible}
           activeSectionId={PROFILE_SECTION_OVERVIEW}
-          side={isPhoneLayout ? "right" : "left"}
           onClose={() => setNavSheetVisible(false)}
           onOverviewPress={handleOverviewPress}
         />

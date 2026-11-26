@@ -818,8 +818,7 @@
   border-color: transparent;
   background: var(--iz-gradient-header-btn);
   color: var(--iz-color-on-contrast);
-  box-shadow: 0 4px 12px -4px
-    color-mix(in srgb, var(--iz-color-action) 65%, transparent);
+  box-shadow: none;
 }
 
 .app-shell--header-v2 .header-circle-button--cta:hover {
@@ -827,27 +826,30 @@
   filter: brightness(1.07);
 }
 
-/* Кнопки у поиска — квадратики со скруглением, а не круги (макет главной).
-   Касается и раскрывающегося меню рядом: его оболочка и кнопка-переключатель. */
+/* Кнопки у поиска — круги без action-glow.
+   Shell при open выше квадрата → radius = half width (капсула), не 50% высоты. */
 .app-shell--header-v2 .app-shell__auth-actions--mobile-top .header-circle-button--cta,
-.app-shell--header-v2 .header-users-stretch__shell,
 .app-shell--header-v2 .header-users-stretch__toggle {
-  border-radius: 14px;
+  border-radius: 50%;
+}
+
+.app-shell--header-v2 .header-users-stretch__shell {
+  border-radius: calc(var(--header-users-stretch-size, 44px) / 2);
 }
 
 .app-shell--header-v2 .app-shell__auth-actions--mobile-top .header-circle-button--cta,
 .app-shell--header-v2
   .header-users-stretch__shell--cta:not(.header-users-stretch__shell--open) {
-  box-shadow: 0 6px 14px -4px
-    color-mix(in srgb, var(--iz-color-action) 55%, transparent);
+  box-shadow: none;
 }
 
 .app-shell--header-v2 .app-shell__header-filter .header-circle-button {
   width: 2.625rem;
   height: 2.625rem;
-  border-radius: 12px;
+  border-radius: 50%;
   border-color: color-mix(in srgb, var(--iz-color-text) 10%, transparent);
   background: var(--iz-color-surface);
+  box-shadow: none;
 }
 
 .app-shell--header-v2 .app-shell__header-filter .header-circle-button:hover {

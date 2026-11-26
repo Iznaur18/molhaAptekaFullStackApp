@@ -14,6 +14,7 @@ type AuctionDashboardRowBuyerMetaProps = {
   onBuyerClick?: (userId: string) => void;
 };
 
+/** Паритет web meta: `buyer · date` в одной строке. */
 export const AuctionDashboardRowBuyerMeta = ({
   buyer,
   createdAt,
@@ -23,6 +24,7 @@ export const AuctionDashboardRowBuyerMeta = ({
   const buyerId = buyer?._id != null ? String(buyer._id) : null;
   const buyerName = buyer?.userName?.trim() || USER_LIST_ROW_UI.MISSING_NAME;
   const isBuyerClickable = Boolean(buyerId && onBuyerClick);
+  const dateLabel = createdAt ? formatIsoDateTime(createdAt) : null;
 
   const buyerNameNode = (
     <UserPremiumDisplayName
@@ -35,7 +37,7 @@ export const AuctionDashboardRowBuyerMeta = ({
   );
 
   return (
-    <View style={styles.metaBlock}>
+    <View style={styles.metaInline}>
       {isBuyerClickable ? (
         <Pressable
           style={styles.metaBuyerPressable}
@@ -47,9 +49,10 @@ export const AuctionDashboardRowBuyerMeta = ({
       ) : (
         buyerNameNode
       )}
-      {createdAt ? (
+      {dateLabel ? (
         <Text style={styles.metaDate} numberOfLines={1}>
-          {formatIsoDateTime(createdAt)}
+          {" · "}
+          {dateLabel}
         </Text>
       ) : null}
     </View>

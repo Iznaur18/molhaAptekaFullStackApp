@@ -35,8 +35,8 @@ export function CartAuctionLine({ bid, onCheckout }) {
       await cancelMutation.mutateAsync();
       void invalidatePriceOfferQueries(queryClient);
     } catch (error) {
-      // mutation.error показывается ниже
-      void error;
+      // Ошибка видна через cancelMutation.isError ниже.
+      console.error(error);
     }
   };
 
@@ -51,17 +51,9 @@ export function CartAuctionLine({ bid, onCheckout }) {
           decoding="async"
           onError={() => setImageFailed(true)}
         />
-        <div className="cart-auction-line__info">
+        <div className="cart-auction-line__main">
           <span className="cart-auction-line__badge">{CART_AUCTION_UI.BADGE}</span>
           <h3 className="cart-auction-line__heading">{productName}</h3>
-          <p className="cart-auction-line__price">
-            <span className="cart-auction-line__price-label">
-              {CART_AUCTION_UI.PRICE_LABEL}
-            </span>
-            <span className="cart-auction-line__price-value">
-              {formatPriceRub(bid.offerPrice)}
-            </span>
-          </p>
           {bid.paymentDeadlineAt ? (
             <p className="cart-auction-line__deadline">
               {CART_AUCTION_UI.DEADLINE_LABEL}:{" "}
@@ -69,16 +61,17 @@ export function CartAuctionLine({ bid, onCheckout }) {
             </p>
           ) : null}
         </div>
+        <div className="cart-auction-line__price-box">
+          <span className="cart-auction-line__price-value">
+            {formatPriceRub(bid.offerPrice)}
+          </span>
+          <span className="cart-auction-line__price-caption">
+            {CART_AUCTION_UI.PRICE_LABEL}
+          </span>
+        </div>
       </div>
 
       <div className="cart-auction-line__actions">
-        <button
-          type="button"
-          className="cart-auction-line__checkout"
-          onClick={() => onCheckout(bid)}
-        >
-          {CART_AUCTION_UI.CHECKOUT}
-        </button>
         <button
           type="button"
           className="cart-auction-line__remove"
@@ -88,6 +81,13 @@ export function CartAuctionLine({ bid, onCheckout }) {
           {cancelMutation.isPending
             ? CART_AUCTION_UI.REMOVE_PENDING
             : CART_AUCTION_UI.REMOVE}
+        </button>
+        <button
+          type="button"
+          className="cart-auction-line__checkout"
+          onClick={() => onCheckout(bid)}
+        >
+          {CART_AUCTION_UI.CHECKOUT}
         </button>
       </div>
 

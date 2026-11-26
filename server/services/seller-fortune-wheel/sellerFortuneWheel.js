@@ -13,6 +13,7 @@ import {
   SellerFortuneWheelWinModel,
 } from "../../models/index.js";
 import { resolveMskDayKey } from "../seller-lucky-box/sellerLuckyBoxDayKey.js";
+import { ensurePrizeProductInCart } from "../cart/ensurePrizeProductInCart.js";
 import {
   assertPrizeProductsBelongToSeller,
   resolvePrizeProductNames,
@@ -66,13 +67,21 @@ async function findActiveWin({ sellerId, buyerId }) {
 }
 
 /**
- * ВРЕМЕННО для локального теста: вне прода продавец может перекручивать
- * колесо на своей витрине без дневного лимита (см. allowSelfPlay на
- * клиенте у «Коробок удачи»).
+ * ВРЕМЕННО для локальной проверки призов:
+ * - development — любой авторизованный без дневного лимита;
+ * - test — только self-play (чтобы лимит-тесты не ломались);
+ * - production — выкл.
  * TODO: убрать после приёмки фичи.
  */
-const isSelfPlayReplayAllowed = ({ sellerId, buyerId }) =>
-  String(sellerId) === String(buyerId) && process.env.NODE_ENV !== "production";
+const isDevGameReplayAllowed = ({ sellerId, buyerId }) => {
+  if (!buyerId || process.env.NODE_ENV === "production") {
+    return false;
+  }
+  if (process.env.NODE_ENV === "development") {
+    return true;
+  }
+  return String(sellerId) === String(buyerId);
+};
 
 /**
  * Публичное состояние колеса на витрине продавца. Секции отдаём без
@@ -96,7 +105,7 @@ export async function getSellerFortuneWheelState({ sellerId, buyerId }) {
   }
 
   const dayKey = resolveMskDayKey();
-  const todaySpin = isSelfPlayReplayAllowed({ sellerId, buyerId })
+  const todaySpin = isDevGameReplayAllowed({ sellerId, buyerId })
     ? null
     : await SellerFortuneWheelSpinModel.findOne({ sellerId, buyerId, dayKey }).lean();
 
@@ -143,11 +152,11 @@ export async function spinSellerFortuneWheel({ sellerId, buyerId }) {
   }
 
   const dayKey = resolveMskDayKey();
-  const selfPlay = isSelfPlayReplayAllowed({ sellerId, buyerId });
+  const selfPlay = isDevGameReplayAllowed({ sellerId, buyerId });
 
   // Спин + выигрыш + статистика — одной транзакцией: сбой посередине не
   // должен оставить спин без выигрыша (день бы сгорел впустую).
-  return runInTransaction(async (session) => {
+  const spinResult = await runInTransaction(async (session) => {
     const existingSpin = await SellerFortuneWheelSpinModel.findOne(
       { sellerId, buyerId, dayKey },
       null,
@@ -253,6 +262,16 @@ export async function spinSellerFortuneWheel({ sellerId, buyerId }) {
         : null,
     };
   });
+
+  // Корзину трогаем после коммита спина: сбой add не откатывает выигрыш.
+  if (spinResult.prize?.prizeProductId) {
+    const cartPrize = await ensurePrizeProductInCart({
+      userId: buyerId,
+      productId: spinResult.prize.prizeProductId,
+    });
+    return { ...spinResult, cartPrize };
+  }
+  return { ...spinResult, cartPrize: null };
 }
 
 export async function getMyFortuneWheelConfig({ sellerId }) {

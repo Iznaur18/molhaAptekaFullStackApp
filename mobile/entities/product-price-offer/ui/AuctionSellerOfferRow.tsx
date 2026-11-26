@@ -9,10 +9,10 @@ import {
 import { usePriceOfferSellerMutations } from "@/entities/product-price-offer/model/usePriceOfferSellerMutations";
 import { AuctionDashboardProductThumb } from "@/entities/product-price-offer/ui/AuctionDashboardProductThumb";
 import { AuctionDashboardRowBuyerMeta } from "@/entities/product-price-offer/ui/AuctionDashboardRowBuyerMeta";
+import { AuctionDashboardRowPrice } from "@/entities/product-price-offer/ui/AuctionDashboardRowPrice";
 import { AuctionDashboardRowStatus } from "@/entities/product-price-offer/ui/AuctionDashboardRowStatus";
 import { AuctionDashboardSellerActions } from "@/entities/product-price-offer/ui/AuctionDashboardSellerActions";
 import { AUCTION_PAGE_UI, PRODUCT_PRICE_OFFER_UI } from "@/shared/config";
-import { formatPriceRub } from "@/shared/lib";
 import { useAuctionDashboardRowStyles } from "@/shared/theme/auctionPageStyles";
 import { CommerceCardExpandToggle } from "@/shared/ui/CommerceCardExpandToggle";
 
@@ -121,9 +121,11 @@ export const AuctionSellerOfferRow = ({
                 createdAt={offer.createdAt}
                 onBuyerClick={onBuyerClick}
               />
-              <AuctionDashboardRowStatus isPending={isPending} isAccepted={isAccepted}>
+              <AuctionDashboardRowStatus
+                tone={isPending ? "attention" : isAccepted ? "success" : "neutral"}
+              >
                 {isPending
-                  ? PRODUCT_PRICE_OFFER_UI.STATUS_PENDING
+                  ? AUCTION_PAGE_UI.STATUS_SELLER_PENDING
                   : isAccepted
                     ? PRODUCT_PRICE_OFFER_UI.ACCEPTED_BADGE
                     : null}
@@ -131,11 +133,10 @@ export const AuctionSellerOfferRow = ({
             </>
           ) : null}
         </View>
-      </View>
-
-      <View style={styles.priceStrip}>
-        <Text style={styles.priceLabel}>{AUCTION_PAGE_UI.BID_PRICE_LABEL}</Text>
-        <Text style={styles.price}>{formatPriceRub(offer.offerPrice)}</Text>
+        <AuctionDashboardRowPrice
+          price={offer.offerPrice}
+          caption={AUCTION_PAGE_UI.PRICE_CAPTION_INCOMING}
+        />
       </View>
 
       {collapsedPreview ? <Text style={styles.preview}>{collapsedPreview}</Text> : null}

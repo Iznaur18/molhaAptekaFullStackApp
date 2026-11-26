@@ -15,6 +15,7 @@ import {
 } from "../constants/sellerLuckyBoxConstants.js";
 import { AppError } from "../errors/AppError.js";
 import {
+  CartModel,
   ProductModel,
   SellerLuckyBoxConfigModel,
   SellerLuckyBoxPlayModel,
@@ -714,6 +715,8 @@ test("play: приз с товаром даёт выигрыш с prizeProductId
   assert.ok(won, "ожидали выигрыш с единственным призом");
   assert.equal(won.prize.prizeProductId, String(product._id));
   assert.equal(won.prize.prizeProductName, product.productName);
+  assert.equal(won.cartPrize?.ok, true);
+  assert.equal(won.cartPrize?.alreadyInCart, false);
 
   const win = await SellerLuckyBoxWinModel.findOne({
     sellerId: seller._id,
@@ -721,4 +724,45 @@ test("play: приз с товаром даёт выигрыш с prizeProductId
   }).lean();
   assert.equal(String(win.prizeProductId), String(product._id));
   assert.equal(win.prizeProductName, product.productName);
+
+  const cart = await CartModel.findOne({ userId: winnerId }).lean();
+  assert.equal(cart?.items?.[String(product._id)], 1);
+});
+
+test("ensurePrizeProductInCart: qty 1; alreadyInCart не трогает qty", async () => {
+  const { ensurePrizeProductInCart } =
+    await import("../services/cart/ensurePrizeProductInCart.js");
+  const seller = await createUser("cart_prize_seller");
+  const buyer = await createUser("cart_prize_buyer");
+  const product = await createProduct(seller._id, "cart");
+
+  const first = await ensurePrizeProductInCart({
+    userId: buyer._id,
+    productId: product._id,
+  });
+  assert.equal(first.ok, true);
+  assert.equal(first.alreadyInCart, false);
+  assert.equal(
+    (await CartModel.findOne({ userId: buyer._id }).lean())?.items?.[
+      String(product._id)
+    ],
+    1,
+  );
+
+  await CartModel.updateOne(
+    { userId: buyer._id },
+    { $set: { [`items.${String(product._id)}`]: 3 } },
+  );
+  const second = await ensurePrizeProductInCart({
+    userId: buyer._id,
+    productId: product._id,
+  });
+  assert.equal(second.ok, true);
+  assert.equal(second.alreadyInCart, true);
+  assert.equal(
+    (await CartModel.findOne({ userId: buyer._id }).lean())?.items?.[
+      String(product._id)
+    ],
+    3,
+  );
 });

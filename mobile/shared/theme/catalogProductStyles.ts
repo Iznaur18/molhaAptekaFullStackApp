@@ -2950,7 +2950,13 @@ export const useProductPriceOfferStyles = createThemedStyles((theme, layout) => 
     color: theme.colors.text,
   },
   actions: {
+    flexDirection: "row",
     gap: 8,
+  },
+  /** Slot под AppButton (flex на Animated.View-обёртке не пробрасывается). */
+  actionSlot: {
+    flex: 1,
+    minWidth: 0,
   },
   inlinePrimaryButton: {
     alignSelf: "stretch",

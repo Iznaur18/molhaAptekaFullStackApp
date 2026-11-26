@@ -886,17 +886,28 @@ export const AUCTION_PAGE_UI = {
   BID_PRICE_LABEL: "Ставка",
   PAY_DEADLINE_LABEL: "Оплатить до",
   EDIT_PRICE_LABEL: "Новая цена, ₽",
+  /** Подпись под ценой в карточке своей ставки */
+  PRICE_CAPTION_MINE: "ваша ставка",
+  /** Подпись под ценой в карточке входящей ставки */
+  PRICE_CAPTION_INCOMING: "ставка",
+  STATUS_BUYER_PENDING: "Ждём ответа продавца",
+  STATUS_SELLER_PENDING: "Ждёт вашего решения",
+  EDIT_BID: "Изменить ставку",
+  CANCEL_BID: "Отменить",
+  SAVE_BID: "Сохранить",
+  CLOSE_EDITOR: "Не менять",
   LOADING: "Загрузка аукциона…",
   ERROR_GENERIC: "Не удалось выполнить действие",
   BUYER_SECTION_TITLE: "Мои ставки",
   SELLER_SECTION_TITLE: "Ставки покупателей",
+  BUYER_EMPTY: "У вас пока нет активных ставок",
+  SELLER_EMPTY: "Входящих ставок пока нет",
   BOTH_EMPTY: "Активных ставок пока нет",
   COUNT_FILTERED: (shown: number, total: number) => `${shown} из ${total}`,
   COUNT_ITEMS: (count: number) => `${count} записей`,
   VIEW_FILTER_LABEL: "Раздел",
-  VIEW_FILTER_ALL: "Все",
   VIEW_FILTER_BUYER: "Мои ставки",
-  VIEW_FILTER_SELLER: "Входящие",
+  VIEW_FILTER_SELLER: "Ставки покупателей",
   OVERVIEW_BUYER_BIDS: "Мои ставки",
   OVERVIEW_INCOMING: "Входящие",
   OVERVIEW_ATTENTION: "Нужно действие",
@@ -1357,7 +1368,7 @@ export const CHECKOUT_FORM_UI = {
   FULFILLMENT_DELIVERY_SOON: "Скоро",
   FULFILLMENT_DELIVERY_UNAVAILABLE: "Доставка недоступна для выбранных товаров",
   FULFILLMENT_PICKUP_UNAVAILABLE: "Самовывоз недоступен для выбранных товаров",
-  PICKUP_ADDRESS_LABEL: "Где забрать",
+  PICKUP_ADDRESS_LABEL: "Откуда забрать заказ",
   PICKUP_MULTI_HINT: "Несколько точек — каждый товар по своему адресу",
   CHECKOUT_PICK_LOCATION: "Выберите точку",
   LABEL_DELIVERY_ADDRESS: "Адрес доставки",
@@ -1511,6 +1522,8 @@ export const PAYMENT_UI = {
 export const ORDER_CARD_UI = {
   ITEMS_HEADING: "Позиции",
   ADDRESS_LABEL: "Адрес доставки",
+  /** У отправления с самовывозом — точка выдачи, не адрес покупателя. */
+  PICKUP_ADDRESS_LABEL: "Забрать по адресу",
   TRACKING_LABEL: "Трек-номер",
   CDEK_STATUS_LABEL: "СДЭК",
   CDEK_PICK_UP_BY_LABEL: "Забрать до",
@@ -1519,13 +1532,19 @@ export const ORDER_CARD_UI = {
   PAYMENT_POINTS_WITH_DELIVERY: (deliveryMethodLabel: string) =>
     `Баллами, доставка — ${deliveryMethodLabel.toLowerCase()}`,
   CREATED_LABEL: "Создан",
+  ORDER_NUMBER_LABEL: "Номер заказа",
+  ORDER_NUMBER: (number: string) => `№ ${number}`,
   BUYER_LABEL: "Покупатель",
   SELLER_LABEL: "Продавец",
   ITEM_STATUS_LABEL: "Статус позиции",
   ITEM_DELIVERED_AT_LABEL: "Доставлен",
   ITEM_CONFIRMED_AT_LABEL: "Подтверждён",
   DETAILS_FOLD_SUMMARY: "Подробности заказа",
-  ACTION_CONFIRM: "Подтвердить получение",
+  SHIPMENT_HEADING: "Получение",
+  SHIPMENT_PICKUP: "Самовывоз",
+  SHIPMENT_DELIVERY: "Доставка",
+  /** web `ORDER_CARD_UI.ACTION_CONFIRM` — в shipment-row. */
+  ACTION_CONFIRM: "Подтвердить",
   ACTION_CANCEL: "Отменить",
   ACTION_CANCEL_ORDER: "Отменить заказ",
   ACTION_SHIPPED: "Отгрузить",
@@ -3881,7 +3900,7 @@ export const SAFE_DEAL_BADGE_UI = {
  */
 export const LUCKY_BOX_SECTION_UI = {
   TITLE: "Коробки удачи",
-  CART_LINE_LABEL: "Коробки удачи",
+  CART_LINE_LABEL: "Коробки удачи · на этот товар",
   SUBTITLE: (prizesCount: number) => {
     const word = { 1: "одна", 2: "две", 3: "три", 4: "четыре" }[
       prizesCount as 1 | 2 | 3 | 4
@@ -3910,9 +3929,13 @@ export const LUCKY_BOX_SECTION_UI = {
   ACTIVE_WIN_NOTICE: (percent: number) =>
     `У вас активна скидка ${percent}% — применится автоматически при оформлении заказа`,
   WIN_PRODUCT_TITLE: (productName: string) => `Товар в подарок: ${productName}`,
-  WIN_PRODUCT_APPLIES: "Добавим бесплатно в ваш заказ у этого продавца",
+  WIN_PRODUCT_APPLIES:
+    "Товар добавлен в корзину — бесплатно при заказе у этого продавца",
+  WIN_PRODUCT_ALREADY_IN_CART:
+    "Товар уже в корзине — бесплатно при заказе у этого продавца",
+  CART_PRIZE_ADD_FAILED: "Приз получен, но не удалось добавить в корзину",
   ACTIVE_PRODUCT_WIN_NOTICE: (productName: string) =>
-    `У вас выигран товар «${productName}» — добавим бесплатно к заказу у этого продавца`,
+    `У вас выигран товар «${productName}» — он в корзине, бесплатно при заказе у этого продавца`,
   LOAD_FALLBACK: "Не удалось загрузить игру",
   PLAY_FALLBACK: "Не удалось открыть коробку",
   CLOSE: "Закрыть",
@@ -3924,7 +3947,7 @@ export const LUCKY_BOX_SECTION_UI = {
  */
 export const FORTUNE_WHEEL_SECTION_UI = {
   TITLE: "Колесо фортуны",
-  CART_LINE_LABEL: "Колесо фортуны",
+  CART_LINE_LABEL: "Колесо фортуны · на этот товар",
   SUBTITLE: "Один спин в день — какая скидка выпадет сегодня?",
   BUTTON_HINT: "Испытайте удачу",
   SPIN: "Крутить",
@@ -3945,9 +3968,13 @@ export const FORTUNE_WHEEL_SECTION_UI = {
   ACTIVE_WIN_NOTICE: (percent: number) =>
     `У вас активна скидка ${percent}% — применится автоматически при оформлении заказа`,
   WIN_PRODUCT_TITLE: (productName: string) => `Товар в подарок: ${productName}`,
-  WIN_PRODUCT_APPLIES: "Добавим бесплатно в ваш заказ у этого продавца",
+  WIN_PRODUCT_APPLIES:
+    "Товар добавлен в корзину — бесплатно при заказе у этого продавца",
+  WIN_PRODUCT_ALREADY_IN_CART:
+    "Товар уже в корзине — бесплатно при заказе у этого продавца",
+  CART_PRIZE_ADD_FAILED: "Приз получен, но не удалось добавить в корзину",
   ACTIVE_PRODUCT_WIN_NOTICE: (productName: string) =>
-    `У вас выигран товар «${productName}» — добавим бесплатно к заказу у этого продавца`,
+    `У вас выигран товар «${productName}» — он в корзине, бесплатно при заказе у этого продавца`,
   LOAD_FALLBACK: "Не удалось загрузить игру",
   SPIN_FALLBACK: "Не удалось крутить колесо",
   CLOSE: "Закрыть",

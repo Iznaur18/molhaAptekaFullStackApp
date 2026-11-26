@@ -5,67 +5,52 @@ import { fileURLToPath } from "node:url";
 import { test } from "node:test";
 
 const MOBILE_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+const CLIENT_ROOT = join(MOBILE_ROOT, "..", "client");
 
 const readMobileFile = (relativePath) =>
   readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
+const readClientFile = (relativePath) =>
+  readFileSync(join(CLIENT_ROOT, "src", relativePath), "utf8");
 
-test("auction page mirrors web toolbar and dashboard rows", () => {
+test("auction page uses buyer/seller switcher without overview tiles", () => {
   const page = readMobileFile("features/auction-page/ui/AuctionPage.tsx");
   const toolbar = readMobileFile("features/auction-page/ui/AuctionPageToolbar.tsx");
-  const overview = readMobileFile("features/auction-page/ui/AuctionPageOverview.tsx");
-  const buyerRow = readMobileFile(
-    "entities/product-price-offer/ui/AuctionBuyerBidRow.tsx",
+  const webPage = readClientFile("pages/auction/ui/AuctionPage.jsx");
+  const webToolbar = readClientFile("pages/auction/ui/AuctionPageToolbar.jsx");
+  const filters = readMobileFile(
+    "entities/product-price-offer/model/auctionViewFilters.ts",
   );
-  const sellerRow = readMobileFile(
-    "entities/product-price-offer/ui/AuctionSellerOfferRow.tsx",
+  const webFilters = readClientFile(
+    "entities/product-price-offer/model/auctionViewFilters.js",
   );
 
   assert.match(page, /ProfileMobileSectionToggle/);
   assert.match(page, /AuctionPageToolbar/);
-  assert.match(page, /AuctionPageOverview/);
-  assert.match(page, /filterAuctionDashboard/);
-  assert.match(page, /summarizeAuctionDashboard/);
-  assert.doesNotMatch(page, /EXPAND_ALL/);
-  assert.doesNotMatch(page, /COLLAPSE_ALL/);
-  assert.doesNotMatch(page, /collapsible/);
-  assert.match(page, /COUNT_FILTERED/);
-  assert.match(page, /ListHeaderComponent/);
+  assert.doesNotMatch(page, /AuctionPageOverview/);
+  assert.doesNotMatch(page, /summarizeAuctionDashboard/);
+  assert.doesNotMatch(page, /attentionOnly/);
+  assert.match(page, /AUCTION_VIEW_FILTER_BUYER/);
   assert.match(page, /contentPaddingBottom/);
   assert.match(page, /listInAccountShell/);
-  assert.match(page, /useProfileAdaptiveLayout/);
-  assert.match(page, /listItemFirst/);
-  assert.match(page, /ProfileAccountList/);
   assert.match(page, /AuctionBuyerBidRow/);
-
-  const pageStyles = readMobileFile("shared/theme/auctionPageStyles.ts");
-  assert.match(pageStyles, /AUCTION_PAGE_LAYOUT/);
-  assert.match(pageStyles, /listInAccountShell/);
-  assert.match(pageStyles, /paddingTop:\s*0/);
-
-  const layout = readMobileFile("shared/lib/guestProfileLayout.ts");
-  assert.match(layout, /AUCTION_PAGE_LAYOUT/);
-
   assert.match(page, /AuctionSellerOfferRow/);
-  assert.match(page, /ATTENTION_FILTER_HINT/);
-  assert.doesNotMatch(page, /sellerFlowStyles/);
 
-  assert.match(toolbar, /AUCTION_PAGE_UI\.TITLE/);
-  assert.match(toolbar, /summaryCountLabel/);
+  assert.doesNotMatch(webPage, /AuctionPageOverview/);
+  assert.doesNotMatch(webPage, /attentionOnly/);
+  assert.match(webPage, /AUCTION_VIEW_FILTER_BUYER/);
+
+  assert.doesNotMatch(toolbar, /AUCTION_PAGE_UI\.TITLE/);
+  assert.doesNotMatch(toolbar, /summaryCountLabel/);
+  assert.doesNotMatch(webToolbar, /auction-page__toolbar/);
   assert.match(toolbar, /AUCTION_VIEW_FILTER_OPTIONS/);
+  assert.match(toolbar, /viewSwitch/);
+  assert.match(webToolbar, /role="tablist"/);
+  assert.match(webToolbar, /auction-page__chips/);
 
-  assert.match(overview, /OVERVIEW_BUYER_BIDS/);
-  assert.match(overview, /OVERVIEW_INCOMING/);
-  assert.match(overview, /OVERVIEW_ATTENTION/);
-
-  assert.match(buyerRow, /AuctionDashboardBuyerPriceEditor/);
-  assert.match(buyerRow, /priceOfferId|productId/);
-  assert.match(buyerRow, /collapsible/);
-  assert.match(buyerRow, /bidNeedsAttention/);
-
-  assert.match(sellerRow, /AuctionDashboardSellerActions/);
-  assert.match(sellerRow, /AuctionDashboardRowBuyerMeta/);
-  assert.match(sellerRow, /collapsible/);
-  assert.match(sellerRow, /offerNeedsAttention/);
+  assert.doesNotMatch(filters, /VIEW_FILTER_ALL/);
+  assert.doesNotMatch(webFilters, /VIEW_FILTER_ALL/);
+  assert.match(filters, /VIEW_FILTER_BUYER/);
+  assert.match(filters, /VIEW_FILTER_SELLER/);
 });
 
 test("auction page ui copy matches web auction dashboard", () => {
@@ -76,11 +61,41 @@ test("auction page ui copy matches web auction dashboard", () => {
 
   assert.ok(auctionUi);
   assert.match(auctionUi[0], /TITLE: "Аукцион"/);
-  assert.match(auctionUi[0], /BID_PRICE_LABEL: "Ставка"/);
-  assert.match(auctionUi[0], /PAY_DEADLINE_LABEL: "Оплатить до"/);
-  assert.match(auctionUi[0], /EDIT_PRICE_LABEL: "Новая цена, ₽"/);
-  assert.match(auctionUi[0], /COUNT_FILTERED:/);
+  assert.match(auctionUi[0], /VIEW_FILTER_BUYER: "Мои ставки"/);
+  assert.match(auctionUi[0], /VIEW_FILTER_SELLER: "Ставки покупателей"/);
+  assert.doesNotMatch(auctionUi[0], /VIEW_FILTER_ALL/);
+  assert.match(auctionUi[0], /BUYER_EMPTY:/);
+  assert.match(auctionUi[0], /SELLER_EMPTY:/);
   assert.doesNotMatch(auctionUi[0], /EXPAND_ALL/);
   assert.doesNotMatch(auctionUi[0], /COLLAPSE_ALL/);
-  assert.match(auctionUi[0], /OVERVIEW_ATTENTION: "Нужно действие"/);
+});
+
+test("auction dashboard rows match web price-box + edit flow", () => {
+  const buyerRow = readMobileFile(
+    "entities/product-price-offer/ui/AuctionBuyerBidRow.tsx",
+  );
+  const sellerRow = readMobileFile(
+    "entities/product-price-offer/ui/AuctionSellerOfferRow.tsx",
+  );
+  const editor = readMobileFile(
+    "entities/product-price-offer/ui/AuctionDashboardBuyerPriceEditor.tsx",
+  );
+  const styles = readMobileFile("shared/theme/auctionPageStyles.ts");
+
+  assert.match(buyerRow, /AuctionDashboardRowPrice/);
+  assert.match(buyerRow, /STATUS_BUYER_PENDING/);
+  assert.match(buyerRow, /isEditing/);
+  assert.match(buyerRow, /EDIT_BID/);
+  assert.match(buyerRow, /CANCEL_BID/);
+  assert.doesNotMatch(buyerRow, /priceStrip/);
+  assert.match(sellerRow, /AuctionDashboardRowPrice/);
+  assert.match(sellerRow, /STATUS_SELLER_PENDING/);
+  assert.doesNotMatch(sellerRow, /priceStrip/);
+  assert.match(editor, /onClose/);
+  assert.match(editor, /closeLabel/);
+  assert.match(styles, /priceBox:/);
+  assert.match(styles, /actions:/);
+  assert.match(styles, /textBtnDanger:/);
+  assert.match(styles, /viewSwitch:/);
+  assert.doesNotMatch(styles, /overviewTile:/);
 });

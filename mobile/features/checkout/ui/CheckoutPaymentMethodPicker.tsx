@@ -5,7 +5,6 @@ import {
   ORDER_PAYMENT_METHOD_LABEL_RU,
   type OrderPaymentMethod,
 } from "@/entities/order/model/constants";
-import { CHECKOUT_PAYMENT_METHOD_CARD_THEME } from "@/entities/order/lib/checkoutPaymentMethodCardTheme";
 import { CHECKOUT_FORM_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useCheckoutPaymentMethodPickerStyles } from "@/shared/theme/formChromeStyles";
@@ -69,7 +68,6 @@ export const CheckoutPaymentMethodPicker = ({
           const isSelectable = availableMethods.includes(method);
           const isSelected = value === method;
           const isLocked = !isSelectable;
-          const cardTheme = CHECKOUT_PAYMENT_METHOD_CARD_THEME[method];
           const isInactive = disabled || isLocked;
           // «Скоро» и «продавец не принимает» — разные вещи: первое обещает,
           // что способ вот-вот появится, а у этого продавца он не появится.
@@ -82,14 +80,7 @@ export const CheckoutPaymentMethodPicker = ({
               key={method}
               style={[
                 styles.card,
-                isLocked
-                  ? styles.cardLocked
-                  : isSelected
-                    ? styles.cardSelected
-                    : {
-                        backgroundColor: cardTheme.surface,
-                        borderColor: cardTheme.surface,
-                      },
+                isLocked ? styles.cardLocked : isSelected ? styles.cardSelected : null,
               ]}
               onPress={() => {
                 if (!isSelectable) {
@@ -109,11 +100,8 @@ export const CheckoutPaymentMethodPicker = ({
               <Text
                 style={[
                   styles.cardLabel,
-                  isLocked
-                    ? { color: theme.colors.textMuted }
-                    : isSelected
-                      ? styles.cardLabelSelected
-                      : { color: cardTheme.label },
+                  isLocked ? { color: theme.colors.textMuted } : null,
+                  isSelected ? styles.cardLabelSelected : null,
                 ]}
               >
                 {ORDER_PAYMENT_METHOD_LABEL_RU[method]}

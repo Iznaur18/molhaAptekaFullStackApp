@@ -258,6 +258,9 @@ test("raffle section opens /raffle/:id from reveal button (web parity)", () => {
   assert.match(reveal, /lucide-react-native\/icons\/gift/);
   assert.match(reveal, /lucide-react-native\/icons\/chevron-right/);
   assert.match(reveal, /RaffleRevealButtonGradient/);
+  assert.match(reveal, /borderRadius: RAFFLE_REVEAL_BUTTON_BORDER_RADIUS/);
+  // web: corner-shape: round на pill — не SquircleView (squircle режет «таблетку»).
+  assert.doesNotMatch(reveal, /SquircleView/);
   assert.doesNotMatch(reveal, /HIDE_RAFFLES/);
   assert.doesNotMatch(reveal, /RainbowFlowBackdrop/);
   assert.doesNotMatch(

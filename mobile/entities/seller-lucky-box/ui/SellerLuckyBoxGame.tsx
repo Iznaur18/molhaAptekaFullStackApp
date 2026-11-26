@@ -188,10 +188,15 @@ export const SellerLuckyBoxGame = ({
             : null;
 
   return (
-    <>
+    <View style={styles.gameCell}>
       <Pressable
         style={({ pressed }) => [styles.toggle, pressed && styles.togglePressed]}
-        onPress={() => setSheetOpen(true)}
+        onPress={() => {
+          // Dev-replay: сброс локальных попыток, чтобы открыть снова.
+          setLocalPlays([]);
+          playMutation.reset();
+          setSheetOpen(true);
+        }}
         accessibilityRole="button"
         accessibilityLabel={UI.TITLE}
       >
@@ -294,7 +299,11 @@ export const SellerLuckyBoxGame = ({
                   <Text style={styles.resultText}>
                     {showWinResult
                       ? winIsProduct
-                        ? UI.WIN_PRODUCT_APPLIES
+                        ? lastPlay?.cartPrize?.ok === false
+                          ? (lastPlay.cartPrize.message ?? UI.CART_PRIZE_ADD_FAILED)
+                          : lastPlay?.cartPrize?.alreadyInCart
+                            ? UI.WIN_PRODUCT_ALREADY_IN_CART
+                            : UI.WIN_PRODUCT_APPLIES
                         : winExpiresAt
                           ? UI.WIN_APPLIES
                           : UI.ACTIVE_WIN_NOTICE(lastPlay?.prize?.discountPercent ?? 0)
@@ -338,6 +347,6 @@ export const SellerLuckyBoxGame = ({
           </>
         )}
       </SellerStorefrontSheet>
-    </>
+    </View>
   );
 };

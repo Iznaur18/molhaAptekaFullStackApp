@@ -14,15 +14,8 @@ import { useOrderMutations } from "@/entities/order/model/useOrderMutations";
 import { orderShipmentActionKey } from "@/entities/order/ui/OrderCard";
 import { useCreateOrderPaymentMutation } from "@/entities/payment/model/useCreateOrderPaymentMutation";
 import { orderQueryKeys } from "@/shared/api";
-import {
-  API_CLIENT_UI,
-  MY_ORDERS_PAGE_UI,
-  ORDER_CARD_UI,
-  PAYMENT_UI,
-  PRODUCT_REPORT_UI,
-} from "@/shared/config";
+import { API_CLIENT_UI, MY_ORDERS_PAGE_UI, PAYMENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
-import { confirmDestructiveAction } from "@/shared/lib/confirmDestructiveAction";
 
 type OrderRecord = z.infer<typeof orderFromApiSchema>;
 
@@ -157,23 +150,6 @@ export const useBuyerOrderCardActions = ({
     }
   };
 
-  const confirmAction = (
-    title: string,
-    question: string,
-    confirmLabel: string,
-    run: () => Promise<void>,
-  ) => {
-    confirmDestructiveAction({
-      title,
-      message: question,
-      confirmLabel,
-      cancelLabel: PRODUCT_REPORT_UI.CANCEL,
-      onConfirm: () => {
-        void run();
-      },
-    });
-  };
-
   const runItemAction = async ({
     orderId,
     itemIndex,
@@ -223,6 +199,7 @@ export const useBuyerOrderCardActions = ({
     }
   };
 
+  /** Confirm — в OrderCard `ConfirmButton` (popover), как web. */
   const handleCancelItem = ({
     orderId,
     itemIndex,
@@ -230,18 +207,12 @@ export const useBuyerOrderCardActions = ({
     orderId: string;
     itemIndex: number;
   }) => {
-    confirmAction(
-      ORDER_CARD_UI.ACTION_CANCEL,
-      ORDER_CARD_UI.ITEM_CANCEL_CONFIRM,
-      ORDER_CARD_UI.ACTION_CANCEL,
-      () =>
-        runItemAction({
-          orderId,
-          itemIndex,
-          optimisticStatus: ORDER_STATUS_CANCELLED,
-          mutate: () => cancelItemMutation.mutateAsync({ orderId, itemIndex }),
-        }),
-    );
+    void runItemAction({
+      orderId,
+      itemIndex,
+      optimisticStatus: ORDER_STATUS_CANCELLED,
+      mutate: () => cancelItemMutation.mutateAsync({ orderId, itemIndex }),
+    });
   };
 
   const handleMarkReturned = ({
@@ -251,18 +222,12 @@ export const useBuyerOrderCardActions = ({
     orderId: string;
     itemIndex: number;
   }) => {
-    confirmAction(
-      ORDER_CARD_UI.ACTION_REFUSE,
-      ORDER_CARD_UI.ACTION_REFUSE_CONFIRM,
-      ORDER_CARD_UI.ACTION_REFUSE,
-      () =>
-        runItemAction({
-          orderId,
-          itemIndex,
-          optimisticStatus: ORDER_STATUS_RETURNED,
-          mutate: () => returnItemMutation.mutateAsync({ orderId, itemIndex }),
-        }),
-    );
+    void runItemAction({
+      orderId,
+      itemIndex,
+      optimisticStatus: ORDER_STATUS_RETURNED,
+      mutate: () => returnItemMutation.mutateAsync({ orderId, itemIndex }),
+    });
   };
 
   const handleCancelOrder = ({
@@ -272,36 +237,31 @@ export const useBuyerOrderCardActions = ({
     orderId: string;
     sellerId: string;
   }) => {
-    confirmAction(
-      ORDER_CARD_UI.ACTION_CANCEL_ORDER,
-      ORDER_CARD_UI.BUYER_CANCEL_CONFIRM,
-      ORDER_CARD_UI.ACTION_CANCEL_ORDER,
-      async () => {
-        const actionKey = orderShipmentActionKey(orderId, "cancel");
-        setPendingActionKey(actionKey);
-        setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
-        try {
-          const updatedOrder = await cancelShipmentMutation.mutateAsync({
-            orderId,
-            sellerId,
-          });
-          patchOrders((prev) =>
-            prev.map((order) => (order._id === orderId ? updatedOrder : order)),
-          );
-          await invalidateOrderQueues();
-          void refetchOrders();
-        } catch (error) {
-          const message = formatApiErrorMessage(
-            error,
-            API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK,
-          );
-          setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
-          void refetchOrders();
-        } finally {
-          setPendingActionKey(null);
-        }
-      },
-    );
+    void (async () => {
+      const actionKey = orderShipmentActionKey(orderId, "cancel");
+      setPendingActionKey(actionKey);
+      setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
+      try {
+        const updatedOrder = await cancelShipmentMutation.mutateAsync({
+          orderId,
+          sellerId,
+        });
+        patchOrders((prev) =>
+          prev.map((order) => (order._id === orderId ? updatedOrder : order)),
+        );
+        await invalidateOrderQueues();
+        void refetchOrders();
+      } catch (error) {
+        const message = formatApiErrorMessage(
+          error,
+          API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK,
+        );
+        setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
+        void refetchOrders();
+      } finally {
+        setPendingActionKey(null);
+      }
+    })();
   };
 
   return {

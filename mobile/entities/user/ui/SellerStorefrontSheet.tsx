@@ -1,7 +1,18 @@
 import type { ReactNode } from "react";
-import { Modal, Pressable, ScrollView, Text, View } from "react-native";
+import { useMemo } from "react";
+import {
+  Dimensions,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useWholesalePriceSheetAnimation } from "@/entities/product/model/useWholesalePriceSheetAnimation";
 import { useSellerStorefrontSheetStyles } from "@/shared/theme/sellerStorefrontSheetStyles";
 import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
 
@@ -14,8 +25,9 @@ type SellerStorefrontSheetProps = {
 };
 
 /**
- * Каркас окна снизу на витрине — общий для «QR-код» и «Соцсети и сайт»,
- * как web `SellerQrSheet.css`: шапка с заголовком и «Закрыть», тело с линией.
+ * Каркас окна снизу на витрине — общий для QR / соцсетей / игр.
+ * Backdrop fade + sheet slide отдельно (как CuratedListViewAllSheet),
+ * не RN `animationType="slide"` — иначе затемнение едет вместе с панелью.
  */
 export const SellerStorefrontSheet = ({
   visible,
@@ -26,18 +38,41 @@ export const SellerStorefrontSheet = ({
 }: SellerStorefrontSheetProps) => {
   const styles = useSellerStorefrontSheetStyles();
   const insets = useSafeAreaInsets();
+  const sheetSlideDistance = useMemo(() => Dimensions.get("window").height, []);
+  const { modalVisible, backdropAnimatedStyle, sheetAnimatedStyle, useCssTransition } =
+    useWholesalePriceSheetAnimation(visible, sheetSlideDistance);
+
+  const BackdropContainer = useCssTransition ? View : Animated.View;
+  const SheetContainer = useCssTransition ? View : Animated.View;
+
+  if (!modalVisible) {
+    return null;
+  }
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+    <Modal
+      visible={modalVisible}
+      animationType="none"
+      transparent
+      onRequestClose={onClose}
+    >
       <View style={styles.overlay}>
-        <ModalSheetGradientBackdrop />
+        <BackdropContainer
+          style={[StyleSheet.absoluteFillObject, backdropAnimatedStyle]}
+          pointerEvents="none"
+        >
+          <ModalSheetGradientBackdrop />
+        </BackdropContainer>
         <Pressable
           style={styles.dismiss}
           onPress={onClose}
           accessibilityRole="button"
           accessibilityLabel={closeLabel}
         />
-        <View style={styles.panel} accessibilityViewIsModal>
+        <SheetContainer
+          style={[styles.panel, sheetAnimatedStyle]}
+          accessibilityViewIsModal
+        >
           <View style={styles.header}>
             <Text style={styles.title} accessibilityRole="header">
               {title}
@@ -54,7 +89,7 @@ export const SellerStorefrontSheet = ({
           >
             {children}
           </ScrollView>
-        </View>
+        </SheetContainer>
       </View>
     </Modal>
   );

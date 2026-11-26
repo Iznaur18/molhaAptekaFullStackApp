@@ -71,13 +71,15 @@ test("profile adaptive layout matches web /me breakpoints", () => {
   assert.match(overview, /ProfileMobileNavSheet/);
   assert.match(overview, /MOBILE_NAV_TOGGLE_ARIA|TAB_OVERVIEW/);
   assert.match(overview, /appearance=\{isPhoneLayout \? "phone" : "tablet"\}/);
-  assert.match(overview, /side=\{isPhoneLayout \? "right" : "left"\}/);
+  assert.doesNotMatch(overview, /side=\{/);
 
   assert.match(toggle, /appearance\?:/);
   assert.match(toggle, /"phone" \| "tablet"/);
   assert.match(toggle, /if \(!isDrawerLayout\)/);
   assert.match(toggle, /MOBILE_NAV_TOGGLE_ARIA/);
   assert.match(sheet, /side\?:/);
+  assert.match(sheet, /useProfileAdaptiveLayout/);
+  assert.match(sheet, /isPhoneLayout \? "right" : "left"/);
   assert.match(sheet, /sheetFromLeft/);
   assert.match(menu, /"sidebar"/);
 });

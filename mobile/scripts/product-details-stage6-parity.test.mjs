@@ -59,13 +59,16 @@ test("product details page enter/exit timings match web CSS vars", () => {
   assert.match(screen, /ProductDetailsPageEnterShell/);
 });
 
-test("product details tabs + blocked purchase + stack hide bottom nav", () => {
+test("product details tabs + blocked purchase + stack shows bottom nav overlay", () => {
   const tabs = readMobile("entities/product/model/useProductDetailTabs.ts");
   const purchase = readMobile(
     "features/product-detail/ui/ProductDetailPurchaseActions.tsx",
   );
   const layout = readMobile("app/_layout.tsx");
   const tabsLayout = readMobile("app/(tabs)/_layout.tsx");
+  const screen = readMobile("app/product/[id].tsx");
+  const skeleton = readMobile("features/product-detail/ui/ProductDetailsSkeleton.tsx");
+  const screenLayout = readMobile("shared/lib/productDetailScreenLayout.ts");
 
   assert.match(tabs, /"details"/);
   assert.match(tabs, /"reviews"/);
@@ -77,4 +80,10 @@ test("product details tabs + blocked purchase + stack hide bottom nav", () => {
   assert.match(purchase, /BlockedPurchaseButton/);
   assert.match(layout, /name="product\/\[id\]"/);
   assert.match(tabsLayout, /MobileBottomTabBar/);
+  assert.match(screen, /MobileBottomNavOverlay/);
+  assert.match(screen, /resolveMobileBottomNavLayoutHeight/);
+  assert.match(screen, /dockBottomStyle/);
+  assert.match(skeleton, /resolveMobileBottomNavLayoutHeight/);
+  assert.match(screenLayout, /navOverlayInset/);
+  assert.match(screenLayout, /dockSafe/);
 });

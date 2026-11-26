@@ -53,10 +53,6 @@ export const CartAuctionLine = ({ bid, onCheckout }: CartAuctionLineProps) => {
           <Text style={styles.title} numberOfLines={2}>
             {productName}
           </Text>
-          <View style={styles.priceRow}>
-            <Text style={styles.priceLabel}>{CART_AUCTION_UI.PRICE_LABEL}</Text>
-            <Text style={styles.price}>{formatPriceRub(bid.offerPrice)}</Text>
-          </View>
           {bid.paymentDeadlineAt ? (
             <Text style={styles.meta}>
               {CART_AUCTION_UI.DEADLINE_LABEL}:{" "}
@@ -64,16 +60,13 @@ export const CartAuctionLine = ({ bid, onCheckout }: CartAuctionLineProps) => {
             </Text>
           ) : null}
         </View>
+        <View style={styles.priceBox}>
+          <Text style={styles.price}>{formatPriceRub(bid.offerPrice)}</Text>
+          <Text style={styles.priceCaption}>{CART_AUCTION_UI.PRICE_LABEL}</Text>
+        </View>
       </View>
 
       <View style={styles.actions}>
-        <AppButton
-          label={CART_AUCTION_UI.CHECKOUT}
-          variant="primary"
-          style={styles.checkoutButton}
-          disabled={cancelMutation.isPending}
-          onPress={() => onCheckout(bid)}
-        />
         <Pressable
           style={[
             styles.removeButton,
@@ -88,6 +81,15 @@ export const CartAuctionLine = ({ bid, onCheckout }: CartAuctionLineProps) => {
               : CART_AUCTION_UI.REMOVE}
           </Text>
         </Pressable>
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <AppButton
+            label={CART_AUCTION_UI.CHECKOUT}
+            variant="contrast"
+            style={styles.checkoutButton}
+            disabled={cancelMutation.isPending}
+            onPress={() => onCheckout(bid)}
+          />
+        </View>
       </View>
     </View>
   );

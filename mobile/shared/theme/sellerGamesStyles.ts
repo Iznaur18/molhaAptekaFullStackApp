@@ -7,9 +7,19 @@ import { createThemedStyles } from "@/shared/theme/createThemedStyles";
  * `SellerLuckyBoxSection.css` / `SellerFortuneWheelSection.css` (+ sheet css).
  */
 export const useSellerGamesStyles = createThemedStyles((theme) => ({
+  // Паритет web `.seller-products-page__games` — в один ряд, без лишних margin
+  // (отступы даёт header gap / paddingBottom = screenGap 8).
   gamesRow: {
-    gap: 10,
-    marginTop: 4,
+    flexDirection: "row",
+    alignItems: "stretch",
+    gap: 8,
+  },
+  // Паритет web `.seller-products-page__games > *` — flex: 1 1 0.
+  gameCell: {
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: 0,
+    minWidth: 0,
   },
   // Кнопка-карточка игры (градиент рисуется Svg-подложкой в компоненте).
   toggle: {

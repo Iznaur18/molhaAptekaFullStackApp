@@ -44,14 +44,14 @@
   max-width: 11.5rem;
   min-height: 3.25rem;
   padding: 0.5rem 0.75rem;
-  border: 1.5px solid var(--iz-color-border-strong, var(--iz-color-border));
+  border: 1.5px solid var(--iz-color-surface-muted);
   border-radius: 0.75rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  background: var(--iz-color-surface);
-  box-shadow: 0 1px 3px color-mix(in srgb, var(--iz-color-ink) 10%, transparent);
+  background: var(--iz-color-surface-muted);
+  box-shadow: none;
   color: var(--iz-color-text);
   font: inherit;
   text-align: center;
@@ -68,7 +68,7 @@
 }
 
 .checkout-payment-method-picker__card--selected {
-  background: color-mix(in srgb, var(--iz-color-action) 7%, var(--iz-color-surface));
+  background: var(--iz-color-surface);
   border: 2px solid var(--iz-color-action);
   color: var(--iz-color-text);
 }

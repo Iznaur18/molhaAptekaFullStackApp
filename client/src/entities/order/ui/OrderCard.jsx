@@ -445,25 +445,32 @@ function OrderCardLineItem({
       <div className="order-card__item-body">
         {showPrimary ? (
           <div className="order-card__item-main">
-            {isOrderLineItemProductClickable(item) ? (
-              <button
-                type="button"
-                className="order-card__item-name-button"
-                onClick={() => onProductClick?.(item)}
-              >
-                {productName}
-              </button>
-            ) : (
-              <span className="order-card__item-name">{productName}</span>
-            )}
-            {isCancelled ? (
-              <span className="order-card__item-cancelled-badge">
-                {ORDER_CARD_UI.ITEM_CANCELLED_BADGE}
-              </span>
-            ) : null}
+            <div className="order-card__item-title-row">
+              {isOrderLineItemProductClickable(item) ? (
+                <button
+                  type="button"
+                  className="order-card__item-name-button"
+                  onClick={() => onProductClick?.(item)}
+                >
+                  {productName}
+                </button>
+              ) : (
+                <span className="order-card__item-name">{productName}</span>
+              )}
+              {isCancelled ? (
+                <span className="order-card__item-cancelled-badge">
+                  {ORDER_CARD_UI.ITEM_CANCELLED_BADGE}
+                </span>
+              ) : null}
+              {!compact ? (
+                <>
+                  <span className="order-card__item-quantity">×{item.quantity}</span>
+                  <span className="order-card__item-price">{unitPriceText}</span>
+                </>
+              ) : null}
+            </div>
             {compact ? (
-              // Сумма позиции напротив названия; при нескольких штуках — ещё
-              // «количество × цена за штуку», чтобы было видно, из чего она.
+              // Сумма под названием; при qty>1 — ещё «N × цена/шт».
               <span className="order-card__item-price-block">
                 <span className="order-card__item-price">{lineTotalText}</span>
                 {quantity > 1 ? (
@@ -472,12 +479,7 @@ function OrderCardLineItem({
                   </span>
                 ) : null}
               </span>
-            ) : (
-              <>
-                <span className="order-card__item-quantity">×{item.quantity}</span>
-                <span className="order-card__item-price">{unitPriceText}</span>
-              </>
-            )}
+            ) : null}
           </div>
         ) : null}
         {showSecondary && !compact ? (

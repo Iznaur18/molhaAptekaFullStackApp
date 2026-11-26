@@ -160,6 +160,8 @@ export const CheckoutSheetModal = ({
               isDisabled={isDisabled}
               showHeading={false}
               pinSubmitToBottom
+              fulfillmentCardsLayout
+              fulfillmentPageContentInset={0}
               onSubmit={onSubmit}
             />
           </ScrollView>

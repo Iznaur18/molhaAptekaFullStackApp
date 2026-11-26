@@ -255,7 +255,7 @@ export function SellerFortuneWheelSheet({
                     ? FORTUNE_WHEEL_SECTION_UI.SPINNING
                     : FORTUNE_WHEEL_SECTION_UI.SPIN
                 }
-                hubDisabled={!canSpin || sectorsTotal === 0 || Boolean(playedResult)}
+                hubDisabled={!canSpin || sectorsTotal === 0 || spinning}
                 onHubClick={handleSpin}
                 onSpinEnd={() => {
                   if (spinning && pendingResultRef.current) {
@@ -284,7 +284,12 @@ export function SellerFortuneWheelSheet({
                     <p className="fortune-wheel__result-text">
                       {showWinResult
                         ? winIsProduct
-                          ? FORTUNE_WHEEL_SECTION_UI.WIN_PRODUCT_APPLIES
+                          ? playedResult.cartPrize?.ok === false
+                            ? (playedResult.cartPrize.message ??
+                              FORTUNE_WHEEL_SECTION_UI.CART_PRIZE_ADD_FAILED)
+                            : playedResult.cartPrize?.alreadyInCart
+                              ? FORTUNE_WHEEL_SECTION_UI.WIN_PRODUCT_ALREADY_IN_CART
+                              : FORTUNE_WHEEL_SECTION_UI.WIN_PRODUCT_APPLIES
                           : FORTUNE_WHEEL_SECTION_UI.WIN_APPLIES
                         : FORTUNE_WHEEL_SECTION_UI.EMPTY_HINT}
                     </p>

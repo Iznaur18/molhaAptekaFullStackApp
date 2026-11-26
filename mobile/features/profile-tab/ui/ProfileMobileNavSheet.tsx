@@ -16,6 +16,7 @@ import {
   type ProfileSectionId,
 } from "@/features/profile-hub/model/profileSections";
 import { MY_PROFILE_PAGE_UI } from "@/shared/config";
+import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import {
   PROFILE_MOBILE_NAV_SHEET_ANIMATION,
   useProfileMobileNavSheetStyles,
@@ -27,7 +28,10 @@ type ProfileMobileNavSheetProps = {
   activeSectionId: ProfileSectionId;
   onClose: () => void;
   onOverviewPress: () => void;
-  /** phone: справа; tablet drawer: слева (web ≤900 / ≤640). */
+  /**
+   * Override. По умолчанию как web: phone ≤640 справа, tablet drawer слева.
+   * Не передавать с страниц — иначе меню прыгает left/right между разделами.
+   */
   side?: "left" | "right";
 };
 
@@ -38,10 +42,12 @@ export const ProfileMobileNavSheet = ({
   activeSectionId,
   onClose,
   onOverviewPress,
-  side = "right",
+  side: sideProp,
 }: ProfileMobileNavSheetProps) => {
   const insets = useSafeAreaInsets();
   const styles = useProfileMobileNavSheetStyles();
+  const { isPhoneLayout } = useProfileAdaptiveLayout();
+  const side = sideProp ?? (isPhoneLayout ? "right" : "left");
   const [modalVisible, setModalVisible] = useState(visible);
   const closedOffset = side === "left" ? -slideDistance : slideDistance;
   const sheetTranslateX = useSharedValue(closedOffset);

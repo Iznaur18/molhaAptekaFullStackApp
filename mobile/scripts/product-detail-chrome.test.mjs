@@ -88,14 +88,27 @@ test("split wide product detail tabs drop root margin (parent gap only)", () => 
   );
 });
 
-test("web mobile bottom nav hidden while product details modal is open", () => {
+test("web mobile bottom nav: hide modal only, show on product details page", () => {
   const navCss = readFile(
     CLIENT_ROOT,
     "src/widgets/mobile-bottom-nav/ui/MobileBottomNav.css",
   );
+  const pageCss = readFile(
+    CLIENT_ROOT,
+    "src/pages/product-details/ui/ProductDetailsPage.css",
+  );
 
-  assert.match(navCss, /body:has\(\.product-details-modal\)\s+\.mobile-bottom-nav/);
-  assert.match(navCss, /display:\s*none/);
+  assert.match(
+    navCss,
+    /body:has\(\.product-details-modal\):not\(:has\(\.product-details-page\)\)\s+\.mobile-bottom-nav/,
+  );
+  assert.match(navCss, /body:has\(\.product-details-page\)\s+\.mobile-bottom-nav/);
+  assert.match(navCss, /z-index:\s*calc\(var\(--iz-z-modal\)\s*\+\s*20\)/);
+  assert.match(pageCss, /--product-details-page-bottom-nav-clearance/);
+  assert.doesNotMatch(
+    pageCss,
+    /body:has\(\.product-details-page\)\s+\.mobile-bottom-nav\s*\{[^}]*display:\s*none/,
+  );
 });
 
 test("web product details modal uses full viewport and dock without nav offset", () => {

@@ -23,6 +23,10 @@
   background: var(--iz-color-surface-elevated);
 }
 
+.cart-fulfillment__payment {
+  background: var(--iz-color-surface);
+}
+
 .cart-fulfillment__payment .checkout-payment-method-picker {
   margin-top: 0;
 }
@@ -41,7 +45,11 @@
   background: var(--iz-color-surface-elevated);
 }
 
-.cart-fulfillment__details .checkout-form__fulfillment-section--pickup,
+.cart-fulfillment__details .checkout-form__fulfillment-section--pickup {
+  background: var(--iz-color-surface);
+  border-color: color-mix(in srgb, var(--iz-color-action) 18%, transparent);
+}
+
 .cart-fulfillment__details .checkout-form__fulfillment-section--delivery {
   background: color-mix(
     in srgb,
@@ -61,6 +69,9 @@
 .cart-fulfillment__details
   .checkout-form__fulfillment-section
   .saved-address-picker__list--carousel,
+.cart-fulfillment__details
+  .checkout-form__fulfillment-section
+  .checkout-form__pickup-groups--carousel,
 .cart-fulfillment__payment .checkout-payment-method-picker__scroll {
   width: auto;
   max-width: none;

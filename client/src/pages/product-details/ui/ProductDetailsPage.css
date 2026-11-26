@@ -22,6 +22,12 @@
   max-width: var(--app-shell-max-width, 60rem);
   margin-inline: auto;
   padding-top: env(safe-area-inset-top, 0px);
+  /* Clearance под floating bottom nav (safe-area внутри clearance). */
+  --product-details-page-bottom-nav-clearance: calc(
+    var(--app-shell-mobile-bottom-nav-height, 3.6rem) + 0.125rem +
+      max(0.75rem, env(safe-area-inset-bottom, 0px))
+  );
+  padding-bottom: var(--product-details-page-bottom-nav-clearance);
   overflow: hidden;
   overscroll-behavior-x: none;
   overscroll-behavior-y: none;
@@ -159,7 +165,8 @@
 
 .product-details-modal--page:not(.product-details-modal--mobile-dock-active)
   .product-details-modal__tab-panel {
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--iz-space-4));
+  /* Safe-area уходит в page bottom-nav clearance. */
+  padding-bottom: var(--iz-space-4);
 }
 
 /* App layout: квадрат сверху, цена/бейджи/описание — строго под ним. */
@@ -455,17 +462,16 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem var(--product-details-page-inline-padding)
-    calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  padding: 0.75rem var(--product-details-page-inline-padding);
 }
 
-/* Flex-sibling у низа fixed-страницы; бар тянется в home-indicator. */
+/* Flex-sibling у низа fixed-страницы; над bottom nav (safe в page clearance). */
 .product-details-page__docked-footer {
   flex-shrink: 0;
   z-index: 20;
   box-sizing: border-box;
   width: 100%;
-  padding: 0.55rem var(--iz-space-3) max(0.65rem, env(safe-area-inset-bottom, 0px));
+  padding: 0.55rem var(--iz-space-3) 0.65rem;
   border-top: 1px solid var(--iz-color-border);
   background: color-mix(in srgb, var(--iz-color-surface) 94%, transparent);
   backdrop-filter: blur(12px);
@@ -520,7 +526,7 @@
   position: fixed;
   left: 0;
   right: 0;
-  bottom: env(safe-area-inset-bottom, 0px);
+  bottom: var(--product-details-page-bottom-nav-clearance);
   z-index: 30;
   box-sizing: border-box;
   width: 100%;
@@ -550,8 +556,7 @@
   border-radius: 0.7rem;
 }
 
-body:has(.product-details-page) .app-shell__header,
-body:has(.product-details-page) .mobile-bottom-nav {
+body:has(.product-details-page) .app-shell__header {
   display: none;
 }
 

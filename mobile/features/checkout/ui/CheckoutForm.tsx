@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   Alert,
   Pressable,
+  ScrollView,
   Text,
   TextInput,
   View,
@@ -43,6 +44,7 @@ import {
   type CheckoutProductPickupGroup,
 } from "@/entities/cart/lib/buildCheckoutPickupLocations";
 import { CHECKOUT_FORM_UI } from "@/shared/config";
+import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useCheckoutFormStyles } from "@/shared/theme/formChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
@@ -165,6 +167,10 @@ type CheckoutFormProps = {
    */
   fulfillmentCardsLayout?: boolean;
   /**
+   * web `--cart-page-content-inset`: 12 на странице корзины, 0 в checkout sheet.
+   */
+  fulfillmentPageContentInset?: number;
+  /**
    * Форма на странице корзины: своей кнопки, сообщений и цены доставки не
    * рисует — всё уходит в итог, который рисует этот рендер.
    */
@@ -213,6 +219,7 @@ export const CheckoutForm = ({
   showHeading = true,
   pinSubmitToBottom = false,
   fulfillmentCardsLayout = false,
+  fulfillmentPageContentInset = 12,
   renderFooter,
   fieldsStyle,
   onSubmit,
@@ -596,13 +603,18 @@ export const CheckoutForm = ({
     ) : null;
 
   const fulfillmentMethodBlock = (
-    <>
+    <View
+      style={checkoutStyles.fulfillmentMethodInner}
+      accessibilityRole="radiogroup"
+      accessibilityLabel={CHECKOUT_FORM_UI.LABEL_FULFILLMENT}
+    >
       <Text style={checkoutStyles.fieldLabel}>
         {CHECKOUT_FORM_UI.LABEL_FULFILLMENT}
       </Text>
       <View style={checkoutStyles.fulfillmentRow}>
         <Pressable
           disabled={isDisabled || isSubmitting}
+          accessibilityRole="radio"
           accessibilityState={{
             disabled: !pickupSelectable || isDisabled || isSubmitting,
             checked: isPickup,
@@ -636,6 +648,7 @@ export const CheckoutForm = ({
         </Pressable>
         <Pressable
           disabled={isDisabled || isSubmitting}
+          accessibilityRole="radio"
           accessibilityState={{
             disabled: !deliverySelectable || isDisabled || isSubmitting,
             checked: !isPickup,
@@ -668,7 +681,7 @@ export const CheckoutForm = ({
           </Text>
         </Pressable>
       </View>
-    </>
+    </View>
   );
 
   const fulfillmentDetailsBlock = isPickup ? (
@@ -699,8 +712,9 @@ export const CheckoutForm = ({
                 {CHECKOUT_FORM_UI.PICKUP_MULTI_HINT}
               </Text>
             ) : null}
-            <View style={checkoutStyles.pickupList}>
-              {pickupGroups.map((group) => {
+            {(() => {
+              const pickupCarousel = pickupGroups.length > 1;
+              const pickupCards = pickupGroups.map((group) => {
                 const needsSelect = group.locations.length >= 2;
                 const selectedId =
                   selectedPickupByProductId[group.productId] ??
@@ -708,9 +722,18 @@ export const CheckoutForm = ({
                   group.locations[0]?.id;
 
                 return (
-                  <View key={group.productId} style={checkoutStyles.pickupGroup}>
+                  <View
+                    key={group.productId}
+                    style={[
+                      checkoutStyles.pickupGroup,
+                      pickupCarousel && checkoutStyles.pickupGroupCarousel,
+                    ]}
+                  >
                     {showPickupTitles && group.productTitle ? (
-                      <Text style={checkoutStyles.pickupProducts}>
+                      <Text
+                        style={checkoutStyles.pickupProducts}
+                        numberOfLines={pickupCarousel ? 2 : undefined}
+                      >
                         {group.productTitle}
                       </Text>
                     ) : null}
@@ -744,7 +767,10 @@ export const CheckoutForm = ({
                                     {location.label}
                                   </Text>
                                 ) : null}
-                                <Text style={checkoutStyles.pickupAddressText}>
+                                <Text
+                                  style={checkoutStyles.pickupAddressText}
+                                  numberOfLines={pickupCarousel ? 3 : undefined}
+                                >
                                   {location.address}
                                 </Text>
                               </Pressable>
@@ -753,14 +779,31 @@ export const CheckoutForm = ({
                         </View>
                       </>
                     ) : (
-                      <Text style={checkoutStyles.pickupAddressText}>
+                      <Text
+                        style={checkoutStyles.pickupAddressText}
+                        numberOfLines={pickupCarousel ? 3 : undefined}
+                      >
                         {group.locations[0]?.address}
                       </Text>
                     )}
                   </View>
                 );
-              })}
-            </View>
+              });
+
+              return pickupCarousel ? (
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={checkoutStyles.pickupListCarousel}
+                  accessibilityRole="list"
+                  {...nestedHorizontalScrollProps}
+                >
+                  {pickupCards}
+                </ScrollView>
+              ) : (
+                <View style={checkoutStyles.pickupList}>{pickupCards}</View>
+              );
+            })()}
           </>
         ) : (
           <Text
@@ -913,7 +956,13 @@ export const CheckoutForm = ({
     );
 
   return (
-    <View style={[checkoutStyles.form, pinSubmitToBottom && checkoutStyles.formPinned]}>
+    <View
+      style={[
+        checkoutStyles.form,
+        fulfillmentCardsLayout && checkoutStyles.formCardsLayout,
+        pinSubmitToBottom && checkoutStyles.formPinned,
+      ]}
+    >
       <View
         style={[
           fulfillmentCardsLayout
@@ -927,7 +976,12 @@ export const CheckoutForm = ({
         ) : null}
 
         {fulfillmentCardsLayout ? (
-          <View style={checkoutStyles.fulfillmentMethodCard}>
+          <View
+            style={[
+              checkoutStyles.fulfillmentMethodCard,
+              { marginHorizontal: fulfillmentPageContentInset },
+            ]}
+          >
             {fulfillmentMethodBlock}
           </View>
         ) : (
@@ -935,7 +989,12 @@ export const CheckoutForm = ({
         )}
 
         {fulfillmentCardsLayout ? (
-          <View style={checkoutStyles.fulfillmentDetailsCard}>
+          <View
+            style={[
+              checkoutStyles.fulfillmentDetailsCard,
+              { marginHorizontal: fulfillmentPageContentInset },
+            ]}
+          >
             {fulfillmentDetailsBlock}
           </View>
         ) : (
@@ -944,7 +1003,12 @@ export const CheckoutForm = ({
 
         {paymentMethodBlock ? (
           fulfillmentCardsLayout ? (
-            <View style={checkoutStyles.fulfillmentPaymentCard}>
+            <View
+              style={[
+                checkoutStyles.fulfillmentPaymentCard,
+                { marginHorizontal: fulfillmentPageContentInset },
+              ]}
+            >
               {paymentMethodBlock}
             </View>
           ) : (

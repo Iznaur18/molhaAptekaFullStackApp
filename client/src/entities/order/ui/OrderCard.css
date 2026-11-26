@@ -268,7 +268,7 @@
   padding: 0.65rem 0.75rem;
   border: 1px solid var(--iz-color-border);
   border-radius: 16px;
-  background: var(--iz-color-bg-subtle, transparent);
+  background: transparent;
   overflow: visible;
 }
 
@@ -436,9 +436,19 @@
 
 .order-card__item-main {
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.order-card__item-title-row {
+  display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.2rem 0.45rem;
+  width: 100%;
+  min-width: 0;
 }
 
 .order-card__item-name {
@@ -479,13 +489,12 @@
   white-space: nowrap;
 }
 
-/* Компактная карточка: сумма позиции справа от названия. */
+/* Компактная карточка: сумма позиции под названием. */
 .order-card__item-price-block {
   display: inline-flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   flex-shrink: 0;
-  margin-left: auto;
   line-height: 1.2;
   font-variant-numeric: tabular-nums;
 }

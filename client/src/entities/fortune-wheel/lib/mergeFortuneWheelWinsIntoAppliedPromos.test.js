@@ -2,8 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import { mergeFortuneWheelWinsIntoAppliedPromos } from "./mergeFortuneWheelWinsIntoAppliedPromos.js";
 
-const product = (id, sellerId) => ({
+const product = (id, sellerId, productPrice = 100) => ({
   _id: id,
+  productPrice,
   productSeller: sellerId ? { _id: sellerId } : null,
 });
 
@@ -15,29 +16,29 @@ describe("mergeFortuneWheelWinsIntoAppliedPromos", () => {
     ).toEqual(promos);
   });
 
-  it("добавляет выигрыш на товары своего продавца", () => {
+  it("скидка только на самый дорогой товар продавца", () => {
     const result = mergeFortuneWheelWinsIntoAppliedPromos(
       [],
       [{ sellerId: "s1", discountPercent: 15 }],
-      [product("p1", "s1"), product("p2", "s2")],
+      [product("p1", "s1", 100), product("p2", "s1", 500), product("p3", "s2", 900)],
     );
     expect(result).toEqual([
-      { productId: "p1", code: "FORTUNEWHEEL", discountPercent: 15 },
+      { productId: "p2", code: "FORTUNEWHEEL", discountPercent: 15 },
     ]);
   });
 
-  it("перебивает слабый промо и не трогает более сильный", () => {
+  it("перебивает слабый промо на целевом товаре", () => {
     const result = mergeFortuneWheelWinsIntoAppliedPromos(
       [
-        { productId: "p1", code: "SALE", discountPercent: 5 },
-        { productId: "p2", code: "BIG", discountPercent: 50 },
+        { productId: "p2", code: "SALE", discountPercent: 5 },
+        { productId: "p1", code: "BIG", discountPercent: 50 },
       ],
       [{ sellerId: "s1", discountPercent: 15 }],
-      [product("p1", "s1"), product("p2", "s1")],
+      [product("p1", "s1", 100), product("p2", "s1", 900)],
     );
     expect(result).toEqual([
-      { productId: "p1", code: "FORTUNEWHEEL", discountPercent: 15 },
-      { productId: "p2", code: "BIG", discountPercent: 50 },
+      { productId: "p2", code: "FORTUNEWHEEL", discountPercent: 15 },
+      { productId: "p1", code: "BIG", discountPercent: 50 },
     ]);
   });
 
@@ -48,7 +49,7 @@ describe("mergeFortuneWheelWinsIntoAppliedPromos", () => {
         { sellerId: "s1", discountPercent: 10 },
         { sellerId: "s1", discountPercent: 30 },
       ],
-      [product("p1", "s1")],
+      [product("p1", "s1", 200)],
     );
     expect(result).toEqual([
       { productId: "p1", code: "FORTUNEWHEEL", discountPercent: 30 },
@@ -68,7 +69,7 @@ describe("mergeFortuneWheelWinsIntoAppliedPromos", () => {
     const result = mergeFortuneWheelWinsIntoAppliedPromos(
       [],
       [{ sellerId: "s1", discountPercent: 25, prizeProductId: "p9" }],
-      [product("p1", "s1")],
+      [product("p1", "s1", 100)],
     );
     expect(result).toEqual([]);
   });
