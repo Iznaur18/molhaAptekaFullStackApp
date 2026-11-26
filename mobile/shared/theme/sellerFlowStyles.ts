@@ -713,6 +713,8 @@ export const useSellerProductsPageStyles = createThemedStyles((theme, layout) =>
   header: {
     gap: L.screenGap,
     paddingTop: L.screenPaddingTop,
+    // Паритет web `.seller-products-page` gap после header → сетка товаров.
+    paddingBottom: L.screenGap,
   },
   sellerMetaZone: {
     flexDirection: "row",

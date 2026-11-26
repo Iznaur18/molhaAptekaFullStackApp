@@ -1,5 +1,5 @@
 import SlidersHorizontal from "lucide-react-native/icons/sliders-horizontal";
-import { Pressable } from "react-native";
+import { Platform, Pressable, type ViewStyle } from "react-native";
 
 import { HOME_PAGE_UI } from "@/shared/config/homePageUi";
 import {
@@ -23,11 +23,12 @@ const useHomeCatalogFiltersButtonStyles = createThemedStyles((theme) => ({
     borderWidth: HOME_CATALOG_HEADER_CIRCLE_BUTTON_BORDER_WIDTH,
     borderColor: "transparent",
     backgroundColor: theme.colors.action,
-    shadowColor: theme.colors.action,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.55,
-    shadowRadius: 10,
-    elevation: 4,
+    shadowColor: "transparent",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
+    ...(Platform.OS === "web" ? ({ boxShadow: "none" } as unknown as ViewStyle) : null),
   },
 }));
 

@@ -243,10 +243,14 @@ export const SellerFortuneWheelGame = ({
     revealedResult?.prize?.expiresAt ?? todaySpin?.winExpiresAt ?? null;
 
   return (
-    <>
+    <View style={styles.gameCell}>
       <Pressable
         style={({ pressed }) => [styles.toggle, pressed && styles.togglePressed]}
-        onPress={() => setSheetOpen(true)}
+        onPress={() => {
+          setRevealedResult(null);
+          setLocalError("");
+          setSheetOpen(true);
+        }}
         accessibilityRole="button"
         accessibilityLabel={UI.TITLE}
       >
@@ -291,7 +295,9 @@ export const SellerFortuneWheelGame = ({
               spinning={spinning}
               landedIndex={spinning ? null : landedIndex}
               hubLabel={spinning ? UI.SPINNING : UI.SPIN}
-              hubDisabled={!canSpin || sectors.length === 0 || Boolean(playedResult)}
+              // canSpin с сервера (в development — без дневного лимита):
+              // не блокируем хаб из-за локального playedResult.
+              hubDisabled={!canSpin || sectors.length === 0 || spinning}
               onHubPress={() => void handleSpin()}
             />
 
@@ -310,7 +316,11 @@ export const SellerFortuneWheelGame = ({
                   <Text style={styles.resultText}>
                     {showWinResult
                       ? winIsProduct
-                        ? UI.WIN_PRODUCT_APPLIES
+                        ? playedResult?.cartPrize?.ok === false
+                          ? (playedResult.cartPrize.message ?? UI.CART_PRIZE_ADD_FAILED)
+                          : playedResult?.cartPrize?.alreadyInCart
+                            ? UI.WIN_PRODUCT_ALREADY_IN_CART
+                            : UI.WIN_PRODUCT_APPLIES
                         : UI.WIN_APPLIES
                       : UI.EMPTY_HINT}
                   </Text>
@@ -355,6 +365,6 @@ export const SellerFortuneWheelGame = ({
           </>
         )}
       </SellerStorefrontSheet>
-    </>
+    </View>
   );
 };

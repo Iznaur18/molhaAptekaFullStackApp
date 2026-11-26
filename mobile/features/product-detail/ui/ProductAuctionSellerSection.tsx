@@ -10,9 +10,9 @@ import {
   useSellerProductPriceOffersQuery,
 } from "@/entities/product-price-offer/model/useSellerProductPriceOffersQuery";
 import { AuctionDashboardRowBuyerMeta } from "@/entities/product-price-offer/ui/AuctionDashboardRowBuyerMeta";
+import { AuctionDashboardRowPrice } from "@/entities/product-price-offer/ui/AuctionDashboardRowPrice";
 import { AuctionDashboardSellerActions } from "@/entities/product-price-offer/ui/AuctionDashboardSellerActions";
 import { AUCTION_PAGE_UI, PRODUCT_PRICE_OFFER_UI } from "@/shared/config";
-import { formatPriceRub } from "@/shared/lib";
 import { useAuctionDashboardRowStyles } from "@/shared/theme/auctionPageStyles";
 import { useProductPriceOfferStyles } from "@/shared/theme/catalogProductStyles";
 
@@ -56,15 +56,19 @@ const SellerOfferRow = ({
   const rowStyles = useAuctionDashboardRowStyles();
   return (
     <View style={rowStyles.row}>
-      <AuctionDashboardRowBuyerMeta
-        buyer={resolveBuyer(offer)}
-        createdAt={date}
-        onBuyerClick={onBuyerClick}
-      />
-      {statusText ? <Text style={rowStyles.meta}>{statusText}</Text> : null}
-      <View style={rowStyles.priceStrip}>
-        <Text style={rowStyles.priceLabel}>{AUCTION_PAGE_UI.BID_PRICE_LABEL}</Text>
-        <Text style={rowStyles.price}>{formatPriceRub(offer.offerPrice)}</Text>
+      <View style={rowStyles.head}>
+        <View style={rowStyles.main}>
+          <AuctionDashboardRowBuyerMeta
+            buyer={resolveBuyer(offer)}
+            createdAt={date}
+            onBuyerClick={onBuyerClick}
+          />
+          {statusText ? <Text style={rowStyles.meta}>{statusText}</Text> : null}
+        </View>
+        <AuctionDashboardRowPrice
+          price={offer.offerPrice}
+          caption={AUCTION_PAGE_UI.PRICE_CAPTION_INCOMING}
+        />
       </View>
       {children}
     </View>

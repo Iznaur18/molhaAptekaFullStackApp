@@ -3,13 +3,20 @@ import { Text, View } from "react-native";
 
 import { useAuctionDashboardRowStyles } from "@/shared/theme/auctionPageStyles";
 
+export type AuctionDashboardRowStatusTone = "neutral" | "attention" | "success";
+
 type AuctionDashboardRowStatusProps = {
+  tone?: AuctionDashboardRowStatusTone;
+  /** @deprecated используйте tone */
   isPending?: boolean;
+  /** @deprecated используйте tone */
   isAccepted?: boolean;
   children: ReactNode;
 };
 
+/** Паритет web `AuctionDashboardRowStatus` (tone: neutral | attention | success). */
 export const AuctionDashboardRowStatus = ({
+  tone,
   isPending = false,
   isAccepted = false,
   children,
@@ -20,19 +27,24 @@ export const AuctionDashboardRowStatus = ({
     return null;
   }
 
+  const resolvedTone: AuctionDashboardRowStatusTone =
+    tone ?? (isAccepted ? "success" : isPending ? "attention" : "neutral");
+
   return (
     <View
       style={[
         styles.statusPill,
-        isPending ? styles.statusPillPending : null,
-        isAccepted ? styles.statusPillAccepted : null,
+        resolvedTone === "neutral" ? styles.statusPillNeutral : null,
+        resolvedTone === "attention" ? styles.statusPillAttention : null,
+        resolvedTone === "success" ? styles.statusPillSuccess : null,
       ]}
     >
       <Text
         style={[
           styles.statusPillText,
-          isPending ? styles.statusPillTextPending : null,
-          isAccepted ? styles.statusPillTextAccepted : null,
+          resolvedTone === "neutral" ? styles.statusPillTextNeutral : null,
+          resolvedTone === "attention" ? styles.statusPillTextAttention : null,
+          resolvedTone === "success" ? styles.statusPillTextSuccess : null,
         ]}
       >
         {children}

@@ -24,6 +24,11 @@ export type FortuneWheelSpin = {
   result: "win" | "empty";
   prize?: FortuneWheelPrize | null;
   winExpiresAt?: string | null;
+  /** Сервер положил товар-приз в корзину (или объяснил, почему нет). */
+  cartPrize?:
+    | { ok: true; alreadyInCart: boolean }
+    | { ok: false; message: string }
+    | null;
 };
 
 export type FortuneWheelActiveWin = {

@@ -9,7 +9,6 @@ import {
   RAFFLE_REVEAL_BUTTON_BORDER_RADIUS,
   useRaffleFeaturedSectionStyles,
 } from "@/shared/theme/raffleFeaturedStyles";
-import { SquircleView } from "@/shared/ui/SquircleView";
 
 type HomeFeaturedRafflesRevealButtonProps = {
   onPress: () => void;
@@ -33,9 +32,12 @@ export const HomeFeaturedRafflesRevealButton = ({
       accessibilityRole="button"
       accessibilityLabel={label}
     >
-      <SquircleView
-        radius={RAFFLE_REVEAL_BUTTON_BORDER_RADIUS}
-        style={styles.revealButton}
+      {/* Pill radius + round corners — паритет web `corner-shape: round`. */}
+      <View
+        style={[
+          styles.revealButton,
+          { borderRadius: RAFFLE_REVEAL_BUTTON_BORDER_RADIUS },
+        ]}
       >
         <RaffleRevealButtonGradient />
         <View style={styles.revealLabel}>
@@ -43,7 +45,7 @@ export const HomeFeaturedRafflesRevealButton = ({
           <Text style={styles.revealButtonText}>{label}</Text>
         </View>
         <ChevronRight size={18} color={iconColor} style={styles.revealChevron} />
-      </SquircleView>
+      </View>
     </Pressable>
   );
 };

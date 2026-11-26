@@ -159,8 +159,9 @@ export const HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_RIGHT = 36;
 export const HOME_CATALOG_HEADER_SEARCH_INPUT_BORDER_RADIUS = 14;
 export const HOME_CATALOG_HEADER_SEARCH_INPUT_FONT_SIZE = 15.2;
 
-/** Кнопки у поиска на сайте v2: 2.75rem, radius 14px, не круг. */
-export const HOME_CATALOG_HEADER_CTA_BUTTON_RADIUS = 14;
+/** Кнопки у поиска — полный круг (`size / 2` ≡ `border-radius: 50%`). */
+export const HOME_CATALOG_HEADER_CTA_BUTTON_RADIUS =
+  HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE / 2;
 
 type ScreenSafeAreaInsets = {
   left?: number;

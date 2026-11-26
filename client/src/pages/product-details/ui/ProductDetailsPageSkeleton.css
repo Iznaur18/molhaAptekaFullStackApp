@@ -155,7 +155,7 @@
   flex-shrink: 0;
   box-sizing: border-box;
   width: 100%;
-  padding: 0.55rem var(--iz-space-3) calc(0.65rem + env(safe-area-inset-bottom, 0px));
+  padding: 0.55rem var(--iz-space-3) 0.65rem;
   border-top: 1px solid var(--iz-color-border);
   background: color-mix(in srgb, var(--iz-color-surface) 94%, transparent);
 }

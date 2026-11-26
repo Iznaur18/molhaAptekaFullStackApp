@@ -2,6 +2,7 @@ import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { MY_ORDERS_PAGE_UI } from "@/shared/config";
+import { resolveMobileBottomNavLayoutHeight } from "@/shared/lib/mobileBottomNavLayout";
 import {
   PRODUCT_DETAIL_PURCHASE_DOCK_BOTTOM_INSET,
   PRODUCT_DETAIL_PURCHASE_DOCK_INSET,
@@ -99,6 +100,7 @@ const useStyles = createThemedStyles((theme, layout) => ({
 export const ProductDetailsSkeleton = () => {
   const styles = useStyles();
   const insets = useSafeAreaInsets();
+  const navOverlayInset = resolveMobileBottomNavLayoutHeight(insets.bottom);
 
   return (
     <View
@@ -130,7 +132,7 @@ export const ProductDetailsSkeleton = () => {
         style={[
           styles.dock,
           styles.dockInner,
-          { paddingBottom: Math.max(insets.bottom, 10.4) },
+          { bottom: navOverlayInset, paddingBottom: 10.4 },
         ]}
         importantForAccessibility="no-hide-descendants"
       >

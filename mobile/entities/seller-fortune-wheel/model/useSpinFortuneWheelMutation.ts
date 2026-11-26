@@ -1,5 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { cartQueryKeys } from "@/shared/api";
+
 import { spinFortuneWheel } from "../api/fortuneWheelApi";
 import { fortuneWheelQueryKeys } from "./fortuneWheelQueryKeys";
 
@@ -12,8 +14,11 @@ export function useSpinFortuneWheelMutation({ sellerId }: { sellerId: string }) 
   const id = String(sellerId ?? "").trim();
   return useMutation({
     mutationFn: () => spinFortuneWheel(id),
-    onSuccess: () => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: fortuneWheelQueryKeys.myWins() });
+      if (result?.prize?.prizeProductId) {
+        queryClient.invalidateQueries({ queryKey: cartQueryKeys.all });
+      }
     },
   });
 }

@@ -275,23 +275,27 @@ export const ProductAuctionTab = ({
           />
           {myOffer?.status === PRICE_OFFER_STATUS_PENDING || !showDockPrimaryAction ? (
             <View style={styles.actions}>
-              {!showDockPrimaryAction ? (
-                <AppButton
-                  label={offerSubmitLabel}
-                  variant="contrast"
-                  onPress={() => void handleSubmitOffer()}
-                  disabled={isBusy}
-                  style={styles.inlinePrimaryButton}
-                />
-              ) : null}
               {myOffer?.status === PRICE_OFFER_STATUS_PENDING ? (
-                <AppButton
-                  label={PRODUCT_PRICE_OFFER_UI.CANCEL}
-                  variant="cancel"
-                  onPress={() => void handleCancel()}
-                  disabled={isBusy}
-                  style={styles.inlinePrimaryButton}
-                />
+                <View style={styles.actionSlot}>
+                  <AppButton
+                    label={PRODUCT_PRICE_OFFER_UI.CANCEL}
+                    variant="cancel"
+                    onPress={() => void handleCancel()}
+                    disabled={isBusy}
+                    style={styles.inlinePrimaryButton}
+                  />
+                </View>
+              ) : null}
+              {!showDockPrimaryAction ? (
+                <View style={styles.actionSlot}>
+                  <AppButton
+                    label={offerSubmitLabel}
+                    variant="contrast"
+                    onPress={() => void handleSubmitOffer()}
+                    disabled={isBusy}
+                    style={styles.inlinePrimaryButton}
+                  />
+                </View>
               ) : null}
             </View>
           ) : null}

@@ -96,6 +96,7 @@ import {
   resolveProductUnitPriceWithPromo,
   resolveBuyNFreeLineTotal,
   isProductBuyNFreeActive,
+  pickMostExpensiveProductIdBySeller,
 } from "@izibuy/shared-lib";
 import { resolveSelectedProductPickupLocation } from "../product/productPickupLocations.js";
 
@@ -1078,9 +1079,8 @@ export async function createOrder({
     };
   }
 
-  // Выигрыши игр («Коробки удачи», «Колесо фортуны»): скидка применяется
-  // автоматически, без промокода. Берём лучший активный выигрыш на продавца
-  // из обеих игр и перебиваем им обычный промо только там, где процент выше.
+  // Выигрыши игр («Коробки удачи», «Колесо фортуны»): скидка без промокода.
+  // Лучший % на продавца → только на 1 самый дорогой товар этого продавца.
   /** @type {import("mongoose").Types.ObjectId[]} */
   const luckyBoxWinIdsToMark = [];
   /** @type {import("mongoose").Types.ObjectId[]} */
@@ -1114,11 +1114,17 @@ export async function createOrder({
         }
       }
     }
+    const targetProductIdBySeller = pickMostExpensiveProductIdBySeller(
+      uniqueProductIds.map((productId) => ({
+        productId,
+        sellerId: String(productById[productId]?.sellerId ?? ""),
+        productPrice: Number(productById[productId]?.price) || 0,
+      })),
+    );
     const winAppliedSellerIds = new Set();
-    for (const productId of uniqueProductIds) {
-      const winSellerId = String(productById[productId]?.sellerId ?? "");
-      const best = winSellerId ? bestWinBySellerId[winSellerId] : null;
-      if (!best) {
+    for (const [winSellerId, best] of Object.entries(bestWinBySellerId)) {
+      const productId = targetProductIdBySeller.get(winSellerId);
+      if (!productId) {
         continue;
       }
       const currentPromo = promoByProductId[productId];
@@ -1133,8 +1139,8 @@ export async function createOrder({
         winAppliedSellerIds.add(winSellerId);
       }
     }
-    // Выигрыш расходуем только если он реально применился хотя бы к одной
-    // позиции заказа (обычный промо оказался слабее или отсутствовал).
+    // Выигрыш расходуем, если скидка легла на целевой товар (даже если у
+    // продавца в заказе ещё были другие позиции без этой скидки).
     for (const winSellerId of winAppliedSellerIds) {
       const best = bestWinBySellerId[winSellerId];
       if (best.source === "fortuneWheel") {

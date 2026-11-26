@@ -13,7 +13,6 @@ import { useCartActions } from "@/entities/cart/model/useCartActions";
 import { resolveProductImageUrl } from "@/entities/product/lib/resolveProductImageUrl";
 import { getProductCartQuantityLimit } from "@/entities/product/lib/getProductPurchaseLimit";
 import {
-  CART_LINE_CARD_BORDER_RADIUS,
   CART_PAGE_UI,
   FORTUNE_WHEEL_SECTION_UI,
   LUCKY_BOX_SECTION_UI,
@@ -25,7 +24,6 @@ import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useCartLineItemStyles } from "@/shared/theme/commerceScreenStyles";
 import { AppCheckbox } from "@/shared/ui/AppCheckbox";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
-import { SquircleView } from "@/shared/ui/SquircleView";
 
 import type { CartLine } from "../lib/selectCartLines";
 
@@ -107,7 +105,7 @@ export const CartLineItem = ({
 
   return (
     <View style={[styles.rowOuter, isUpdating && styles.rowUpdating]}>
-      <SquircleView radius={CART_LINE_CARD_BORDER_RADIUS} style={styles.row}>
+      <View style={styles.row}>
         <View style={styles.mainRow}>
           <Pressable
             style={styles.imageWrap}
@@ -200,7 +198,7 @@ export const CartLineItem = ({
 
           <Text style={styles.lineTotal}>{lineTotalText}</Text>
         </View>
-      </SquircleView>
+      </View>
 
       <AppCheckbox
         checked={selected}

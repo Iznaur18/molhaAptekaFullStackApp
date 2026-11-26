@@ -258,7 +258,12 @@ export function SellerLuckyBoxSheet({
                     <p className="lucky-box__result-text">
                       {showWinResult
                         ? winIsProduct
-                          ? LUCKY_BOX_SECTION_UI.WIN_PRODUCT_APPLIES
+                          ? lastPlay.cartPrize?.ok === false
+                            ? (lastPlay.cartPrize.message ??
+                              LUCKY_BOX_SECTION_UI.CART_PRIZE_ADD_FAILED)
+                            : lastPlay.cartPrize?.alreadyInCart
+                              ? LUCKY_BOX_SECTION_UI.WIN_PRODUCT_ALREADY_IN_CART
+                              : LUCKY_BOX_SECTION_UI.WIN_PRODUCT_APPLIES
                           : lastPlay.winExpiresAt || lastPlay.prize?.expiresAt
                             ? LUCKY_BOX_SECTION_UI.WIN_APPLIES
                             : LUCKY_BOX_SECTION_UI.ACTIVE_WIN_NOTICE(

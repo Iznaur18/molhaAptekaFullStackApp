@@ -73,14 +73,16 @@ export const CartFulfillmentSection = ({
         onToggleAll={onToggleAll}
       />
 
-      {lines.map((line) => (
-        <CartLineItem
-          key={line.productId}
-          line={line}
-          selected={isLineSelected(line.productId)}
-          onToggleSelected={onToggleSelected}
-        />
-      ))}
+      <View style={styles.lines}>
+        {lines.map((line) => (
+          <CartLineItem
+            key={line.productId}
+            line={line}
+            selected={isLineSelected(line.productId)}
+            onToggleSelected={onToggleSelected}
+          />
+        ))}
+      </View>
 
       {children}
     </View>

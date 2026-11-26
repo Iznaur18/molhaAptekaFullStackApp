@@ -14,6 +14,7 @@ import {
   SellerLuckyBoxWinModel,
 } from "../../models/index.js";
 import { resolveMskDayKey } from "./sellerLuckyBoxDayKey.js";
+import { ensurePrizeProductInCart } from "../cart/ensurePrizeProductInCart.js";
 import {
   assertPrizeProductsBelongToSeller,
   resolvePrizeProductNames,
@@ -106,12 +107,21 @@ async function findActiveWin({ sellerId, buyerId }) {
 }
 
 /**
- * ВРЕМЕННО для локального теста: вне прода продавец может переигрывать на
- * своей витрине без дневного лимита (см. allowSelfPlay на клиенте).
+ * ВРЕМЕННО для локальной проверки призов:
+ * - development — любой авторизованный без дневного лимита;
+ * - test — только self-play (чтобы лимит-тесты не ломались);
+ * - production — выкл.
  * TODO: убрать после приёмки фичи.
  */
-const isSelfPlayReplayAllowed = ({ sellerId, buyerId }) =>
-  String(sellerId) === String(buyerId) && process.env.NODE_ENV !== "production";
+const isDevGameReplayAllowed = ({ sellerId, buyerId }) => {
+  if (!buyerId || process.env.NODE_ENV === "production") {
+    return false;
+  }
+  if (process.env.NODE_ENV === "development") {
+    return true;
+  }
+  return String(sellerId) === String(buyerId);
+};
 
 /** Попытки покупателя за сегодня (по МСК) в порядке attemptIndex. */
 async function listTodayPlays({ sellerId, buyerId, dayKey }) {
@@ -148,7 +158,7 @@ export async function getSellerLuckyBoxState({ sellerId, buyerId }) {
   }
 
   const dayKey = resolveMskDayKey();
-  const todayPlays = isSelfPlayReplayAllowed({ sellerId, buyerId })
+  const todayPlays = isDevGameReplayAllowed({ sellerId, buyerId })
     ? []
     : await listTodayPlays({ sellerId, buyerId, dayKey });
 
@@ -229,7 +239,7 @@ export async function playSellerLuckyBox({ sellerId, buyerId, boxIndex }) {
   // попытке, чтобы можно было переиграть после обновления страницы.
   // Убрать после приёмки.
   if (
-    isSelfPlayReplayAllowed({ sellerId, buyerId }) &&
+    isDevGameReplayAllowed({ sellerId, buyerId }) &&
     (hasWinningPlay(todayPlays) || todayPlays.length >= LUCKY_BOX_ATTEMPTS_PER_DAY)
   ) {
     await SellerLuckyBoxPlayModel.deleteMany({ sellerId, buyerId, dayKey });
@@ -327,6 +337,15 @@ export async function playSellerLuckyBox({ sellerId, buyerId, boxIndex }) {
 
   const attemptsLeft = isWin ? 0 : LUCKY_BOX_ATTEMPTS_PER_DAY - (todayPlays.length + 1);
 
+  /** @type {{ ok: true; alreadyInCart: boolean } | { ok: false; message: string } | null} */
+  let cartPrize = null;
+  if (prizeProductId) {
+    cartPrize = await ensurePrizeProductInCart({
+      userId: buyerId,
+      productId: prizeProductId,
+    });
+  }
+
   return {
     result: isWin ? LUCKY_BOX_RESULT_WIN : LUCKY_BOX_RESULT_EMPTY,
     pickedBoxIndex: boxIndex,
@@ -348,6 +367,7 @@ export async function playSellerLuckyBox({ sellerId, buyerId, boxIndex }) {
           prizeProductName,
         }
       : null,
+    cartPrize,
   };
 }
 

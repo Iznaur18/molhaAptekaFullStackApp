@@ -21,9 +21,8 @@ export const AUCTION_PAGE_UI = {
   /** @param {number} count */
   COUNT_ITEMS: (count) => `${count} записей`,
   VIEW_FILTER_LABEL: "Раздел",
-  VIEW_FILTER_ALL: "Все",
   VIEW_FILTER_BUYER: "Мои ставки",
-  VIEW_FILTER_SELLER: "Входящие",
+  VIEW_FILTER_SELLER: "Ставки покупателей",
   OVERVIEW_BUYER_BIDS: "Мои ставки",
   OVERVIEW_INCOMING: "Входящие",
   OVERVIEW_ATTENTION: "Нужно действие",

@@ -10,19 +10,13 @@ import type {
   MyPriceOfferBid,
 } from "@/entities/product-price-offer/api/incomingPriceOffersApi";
 import { filterAuctionDashboard } from "@/entities/product-price-offer/lib/filterAuctionDashboard";
-import { summarizeAuctionDashboard } from "@/entities/product-price-offer/lib/summarizeAuctionDashboard";
-import {
-  AUCTION_VIEW_FILTER_BUYER,
-  AUCTION_VIEW_FILTER_SELLER,
-} from "@/entities/product-price-offer/model/auctionViewFilters";
+import { AUCTION_VIEW_FILTER_BUYER } from "@/entities/product-price-offer/model/auctionViewFilters";
 import { useIncomingPriceOffersQuery } from "@/entities/product-price-offer/model/useIncomingPriceOffersQuery";
 import { useMyPriceOfferBidsQuery } from "@/entities/product-price-offer/model/useMyPriceOfferBidsQuery";
 import { AuctionBuyerBidRow } from "@/entities/product-price-offer/ui/AuctionBuyerBidRow";
 import { AuctionSellerOfferRow } from "@/entities/product-price-offer/ui/AuctionSellerOfferRow";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
-import { AuctionPageOverview } from "@/features/auction-page/ui/AuctionPageOverview";
-import { AuctionPageSection } from "@/features/auction-page/ui/AuctionPageSection";
 import { AuctionPageToolbar } from "@/features/auction-page/ui/AuctionPageToolbar";
 import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
 import { ProfileAccountList } from "@/features/profile-tab/ui/ProfileAccountList";
@@ -37,7 +31,6 @@ import { useAuctionPageStyles } from "@/shared/theme/auctionPageStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 type AuctionListItem =
-  | { kind: "section"; id: string; title: string; count: number }
   | { kind: "bid"; id: string; bid: MyPriceOfferBid }
   | { kind: "offer"; id: string; offer: IncomingPriceOffer };
 
@@ -56,34 +49,22 @@ export const AuctionPage = () => {
   const bidsQuery = useMyPriceOfferBidsQuery(isAuthorized);
   const offersQuery = useIncomingPriceOffersQuery(isAuthorized);
   const [navSheetVisible, setNavSheetVisible] = useState(false);
-  const [viewFilter, setViewFilter] = useState("");
-  const [attentionOnly, setAttentionOnly] = useState(false);
+  const [viewFilter, setViewFilter] = useState(AUCTION_VIEW_FILTER_BUYER);
 
   const isUserDataConfirmed = sessionQuery.data?.user?.isUserDataConfirmed === true;
 
   const allBuyerBids = bidsQuery.data ?? EMPTY_BUYER_BIDS;
   const allSellerOffers = offersQuery.data ?? EMPTY_SELLER_OFFERS;
 
-  const summary = useMemo(
-    () => summarizeAuctionDashboard(allBuyerBids, allSellerOffers),
-    [allBuyerBids, allSellerOffers],
-  );
-
   const { buyerBids, sellerOffers } = useMemo(
     () =>
       filterAuctionDashboard(allBuyerBids, allSellerOffers, {
         viewFilter,
-        attentionOnly,
       }),
-    [allBuyerBids, allSellerOffers, viewFilter, attentionOnly],
+    [allBuyerBids, allSellerOffers, viewFilter],
   );
 
-  const totalAll = allBuyerBids.length + allSellerOffers.length;
-  const totalVisible = buyerBids.length + sellerOffers.length;
-  const hasFilters = Boolean(viewFilter) || attentionOnly;
-  const summaryCountLabel = hasFilters
-    ? AUCTION_PAGE_UI.COUNT_FILTERED(totalVisible, totalAll)
-    : AUCTION_PAGE_UI.COUNT_ITEMS(totalAll);
+  const isBuyerTab = viewFilter === AUCTION_VIEW_FILTER_BUYER;
 
   useFocusEffect(
     useCallback(() => {
@@ -119,52 +100,20 @@ export const AuctionPage = () => {
     [router],
   );
 
-  const handleBuyerFilterClick = useCallback(() => {
-    setViewFilter(AUCTION_VIEW_FILTER_BUYER);
-    setAttentionOnly(false);
-  }, []);
-
-  const handleSellerFilterClick = useCallback(() => {
-    setViewFilter(AUCTION_VIEW_FILTER_SELLER);
-    setAttentionOnly(false);
-  }, []);
-
   const listItems = useMemo((): AuctionListItem[] => {
-    const items: AuctionListItem[] = [];
-
-    if (buyerBids.length > 0) {
-      items.push({
-        kind: "section",
-        id: "buyer-section",
-        title: AUCTION_PAGE_UI.BUYER_SECTION_TITLE,
-        count: buyerBids.length,
-      });
-      buyerBids.forEach((bid) => {
-        items.push({ kind: "bid", id: bid._id, bid });
-      });
+    if (isBuyerTab) {
+      return buyerBids.map((bid) => ({ kind: "bid" as const, id: bid._id, bid }));
     }
+    return sellerOffers.map((offer) => ({
+      kind: "offer" as const,
+      id: offer._id,
+      offer,
+    }));
+  }, [buyerBids, isBuyerTab, sellerOffers]);
 
-    if (sellerOffers.length > 0) {
-      items.push({
-        kind: "section",
-        id: "seller-section",
-        title: AUCTION_PAGE_UI.SELLER_SECTION_TITLE,
-        count: sellerOffers.length,
-      });
-      sellerOffers.forEach((offer) => {
-        items.push({ kind: "offer", id: offer._id, offer });
-      });
-    }
-
-    return items;
-  }, [buyerBids, sellerOffers]);
-
-  const emptyMessage =
-    totalAll === 0
-      ? AUCTION_PAGE_UI.BOTH_EMPTY
-      : hasFilters
-        ? AUCTION_PAGE_UI.EMPTY_BY_FILTER
-        : AUCTION_PAGE_UI.BOTH_EMPTY;
+  const emptyMessage = isBuyerTab
+    ? AUCTION_PAGE_UI.BUYER_EMPTY
+    : AUCTION_PAGE_UI.SELLER_EMPTY;
 
   const listHeader = (
     <View style={styles.header}>
@@ -172,29 +121,8 @@ export const AuctionPage = () => {
         activeLabel={MY_PROFILE_PAGE_UI.TAB_AUCTION}
         onPress={() => setNavSheetVisible(true)}
       />
-      <AuctionPageToolbar
-        summaryCountLabel={summaryCountLabel}
-        viewFilter={viewFilter}
-        onViewFilterChange={(value) => {
-          setViewFilter(value);
-          if (value) {
-            setAttentionOnly(false);
-          }
-        }}
-      />
-      <AuctionPageOverview
-        buyerCount={summary.buyerCount}
-        sellerCount={summary.sellerCount}
-        attentionCount={summary.attentionCount}
-        attentionOnly={attentionOnly}
-        onBuyerFilterClick={handleBuyerFilterClick}
-        onSellerFilterClick={handleSellerFilterClick}
-        onAttentionFilterChange={setAttentionOnly}
-      />
-      {totalVisible > 0 && attentionOnly ? (
-        <Text style={styles.filterHint}>{AUCTION_PAGE_UI.ATTENTION_FILTER_HINT}</Text>
-      ) : null}
-      {totalVisible === 0 ? (
+      <AuctionPageToolbar viewFilter={viewFilter} onViewFilterChange={setViewFilter} />
+      {listItems.length === 0 ? (
         <Text style={styles.emptyState} accessibilityRole="text">
           {emptyMessage}
         </Text>
@@ -257,14 +185,6 @@ export const AuctionPage = () => {
         ListHeaderComponent={listHeader}
         renderItem={({ item, index }) => {
           const itemStyle = index === 0 ? styles.listItemFirst : styles.listItem;
-
-          if (item.kind === "section") {
-            return (
-              <View style={itemStyle}>
-                <AuctionPageSection title={item.title} count={item.count} />
-              </View>
-            );
-          }
 
           if (item.kind === "bid") {
             return (

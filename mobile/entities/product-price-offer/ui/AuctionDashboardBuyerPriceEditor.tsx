@@ -7,31 +7,33 @@ type AuctionDashboardBuyerPriceEditorProps = {
   value: string;
   onChange: (value: string) => void;
   onSubmit: () => void;
-  onCancel: () => void;
+  onClose: () => void;
   disabled?: boolean;
   submitLabel: string;
-  cancelLabel: string;
+  closeLabel: string;
   pendingLabel: string;
 };
 
+/** Паритет web `AuctionDashboardBuyerPriceEditor` — composer + «Не менять». */
 export const AuctionDashboardBuyerPriceEditor = ({
   label,
   value,
   onChange,
   onSubmit,
-  onCancel,
+  onClose,
   disabled = false,
   submitLabel,
-  cancelLabel,
+  closeLabel,
   pendingLabel,
 }: AuctionDashboardBuyerPriceEditorProps) => {
   const styles = useAuctionDashboardRowStyles();
 
   return (
     <View style={styles.editor}>
-      <Text style={styles.editorLabel}>{label}</Text>
       <View style={styles.composer}>
-        <Text style={styles.composerPrefix}>₽</Text>
+        <Text style={styles.composerPrefix} accessibilityElementsHidden>
+          ₽
+        </Text>
         <TextInput
           style={[styles.composerInput, disabled ? styles.disabled : null]}
           value={value}
@@ -39,6 +41,7 @@ export const AuctionDashboardBuyerPriceEditor = ({
           editable={!disabled}
           keyboardType="number-pad"
           accessibilityLabel={label}
+          autoFocus
         />
         <Pressable
           style={[styles.composerSubmit, disabled ? styles.disabled : null]}
@@ -51,11 +54,11 @@ export const AuctionDashboardBuyerPriceEditor = ({
         </Pressable>
       </View>
       <Pressable
-        style={[styles.editorCancel, disabled ? styles.disabled : null]}
+        style={[styles.textBtn, disabled ? styles.disabled : null]}
         disabled={disabled}
-        onPress={onCancel}
+        onPress={onClose}
       >
-        <Text style={styles.editorCancelText}>{cancelLabel}</Text>
+        <Text style={styles.textBtnLabel}>{closeLabel}</Text>
       </Pressable>
     </View>
   );

@@ -39,11 +39,8 @@ import {
   AUTH_UI,
   MY_PROFILE_PAGE_UI,
   MY_SALES_PAGE_UI,
-  ORDER_CARD_UI,
-  PRODUCT_REPORT_UI,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
-import { confirmDestructiveAction } from "@/shared/lib/confirmDestructiveAction";
 import { useDebouncedValue } from "@/shared/lib/useDebouncedValue";
 import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
@@ -295,6 +292,7 @@ export const MySalesPage = () => {
     });
   };
 
+  /** Confirm — в OrderCard `ConfirmButton` (popover), как web. */
   const handleCancelItem = ({
     orderId,
     itemIndex,
@@ -302,19 +300,11 @@ export const MySalesPage = () => {
     orderId: string;
     itemIndex: number;
   }) => {
-    confirmDestructiveAction({
-      title: ORDER_CARD_UI.ACTION_CANCEL,
-      message: ORDER_CARD_UI.ITEM_CANCEL_CONFIRM,
-      confirmLabel: ORDER_CARD_UI.ACTION_CANCEL,
-      cancelLabel: PRODUCT_REPORT_UI.CANCEL,
-      onConfirm: () => {
-        void runSellerAction({
-          orderId,
-          itemIndex,
-          optimisticStatus: ORDER_STATUS_CANCELLED,
-          mutate: () => cancelItemMutation.mutateAsync({ orderId, itemIndex }),
-        });
-      },
+    void runSellerAction({
+      orderId,
+      itemIndex,
+      optimisticStatus: ORDER_STATUS_CANCELLED,
+      mutate: () => cancelItemMutation.mutateAsync({ orderId, itemIndex }),
     });
   };
 
@@ -326,19 +316,11 @@ export const MySalesPage = () => {
     orderId: string;
     itemIndex: number;
   }) => {
-    confirmDestructiveAction({
-      title: ORDER_CARD_UI.ACTION_RETURN,
-      message: ORDER_CARD_UI.ACTION_RETURN_CONFIRM,
-      confirmLabel: ORDER_CARD_UI.ACTION_RETURN,
-      cancelLabel: PRODUCT_REPORT_UI.CANCEL,
-      onConfirm: () => {
-        void runSellerAction({
-          orderId,
-          itemIndex,
-          optimisticStatus: ORDER_STATUS_RETURNED,
-          mutate: () => returnItemMutation.mutateAsync({ orderId, itemIndex }),
-        });
-      },
+    void runSellerAction({
+      orderId,
+      itemIndex,
+      optimisticStatus: ORDER_STATUS_RETURNED,
+      mutate: () => returnItemMutation.mutateAsync({ orderId, itemIndex }),
     });
   };
 
@@ -350,39 +332,31 @@ export const MySalesPage = () => {
     orderId: string;
     sellerId: string;
   }) => {
-    confirmDestructiveAction({
-      title: ORDER_CARD_UI.ACTION_CANCEL_ORDER,
-      message: ORDER_CARD_UI.CANCEL_CONFIRM,
-      confirmLabel: ORDER_CARD_UI.ACTION_CANCEL_ORDER,
-      cancelLabel: PRODUCT_REPORT_UI.CANCEL,
-      onConfirm: () => {
-        void (async () => {
-          const actionKey = orderShipmentActionKey(orderId, "cancel");
-          setPendingActionKey(actionKey);
-          setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
-          try {
-            const updatedOrder = await cancelShipmentMutation.mutateAsync({
-              orderId,
-              sellerId,
-            });
-            patchSalesCaches((prev) =>
-              prev.map((order) => (order._id === orderId ? updatedOrder : order)),
-            );
-            await invalidateSalesQueues();
-            void handleRefresh();
-          } catch (error) {
-            const message = formatApiErrorMessage(
-              error,
-              API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK,
-            );
-            setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
-            void handleRefresh();
-          } finally {
-            setPendingActionKey(null);
-          }
-        })();
-      },
-    });
+    void (async () => {
+      const actionKey = orderShipmentActionKey(orderId, "cancel");
+      setPendingActionKey(actionKey);
+      setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
+      try {
+        const updatedOrder = await cancelShipmentMutation.mutateAsync({
+          orderId,
+          sellerId,
+        });
+        patchSalesCaches((prev) =>
+          prev.map((order) => (order._id === orderId ? updatedOrder : order)),
+        );
+        await invalidateSalesQueues();
+        void handleRefresh();
+      } catch (error) {
+        const message = formatApiErrorMessage(
+          error,
+          API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK,
+        );
+        setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
+        void handleRefresh();
+      } finally {
+        setPendingActionKey(null);
+      }
+    })();
   };
 
   const handleProductClick = useCallback(

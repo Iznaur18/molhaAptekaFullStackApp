@@ -1,11 +1,8 @@
-import { useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import {
-  LayoutAnimation,
   Linking,
-  Platform,
   Pressable,
   Text,
-  UIManager,
   View,
   type StyleProp,
   type ViewStyle,
@@ -24,10 +21,7 @@ import {
   summarizeOrderItems,
 } from "@izibuy/shared-lib";
 
-if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
-
+import { formatOrderNumber } from "@/entities/order/lib/formatOrderNumber";
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
 import { isOrderLineItemProductClickable } from "@/entities/order/lib/isOrderLineItemProductClickable";
 import {
@@ -46,8 +40,10 @@ import {
   resolveOrderSellers,
   type OrderLineLike,
 } from "@/entities/order/lib/resolveOrderSellers";
+import { OrderCardDetailsFold } from "@/entities/order/ui/OrderCardDetailsFold";
 import { OrderCardLineItemThumb } from "@/entities/order/ui/OrderCardLineItemThumb";
 import { BuyerPassportSharePanel } from "@/entities/installment/ui/BuyerPassportSharePanel";
+import { ConfirmButton } from "@/shared/ui/ConfirmButton";
 import {
   ORDER_PAYMENT_METHOD_LABEL_RU,
   ORDER_STATUS_CANCELLED,
@@ -63,8 +59,10 @@ import {
 } from "@/shared/config";
 import { formatIsoDateTime, formatPriceRub } from "@/shared/lib";
 import { formatLoyaltyPointsAmount } from "@molha/api-contract";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useOrderCardStyles } from "@/shared/theme/commerceScreenStyles";
 import { CommerceCardExpandToggle } from "@/shared/ui/CommerceCardExpandToggle";
+import { Store, Truck } from "@/shared/ui/productDetailsLucideIcons";
 import {
   formatRuPhoneDisplayOrEmpty,
   toRuPhoneTelHref,
@@ -248,13 +246,21 @@ const openTelHref = (href: string) => {
 const CounterpartyValue = ({
   user,
   onNameClick,
+  stacked = false,
 }: {
   user: OrderBuyer;
   onNameClick?: (userId: string) => void;
+  stacked?: boolean;
 }) => {
   const styles = useOrderCardStyles();
+  const valueStyle = stacked
+    ? [styles.metaValue, styles.metaValueFold]
+    : styles.metaValue;
+  const linkStyle = stacked
+    ? [styles.buyerLink, styles.buyerLinkFold]
+    : styles.buyerLink;
   if (user == null || typeof user === "string") {
-    return <Text style={styles.metaValue}>—</Text>;
+    return <Text style={valueStyle}>—</Text>;
   }
   const label = formatBuyerLabel(user);
   const userId = resolveBuyerId(user);
@@ -263,13 +269,15 @@ const CounterpartyValue = ({
   const phoneHref = toRuPhoneTelHref(user.userPhoneNumber);
 
   return (
-    <View style={styles.counterpartyValue}>
+    <View
+      style={[styles.counterpartyValue, stacked ? styles.counterpartyValueFold : null]}
+    >
       {canLink ? (
         <Pressable onPress={() => onNameClick?.(userId!)}>
-          <Text style={styles.buyerLink}>{label}</Text>
+          <Text style={linkStyle}>{label}</Text>
         </Pressable>
       ) : (
-        <Text style={styles.metaValue}>{label}</Text>
+        <Text style={valueStyle}>{label}</Text>
       )}
       {phoneHref ? (
         <Pressable onPress={() => openTelHref(phoneHref)}>
@@ -289,6 +297,8 @@ type OrderCardMetaProps = {
   onBuyerNameClick?: (userId: string) => void;
   onSellerNameClick?: (userId: string) => void;
   isInstallmentOrder: boolean;
+  /** web details-fold: label сверху, value снизу, без «:». */
+  stacked?: boolean;
 };
 
 const OrderCardMeta = ({
@@ -298,73 +308,128 @@ const OrderCardMeta = ({
   onBuyerNameClick,
   onSellerNameClick,
   isInstallmentOrder,
+  stacked = false,
 }: OrderCardMetaProps) => {
   const styles = useOrderCardStyles();
   const sellers = showSeller ? resolveOrderSellers(order) : [];
   const trackingNumber = String(order.shippingTrackingNumber ?? "").trim();
   const trackingUrl = trackingNumber ? resolveOrderShippingTrackingUrl(order) : null;
   const cdek = resolveCdekSummary(order);
+  const orderNumber = formatOrderNumber(order._id);
+  const isPickupShipment = order.fulfillmentMethod !== "delivery";
+  const labelSuffix = stacked ? "" : ":";
+  const rowStyle = stacked ? [styles.metaRow, styles.metaRowFold] : styles.metaRow;
+  const valueStyle = stacked
+    ? [styles.metaValue, styles.metaValueFold]
+    : styles.metaValue;
+  const linkStyle = stacked
+    ? [styles.buyerLink, styles.buyerLinkFold]
+    : styles.buyerLink;
+  const addressLabel = isPickupShipment
+    ? ORDER_CARD_UI.PICKUP_ADDRESS_LABEL
+    : ORDER_CARD_UI.ADDRESS_LABEL;
 
   return (
-    <View>
+    <View style={stacked ? styles.metaFold : undefined}>
       {showBuyer ? (
-        <View style={styles.metaRow}>
-          <Text style={styles.metaLabel}>{ORDER_CARD_UI.BUYER_LABEL}:</Text>
-          <CounterpartyValue user={order.userBuyerId} onNameClick={onBuyerNameClick} />
+        <View style={rowStyle}>
+          <Text style={styles.metaLabel}>
+            {ORDER_CARD_UI.BUYER_LABEL}
+            {labelSuffix}
+          </Text>
+          <CounterpartyValue
+            user={order.userBuyerId}
+            onNameClick={onBuyerNameClick}
+            stacked={stacked}
+          />
         </View>
       ) : null}
       {showSeller ? (
-        <View style={styles.metaRow}>
-          <Text style={styles.metaLabel}>{ORDER_CARD_UI.SELLER_LABEL}:</Text>
+        <View style={rowStyle}>
+          <Text style={styles.metaLabel}>
+            {ORDER_CARD_UI.SELLER_LABEL}
+            {labelSuffix}
+          </Text>
           {sellers.length === 0 ? (
-            <Text style={styles.metaValue}>—</Text>
+            <Text style={valueStyle}>—</Text>
           ) : (
             <View style={styles.counterpartyList}>
               {sellers.map((seller, index) => (
                 <View key={seller._id} style={styles.counterpartyListItem}>
-                  {index > 0 ? <Text style={styles.metaValue}>, </Text> : null}
-                  <CounterpartyValue user={seller} onNameClick={onSellerNameClick} />
+                  {index > 0 && !stacked ? <Text style={valueStyle}>, </Text> : null}
+                  <CounterpartyValue
+                    user={seller}
+                    onNameClick={onSellerNameClick}
+                    stacked={stacked}
+                  />
                 </View>
               ))}
             </View>
           )}
         </View>
       ) : null}
-      <View style={styles.metaRow}>
-        <Text style={styles.metaLabel}>{ORDER_CARD_UI.CREATED_LABEL}:</Text>
-        <Text style={styles.metaValue}>{formatIsoDateTime(order.createdAt)}</Text>
+      {orderNumber ? (
+        <View style={rowStyle}>
+          <Text style={styles.metaLabel}>
+            {ORDER_CARD_UI.ORDER_NUMBER_LABEL}
+            {labelSuffix}
+          </Text>
+          <Text style={valueStyle}>{ORDER_CARD_UI.ORDER_NUMBER(orderNumber)}</Text>
+        </View>
+      ) : null}
+      <View style={rowStyle}>
+        <Text style={styles.metaLabel}>
+          {ORDER_CARD_UI.CREATED_LABEL}
+          {labelSuffix}
+        </Text>
+        <Text style={valueStyle}>{formatIsoDateTime(order.createdAt)}</Text>
       </View>
-      <View style={styles.metaRow}>
-        <Text style={styles.metaLabel}>{ORDER_CARD_UI.ADDRESS_LABEL}:</Text>
-        <Text style={styles.metaValue}>{order.deliveryAddress || "—"}</Text>
+      <View style={rowStyle}>
+        <Text style={styles.metaLabel}>
+          {addressLabel}
+          {labelSuffix}
+        </Text>
+        <Text style={valueStyle}>{order.deliveryAddress || "—"}</Text>
       </View>
       {trackingNumber ? (
-        <View style={styles.metaRow}>
-          <Text style={styles.metaLabel}>{ORDER_CARD_UI.TRACKING_LABEL}:</Text>
+        <View style={rowStyle}>
+          <Text style={styles.metaLabel}>
+            {ORDER_CARD_UI.TRACKING_LABEL}
+            {labelSuffix}
+          </Text>
           {trackingUrl ? (
             <Pressable onPress={() => void Linking.openURL(trackingUrl)}>
-              <Text style={styles.buyerLink}>{trackingNumber}</Text>
+              <Text style={linkStyle}>{trackingNumber}</Text>
             </Pressable>
           ) : (
-            <Text style={styles.metaValue}>{trackingNumber}</Text>
+            <Text style={valueStyle}>{trackingNumber}</Text>
           )}
         </View>
       ) : null}
       {cdek ? (
-        <View style={styles.metaRow}>
-          <Text style={styles.metaLabel}>{ORDER_CARD_UI.CDEK_STATUS_LABEL}:</Text>
-          <Text style={styles.metaValue}>{cdek.stage}</Text>
+        <View style={rowStyle}>
+          <Text style={styles.metaLabel}>
+            {ORDER_CARD_UI.CDEK_STATUS_LABEL}
+            {labelSuffix}
+          </Text>
+          <Text style={valueStyle}>{cdek.stage}</Text>
         </View>
       ) : null}
       {cdek?.keepFreeUntil ? (
-        <View style={styles.metaRow}>
-          <Text style={styles.metaLabel}>{ORDER_CARD_UI.CDEK_PICK_UP_BY_LABEL}:</Text>
-          <Text style={styles.metaValue}>{cdek.keepFreeUntil}</Text>
+        <View style={rowStyle}>
+          <Text style={styles.metaLabel}>
+            {ORDER_CARD_UI.CDEK_PICK_UP_BY_LABEL}
+            {labelSuffix}
+          </Text>
+          <Text style={valueStyle}>{cdek.keepFreeUntil}</Text>
         </View>
       ) : null}
-      <View style={styles.metaRow}>
-        <Text style={styles.metaLabel}>{ORDER_CARD_UI.PAYMENT_LABEL}:</Text>
-        <Text style={styles.metaValue}>
+      <View style={rowStyle}>
+        <Text style={styles.metaLabel}>
+          {ORDER_CARD_UI.PAYMENT_LABEL}
+          {labelSuffix}
+        </Text>
+        <Text style={valueStyle}>
           {order.paidWithLoyaltyPoints === true
             ? order.fulfillmentMethod === "delivery"
               ? ORDER_CARD_UI.PAYMENT_POINTS_WITH_DELIVERY(
@@ -375,9 +440,12 @@ const OrderCardMeta = ({
         </Text>
       </View>
       {isInstallmentOrder && order.installmentContract ? (
-        <View style={styles.metaRow}>
-          <Text style={styles.metaLabel}>{INSTALLMENT_UI.CONTRACT_PLAN}:</Text>
-          <Text style={styles.metaValue}>
+        <View style={rowStyle}>
+          <Text style={styles.metaLabel}>
+            {INSTALLMENT_UI.CONTRACT_PLAN}
+            {labelSuffix}
+          </Text>
+          <Text style={valueStyle}>
             {order.installmentContract.planTitle} ·{" "}
             {order.installmentContract.monthsCount} мес ×{" "}
             {formatPriceRub(order.installmentContract.monthlyPaymentRub)}
@@ -415,8 +483,10 @@ export const OrderCard = ({
   style,
 }: OrderCardProps) => {
   const styles = useOrderCardStyles();
-  const [detailsExpanded, setDetailsExpanded] = useState(false);
+  const theme = useAppTheme();
   const items = Array.isArray(order.items) ? order.items : [];
+  const itemsSummary = summarizeOrderItems(items);
+  const orderNumber = formatOrderNumber(order._id);
   const isAuctionOrder = Boolean(order.priceOfferId);
   const isInstallmentOrder = Boolean(order.installmentContractId);
   const statusBadgeColors = resolveOrderStatusBadgeStyle(order.status);
@@ -438,6 +508,17 @@ export const OrderCard = ({
   // Кнопки отправления целиком — не у каждой позиции: продавец собирает
   // свой кусок заказа, а не строку за строкой.
   const shipment = resolveOrderShipmentActions(order, attentionRole);
+  const shipmentOwn =
+    (Array.isArray(order.shipments) ? order.shipments : []).find(
+      (row) => row?.sellerId != null && String(row.sellerId) === shipment.sellerId,
+    ) ?? null;
+  const shipmentFulfillment =
+    (shipmentOwn?.fulfillmentMethod as string | undefined) ?? order.fulfillmentMethod;
+  const isDeliveryShipment = shipmentFulfillment === "delivery";
+  const orderTotalText =
+    itemsSummary.pointsTotal > 0
+      ? formatLoyaltyPointsAmount(itemsSummary.pointsTotal)
+      : formatPriceRub(itemsSummary.totalAmount);
   const advanceKey = orderShipmentActionKey(order._id, "advance");
   const payKey = orderShipmentActionKey(order._id, "pay");
   const cancelOrderKey = orderShipmentActionKey(order._id, "cancel");
@@ -452,20 +533,41 @@ export const OrderCard = ({
   const shipItemIndexes = onMarkShipped ? shipment.shipItemIndexes : [];
   const deliverItemIndexes = onMarkDelivered ? shipment.deliverItemIndexes : [];
   const handOverItemIndexes = onMarkDelivered ? shipment.handOverItemIndexes : [];
+  // Покупатель подтверждает получение — справа в shipment-row (как web).
+  // Курьер Gitorg: закрытие только кодом, кнопка здесь обходила бы оплату.
+  const confirmItemIndexes =
+    attentionRole === "buyer" &&
+    Boolean(onConfirmDelivered) &&
+    shipmentOwn?.courierDelivery !== true
+      ? items
+          .map((item, index) => {
+            const row = item as { itemIndex?: number; status?: string };
+            return {
+              itemIndex: typeof row.itemIndex === "number" ? row.itemIndex : index,
+              status: row.status,
+            };
+          })
+          .filter((row) => row.status === ORDER_STATUS_DELIVERED)
+          .map((row) => row.itemIndex)
+      : [];
+  const canConfirmShipment = confirmItemIndexes.length > 0;
   const isAdvancePending = pendingActionKey === advanceKey;
   const isShipPending = shipItemIndexes.some(isItemPending);
   const isDeliverPending = deliverItemIndexes.some(isItemPending);
   const isHandOverPending = handOverItemIndexes.some(isItemPending);
+  const isConfirmPending = confirmItemIndexes.some(isItemPending);
   const isShipmentBusy =
     isAdvancePending ||
     isShipPending ||
     isDeliverPending ||
     isHandOverPending ||
+    isConfirmPending ||
     isCancelOrderPending;
   // Ошибка отгрузки или выдачи привязана к позиции и показывается у неё.
   const shipmentActionError = itemActionErrors[advanceKey] ?? "";
   const hasShipmentActions =
     canCancelOrder ||
+    canConfirmShipment ||
     Boolean(shipmentAdvance) ||
     shipItemIndexes.length > 0 ||
     deliverItemIndexes.length > 0 ||
@@ -593,8 +695,7 @@ export const OrderCard = ({
         carrierTracksShipment: shipment.carrierTracksShipment,
       }) && Boolean(onMarkReturned);
     const returnedByLabel = resolveReturnedByLabel(source, buyerId);
-    const canConfirm =
-      source.status === ORDER_STATUS_DELIVERED && Boolean(onConfirmDelivered);
+    // «Подтвердить» — в shipment-row, не у позиции (паритет web).
     const key = source._id ?? `item-${index}`;
     const productName = resolveOrderLineItemName(item);
     const isProductClickable =
@@ -615,9 +716,19 @@ export const OrderCard = ({
     // В компактной карточке статус строки не печатается, поэтому отменённую
     // позицию видно только по метке.
     const isCancelled = source.status === ORDER_STATUS_CANCELLED;
-    // «Отгрузить», «Доставлен» и ступени сборки — в строке отправления ниже:
-    // у позиции остаются только отмена и подтверждение получения.
-    const hasItemActions = canConfirm || canCancel || canReturn;
+    // «Отгрузить» / «Доставлен» / «Подтвердить» — в shipment-row;
+    // у позиции остаются отмена и возврат/отказ.
+    const hasItemActions = canCancel || canReturn;
+    const quantity = Math.max(0, Math.floor(Number(source.quantity) || 0));
+    const unitPriceRub = Number(source.unitPriceAtOrder) || 0;
+    const pointsUnit = Math.max(0, Math.floor(Number(source.pointsPriceAtOrder) || 0));
+    const isPointsLine = pointsUnit > 0;
+    const unitPriceText = isPointsLine
+      ? formatLoyaltyPointsAmount(pointsUnit)
+      : formatPriceRub(unitPriceRub);
+    const lineTotalText = isPointsLine
+      ? formatLoyaltyPointsAmount(pointsUnit * quantity)
+      : formatPriceRub(unitPriceRub * quantity);
 
     return (
       <View
@@ -636,55 +747,81 @@ export const OrderCard = ({
           />
           <View style={styles.itemBody}>
             <View style={styles.itemMain}>
-              {isProductClickable ? (
-                <Pressable
-                  onPress={() => onProductClick?.(item)}
-                  style={styles.itemNamePressable}
-                >
+              <View style={styles.itemTitleRow}>
+                {isProductClickable ? (
+                  <Pressable
+                    onPress={() => onProductClick?.(item)}
+                    style={styles.itemNamePressable}
+                  >
+                    <Text
+                      style={[
+                        styles.itemNameLink,
+                        isCancelled ? styles.itemTextCancelled : undefined,
+                      ]}
+                      numberOfLines={2}
+                    >
+                      {productName}
+                    </Text>
+                  </Pressable>
+                ) : (
                   <Text
                     style={[
-                      styles.itemNameLink,
+                      styles.itemLine,
                       isCancelled ? styles.itemTextCancelled : undefined,
                     ]}
                     numberOfLines={2}
                   >
                     {productName}
                   </Text>
-                </Pressable>
+                )}
+                {isCancelled ? (
+                  <Text style={styles.itemCancelledBadge}>
+                    {ORDER_CARD_UI.ITEM_CANCELLED_BADGE}
+                  </Text>
+                ) : null}
+                {!compact ? (
+                  <Text
+                    style={[
+                      styles.itemQuantity,
+                      isCancelled ? styles.itemTextCancelled : undefined,
+                    ]}
+                  >
+                    ×{quantity || 1}
+                  </Text>
+                ) : null}
+              </View>
+              {compact ? (
+                <View style={styles.itemPriceBlock}>
+                  <Text
+                    style={[
+                      styles.itemPrice,
+                      styles.itemPriceCompact,
+                      isCancelled ? styles.itemTextCancelled : undefined,
+                    ]}
+                  >
+                    {lineTotalText}
+                  </Text>
+                  {quantity > 1 ? (
+                    <Text
+                      style={[
+                        styles.itemPriceUnit,
+                        isCancelled ? styles.itemTextCancelled : undefined,
+                      ]}
+                    >
+                      {quantity} × {unitPriceText}
+                    </Text>
+                  ) : null}
+                </View>
               ) : (
                 <Text
                   style={[
-                    styles.itemLine,
+                    styles.itemPrice,
                     isCancelled ? styles.itemTextCancelled : undefined,
                   ]}
-                  numberOfLines={2}
                 >
-                  {productName}
+                  {unitPriceText}
                 </Text>
               )}
-              {isCancelled ? (
-                <Text style={styles.itemCancelledBadge}>
-                  {ORDER_CARD_UI.ITEM_CANCELLED_BADGE}
-                </Text>
-              ) : null}
-              <Text
-                style={[
-                  styles.itemQuantity,
-                  isCancelled ? styles.itemTextCancelled : undefined,
-                ]}
-              >
-                ×{source.quantity ?? 1}
-              </Text>
-              <Text
-                style={[
-                  styles.itemPrice,
-                  isCancelled ? styles.itemTextCancelled : undefined,
-                ]}
-              >
-                {Number(source.pointsPriceAtOrder) > 0
-                  ? formatLoyaltyPointsAmount(source.pointsPriceAtOrder)
-                  : formatPriceRub(source.unitPriceAtOrder)}
-              </Text>
             </View>
 
             {showSecondaryInline && loyaltyPerUnit > 0 ? (
@@ -732,66 +869,59 @@ export const OrderCard = ({
 
         {hasItemActions || actionError ? (
           <View style={styles.itemActionsRow}>
-            {canConfirm || canCancel || canReturn ? (
+            {canCancel || canReturn ? (
               <>
                 {canCancel ? (
-                  <Pressable
-                    style={[
+                  <ConfirmButton
+                    variant="popover"
+                    label={ORDER_CARD_UI.ACTION_CANCEL}
+                    pendingLabel={ORDER_CARD_UI.ACTION_PENDING}
+                    isPending={isActionPending}
+                    question={ORDER_CARD_UI.ITEM_CANCEL_CONFIRM}
+                    onConfirm={() => onCancelItem?.({ orderId: order._id, itemIndex })}
+                    disabled={isActionPending}
+                    triggerStyle={[
                       styles.actionButton,
                       styles.actionButtonCancel,
+                      compact ? styles.actionButtonCompact : null,
                       isActionPending && styles.actionDisabled,
                     ]}
-                    onPress={() => onCancelItem?.({ orderId: order._id, itemIndex })}
-                    disabled={isActionPending}
-                  >
-                    <Text
-                      style={[styles.actionButtonText, styles.actionButtonTextCancel]}
-                    >
-                      {isActionPending
-                        ? ORDER_CARD_UI.ACTION_PENDING
-                        : ORDER_CARD_UI.ACTION_CANCEL}
-                    </Text>
-                  </Pressable>
+                    triggerTextStyle={[
+                      styles.actionButtonText,
+                      styles.actionButtonTextCancel,
+                    ]}
+                  />
                 ) : null}
                 {canReturn ? (
-                  <Pressable
-                    style={[
-                      styles.actionButton,
-                      styles.actionButtonCancel,
-                      isActionPending && styles.actionDisabled,
-                    ]}
-                    onPress={() => onMarkReturned?.({ orderId: order._id, itemIndex })}
-                    disabled={isActionPending}
-                    accessibilityRole="button"
-                  >
-                    <Text
-                      style={[styles.actionButtonText, styles.actionButtonTextCancel]}
-                    >
-                      {isActionPending
-                        ? ORDER_CARD_UI.ACTION_PENDING
-                        : attentionRole === "seller"
-                          ? ORDER_CARD_UI.ACTION_RETURN
-                          : ORDER_CARD_UI.ACTION_REFUSE}
-                    </Text>
-                  </Pressable>
-                ) : null}
-                {canConfirm ? (
-                  <Pressable
-                    style={[
-                      styles.actionButton,
-                      isActionPending && styles.actionDisabled,
-                    ]}
-                    onPress={() =>
-                      onConfirmDelivered?.({ orderId: order._id, itemIndex })
+                  <ConfirmButton
+                    variant="popover"
+                    label={
+                      attentionRole === "seller"
+                        ? ORDER_CARD_UI.ACTION_RETURN
+                        : ORDER_CARD_UI.ACTION_REFUSE
+                    }
+                    pendingLabel={ORDER_CARD_UI.ACTION_PENDING}
+                    isPending={isActionPending}
+                    question={
+                      attentionRole === "seller"
+                        ? ORDER_CARD_UI.ACTION_RETURN_CONFIRM
+                        : ORDER_CARD_UI.ACTION_REFUSE_CONFIRM
+                    }
+                    onConfirm={() =>
+                      onMarkReturned?.({ orderId: order._id, itemIndex })
                     }
                     disabled={isActionPending}
-                  >
-                    <Text style={styles.actionButtonText}>
-                      {isActionPending
-                        ? ORDER_CARD_UI.ACTION_PENDING
-                        : ORDER_CARD_UI.ACTION_CONFIRM}
-                    </Text>
-                  </Pressable>
+                    triggerStyle={[
+                      styles.actionButton,
+                      styles.actionButtonCancel,
+                      compact ? styles.actionButtonCompact : null,
+                      isActionPending && styles.actionDisabled,
+                    ]}
+                    triggerTextStyle={[
+                      styles.actionButtonText,
+                      styles.actionButtonTextCancel,
+                    ]}
+                  />
                 ) : null}
               </>
             ) : null}
@@ -833,6 +963,14 @@ export const OrderCard = ({
             >
               {resolveOrderStatusLabelRu(order.status, attentionRole)}
             </Text>
+            {orderNumber ? (
+              <Text
+                style={styles.orderNumber}
+                accessibilityLabel={ORDER_CARD_UI.ORDER_NUMBER_LABEL}
+              >
+                {ORDER_CARD_UI.ORDER_NUMBER(orderNumber)}
+              </Text>
+            ) : null}
             {isAuctionOrder ? (
               <Text style={styles.auctionBadge}>{PRODUCT_CARD_UI.AUCTION_BADGE}</Text>
             ) : null}
@@ -848,12 +986,14 @@ export const OrderCard = ({
             />
           ) : null}
         </View>
-        <Text style={styles.total}>
-          {/* Заказ за баллы: сумма в баллах, рублёвая у него 0. */}
-          {summarizeOrderItems(order.items).pointsTotal > 0
-            ? formatLoyaltyPointsAmount(summarizeOrderItems(order.items).pointsTotal)
-            : formatPriceRub(summarizeOrderItems(order.items).totalAmount)}
-        </Text>
+        <View style={styles.headerTotals}>
+          {compact && itemsSummary.quantity > 0 ? (
+            <Text style={styles.headerQuantity}>×{itemsSummary.quantity}</Text>
+          ) : null}
+          <Text style={[styles.total, compact ? styles.totalCompact : null]}>
+            {orderTotalText}
+          </Text>
+        </View>
       </Pressable>
 
       {collapsedPreview ? (
@@ -878,99 +1018,165 @@ export const OrderCard = ({
             </>
           ) : null}
 
-          <View style={styles.itemsList}>
-            {items.map((item, index) => renderLineItem(item, index))}
-          </View>
-
-          {hasShipmentActions || shipmentActionError || cancelOrderError ? (
-            <View style={styles.itemActionsRow}>
-              {canCancelOrder ? (
-                <Pressable
-                  style={[
-                    styles.actionButton,
-                    styles.actionButtonCancel,
-                    isShipmentBusy && styles.actionDisabled,
-                  ]}
-                  onPress={() =>
-                    onCancelOrder?.({ orderId: order._id, sellerId: shipment.sellerId })
-                  }
-                  disabled={isShipmentBusy}
-                  accessibilityRole="button"
-                >
-                  <Text
-                    style={[styles.actionButtonText, styles.actionButtonTextCancel]}
-                  >
-                    {isCancelOrderPending
-                      ? ORDER_CARD_UI.ACTION_PENDING
-                      : ORDER_CARD_UI.ACTION_CANCEL_ORDER}
-                  </Text>
-                </Pressable>
-              ) : null}
-              {shipmentAdvance ? (
-                <Pressable
-                  style={[styles.actionButton, isShipmentBusy && styles.actionDisabled]}
-                  onPress={() =>
-                    onAdvanceShipment?.({
-                      orderId: order._id,
-                      nextStatus: shipmentAdvance.nextStatus,
-                    })
-                  }
-                  disabled={isShipmentBusy}
-                >
-                  <Text style={styles.actionButtonText}>
-                    {isAdvancePending
-                      ? ORDER_CARD_UI.ACTION_PENDING
-                      : shipmentAdvance.label}
-                  </Text>
-                </Pressable>
-              ) : null}
-              {shipItemIndexes.length > 0 ? (
-                <Pressable
-                  style={[styles.actionButton, isShipmentBusy && styles.actionDisabled]}
-                  onPress={() => void runForItems(shipItemIndexes, onMarkShipped)}
-                  disabled={isShipmentBusy}
-                >
-                  <Text style={styles.actionButtonText}>
-                    {isShipPending
-                      ? ORDER_CARD_UI.ACTION_PENDING
-                      : ORDER_CARD_UI.ACTION_SHIPPED}
-                  </Text>
-                </Pressable>
-              ) : null}
-              {deliverItemIndexes.length > 0 ? (
-                <Pressable
-                  style={[styles.actionButton, isShipmentBusy && styles.actionDisabled]}
-                  onPress={() => void runForItems(deliverItemIndexes, onMarkDelivered)}
-                  disabled={isShipmentBusy}
-                >
-                  <Text style={styles.actionButtonText}>
-                    {isDeliverPending
-                      ? ORDER_CARD_UI.ACTION_PENDING
-                      : ORDER_CARD_UI.ACTION_DELIVERED}
-                  </Text>
-                </Pressable>
-              ) : null}
-              {handOverItemIndexes.length > 0 ? (
-                <Pressable
-                  style={[styles.actionButton, isShipmentBusy && styles.actionDisabled]}
-                  onPress={() => void runForItems(handOverItemIndexes, onMarkDelivered)}
-                  disabled={isShipmentBusy}
-                >
-                  <Text style={styles.actionButtonText}>
-                    {isHandOverPending
-                      ? ORDER_CARD_UI.ACTION_PENDING
-                      : ORDER_CARD_UI.ACTION_HANDED_TO_BUYER}
-                  </Text>
-                </Pressable>
-              ) : null}
-              {shipmentActionError ? (
-                <Text style={styles.itemError}>{shipmentActionError}</Text>
-              ) : null}
-              {cancelOrderError ? (
-                <Text style={styles.itemError}>{cancelOrderError}</Text>
-              ) : null}
+          {/* web `.order-card__shipment-row` — способ + действия над позициями. */}
+          <View style={styles.shipmentRow}>
+            <View style={styles.shipmentMethod}>
+              <View style={styles.shipmentIcon} accessibilityElementsHidden>
+                {isDeliveryShipment ? (
+                  <Truck size={18} strokeWidth={2} color={theme.colors.action} />
+                ) : (
+                  <Store size={18} strokeWidth={2} color={theme.colors.action} />
+                )}
+              </View>
+              <View style={styles.shipmentMethodCopy}>
+                <Text style={styles.shipmentMethodCaption}>
+                  {ORDER_CARD_UI.SHIPMENT_HEADING}
+                </Text>
+                <Text style={styles.shipmentMethodValue}>
+                  {isDeliveryShipment
+                    ? ORDER_CARD_UI.SHIPMENT_DELIVERY
+                    : ORDER_CARD_UI.SHIPMENT_PICKUP}
+                </Text>
+              </View>
             </View>
-          ) : null}
+            {hasShipmentActions || shipmentActionError || cancelOrderError ? (
+              <View style={styles.shipmentActions}>
+                {canCancelOrder ? (
+                  <ConfirmButton
+                    variant="popover"
+                    label={ORDER_CARD_UI.ACTION_CANCEL_ORDER}
+                    pendingLabel={ORDER_CARD_UI.ACTION_PENDING}
+                    isPending={isCancelOrderPending}
+                    question={
+                      attentionRole === "buyer"
+                        ? ORDER_CARD_UI.BUYER_CANCEL_CONFIRM
+                        : ORDER_CARD_UI.CANCEL_CONFIRM
+                    }
+                    onConfirm={() =>
+                      onCancelOrder?.({
+                        orderId: order._id,
+                        sellerId: shipment.sellerId,
+                      })
+                    }
+                    disabled={isShipmentBusy}
+                    triggerStyle={[
+                      styles.actionButton,
+                      styles.actionButtonCancel,
+                      compact ? styles.actionButtonCompact : null,
+                      isShipmentBusy && styles.actionDisabled,
+                    ]}
+                    triggerTextStyle={[
+                      styles.actionButtonText,
+                      styles.actionButtonTextCancel,
+                    ]}
+                  />
+                ) : null}
+                {shipmentAdvance ? (
+                  <Pressable
+                    style={[
+                      styles.actionButton,
+                      compact ? styles.actionButtonCompact : null,
+                      isShipmentBusy && styles.actionDisabled,
+                    ]}
+                    onPress={() =>
+                      onAdvanceShipment?.({
+                        orderId: order._id,
+                        nextStatus: shipmentAdvance.nextStatus,
+                      })
+                    }
+                    disabled={isShipmentBusy}
+                  >
+                    <Text style={styles.actionButtonText}>
+                      {isAdvancePending
+                        ? ORDER_CARD_UI.ACTION_PENDING
+                        : shipmentAdvance.label}
+                    </Text>
+                  </Pressable>
+                ) : null}
+                {shipItemIndexes.length > 0 ? (
+                  <Pressable
+                    style={[
+                      styles.actionButton,
+                      compact ? styles.actionButtonCompact : null,
+                      isShipmentBusy && styles.actionDisabled,
+                    ]}
+                    onPress={() => void runForItems(shipItemIndexes, onMarkShipped)}
+                    disabled={isShipmentBusy}
+                  >
+                    <Text style={styles.actionButtonText}>
+                      {isShipPending
+                        ? ORDER_CARD_UI.ACTION_PENDING
+                        : ORDER_CARD_UI.ACTION_SHIPPED}
+                    </Text>
+                  </Pressable>
+                ) : null}
+                {deliverItemIndexes.length > 0 ? (
+                  <Pressable
+                    style={[
+                      styles.actionButton,
+                      compact ? styles.actionButtonCompact : null,
+                      isShipmentBusy && styles.actionDisabled,
+                    ]}
+                    onPress={() =>
+                      void runForItems(deliverItemIndexes, onMarkDelivered)
+                    }
+                    disabled={isShipmentBusy}
+                  >
+                    <Text style={styles.actionButtonText}>
+                      {isDeliverPending
+                        ? ORDER_CARD_UI.ACTION_PENDING
+                        : ORDER_CARD_UI.ACTION_DELIVERED}
+                    </Text>
+                  </Pressable>
+                ) : null}
+                {handOverItemIndexes.length > 0 ? (
+                  <Pressable
+                    style={[
+                      styles.actionButton,
+                      compact ? styles.actionButtonCompact : null,
+                      isShipmentBusy && styles.actionDisabled,
+                    ]}
+                    onPress={() =>
+                      void runForItems(handOverItemIndexes, onMarkDelivered)
+                    }
+                    disabled={isShipmentBusy}
+                  >
+                    <Text style={styles.actionButtonText}>
+                      {isHandOverPending
+                        ? ORDER_CARD_UI.ACTION_PENDING
+                        : ORDER_CARD_UI.ACTION_HANDED_TO_BUYER}
+                    </Text>
+                  </Pressable>
+                ) : null}
+                {canConfirmShipment ? (
+                  <Pressable
+                    style={[
+                      styles.actionButton,
+                      compact ? styles.actionButtonCompact : null,
+                      isShipmentBusy && styles.actionDisabled,
+                    ]}
+                    onPress={() =>
+                      void runForItems(confirmItemIndexes, onConfirmDelivered)
+                    }
+                    disabled={isShipmentBusy}
+                    accessibilityRole="button"
+                  >
+                    <Text style={styles.actionButtonText}>
+                      {isConfirmPending
+                        ? ORDER_CARD_UI.ACTION_PENDING
+                        : ORDER_CARD_UI.ACTION_CONFIRM}
+                    </Text>
+                  </Pressable>
+                ) : null}
+                {shipmentActionError ? (
+                  <Text style={styles.itemError}>{shipmentActionError}</Text>
+                ) : null}
+                {cancelOrderError ? (
+                  <Text style={styles.itemError}>{cancelOrderError}</Text>
+                ) : null}
+              </View>
+            ) : null}
+          </View>
 
           {shipment.awaitingPrepayment ? (
             <View style={styles.awaitingPrepayment}>
@@ -1017,40 +1223,28 @@ export const OrderCard = ({
             </View>
           ) : null}
 
+          <View style={styles.itemsList}>
+            {items.map((item, index) => renderLineItem(item, index))}
+          </View>
+
           {compact ? (
-            <View style={styles.detailsFold}>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityState={{ expanded: detailsExpanded }}
-                onPress={() => {
-                  LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-                  setDetailsExpanded((value) => !value);
-                }}
-              >
-                <Text style={styles.detailsFoldSummary}>
-                  {detailsExpanded ? "▾ " : "▸ "}
-                  {ORDER_CARD_UI.DETAILS_FOLD_SUMMARY}
-                </Text>
-              </Pressable>
-              {detailsExpanded ? (
-                <View style={styles.detailsFoldBody}>
-                  <OrderCardMeta
-                    order={order}
-                    showBuyer={showBuyer}
-                    showSeller={showSeller}
-                    onBuyerNameClick={onBuyerNameClick}
-                    onSellerNameClick={onSellerNameClick}
-                    isInstallmentOrder={isInstallmentOrder}
-                  />
-                  {showBuyer && order.buyerPassportShare ? (
-                    <BuyerPassportSharePanel share={order.buyerPassportShare} />
-                  ) : null}
-                  {items.map((item, index) =>
-                    renderLineItemSecondary(item, index, { showName: true }),
-                  )}
-                </View>
+            <OrderCardDetailsFold>
+              <OrderCardMeta
+                order={order}
+                showBuyer={showBuyer}
+                showSeller={showSeller}
+                onBuyerNameClick={onBuyerNameClick}
+                onSellerNameClick={onSellerNameClick}
+                isInstallmentOrder={isInstallmentOrder}
+                stacked
+              />
+              {showBuyer && order.buyerPassportShare ? (
+                <BuyerPassportSharePanel share={order.buyerPassportShare} />
               ) : null}
-            </View>
+              {items.map((item, index) =>
+                renderLineItemSecondary(item, index, { showName: true }),
+              )}
+            </OrderCardDetailsFold>
           ) : null}
         </>
       ) : null}

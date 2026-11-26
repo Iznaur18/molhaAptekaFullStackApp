@@ -81,11 +81,13 @@ import {
 } from "@/shared/config";
 import { confirmDestructiveAction } from "@/shared/lib/confirmDestructiveAction";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { resolveMobileBottomNavLayoutHeight } from "@/shared/lib/mobileBottomNavLayout";
 import { useVisualViewportKeyboardBottomInset } from "@/shared/lib/useVisualViewportKeyboardBottomInset";
 import { useProductDetailPageLayout } from "@/shared/model/useProductDetailPageLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";
 import { AppButton } from "@/shared/ui/AppButton";
+import { MobileBottomNavOverlay } from "@/shared/ui/MobileBottomNavOverlay";
 import { ScreenErrorState } from "@/shared/ui/ScreenStates";
 
 export default function ProductDetailScreen() {
@@ -297,18 +299,26 @@ export default function ProductDetailScreen() {
   );
 
   if (productQuery.isPending) {
-    return <ProductDetailsSkeleton />;
+    return (
+      <View style={{ flex: 1 }}>
+        <ProductDetailsSkeleton />
+        <MobileBottomNavOverlay />
+      </View>
+    );
   }
 
   if (productQuery.isError || !product) {
     return (
-      <ScreenErrorState
-        message={formatApiErrorMessage(
-          productQuery.error,
-          API_CLIENT_UI.FETCH_CATALOG_PRODUCT_FALLBACK,
-        )}
-        onRetry={() => productQuery.refetch()}
-      />
+      <View style={{ flex: 1 }}>
+        <ScreenErrorState
+          message={formatApiErrorMessage(
+            productQuery.error,
+            API_CLIENT_UI.FETCH_CATALOG_PRODUCT_FALLBACK,
+          )}
+          onRetry={() => productQuery.refetch()}
+        />
+        <MobileBottomNavOverlay />
+      </View>
     );
   }
 
@@ -372,14 +382,26 @@ export default function ProductDetailScreen() {
     !showMobilePurchaseDock &&
     !viaCart &&
     !isOwnProduct;
-  const scrollPaddingBottom = pageLayout.resolveScrollPaddingBottom(
-    insets.bottom,
-    showMobilePurchaseDock || showMobileDealDock,
-  );
   const showInstallmentDock =
     !pageLayout.isPageSplit && activeTab === "installment" && installmentDock != null;
   const showAuctionDock =
     !pageLayout.isPageSplit && activeTab === "auction" && auctionDock != null;
+  /** Bottom nav поверх stack `/product/:id` — как overlay на `/user/:id`. */
+  const navOverlayInset = resolveMobileBottomNavLayoutHeight(insets.bottom);
+  const showAnyMobileDock =
+    showMobilePurchaseDock ||
+    showMobileDealDock ||
+    showInstallmentDock ||
+    showAuctionDock;
+  const scrollPaddingBottom = pageLayout.resolveScrollPaddingBottom(
+    insets.bottom,
+    showAnyMobileDock,
+    navOverlayInset,
+  );
+  const dockBottomStyle = {
+    bottom: navOverlayInset,
+    paddingBottom: 10.4,
+  };
   const isAltTab =
     activeTab === "reviews" ||
     activeTab === "qa" ||
@@ -972,11 +994,7 @@ export default function ProductDetailScreen() {
 
           {showMobilePurchaseDock && keyboardBottomInset === 0 ? (
             <View
-              style={[
-                styles.purchaseDock,
-                styles.purchaseDockInner,
-                { paddingBottom: Math.max(insets.bottom, 10.4) },
-              ]}
+              style={[styles.purchaseDock, styles.purchaseDockInner, dockBottomStyle]}
             >
               <ProductDetailPurchaseActions
                 productId={productId}
@@ -1002,11 +1020,7 @@ export default function ProductDetailScreen() {
 
           {showMobileDealDock && keyboardBottomInset === 0 ? (
             <View
-              style={[
-                styles.purchaseDock,
-                styles.purchaseDockInner,
-                { paddingBottom: Math.max(insets.bottom, 10.4) },
-              ]}
+              style={[styles.purchaseDock, styles.purchaseDockInner, dockBottomStyle]}
             >
               <ProductDealActions
                 product={productRecord}
@@ -1017,12 +1031,7 @@ export default function ProductDetailScreen() {
           ) : null}
 
           {showInstallmentDock && installmentDock && keyboardBottomInset === 0 ? (
-            <View
-              style={[
-                styles.installmentDock,
-                { paddingBottom: Math.max(insets.bottom, 10.4) },
-              ]}
-            >
+            <View style={[styles.installmentDock, dockBottomStyle]}>
               <AppButton
                 label={installmentDock.label}
                 variant="primary"
@@ -1035,12 +1044,7 @@ export default function ProductDetailScreen() {
           ) : null}
 
           {showAuctionDock && auctionDock && keyboardBottomInset === 0 ? (
-            <View
-              style={[
-                styles.installmentDock,
-                { paddingBottom: Math.max(insets.bottom, 10.4) },
-              ]}
-            >
+            <View style={[styles.installmentDock, dockBottomStyle]}>
               <AppButton
                 label={auctionDock.label}
                 variant="contrast"
@@ -1052,6 +1056,8 @@ export default function ProductDetailScreen() {
             </View>
           ) : null}
         </View>
+
+        <MobileBottomNavOverlay />
 
         <ReportProductModal
           visible={reportModalVisible}

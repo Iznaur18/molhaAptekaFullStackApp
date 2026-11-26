@@ -24,19 +24,19 @@ type PaymentMethodCardTheme = {
   label: string;
 };
 
+/** Невыбранные кнопки — серые; цвет метода не красит фон. */
 export const CHECKOUT_PAYMENT_METHOD_CARD_THEME: Record<
   OrderPaymentMethod,
   PaymentMethodCardTheme
 > = {
   [ORDER_PAYMENT_METHOD_CARD_PREPAID]: {
-    surface: semanticColors.actionSoft,
-    label: semanticColors.action,
+    surface: semanticColors.surfaceMuted,
+    label: semanticColors.text,
   },
   [ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY]: {
-    surface: semanticColors.successSurface,
-    label: semanticColors.successText,
+    surface: semanticColors.surfaceMuted,
+    label: semanticColors.text,
   },
-  // На сайте у способа нет своей заливки — обычная карточка на поверхности.
   [ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY]: {
     surface: semanticColors.surfaceMuted,
     label: semanticColors.text,

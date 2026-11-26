@@ -43,7 +43,11 @@ export const LUCKY_BOX_SECTION_UI = {
     `У вас активна скидка ${percent}% — применится автоматически при оформлении заказа`,
   /** Заголовок выигрыша товара. @param {string} productName */
   WIN_PRODUCT_TITLE: (productName) => `Товар в подарок: ${productName}`,
-  WIN_PRODUCT_APPLIES: "Добавим бесплатно в ваш заказ у этого продавца",
+  WIN_PRODUCT_APPLIES:
+    "Товар добавлен в корзину — бесплатно при заказе у этого продавца",
+  WIN_PRODUCT_ALREADY_IN_CART:
+    "Товар уже в корзине — бесплатно при заказе у этого продавца",
+  CART_PRIZE_ADD_FAILED: "Приз получен, но не удалось добавить в корзину",
   /** Чип в списке призов для коробки с товаром. */
   PRIZE_CHIP_PRODUCT: "Товар",
   /** @param {string} productName */
@@ -51,12 +55,12 @@ export const LUCKY_BOX_SECTION_UI = {
     `Сегодня вы выиграли товар: ${productName}`,
   /** @param {string} productName */
   ACTIVE_PRODUCT_WIN_NOTICE: (productName) =>
-    `У вас выигран товар «${productName}» — добавим бесплатно к заказу у этого продавца`,
+    `У вас выигран товар «${productName}» — он в корзине, бесплатно при заказе у этого продавца`,
   LOAD_FALLBACK: "Не удалось загрузить игру",
   PLAY_FALLBACK: "Не удалось открыть коробку",
   CLOSE: "Закрыть",
   /** Метка строки корзины со скидкой из игры (вместо «Промокод»). */
-  CART_LINE_LABEL: "Коробки удачи",
+  CART_LINE_LABEL: "Коробки удачи · на этот товар",
   /** Бейдж строки корзины с товаром-призом. */
   CART_PRODUCT_BADGE: "Приз",
 };

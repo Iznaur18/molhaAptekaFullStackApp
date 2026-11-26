@@ -10,9 +10,10 @@ import {
 import { usePriceOfferMutations } from "@/entities/product-price-offer/model/usePriceOfferMutations";
 import { AuctionDashboardBuyerPriceEditor } from "@/entities/product-price-offer/ui/AuctionDashboardBuyerPriceEditor";
 import { AuctionDashboardProductThumb } from "@/entities/product-price-offer/ui/AuctionDashboardProductThumb";
+import { AuctionDashboardRowPrice } from "@/entities/product-price-offer/ui/AuctionDashboardRowPrice";
 import { AuctionDashboardRowStatus } from "@/entities/product-price-offer/ui/AuctionDashboardRowStatus";
 import { AUCTION_PAGE_UI, PRODUCT_PRICE_OFFER_UI } from "@/shared/config";
-import { formatIsoDateTime, formatPriceRub } from "@/shared/lib";
+import { formatIsoDateTime } from "@/shared/lib";
 import {
   formatIntegerGroupRu,
   formatRubPriceInput,
@@ -50,6 +51,7 @@ export const AuctionBuyerBidRow = ({
     formatIntegerGroupRu(bid.offerPrice ?? ""),
   );
   const [error, setError] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
   const { patchMutation, cancelMutation } = usePriceOfferMutations(bid.productId);
   const isBusy = patchMutation.isPending || cancelMutation.isPending;
 
@@ -82,6 +84,7 @@ export const AuctionBuyerBidRow = ({
     setError("");
     try {
       await patchMutation.mutateAsync(price);
+      setIsEditing(false);
       onChanged?.();
     } catch (patchError) {
       setError(
@@ -104,6 +107,12 @@ export const AuctionBuyerBidRow = ({
           : AUCTION_PAGE_UI.ERROR_GENERIC,
       );
     }
+  };
+
+  const handleCloseEditor = () => {
+    setIsEditing(false);
+    setError("");
+    setPriceInput(formatIntegerGroupRu(bid.offerPrice ?? ""));
   };
 
   const handleGoToCart = () => {
@@ -143,9 +152,9 @@ export const AuctionBuyerBidRow = ({
               <Text style={styles.meta} numberOfLines={1}>
                 {formatIsoDateTime(bid.createdAt)}
               </Text>
-              <AuctionDashboardRowStatus isPending={isPending} isAccepted={isAccepted}>
+              <AuctionDashboardRowStatus tone={isAccepted ? "success" : "neutral"}>
                 {isPending
-                  ? PRODUCT_PRICE_OFFER_UI.STATUS_PENDING
+                  ? AUCTION_PAGE_UI.STATUS_BUYER_PENDING
                   : isAccepted
                     ? PRODUCT_PRICE_OFFER_UI.STATUS_ACCEPTED
                     : null}
@@ -159,18 +168,17 @@ export const AuctionBuyerBidRow = ({
             </>
           ) : null}
         </View>
-      </View>
-
-      <View style={styles.priceStrip}>
-        <Text style={styles.priceLabel}>{AUCTION_PAGE_UI.BID_PRICE_LABEL}</Text>
-        <Text style={styles.price}>{formatPriceRub(bid.offerPrice)}</Text>
+        <AuctionDashboardRowPrice
+          price={bid.offerPrice}
+          caption={AUCTION_PAGE_UI.PRICE_CAPTION_MINE}
+        />
       </View>
 
       {collapsedPreview ? <Text style={styles.preview}>{collapsedPreview}</Text> : null}
 
       {isExpanded ? (
         <>
-          {isPending && isUserDataConfirmed ? (
+          {isPending && isUserDataConfirmed && isEditing ? (
             <AuctionDashboardBuyerPriceEditor
               label={AUCTION_PAGE_UI.EDIT_PRICE_LABEL}
               value={priceInput}
@@ -178,14 +186,43 @@ export const AuctionBuyerBidRow = ({
               onSubmit={() => {
                 void handleUpdate();
               }}
-              onCancel={() => {
-                void handleCancel();
-              }}
+              onClose={handleCloseEditor}
               disabled={isBusy}
-              submitLabel={PRODUCT_PRICE_OFFER_UI.UPDATE}
-              cancelLabel={PRODUCT_PRICE_OFFER_UI.CANCEL}
+              submitLabel={AUCTION_PAGE_UI.SAVE_BID}
+              closeLabel={AUCTION_PAGE_UI.CLOSE_EDITOR}
               pendingLabel={PRODUCT_PRICE_OFFER_UI.ACTION_PENDING}
             />
+          ) : null}
+
+          {isPending && isUserDataConfirmed && !isEditing ? (
+            <View style={styles.actions} accessibilityRole="toolbar">
+              <Pressable
+                style={[
+                  styles.actionBtn,
+                  styles.actionBtnSecondary,
+                  isBusy ? styles.disabled : null,
+                ]}
+                disabled={isBusy}
+                onPress={() => setIsEditing(true)}
+              >
+                <Text style={styles.actionBtnSecondaryText}>
+                  {`✎ ${AUCTION_PAGE_UI.EDIT_BID}`}
+                </Text>
+              </Pressable>
+              <Pressable
+                style={[styles.textBtn, isBusy ? styles.disabled : null]}
+                disabled={isBusy}
+                onPress={() => {
+                  void handleCancel();
+                }}
+              >
+                <Text style={styles.textBtnDanger}>
+                  {cancelMutation.isPending
+                    ? PRODUCT_PRICE_OFFER_UI.ACTION_PENDING
+                    : AUCTION_PAGE_UI.CANCEL_BID}
+                </Text>
+              </Pressable>
+            </View>
           ) : null}
 
           {isAccepted ? (

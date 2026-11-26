@@ -307,6 +307,15 @@ export {
 } from "./productPromoCode.js";
 export type { ProductPromoLike } from "./productPromoCode.js";
 export {
+  mergeSellerGameDiscountWinsIntoAppliedPromos,
+  pickMostExpensiveProductIdBySeller,
+} from "./mergeSellerGameDiscountWinsIntoAppliedPromos.js";
+export type {
+  GameDiscountAppliedPromoRow,
+  GameDiscountProductInput,
+  GameDiscountWinInput,
+} from "./mergeSellerGameDiscountWinsIntoAppliedPromos.js";
+export {
   PRODUCT_RENTAL_PRICE_UNIT_DAY,
   PRODUCT_RENTAL_PRICE_UNIT_HOUR,
   PRODUCT_RENTAL_PRICE_UNIT_VALUES,

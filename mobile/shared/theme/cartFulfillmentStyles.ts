@@ -152,9 +152,19 @@ export const useCartFulfillmentSectionStyles = createThemedStyles((theme) => ({
   checkoutButton: {
     marginTop: 4,
   },
-  /** Форма оформления между товарами и итогом (web `checkoutBeforeDock`). */
+  /**
+   * Список товаров в отправлении — web
+   * `.cart-fulfillment .cart-page__list { gap: 6px }` + line mb 0.
+   */
+  lines: {
+    gap: 6,
+  },
+  /**
+   * Форма оформления под товарами. Шаг 6px даёт первая method-card
+   * (`marginTop: 6`), как web `.cart-fulfillment__method-card`.
+   */
   checkoutForm: {
-    marginTop: 6,
+    marginTop: 0,
   },
   /**
    * Legacy flat fields (sheet / non-card). Cart path Г uses

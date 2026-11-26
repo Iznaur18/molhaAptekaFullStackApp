@@ -754,7 +754,16 @@ export function CheckoutForm({
               </header>
               <div className="checkout-form__fulfillment-section-body checkout-form__pickup">
                 {pickupReady ? (
-                  <div className="checkout-form__pickup-groups">
+                  <div
+                    className={[
+                      "checkout-form__pickup-groups",
+                      pickupGroups.length > 1
+                        ? "checkout-form__pickup-groups--carousel"
+                        : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                  >
                     {pickupGroups.map((group) => {
                       const needsSelect = group.locations.length >= 2;
                       const selectedId =

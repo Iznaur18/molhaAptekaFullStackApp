@@ -193,7 +193,7 @@
 }
 
 .checkout-form__fulfillment-section--pickup {
-  background: color-mix(in srgb, var(--iz-color-action) 5%, var(--iz-color-surface));
+  background: var(--iz-color-surface);
   border-color: color-mix(in srgb, var(--iz-color-action) 20%, var(--iz-color-border));
 }
 
@@ -334,6 +334,26 @@
   gap: 0.75rem;
 }
 
+/* Несколько точек — ряд слева направо, как saved-address carousel. */
+.checkout-form__pickup-groups--carousel {
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.checkout-form__pickup-groups--carousel::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
 .checkout-form__pickup-group {
   box-sizing: border-box;
   display: flex;
@@ -343,9 +363,30 @@
   padding: 0.75rem 0.875rem;
   border: 1px solid color-mix(in srgb, var(--iz-color-ink) 12%, var(--iz-color-border));
   border-radius: 12px;
-  background: var(--iz-color-surface-muted, var(--iz-color-surface-elevated));
+  background: var(--iz-color-surface);
   box-shadow: 0 1px 0 color-mix(in srgb, var(--iz-color-ink) 5%, transparent);
   color: var(--iz-color-text);
+}
+
+.checkout-form__pickup-groups--carousel .checkout-form__pickup-group {
+  flex: 0 0 auto;
+  width: 10.5rem;
+  min-height: 4.5rem;
+  scroll-snap-align: start;
+}
+
+.checkout-form__pickup-groups--carousel .checkout-form__pickup-products {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.checkout-form__pickup-groups--carousel .checkout-form__pickup-address {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
 }
 
 :root[data-theme="dark"] .checkout-form__pickup-products,

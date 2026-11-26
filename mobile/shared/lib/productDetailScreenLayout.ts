@@ -55,17 +55,26 @@ export const resolveProductDetailHeroSize = (
   };
 };
 
+/**
+ * Scroll padding под floating bottom nav (+ optional purchase/deal dock).
+ * `navOverlayInset` — `resolveMobileBottomNavLayoutHeight(safeArea)`.
+ * Safe-area либо в dock (legacy, nav=0), либо в navOverlayInset — не оба.
+ */
 export const resolveProductDetailDockScrollPadding = (
   bottomInset: number,
   showMobileDock: boolean,
+  navOverlayInset = 0,
 ): number => {
+  const nav = Math.max(0, navOverlayInset);
   if (!showMobileDock) {
-    return 32;
+    return Math.max(32, nav + PRODUCT_DETAILS_MOBILE_DOCK_SCROLL_EXTRA);
   }
+  const dockSafe = nav > 0 ? 0 : Math.max(0, bottomInset);
   return (
     PRODUCT_DETAILS_MOBILE_DOCK_MAX_HEIGHT +
     PRODUCT_DETAILS_MOBILE_DOCK_SCROLL_EXTRA +
-    Math.max(0, bottomInset)
+    dockSafe +
+    nav
   );
 };
 

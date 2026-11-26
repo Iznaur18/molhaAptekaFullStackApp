@@ -46,16 +46,17 @@
   border: 1px solid var(--iz-color-border);
   border-radius: calc(var(--header-users-stretch-size) / 2);
   background: var(--iz-color-surface);
-  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
-  transition:
-    height var(--header-users-stretch-anim-ms) var(--header-users-stretch-ease),
-    box-shadow var(--header-users-stretch-anim-ms) var(--header-users-stretch-ease);
+  box-shadow: none;
+  transition: height var(--header-users-stretch-anim-ms)
+    var(--header-users-stretch-ease);
   will-change: height;
 }
 
 .header-users-stretch__shell--open {
   height: var(--header-users-stretch-open-height, 264px);
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.18);
+  /* Открытое меню: капсула с круглыми торцами, без свечения. */
+  border-radius: calc(var(--header-users-stretch-size) / 2);
+  box-shadow: none;
 }
 
 .header-users-stretch__shell--portal {
@@ -70,8 +71,7 @@
 .header-users-stretch__shell--cta:not(.header-users-stretch__shell--open) {
   border-color: transparent;
   background: var(--iz-gradient-header-btn);
-  box-shadow: 0 4px 12px -4px
-    color-mix(in srgb, var(--iz-color-action) 65%, transparent);
+  box-shadow: none;
 }
 
 .header-users-stretch__shell--cta .header-users-stretch__toggle {
@@ -83,8 +83,7 @@
   border-color: transparent;
   background: var(--iz-gradient-header-btn);
   color: var(--iz-color-on-contrast);
-  box-shadow: 0 4px 12px -4px
-    color-mix(in srgb, var(--iz-color-action) 65%, transparent);
+  box-shadow: none;
 }
 
 .header-users-stretch__toggle {

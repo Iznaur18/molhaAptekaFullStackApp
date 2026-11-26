@@ -248,13 +248,6 @@ export function ProductPriceOfferBuyerBlock({
               {myOffer?.status === PRICE_OFFER_STATUS_PENDING ||
               !showDockPrimaryAction ? (
                 <div className="product-price-offer__actions">
-                  {!showDockPrimaryAction
-                    ? renderPrimaryButton({
-                        label: offerSubmitLabel,
-                        onClick: () => void handleSubmitOffer(),
-                        disabled: isBusy,
-                      })
-                    : null}
                   {myOffer?.status === PRICE_OFFER_STATUS_PENDING ? (
                     <button
                       type="button"
@@ -265,6 +258,13 @@ export function ProductPriceOfferBuyerBlock({
                       {PRODUCT_PRICE_OFFER_UI.CANCEL}
                     </button>
                   ) : null}
+                  {!showDockPrimaryAction
+                    ? renderPrimaryButton({
+                        label: offerSubmitLabel,
+                        onClick: () => void handleSubmitOffer(),
+                        disabled: isBusy,
+                      })
+                    : null}
                 </div>
               ) : null}
             </div>
