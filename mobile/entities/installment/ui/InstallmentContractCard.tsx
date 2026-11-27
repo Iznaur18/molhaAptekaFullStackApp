@@ -1,6 +1,15 @@
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Image } from "expo-image";
+import { useEffect, useState } from "react";
+import { AccessibilityInfo, Pressable, Text, TextInput, View } from "react-native";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 import type { InstallmentContract } from "@/entities/installment/api/installmentApi";
+import { INSTALLMENT_CONTRACT_CARD_LAYOUT as L } from "@/entities/installment/lib/installmentContractCardLayout";
 import { contractNeedsBuyerAttention } from "@/entities/installment/lib/contractNeedsBuyerAttention";
 import { contractNeedsSellerAttention } from "@/entities/installment/lib/contractNeedsSellerAttention";
 import { useInstallmentContractCard } from "@/entities/installment/model/useInstallmentContractCard";
@@ -9,10 +18,13 @@ import { InstallmentContractProgressBar } from "@/entities/installment/ui/Instal
 import { InstallmentContractCardSummary } from "@/entities/installment/ui/InstallmentContractCardSummary";
 import { InstallmentContractCounterparty } from "@/entities/installment/ui/InstallmentContractCounterparty";
 import { BuyerPassportSharePanel } from "@/entities/installment/ui/BuyerPassportSharePanel";
-import { INSTALLMENT_UI } from "@/shared/config";
+import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "@/entities/product/model/constants";
+import { COMMERCE_CARD_UI, INSTALLMENT_UI } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
+import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
+import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useInstallmentContractCardChromeStyles } from "@/shared/theme/installmentContractCardChromeStyles";
-import { CommerceCardExpandToggle } from "@/shared/ui/CommerceCardExpandToggle";
+import { CommerceCardFoldPanel } from "@/shared/ui/CommerceCardFoldPanel";
 
 type InstallmentContractCardProps = {
   contract: InstallmentContract;
@@ -32,6 +44,13 @@ const resolveProductId = (contract: InstallmentContract) =>
 
 const resolveProductName = (contract: InstallmentContract) =>
   contract.productNameAtContract ?? contract.product?.productName ?? "Товар";
+
+const resolveProductThumbUrl = (contract: InstallmentContract) => {
+  const raw = String(
+    contract.productImageUrl ?? contract.product?.productImageUrl ?? "",
+  ).trim();
+  return resolveUploadedMediaUrl(raw) || PRODUCT_IMAGE_PLACEHOLDER_URL;
+};
 
 const resolveStatusPillStyle = (
   status: string | undefined,
@@ -65,16 +84,49 @@ export const InstallmentContractCard = ({
   onExpandedChange,
 }: InstallmentContractCardProps) => {
   const styles = useInstallmentContractCardChromeStyles();
+  const { isPhoneLayout } = useProfileAdaptiveLayout();
   const card = useInstallmentContractCard({ contract, role, onUpdated });
   const productId = resolveProductId(contract);
   const productName = resolveProductName(contract);
+  const thumbUrl = resolveProductThumbUrl(contract);
+  const [thumbFailed, setThumbFailed] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
   const handleProductClick = onProductClick ?? onProductPress;
   const statusPillStyle = resolveStatusPillStyle(contract.status, styles);
   const isExpanded = !collapsible || expanded;
+  const chevronProgress = useSharedValue(isExpanded ? 1 : 0);
+  /** web Mobile.css: `--compact` chrome only at ≤640 */
+  const phoneCompactChrome = Boolean(compact && isPhoneLayout);
   const needsAttention =
     role === "buyer"
       ? contractNeedsBuyerAttention(contract)
       : contractNeedsSellerAttention(contract);
+
+  useEffect(() => {
+    let alive = true;
+    void AccessibilityInfo.isReduceMotionEnabled().then((enabled) => {
+      if (alive) setReduceMotion(Boolean(enabled));
+    });
+    const sub = AccessibilityInfo.addEventListener?.(
+      "reduceMotionChanged",
+      (enabled: boolean) => setReduceMotion(Boolean(enabled)),
+    );
+    return () => {
+      alive = false;
+      sub?.remove?.();
+    };
+  }, []);
+
+  useEffect(() => {
+    chevronProgress.value = withTiming(isExpanded ? 1 : 0, {
+      duration: reduceMotion ? 100 : L.chevronDurationMs,
+      easing: Easing.inOut(Easing.ease),
+    });
+  }, [chevronProgress, isExpanded, reduceMotion]);
+
+  const chevronStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${chevronProgress.value * 90}deg` }],
+  }));
 
   const toggleExpanded = () => {
     onExpandedChange?.(!expanded);
@@ -84,8 +136,8 @@ export const InstallmentContractCard = ({
     (payment) => payment.status === "pending_confirmation",
   );
 
-  const nextDuePreview = !isExpanded
-    ? role === "buyer" && card.nextPayablePayment
+  const nextDuePreview =
+    role === "buyer" && card.nextPayablePayment
       ? INSTALLMENT_UI.PAYMENTS_NEXT_DUE(
           formatPriceRub(card.nextPayablePayment.amountRub),
           card.nextPayablePayment.dueAt
@@ -101,8 +153,7 @@ export const InstallmentContractCard = ({
                 ? new Date(pendingConfirmationPayment.dueAt).toLocaleDateString("ru-RU")
                 : "—",
             )
-          : null
-    : null;
+          : null;
 
   if (!compact) {
     return (
@@ -164,34 +215,79 @@ export const InstallmentContractCard = ({
         needsAttention ? styles.cardAttention : null,
       ]}
     >
-      <View style={styles.header}>
+      <View style={[styles.header, phoneCompactChrome ? styles.headerPhone : null]}>
         {collapsible ? (
-          <View style={styles.headerToggle}>
+          <Pressable
+            style={[
+              styles.headerToggle,
+              phoneCompactChrome ? styles.headerTogglePhone : null,
+            ]}
+            accessibilityRole="button"
+            accessibilityState={{ expanded: isExpanded }}
+            accessibilityLabel={COMMERCE_CARD_UI.EXPAND_TOGGLE_ARIA(isExpanded)}
+            onPress={toggleExpanded}
+          >
+            <View style={styles.productRow}>
+              <Image
+                source={{
+                  uri: thumbFailed ? PRODUCT_IMAGE_PLACEHOLDER_URL : thumbUrl,
+                }}
+                style={styles.thumb}
+                contentFit="cover"
+                accessibilityIgnoresInvertColors
+                onError={() => setThumbFailed(true)}
+              />
+              {handleProductClick && productId ? (
+                <Pressable
+                  style={styles.titlePressable}
+                  onPress={(event) => {
+                    event.stopPropagation?.();
+                    handleProductClick(productId);
+                  }}
+                >
+                  <Text style={styles.title} numberOfLines={2}>
+                    {productName}
+                  </Text>
+                </Pressable>
+              ) : (
+                <Text style={styles.titleStatic} numberOfLines={2}>
+                  {productName}
+                </Text>
+              )}
+            </View>
+            <Animated.Text
+              style={[styles.chevron, chevronStyle]}
+              accessibilityElementsHidden
+            >
+              ▸
+            </Animated.Text>
+          </Pressable>
+        ) : (
+          <View style={styles.productRow}>
+            <Image
+              source={{
+                uri: thumbFailed ? PRODUCT_IMAGE_PLACEHOLDER_URL : thumbUrl,
+              }}
+              style={styles.thumb}
+              contentFit="cover"
+              accessibilityIgnoresInvertColors
+              onError={() => setThumbFailed(true)}
+            />
             {handleProductClick && productId ? (
               <Pressable
                 style={styles.titlePressable}
                 onPress={() => handleProductClick(productId)}
               >
-                <Text style={styles.title}>{productName}</Text>
+                <Text style={styles.title} numberOfLines={2}>
+                  {productName}
+                </Text>
               </Pressable>
             ) : (
-              <Text style={styles.titleStatic}>{productName}</Text>
+              <Text style={styles.titleStatic} numberOfLines={2}>
+                {productName}
+              </Text>
             )}
-            <CommerceCardExpandToggle
-              expanded={isExpanded}
-              accessibilityLabel={INSTALLMENT_UI.PAYMENTS_EXPAND_TOGGLE(isExpanded)}
-              onPress={toggleExpanded}
-            />
           </View>
-        ) : handleProductClick && productId ? (
-          <Pressable
-            style={styles.titlePressable}
-            onPress={() => handleProductClick(productId)}
-          >
-            <Text style={styles.title}>{productName}</Text>
-          </Pressable>
-        ) : (
-          <Text style={styles.titleStatic}>{productName}</Text>
         )}
         <View style={styles.headerBadges}>
           <View style={[styles.statusPill, statusPillStyle.pill]}>
@@ -214,23 +310,203 @@ export const InstallmentContractCard = ({
         ariaLabel={`${INSTALLMENT_UI.CONTRACT_PAID}: ${card.paidPercent}%`}
       />
 
-      {!isExpanded && nextDuePreview ? (
-        <Text style={styles.nextDue}>{nextDuePreview}</Text>
-      ) : null}
+      {collapsible ? (
+        <View style={styles.collapsibleRegion}>
+          {nextDuePreview ? (
+            <CommerceCardFoldPanel open={!isExpanded}>
+              <Text style={styles.nextDue}>{nextDuePreview}</Text>
+            </CommerceCardFoldPanel>
+          ) : null}
 
-      {isExpanded ? (
-        <>
+          <CommerceCardFoldPanel open={isExpanded} innerStyle={styles.foldBody}>
+            {role === "buyer" ? (
+              <InstallmentContractCounterparty
+                label={INSTALLMENT_UI.SELLER_LABEL}
+                counterparty={contract.seller}
+                onUserClick={onCounterpartyClick}
+                compact={phoneCompactChrome}
+              />
+            ) : (
+              <InstallmentContractCounterparty
+                label={INSTALLMENT_UI.BUYER_LABEL}
+                counterparty={contract.buyer}
+                onUserClick={onCounterpartyClick}
+                compact={phoneCompactChrome}
+              />
+            )}
+
+            {role === "seller" && contract.buyerPassportShare ? (
+              <BuyerPassportSharePanel share={contract.buyerPassportShare} />
+            ) : null}
+
+            <InstallmentContractCardSummary
+              contract={contract}
+              remainingRub={card.remainingRub}
+              remainingDays={card.remainingDays}
+              paidPercent={card.paidPercent}
+            />
+
+            <InstallmentContractCardPayments
+              contract={contract}
+              role={role}
+              compact={phoneCompactChrome}
+              paymentStatusLabels={card.paymentStatusLabels}
+              paymentStatuses={card.paymentStatuses}
+              isActiveContract={card.isActiveContract}
+              earlyPayoffPending={card.earlyPayoffPending}
+              pendingKey={card.pendingKey}
+              canBuyerMarkPayment={card.canBuyerMarkPayment}
+              onMarkPaid={card.handleMarkPaid}
+              onConfirmPayment={card.handleConfirmPayment}
+              onRejectPayment={card.handleRejectPayment}
+            />
+
+            {card.error ? (
+              <Text style={styles.error} accessibilityRole="alert">
+                {card.error}
+              </Text>
+            ) : null}
+
+            {card.isActiveContract ? (
+              <View
+                style={[
+                  styles.cardActions,
+                  phoneCompactChrome ? styles.cardActionsPhone : null,
+                ]}
+              >
+                {role === "buyer" && card.earlyPayoffPending ? (
+                  <Pressable
+                    style={[
+                      styles.btn,
+                      styles.btnCancel,
+                      phoneCompactChrome ? styles.btnFullWidth : null,
+                      card.pendingKey != null ? styles.disabled : null,
+                    ]}
+                    disabled={card.pendingKey != null}
+                    onPress={card.handleCancelEarlyPayoff}
+                  >
+                    <Text style={[styles.btnText, styles.btnTextPrimary]}>
+                      {card.pendingKey === "early-cancel"
+                        ? INSTALLMENT_UI.ACTION_PENDING
+                        : INSTALLMENT_UI.CANCEL_EARLY_PAYOFF}
+                    </Text>
+                  </Pressable>
+                ) : null}
+                {role === "buyer" &&
+                !card.earlyPayoffPending &&
+                card.nextPayablePayment != null ? (
+                  <Pressable
+                    style={[
+                      styles.btn,
+                      phoneCompactChrome ? styles.btnFullWidth : null,
+                      card.pendingKey != null ? styles.disabled : null,
+                    ]}
+                    disabled={card.pendingKey != null}
+                    onPress={card.handleEarlyPayoff}
+                  >
+                    <Text style={styles.btnText}>
+                      {card.pendingKey === "early"
+                        ? INSTALLMENT_UI.ACTION_PENDING
+                        : INSTALLMENT_UI.EARLY_PAYOFF}
+                    </Text>
+                  </Pressable>
+                ) : null}
+                {role === "seller" && card.earlyPayoffPending ? (
+                  <>
+                    <Pressable
+                      style={[
+                        styles.btn,
+                        styles.btnSuccess,
+                        phoneCompactChrome ? styles.btnFullWidth : null,
+                        card.pendingKey != null ? styles.disabled : null,
+                      ]}
+                      disabled={card.pendingKey != null}
+                      onPress={card.handleConfirmEarlyPayoff}
+                    >
+                      <Text style={[styles.btnText, styles.btnTextPrimary]}>
+                        {card.pendingKey === "early-confirm"
+                          ? INSTALLMENT_UI.ACTION_PENDING
+                          : INSTALLMENT_UI.CONFIRM_EARLY_PAYOFF}
+                      </Text>
+                    </Pressable>
+                    <Pressable
+                      style={[
+                        styles.btn,
+                        styles.btnDanger,
+                        phoneCompactChrome ? styles.btnFullWidth : null,
+                        card.pendingKey != null ? styles.disabled : null,
+                      ]}
+                      disabled={card.pendingKey != null}
+                      onPress={card.handleRejectEarlyPayoff}
+                    >
+                      <Text style={[styles.btnText, styles.btnTextDanger]}>
+                        {card.pendingKey === "early-reject"
+                          ? INSTALLMENT_UI.ACTION_PENDING
+                          : INSTALLMENT_UI.REJECT_EARLY_PAYOFF}
+                      </Text>
+                    </Pressable>
+                  </>
+                ) : null}
+                {role === "buyer" ? (
+                  !card.showDisputeForm ? (
+                    <Pressable
+                      style={[
+                        styles.btn,
+                        phoneCompactChrome ? styles.btnFullWidth : null,
+                        card.pendingKey != null ? styles.disabled : null,
+                      ]}
+                      disabled={card.pendingKey != null}
+                      onPress={() => card.setShowDisputeForm(true)}
+                    >
+                      <Text style={styles.btnText}>{INSTALLMENT_UI.OPEN_DISPUTE}</Text>
+                    </Pressable>
+                  ) : (
+                    <View style={styles.disputeForm}>
+                      <TextInput
+                        style={styles.textarea}
+                        value={card.disputeReason}
+                        onChangeText={card.setDisputeReason}
+                        placeholder={INSTALLMENT_UI.DISPUTE_REASON_PLACEHOLDER}
+                        multiline
+                      />
+                      <Pressable
+                        style={[
+                          styles.btn,
+                          styles.btnPrimary,
+                          phoneCompactChrome ? styles.btnFullWidth : null,
+                          card.pendingKey != null ? styles.disabled : null,
+                        ]}
+                        disabled={card.pendingKey != null}
+                        onPress={card.handleOpenDispute}
+                      >
+                        <Text style={[styles.btnText, styles.btnTextPrimary]}>
+                          {card.pendingKey === "dispute"
+                            ? INSTALLMENT_UI.ACTION_PENDING
+                            : INSTALLMENT_UI.OPEN_DISPUTE}
+                        </Text>
+                      </Pressable>
+                    </View>
+                  )
+                ) : null}
+              </View>
+            ) : null}
+          </CommerceCardFoldPanel>
+        </View>
+      ) : (
+        <View style={styles.foldBody}>
           {role === "buyer" ? (
             <InstallmentContractCounterparty
               label={INSTALLMENT_UI.SELLER_LABEL}
               counterparty={contract.seller}
               onUserClick={onCounterpartyClick}
+              compact={phoneCompactChrome}
             />
           ) : (
             <InstallmentContractCounterparty
               label={INSTALLMENT_UI.BUYER_LABEL}
               counterparty={contract.buyer}
               onUserClick={onCounterpartyClick}
+              compact={phoneCompactChrome}
             />
           )}
 
@@ -248,7 +524,7 @@ export const InstallmentContractCard = ({
           <InstallmentContractCardPayments
             contract={contract}
             role={role}
-            compact
+            compact={phoneCompactChrome}
             paymentStatusLabels={card.paymentStatusLabels}
             paymentStatuses={card.paymentStatuses}
             isActiveContract={card.isActiveContract}
@@ -267,12 +543,18 @@ export const InstallmentContractCard = ({
           ) : null}
 
           {card.isActiveContract ? (
-            <View style={styles.cardActions}>
+            <View
+              style={[
+                styles.cardActions,
+                phoneCompactChrome ? styles.cardActionsPhone : null,
+              ]}
+            >
               {role === "buyer" && card.earlyPayoffPending ? (
                 <Pressable
                   style={[
                     styles.btn,
                     styles.btnCancel,
+                    phoneCompactChrome ? styles.btnFullWidth : null,
                     card.pendingKey != null ? styles.disabled : null,
                   ]}
                   disabled={card.pendingKey != null}
@@ -289,7 +571,11 @@ export const InstallmentContractCard = ({
               !card.earlyPayoffPending &&
               card.nextPayablePayment != null ? (
                 <Pressable
-                  style={[styles.btn, card.pendingKey != null ? styles.disabled : null]}
+                  style={[
+                    styles.btn,
+                    phoneCompactChrome ? styles.btnFullWidth : null,
+                    card.pendingKey != null ? styles.disabled : null,
+                  ]}
                   disabled={card.pendingKey != null}
                   onPress={card.handleEarlyPayoff}
                 >
@@ -306,6 +592,7 @@ export const InstallmentContractCard = ({
                     style={[
                       styles.btn,
                       styles.btnSuccess,
+                      phoneCompactChrome ? styles.btnFullWidth : null,
                       card.pendingKey != null ? styles.disabled : null,
                     ]}
                     disabled={card.pendingKey != null}
@@ -321,12 +608,13 @@ export const InstallmentContractCard = ({
                     style={[
                       styles.btn,
                       styles.btnDanger,
+                      phoneCompactChrome ? styles.btnFullWidth : null,
                       card.pendingKey != null ? styles.disabled : null,
                     ]}
                     disabled={card.pendingKey != null}
                     onPress={card.handleRejectEarlyPayoff}
                   >
-                    <Text style={styles.btnTextDanger}>
+                    <Text style={[styles.btnText, styles.btnTextDanger]}>
                       {card.pendingKey === "early-reject"
                         ? INSTALLMENT_UI.ACTION_PENDING
                         : INSTALLMENT_UI.REJECT_EARLY_PAYOFF}
@@ -339,6 +627,7 @@ export const InstallmentContractCard = ({
                   <Pressable
                     style={[
                       styles.btn,
+                      phoneCompactChrome ? styles.btnFullWidth : null,
                       card.pendingKey != null ? styles.disabled : null,
                     ]}
                     disabled={card.pendingKey != null}
@@ -359,6 +648,7 @@ export const InstallmentContractCard = ({
                       style={[
                         styles.btn,
                         styles.btnPrimary,
+                        phoneCompactChrome ? styles.btnFullWidth : null,
                         card.pendingKey != null ? styles.disabled : null,
                       ]}
                       disabled={card.pendingKey != null}
@@ -375,8 +665,8 @@ export const InstallmentContractCard = ({
               ) : null}
             </View>
           ) : null}
-        </>
-      ) : null}
+        </View>
+      )}
     </View>
   );
 };

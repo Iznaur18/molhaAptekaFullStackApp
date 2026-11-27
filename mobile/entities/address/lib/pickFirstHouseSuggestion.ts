@@ -1,16 +1,12 @@
+import { pickAddressSuggestionForGeo } from "@molha/api-contract";
+
 import type { AddressSuggestionDto } from "../model/types";
 
+/**
+ * Первая подсказка до дома/участка — тот же критерий, что на сервере и в вебе
+ * (`pickAddressSuggestionForGeo`): ФИАС или номер дома/участка с координатами.
+ */
 export const pickFirstHouseSuggestion = (
   suggestions: AddressSuggestionDto[] | null | undefined,
-): AddressSuggestionDto | null => {
-  if (!Array.isArray(suggestions)) {
-    return null;
-  }
-  for (const item of suggestions) {
-    const fiasId = item?.data?.house_fias_id;
-    if (fiasId != null && String(fiasId).trim().length > 0) {
-      return item;
-    }
-  }
-  return null;
-};
+): AddressSuggestionDto | null =>
+  pickAddressSuggestionForGeo(suggestions) as AddressSuggestionDto | null;

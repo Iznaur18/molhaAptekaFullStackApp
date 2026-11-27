@@ -311,8 +311,20 @@ export const buildProfileNavGroups = (
   const servicesItems: ProfileNavItem[] = PROFILE_SERVICES_SECTION_ORDER.flatMap(
     (sectionId): ProfileNavItem[] => {
       // Пункты сервисов появляются по мере экранов; порядок уже общий с web.
+      if (sectionId === "courier-overview" && access.canUseCourierOverview) {
+        return [{ sectionId, label: MY_PROFILE_PAGE_UI.TAB_COURIER_OVERVIEW }];
+      }
+      if (sectionId === "onec-integration" && access.canUseOneCIntegration) {
+        return [{ sectionId, label: MY_PROFILE_PAGE_UI.TAB_ONEC_INTEGRATION }];
+      }
+      if (sectionId === "delivery-payment" && access.isProfileReady) {
+        return [{ sectionId, label: MY_PROFILE_PAGE_UI.TAB_DELIVERY_PAYMENT }];
+      }
       if (sectionId === "safe-deal" && access.isProfileReady) {
         return [{ sectionId, label: MY_PROFILE_PAGE_UI.TAB_SAFE_DEAL }];
+      }
+      if (sectionId === "courier" && access.canUseCourier) {
+        return [{ sectionId, label: MY_PROFILE_PAGE_UI.TAB_COURIER }];
       }
       return [];
     },

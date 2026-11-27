@@ -67,7 +67,10 @@ export const PROFILE_OVERVIEW_LAYOUT = {
   infoSectionRadius: 24,
   footerGap: 12,
   footerMarginTop: 8,
+  /** web phone ≤640 `.my-profile-page__mobile-nav-toggle { border-radius: 20px }` */
   sectionToggleRadius: 20,
+  /** web `--my-profile-surface-radius` (641–900 toggle) */
+  sectionToggleRadiusTablet: 24,
   sectionTogglePaddingY: 12,
   sectionTogglePaddingX: 14,
   sectionToggleBorderWidth: 2,

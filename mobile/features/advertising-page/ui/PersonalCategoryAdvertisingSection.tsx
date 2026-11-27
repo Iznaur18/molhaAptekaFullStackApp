@@ -273,6 +273,7 @@ export const PersonalCategoryAdvertisingSection = ({
               <Pressable
                 style={[
                   styles.cancelButton,
+                  styles.actionsButton,
                   isSubmitting && styles.cancelButtonDisabled,
                 ]}
                 onPress={() => setShowForm(false)}
@@ -283,6 +284,7 @@ export const PersonalCategoryAdvertisingSection = ({
               <Pressable
                 style={[
                   styles.primaryButton,
+                  styles.actionsButton,
                   (isSubmitting || loyaltyBalance < pricePoints) &&
                     styles.primaryButtonDisabled,
                 ]}

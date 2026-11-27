@@ -13,6 +13,7 @@ type InstallmentContractCounterpartyProps = {
   label: string;
   counterparty?: InstallmentCounterparty | null;
   onUserClick?: (userId: string) => void;
+  compact?: boolean;
 };
 
 const formatDisplayName = (counterparty?: InstallmentCounterparty | null) => {
@@ -30,6 +31,7 @@ export const InstallmentContractCounterparty = ({
   label,
   counterparty,
   onUserClick,
+  compact = false,
 }: InstallmentContractCounterpartyProps) => {
   const styles = useInstallmentContractCardChromeStyles();
 
@@ -43,27 +45,49 @@ export const InstallmentContractCounterparty = ({
   const phoneHref = toRuPhoneTelHref(counterparty.userPhoneNumber);
 
   return (
-    <View style={styles.counterparty}>
-      <Text style={styles.counterpartyLabel}>{label}</Text>
+    <View style={[styles.counterparty, compact ? styles.counterpartyCompact : null]}>
+      <Text
+        style={[
+          styles.counterpartyLabel,
+          compact ? styles.counterpartyLabelCompact : null,
+        ]}
+      >
+        {label}
+      </Text>
       {canLink ? (
         <Pressable onPress={() => onUserClick(String(counterparty._id))}>
-          <Text style={styles.counterpartyName}>{displayName}</Text>
+          <Text
+            style={[
+              styles.counterpartyName,
+              compact ? styles.counterpartyNameCompact : null,
+            ]}
+          >
+            {displayName}
+          </Text>
         </Pressable>
       ) : (
-        <Text style={[styles.counterpartyName, styles.counterpartyNameStatic]}>
+        <Text
+          style={[
+            styles.counterpartyName,
+            styles.counterpartyNameStatic,
+            compact ? styles.counterpartyNameCompact : null,
+          ]}
+        >
           {displayName}
         </Text>
       )}
-      {phoneHref ? (
+      {/* web Mobile.css ≤640: `.detail { display: none }` */}
+      {!compact && phoneHref ? (
         <Pressable onPress={() => openTelHref(phoneHref)}>
           <Text style={[styles.counterpartyDetail, styles.counterpartyPhoneLink]}>
             {phoneDisplay}
           </Text>
         </Pressable>
-      ) : (
+      ) : null}
+      {!compact && !phoneHref && phoneDisplay !== EM_DASH ? (
         <Text style={styles.counterpartyDetail}>{phoneDisplay}</Text>
-      )}
-      {counterparty.email ? (
+      ) : null}
+      {!compact && counterparty.email ? (
         <Text style={styles.counterpartyDetail}>{counterparty.email}</Text>
       ) : null}
     </View>

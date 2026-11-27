@@ -212,7 +212,7 @@ export function AddressDeliveryFields({
 
   const handlePickSuggestion = (suggestion) => {
     const mapped = mapDadataSuggestion(suggestion);
-    const isHouse = mapped.fiasId.length > 0;
+    const isHouse = mapped.isComplete === true;
     setMapError(null);
     setMapStatus("idle");
     patch({

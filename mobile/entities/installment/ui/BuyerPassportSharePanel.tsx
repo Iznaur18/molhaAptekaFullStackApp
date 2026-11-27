@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { Linking, Pressable, Text, View } from "react-native";
 
 import {
   formatPassportDate,
@@ -20,6 +20,11 @@ type BuyerPassportSharePanelProps = {
   share?: BuyerPassportShare | null;
 };
 
+type PassportField = {
+  label: string;
+  value: string;
+};
+
 export const BuyerPassportSharePanel = ({ share }: BuyerPassportSharePanelProps) => {
   const styles = useBuyerPassportSharePanelStyles();
   const passport = share?.passport;
@@ -30,14 +35,42 @@ export const BuyerPassportSharePanel = ({ share }: BuyerPassportSharePanelProps)
     return null;
   }
 
+  const fields: PassportField[] = [
+    { label: "ФИО", value: formatPassportFullName(passport) },
+    { label: "Дата рождения", value: formatPassportDate(passport.birthDate) },
+    {
+      label: "Серия и номер",
+      value: `${passport.series ?? ""} ${passport.number ?? ""}`.trim(),
+    },
+    { label: "Кем выдан", value: String(passport.issuedBy ?? "") },
+    { label: "Дата выдачи", value: formatPassportDate(passport.issuedAt) },
+    { label: "Код подразделения", value: String(passport.departmentCode ?? "") },
+  ];
+
+  const openSelfie = () => {
+    if (selfieState.status === "ready" && selfieState.url) {
+      void Linking.openURL(selfieState.url).catch(() => undefined);
+    }
+  };
+
   const renderSelfie = () => {
     if (selfieState.status === "ready" && selfieState.url) {
       return (
-        <PrivateUploadImage
-          uri={selfieState.url}
-          style={styles.selfieImage}
-          accessibilityLabel={INSTALLMENT_UI.PASSPORT_SHARE_SELFIE_SECTION}
-        />
+        <Pressable
+          style={styles.selfieLink}
+          onPress={openSelfie}
+          accessibilityRole="link"
+          accessibilityLabel={INSTALLMENT_UI.PASSPORT_SHARE_SELFIE_OPEN}
+        >
+          <PrivateUploadImage
+            uri={selfieState.url}
+            style={styles.selfieImage}
+            accessibilityLabel={INSTALLMENT_UI.PASSPORT_SHARE_SELFIE_SECTION}
+          />
+          <Text style={styles.selfieLinkText}>
+            {INSTALLMENT_UI.PASSPORT_SHARE_SELFIE_OPEN}
+          </Text>
+        </Pressable>
       );
     }
     if (selfieState.status === "error") {
@@ -61,36 +94,20 @@ export const BuyerPassportSharePanel = ({ share }: BuyerPassportSharePanelProps)
   return (
     <View style={styles.panel}>
       <Text style={styles.title}>{INSTALLMENT_UI.PASSPORT_SHARE_SECTION}</Text>
-      <View style={styles.field}>
-        <Text style={styles.label}>ФИО</Text>
-        <Text style={styles.value}>{formatPassportFullName(passport)}</Text>
+      <View style={styles.grid}>
+        {fields.map((field) => (
+          <View key={field.label} style={styles.field}>
+            <Text style={styles.label}>{field.label}</Text>
+            <Text style={styles.value}>{field.value}</Text>
+          </View>
+        ))}
       </View>
-      <View style={styles.field}>
-        <Text style={styles.label}>Дата рождения</Text>
-        <Text style={styles.value}>{formatPassportDate(passport.birthDate)}</Text>
-      </View>
-      <View style={styles.field}>
-        <Text style={styles.label}>Серия и номер</Text>
-        <Text style={styles.value}>
-          {passport.series} {passport.number}
+      <View style={styles.selfieSection}>
+        <Text style={styles.selfieTitle}>
+          {INSTALLMENT_UI.PASSPORT_SHARE_SELFIE_SECTION}
         </Text>
+        {renderSelfie()}
       </View>
-      <View style={styles.field}>
-        <Text style={styles.label}>Кем выдан</Text>
-        <Text style={styles.value}>{passport.issuedBy}</Text>
-      </View>
-      <View style={styles.field}>
-        <Text style={styles.label}>Дата выдачи</Text>
-        <Text style={styles.value}>{formatPassportDate(passport.issuedAt)}</Text>
-      </View>
-      <View style={styles.field}>
-        <Text style={styles.label}>Код подразделения</Text>
-        <Text style={styles.value}>{passport.departmentCode}</Text>
-      </View>
-      <Text style={styles.selfieTitle}>
-        {INSTALLMENT_UI.PASSPORT_SHARE_SELFIE_SECTION}
-      </Text>
-      {renderSelfie()}
     </View>
   );
 };

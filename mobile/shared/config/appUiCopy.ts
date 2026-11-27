@@ -128,9 +128,11 @@ export const API_CLIENT_UI = {
 } as const;
 
 export const IMAGE_UPLOAD_UI = {
-  UPLOAD_BUTTON: "Выбрать фото",
+  /** web `IMAGE_URL_FIELD_UI.UPLOAD_BUTTON` */
+  UPLOAD_BUTTON: "Выбрать файл",
   UPLOAD_LOADING: "Загрузка…",
-  UPLOAD_HINT: "JPEG, PNG или WebP, до 50 МБ — большие файлы сожмутся автоматически",
+  UPLOAD_HINT:
+    "JPEG, PNG или WebP, до 50 МБ — большие файлы сожмутся автоматически. Можно также вставить ссылку.",
   ERROR_TYPE: "Допустимы только JPEG, PNG и WebP",
   ERROR_SIZE: "Файл не больше 50 МБ",
   ERROR_GENERIC: "Не удалось загрузить файл",
@@ -1137,6 +1139,10 @@ export const INSTALLMENT_UI = {
   FIRST_PAYMENT_LATER: "первый платёж позже",
   QUANTITY_LABEL: "Количество",
   QUANTITY_AVAILABLE: (max: number) => `Доступно: ${max}`,
+  QUANTITY_DECREASE: "Меньше",
+  QUANTITY_INCREASE: "Больше",
+  PLAN_PER_MONTH: (formatted: string) => `${formatted}/мес`,
+  PLAN_MONTHS: (months: number) => `${months} мес`,
   QUANTITY_EXCEEDS_STOCK: (max: number) => `В наличии только ${max} шт.`,
   MONTHLY_LABEL: "Ежемесячно",
   BUYER_PRODUCT_PRICE_LABEL: "Цена товара",
@@ -1810,6 +1816,10 @@ export const MY_PROFILE_PAGE_UI = {
   TAB_MY_ORDERS: "Мои покупки",
   TAB_DEAL_REQUESTS: "Заявки",
   TAB_SAFE_DEAL: "Безопасная сделка",
+  TAB_DELIVERY_PAYMENT: "Доставка и оплата",
+  TAB_ONEC_INTEGRATION: "1С Интеграция",
+  TAB_COURIER: "Стать курьером",
+  TAB_COURIER_OVERVIEW: "Свободные заказы",
   TAB_AUCTION: "Аукцион",
   TAB_ADMIN_ORDERS: "Все заказы",
   TAB_SEARCH_SYNONYMS_ADMIN: "Синонимы поиска",
@@ -3052,6 +3062,7 @@ export const PARTNER_PROGRAM_PAGE_UI = {
   COPY_FAILED: "Не удалось скопировать",
   LIST_TITLE: "Ваши рефералы",
   LIST_EMPTY: "Пока никого нет — поделитесь ссылкой",
+  COL_NAME: "Ник",
   COL_DATE: "Регистрация",
   COL_SPEND: "Траты",
   COL_CASHBACK: "Кэшбэк",
@@ -3071,6 +3082,7 @@ export const AFFILIATE_SALES_UI = {
     "Пока нет продаж через партнёров — включите партнёрку на объявлении, чтобы ими делились.",
   PARTNER: "Привёл",
   BUYER: "Купил",
+  SELLER: "Продал",
   NAME_FALLBACK: "—",
   PERCENT: "Процент",
   AMOUNT: "Выплата партнёру",
@@ -3158,7 +3170,8 @@ export const DATA_CONFIRMATION_MODAL_UI = {
   PLACEHOLDER_DATE: "ДД.ММ.ГГГГ",
   SUBMIT: "Отправить заявку",
   SUBMIT_LOADING: "Отправка…",
-  CANCEL: "Закрыть",
+  CANCEL: "Отмена",
+  ARIA_CLOSE: "Закрыть",
 } as const;
 
 export const PRODUCT_MODERATION_PAGE_UI = {
@@ -3871,6 +3884,310 @@ export const SAFE_DEAL_UI = {
   LOGIN_HINT: "Войдите, чтобы подключить безопасную сделку.",
   PRIVACY_NOTE:
     "ИНН виден только вам и модератору — на витрине показывается лишь значок «Безопасная сделка».",
+} as const;
+
+/** Раздел профиля: адрес, доставка и оплата сразу для всех товаров продавца. */
+export const SELLER_COMMERCE_DEFAULTS_UI = {
+  TITLE: "Доставка и оплата",
+  INTRO:
+    "Настройки применяются ко всем товарам, которые следуют профилю. Переехали или сменили службу — правите здесь один раз, а не тысячу карточек.",
+  LOADING: "Загрузка…",
+  ERROR_GENERIC: "Не удалось сохранить настройки. Попробуйте ещё раз.",
+  LOGIN_HINT: "Войдите, чтобы настроить доставку и оплату.",
+
+  SECTION_PAYOUT: "Реквизиты для перевода",
+  PAYOUT_HINT:
+    "Номер карты или телефон для СБП. Покупатель увидит их, только когда его заказ уже везёт курьер и платить надо переводом. Платформа деньги не принимает — перевод идёт напрямую вам.",
+  PAYOUT_PLACEHOLDER: "2200 1234 5678 9010 или +7 900 000-00-00",
+  SECTION_FULFILLMENT: "Откуда и как отправляете",
+  SECTION_DELIVERY_ZONE: "Куда доставляете",
+  OUTSIDE_REGION_LABEL: "Доставлять в другие регионы",
+  OUTSIDE_REGION_HINT:
+    "Выключите, и заказать доставку смогут только покупатели из региона вашего товара. Остальные увидят товар, но получить его смогут только самовывозом. На СДЭК и Яндекс Доставку настройка не действует.",
+  SECTION_TARIFF: "Сколько стоит ваша доставка",
+  TARIFF_ONLY_OWN_HINT:
+    "Тариф действует, только когда вы везёте сами. У курьеров Gitorg сумму называет покупатель, у службы доставки — сама служба.",
+  TARIFF_FREE: "Доставка бесплатная",
+  TARIFF_PAID: "Доставка платная",
+  TARIFF_BASE_FEE_LABEL: "Цена за вызов, ₽",
+  TARIFF_BASE_FEE_HINT: "Берётся всегда, сколько бы ни было километров.",
+  TARIFF_PER_KM_LABEL: "Цена за километр, ₽",
+  TARIFF_PER_KM_HINT:
+    "Считается по прямой от точки продажи до адреса покупателя, неполный километр — как целый. Оставьте 0, если километраж не нужен.",
+  TARIFF_FREE_FROM_LABEL: "Бесплатно от суммы заказа, ₽",
+  TARIFF_FREE_FROM_HINT:
+    "0 — порога нет. Сравнивается со стоимостью товаров, без самой доставки.",
+  TARIFF_EMPTY_ERROR:
+    "Укажите цену за вызов или цену за километр — иначе доставка бесплатная",
+  SECTION_TAB_MAIN: "Основной",
+  SECTION_TABS_ARIA: "Разделы: основные настройки и подключение служб",
+  SECTION_PAYMENT: "Как принимаете оплату",
+  PAYMENT_HINT:
+    "Покупатель увидит на оформлении только выбранные способы. Снять все нельзя — иначе заказ не оформить.",
+  PAYMENT_REQUIRED: "Оставьте хотя бы один способ оплаты",
+  PAYMENT_PAYOUT_HINT:
+    "Для перевода при получении нужны реквизиты в блоке выше — без них способ не сработает.",
+  PAYMENT_PREPAID_HINT:
+    "Предоплата картой доступна только товарам площадки: деньги проходят через неё.",
+
+  SAVE: "Сохранить",
+  SAVING: "Сохраняем…",
+  SAVED: "Настройки сохранены",
+  SAVED_WITH_SYNC: (count: number) =>
+    `Настройки сохранены, обновлено товаров: ${count}`,
+  FOLLOWING_COUNT: (count: number) =>
+    count === 0
+      ? "Пока ни один товар не следует профилю."
+      : `Профилю следуют товаров: ${count}. Сохранение изменит их все.`,
+  NOT_CONFIGURED_HINT:
+    "Настройки ещё не заданы. Пока их нет, каждый товар просит адрес отдельно.",
+} as const;
+
+/** Подключение СДЭК в настройках продавца. */
+export const CDEK_CONNECTION_UI = {
+  TITLE: "Доставка СДЭК",
+  SUBTITLE:
+    "Отправления идут по вашему договору со СДЭК и оплачиваются с него же. Площадка ключи не видит и за отправки не платит.",
+  HOW_TO: "Где взять: кабинет СДЭК → «Интеграция» → создать ключ.",
+  HOW_TO_LINK: "https://lk.cdek.ru/integration",
+  ACCOUNT_LABEL: "Account (логин интеграции)",
+  SECURE_LABEL: "Secure password (секретный ключ)",
+  ENVIRONMENT_LABEL: "Контур",
+  ENVIRONMENT_TEST: "Тестовый — отправления не создаются по-настоящему",
+  ENVIRONMENT_PROD: "Боевой — реальные отправления и деньги",
+  SUBMIT: "Подключить СДЭК",
+  SUBMIT_PENDING: "Проверяем ключи…",
+  DISCONNECT: "Отключить",
+  DISCONNECT_PENDING: "Отключаем…",
+  CONNECTED: "СДЭК подключён",
+  NOT_CONNECTED: "СДЭК не подключён",
+  CHECKED_AT: "Ключи проверены",
+  SECURE_HINT:
+    "Ключ хранится зашифрованным: ни в списке заказов, ни в ответах сайта он не появляется.",
+  REPLACE_HINT: "Чтобы заменить ключ, введите новую пару и сохраните.",
+  TOGGLE_LABEL: "Продавать через СДЭК",
+  TOGGLE_ON_HINT: "Покупатели видят СДЭК среди служб доставки ваших товаров",
+  TOGGLE_OFF_HINT:
+    "СДЭК скрыт от покупателей. Уже оформленные заказы это не затрагивает",
+} as const;
+
+/** Подключение Яндекс Доставки в настройках продавца. */
+export const YANDEX_DELIVERY_CONNECTION_UI = {
+  TITLE: "Яндекс Доставка",
+  SUBTITLE:
+    "Доставка в пункты выдачи Яндекса по вашему договору с Яндекс Доставкой. Площадка токен не видит и за отправки не платит.",
+  HOW_TO_STEPS: [
+    "Зарегистрируйте компанию или ИП на dostavka.yandex.ru.",
+    "В кабинете: «Компания» → «Добавить способ оплаты» → расчётный счёт, примите оферту.",
+    "Скопируйте «Токен для API» из профиля компании и вставьте ниже.",
+  ],
+  HOW_TO_LINK: "https://dostavka.yandex.ru/account/profile",
+  HOW_TO_LINK_LABEL: "Открыть кабинет Яндекс Доставки",
+  TOKEN_LABEL: "Токен для API",
+  ENVIRONMENT_LABEL: "Контур",
+  ENVIRONMENT_PROD: "Боевой — реальные отправления",
+  ENVIRONMENT_TEST: "Тестовый — только Москва, заказы не настоящие",
+  SUBMIT: "Подключить Яндекс Доставку",
+  SUBMIT_PENDING: "Проверяем токен…",
+  DISCONNECT: "Отключить",
+  DISCONNECT_PENDING: "Отключаем…",
+  CONNECTED: "Подключена",
+  NOT_CONNECTED: "Не подключена",
+  TOKEN_MASKED_LABEL: "Токен",
+  CHECKED_AT: "Токен проверен",
+  SECURE_HINT:
+    "Токен хранится зашифрованным: ни в заказах, ни в ответах сайта он не появляется.",
+  REPLACE_HINT: "Чтобы заменить токен, вставьте новый и сохраните.",
+  TOGGLE_LABEL: "Продавать через Яндекс Доставку",
+  TOGGLE_ON_HINT: "Покупатели видят Яндекс Доставку среди служб доставки ваших товаров",
+  TOGGLE_OFF_HINT: "Яндекс Доставка скрыта от покупателей",
+  DROPOFF_TITLE: "Куда вы сдаёте посылки",
+  DROPOFF_HINT:
+    "Яндекс принимает отправления только в своих пунктах: выберите тот, куда будете относить коробки. Цену доставки Яндекс считает от него.",
+  DROPOFF_MISSING: "Пункт не выбран — покупатели пока не видят Яндекс Доставку",
+  DROPOFF_CURRENT: "Сейчас",
+  DROPOFF_CITY_LABEL: "Город",
+  DROPOFF_CITY_PLACEHOLDER: "Например, Грозный",
+  DROPOFF_FIND: "Найти пункты",
+  DROPOFF_FIND_PENDING: "Ищем…",
+  DROPOFF_POINT_LABEL: "Пункт приёма",
+  DROPOFF_EMPTY: "В этом городе нет пунктов Яндекса, принимающих отправления",
+  DROPOFF_SAVE: "Сохранить пункт",
+  DROPOFF_SAVE_PENDING: "Сохраняем…",
+} as const;
+
+export const ONEC_INTEGRATION_PAGE_UI = {
+  TITLE: "Интеграция с 1С",
+  LEAD: "Товары, цены и остатки приходят из 1С, а заказы клиентов уходят обратно как «Заказ покупателя».",
+  AUTH_REQUIRED: "Войдите, чтобы настроить интеграцию с 1С",
+  LOGIN_BUTTON: "Войти",
+  CHANNEL_TITLE: "Как обмениваемся",
+  CHANNEL_COMMERCEML: "1С сама шлёт на сайт (CommerceML)",
+  CHANNEL_COMMERCEML_HINT:
+    "Штатный «Обмен с сайтом» в УТ 11, Рознице и Бухгалтерии — настраивается галочками, без доработки конфигурации. Рекомендуемый способ.",
+  CHANNEL_PULL: "Сайт сам ходит в 1С (HTTP-сервис)",
+  CHANNEL_PULL_HINT:
+    "Нужен HTTP-сервис в вашей конфигурации и его публикация наружу. Подойдёт, если сервис уже написан.",
+  LABEL_ENABLED: "Обмен включён",
+  LABEL_BASE_URL: "URL HTTP-сервиса 1С",
+  PLACEHOLDER_BASE_URL: "https://ваш-сервер/onec-api",
+  LABEL_API_KEY: "API-ключ",
+  PLACEHOLDER_API_KEY: "Вставьте ключ (сохраняется в зашифрованном виде)",
+  HINT_API_KEY_SET: "Ключ сохранён:",
+  HINT_LEAVE_KEY: "Оставьте поле пустым, чтобы не менять сохранённый ключ.",
+  ACCESS_TITLE: "Доступы для 1С",
+  ACCESS_HINT:
+    "Вставьте эти три значения в узел обмена 1С: Администрирование → Синхронизация данных → Обмен с сайтом.",
+  LABEL_ENDPOINT: "Адрес обмена",
+  LABEL_LOGIN: "Логин",
+  LABEL_PASSWORD: "Пароль",
+  GENERATE_CREDENTIALS: "Сгенерировать логин и пароль",
+  REGENERATE_CREDENTIALS: "Перевыпустить пароль",
+  GENERATE_PENDING: "Генерируем…",
+  PASSWORD_ONCE:
+    "Пароль показан один раз — скопируйте его сейчас. Потом останется только перевыпустить.",
+  NO_CREDENTIALS: "Доступы ещё не выданы",
+  COPY: "Копировать",
+  COPIED: "Скопировано",
+  FILTERS_TITLE: "Что выгружать на витрину",
+  PRICE_TYPES_LABEL: "Типы цен",
+  PRICE_TYPES_EMPTY:
+    "Типы цен появятся после первой выгрузки из 1С. Пока берём первую цену из файла.",
+  WAREHOUSES_LABEL: "Склады",
+  WAREHOUSES_EMPTY:
+    "Склады появятся после первой выгрузки. Пока суммируем остатки по всем.",
+  FILTERS_HINT:
+    "Ничего не отмечено — берём первую попавшуюся цену и сумму по всем складам.",
+  MAPPING_TITLE: "Категории 1С → категории сайта",
+  MAPPING_HINT:
+    "Пока группа не сопоставлена, её товары не попадают в каталог. Подгруппы наследуют категорию родителя, если у них не задана своя.",
+  MAPPING_EMPTY:
+    "Группы номенклатуры появятся здесь после первой выгрузки каталога из 1С.",
+  MAPPING_SEARCH_PLACEHOLDER: "Начните вводить категорию сайта…",
+  MAPPING_NOT_SET: "Не сопоставлено",
+  MAPPING_CLEAR: "Убрать",
+  MAPPING_SAVE: "Сохранить сопоставления",
+  MAPPING_SAVE_PENDING: "Сохраняем…",
+  MAPPING_PRODUCTS: (count: number) => `Товаров: ${count}`,
+  MAPPING_UNMAPPED_COUNT: (count: number) => `Не сопоставлено групп: ${count}`,
+  MAPPING_NOTHING_PICKED:
+    "Кнопка станет активной, когда выберете категорию: нажмите «Не сопоставлено», введите 2+ буквы и кликните по варианту из списка.",
+  MAPPING_PENDING_COUNT: (count: number) =>
+    `Готово к сохранению: ${count}. Нажмите «Сохранить сопоставления».`,
+  IMPORTS_TITLE: "Приёмка файлов из 1С",
+  IMPORTS_EMPTY: "1С ещё ничего не присылала",
+  IMPORT_STATUS: {
+    pending: "в очереди",
+    processing: "разбираем",
+    completed: "готово",
+    failed: "ошибка",
+  } as Record<string, string>,
+  IMPORT_CREATED: "создано",
+  IMPORT_UPDATED: "обновлено",
+  IMPORT_UNCHANGED: "без изменений",
+  IMPORT_UNCATEGORIZED: "без категории",
+  IMPORT_IMAGES: "картинок залито",
+  IMPORT_DEACTIVATED: "снято с витрины",
+  IMPORT_HELD: "отложено без картинок и остатка",
+  IMPORT_RESTORED: "возвращено с остатком",
+  IMPORT_ISSUES: "Замечания",
+  IMPORT_HOLD_HINT:
+    "Номенклатура без картинок и без остатка на сайт не заводится, а созданная раньше — прячется с витрины. Как только в выгрузке появится остаток или картинка, товар вернётся сам: та же карточка, с прежними отзывами и без повторной модерации.",
+  SAVE: "Сохранить",
+  SAVE_PENDING: "Сохраняем…",
+  TEST: "Проверить соединение",
+  TEST_PENDING: "Проверяем…",
+  SYNC: "Обменять сейчас",
+  SYNC_PENDING: "Обмен…",
+  DISCONNECT: "Отключить 1С",
+  DISCONNECT_CONFIRM: "Отключить интеграцию?",
+  STATUS_IDLE: "Ещё не было обмена",
+  STATUS_SUCCESS: "Последний обмен успешен",
+  STATUS_ERROR: "Последний обмен с ошибкой",
+  LOGS_TITLE: "Журнал обмена",
+  LOGS_EMPTY: "Записей пока нет",
+  LOADING: "Загрузка…",
+  MOCK_HINT:
+    "Локальный тест канала «сайт ходит в 1С»: в папке server выполните npm run onec:mock, URL http://127.0.0.1:3091, ключ mock-onec-key",
+} as const;
+
+export const COURIER_UI = {
+  TITLE: "Стать курьером",
+  INTRO:
+    "Зарегистрируйте авто, и после проверки модератором вы сможете брать заказы на доставку в своём регионе.",
+  STATUS_NONE: "Заявка не подана",
+  STATUS_PENDING: "На проверке",
+  STATUS_APPROVED: "Подтверждён",
+  STATUS_REJECTED: "Отклонена",
+  ADDRESS_REQUIRED:
+    "Сначала укажите адрес в профиле — по нему определяется ваш регион доставки.",
+  APPROVED_HINT: "Вы можете брать заказы на доставку.",
+  REGION: (city: string) => `Ваш регион: ${city}.`,
+  REJECTION_REASON: "Причина отказа",
+  FIELD_MAKE: "Марка и модель",
+  FIELD_COLOR: "Цвет",
+  FIELD_PLATE: "Госномер",
+  VEHICLE_SECTION: "Данные авто",
+  PLACEHOLDER_MAKE: "Lada Granta",
+  PLACEHOLDER_COLOR: "белый",
+  PLACEHOLDER_PLATE: "х123ум797",
+  SUBMIT: "Отправить заявку",
+  RESUBMIT: "Отправить заново",
+  SUBMITTING: "Отправляем…",
+  PENDING_HINT: "Заявка на проверке — дождитесь решения модератора.",
+  DOCS_HEADING: "Фото авто и документов",
+  DOCS_HINT:
+    "Все четыре снимка обязательны. Их видят только модераторы — ни продавцу, ни покупателю они не показываются.",
+  FIELD_PHOTO_FRONT: "Авто спереди",
+  FIELD_PHOTO_REAR: "Авто сзади",
+  FIELD_PHOTO_LICENSE: "Водительские права",
+  FIELD_PHOTO_REGISTRATION: "ПТС",
+  PHOTO_PICK: "Выбрать фото",
+  PHOTO_REPLACE: "Заменить",
+  PHOTO_UPLOADING: "Загружаем…",
+  PHOTO_READY: "Загружено",
+  PHOTO_REQUIRED: "Добавьте все четыре снимка",
+  PRIVACY_NOTE:
+    "Продавец и покупатель увидят ваше имя, рейтинг и данные авто. Права и ПТС не показываются никому, кроме модераторов.",
+  LOADING: "Загрузка…",
+  LOGIN_HINT: "Войдите, чтобы подать заявку курьера.",
+  ERROR_GENERIC: "Не удалось выполнить действие. Попробуйте ещё раз.",
+} as const;
+
+export const COURIER_OVERVIEW_UI = {
+  TITLE: "Обзор",
+  TAB_FREE: "Свободные",
+  TAB_MINE: "Мои доставки",
+  REGION: (region: string, radiusKm: number) => `Регион ${region}, до ${radiusKm} км.`,
+  NO_GEO_HINT: "Геопозиция не разрешена — сортируем от вашего адреса.",
+  DISTANCE: (km: number) => `${km} км`,
+  SELLER: "Продавец",
+  BUYER: "Покупатель",
+  PICKUP: "Забрать",
+  DROPOFF: "Привезти",
+  ACCEPT: "Принять заказ",
+  SAVING: "Сохраняем…",
+  STEP_TAKE: "Забрал у продавца",
+  STEP_GO: "Выехал",
+  STEP_ARRIVED: "Привёз",
+  STEP_HANDED: "Вручил",
+  CODE_FROM_SELLER: "Код у продавца",
+  CODE_FROM_BUYER: "Код у покупателя",
+  PAYMENT_AWAITING: "Ожидает оплаты",
+  PAYMENT_AWAITING_HINT:
+    "Вручить заказ можно после того, как продавец подтвердит перевод.",
+  PAYMENT_RECEIVED: "Оплата получена",
+  PAYMENT_RECEIVED_HINT: "Продавец подтвердил перевод — можно вручать.",
+  CONTACTS_LOCKED: "Точный адрес и телефон покупателя откроются, когда заберёте заказ.",
+  EMPTY_FREE: "Свободных заказов в вашем регионе нет.",
+  EMPTY_MINE: "Активных доставок нет.",
+  LOADING: "Загрузка…",
+  ERROR_GENERIC: "Не удалось выполнить действие. Попробуйте ещё раз.",
+  DECLINE: "Отказаться",
+  DECLINE_CONFIRM:
+    "Заказ вернётся в общий список, а отказ отметится в вашем профиле. Отказаться?",
+  LOGIN_HINT: "Войдите, чтобы видеть свободные заказы.",
+  NOT_APPROVED: "Раздел доступен после одобрения заявки курьера.",
 } as const;
 
 /**

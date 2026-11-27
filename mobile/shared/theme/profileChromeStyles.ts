@@ -349,6 +349,7 @@ export const useProfileOverviewBannerStyles = createThemedStyles((theme, layout)
 const PROFILE_MOBILE_NAV_TOGGLE = {
   borderWidth: O.sectionToggleBorderWidth,
   borderRadius: O.sectionToggleRadius,
+  borderRadiusTablet: O.sectionToggleRadiusTablet,
   iconSize: O.sectionToggleIconSize,
   iconRadius: O.sectionToggleIconRadius,
   iconBorderWidth: O.sectionToggleBorderWidth,
@@ -363,8 +364,13 @@ const PROFILE_MOBILE_NAV_TOGGLE = {
   letterSpacing: 0.8,
 } as const;
 
+/** web phone ≤640 — 20px. */
 export const PROFILE_MOBILE_NAV_TOGGLE_BORDER_RADIUS =
   PROFILE_MOBILE_NAV_TOGGLE.borderRadius;
+
+/** web `--my-profile-surface-radius` — 24px (tablet drawer). */
+export const PROFILE_MOBILE_NAV_TOGGLE_BORDER_RADIUS_TABLET =
+  PROFILE_MOBILE_NAV_TOGGLE.borderRadiusTablet;
 
 export const useProfileMobileNavToggleStyles = createThemedStyles((theme, layout) => ({
   outer: {

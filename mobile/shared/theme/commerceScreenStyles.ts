@@ -550,53 +550,72 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
   },
 }));
 
+/** Паритет `BuyerPassportSharePanel.css`. */
 export const useBuyerPassportSharePanelStyles = createThemedStyles((theme) => ({
   panel: {
-    marginTop: theme.spacing[3],
-    padding: theme.spacing[3],
+    marginTop: 12,
+    padding: 12,
     borderRadius: 10,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surfaceMuted,
-    gap: theme.spacing[2],
+    backgroundColor: theme.colors.bg,
+    gap: 8,
   },
   title: {
-    fontSize: theme.typography.fontBase,
+    marginBottom: 0,
+    fontSize: 14,
     fontWeight: theme.typography.fontWeightBold,
     color: theme.colors.text,
   },
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    columnGap: 12,
+    rowGap: 8,
+  },
   field: {
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: 160,
+    minWidth: 160,
+    maxWidth: "100%",
     gap: 2,
   },
   label: {
-    fontSize: theme.typography.fontXs,
+    fontSize: 12,
     color: theme.colors.textMuted,
   },
   value: {
-    fontSize: theme.typography.fontBase,
+    fontSize: 14,
     color: theme.colors.text,
   },
+  selfieSection: {
+    marginTop: 12,
+    gap: 8,
+  },
   selfieTitle: {
-    marginTop: theme.spacing[1],
-    fontSize: theme.typography.fontSm,
+    fontSize: 13,
     fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
+  selfieLink: {
+    alignSelf: "flex-start",
+    gap: 5.6,
+  },
+  selfieLinkText: {
+    fontSize: 13,
+    color: theme.colors.link,
+  },
   selfieImage: {
-    width: 160,
-    height: 160,
+    width: 192,
+    maxWidth: "100%",
+    height: 192,
     borderRadius: 8,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
-    marginTop: theme.spacing[1],
-  },
-  selfieLink: {
-    fontSize: theme.typography.fontSm,
-    color: theme.colors.link,
-    marginTop: theme.spacing[1],
   },
   selfieMissing: {
-    fontSize: theme.typography.fontSm,
+    fontSize: 13,
     color: theme.colors.textMuted,
   },
 }));

@@ -468,10 +468,6 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
 
               {step === PASSPORT_FORM_STEP_SELFIE ? (
                 <div className="data-confirmation-modal__selfie">
-                  <span>{DATA_CONFIRMATION_MODAL_UI.LABEL_PASSPORT_SELFIE}</span>
-                  <span className="data-confirmation-modal__selfie-hint">
-                    {DATA_CONFIRMATION_MODAL_UI.HINT_PASSPORT_SELFIE}
-                  </span>
                   <div className="data-confirmation-modal__selfie-upload">
                     <button
                       type="button"

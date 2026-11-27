@@ -33,7 +33,7 @@ const PARTNER_PROGRAM_TABS = [
 export const PartnerProgramPage = () => {
   const router = useRouter();
   const styles = usePartnerProgramPageStyles();
-  const { isDrawerLayout } = useProfileAdaptiveLayout();
+  const { isDrawerLayout, isPhoneLayout } = useProfileAdaptiveLayout();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
   const { outerScrollOwns, scrollEnabled } = useProfileAccountNestedListScroll();
   const isAuthorized = useIsAuthorized();
@@ -118,23 +118,39 @@ export const PartnerProgramPage = () => {
     }
   };
 
+  const nameCellStyle = [
+    styles.referralCellName,
+    isPhoneLayout ? styles.referralCellNamePhone : null,
+  ];
+  const metaCellStyle = [
+    styles.referralCellMeta,
+    isPhoneLayout ? styles.referralCellMetaPhone : null,
+  ];
+  const rowChrome = [
+    styles.referralRow,
+    isPhoneLayout ? styles.referralRowPhone : null,
+  ];
+
   const referralRows = data.referrals.map((row, index) => {
     const isLast = index === data.referrals.length - 1;
     return (
       <View
         key={row.userId}
-        style={[styles.referralRow, isLast ? { borderBottomWidth: 0 } : null]}
+        style={[...rowChrome, isLast ? styles.referralRowLast : null]}
       >
-        <Text style={styles.referralName}>{row.userName}</Text>
-        <Text style={styles.referralMeta}>
-          {PARTNER_PROGRAM_PAGE_UI.COL_DATE}:{" "}
+        <Text style={nameCellStyle} numberOfLines={1}>
+          {row.userName}
+        </Text>
+        <Text style={metaCellStyle} numberOfLines={1}>
           {row.registeredAt
             ? new Date(row.registeredAt).toLocaleDateString("ru-RU")
             : "—"}
         </Text>
-        <Text style={styles.referralMeta}>
-          {PARTNER_PROGRAM_PAGE_UI.COL_SPEND}: {row.pointsSpentTotal} ·{" "}
-          {PARTNER_PROGRAM_PAGE_UI.COL_CASHBACK}: {row.cashbackEarnedTotal}
+        <Text style={metaCellStyle} numberOfLines={1}>
+          {row.pointsSpentTotal}
+        </Text>
+        <Text style={metaCellStyle} numberOfLines={1}>
+          {row.cashbackEarnedTotal}
         </Text>
       </View>
     );
@@ -164,18 +180,18 @@ export const PartnerProgramPage = () => {
 
         <View style={styles.card}>
           <Text style={styles.cardTitle}>{PARTNER_PROGRAM_PAGE_UI.STATS_TITLE}</Text>
-          <View style={styles.statsRow}>
-            <View style={styles.stat}>
+          <View style={[styles.statsRow, isPhoneLayout ? styles.statsRowPhone : null]}>
+            <View style={[styles.stat, isPhoneLayout ? styles.statPhone : null]}>
               <Text style={styles.statLabel}>
                 {PARTNER_PROGRAM_PAGE_UI.STAT_REFERRALS}
               </Text>
               <Text style={styles.statValue}>{data.totalReferrals}</Text>
             </View>
-            <View style={styles.stat}>
+            <View style={[styles.stat, isPhoneLayout ? styles.statPhone : null]}>
               <Text style={styles.statLabel}>{PARTNER_PROGRAM_PAGE_UI.STAT_SPEND}</Text>
               <Text style={styles.statValue}>{data.totalReferralsSpend}</Text>
             </View>
-            <View style={styles.stat}>
+            <View style={[styles.stat, isPhoneLayout ? styles.statPhone : null]}>
               <Text style={styles.statLabel}>
                 {PARTNER_PROGRAM_PAGE_UI.STAT_EARNED}
               </Text>
@@ -228,7 +244,25 @@ export const PartnerProgramPage = () => {
             {data.referrals.length === 0 ? (
               <Text style={styles.empty}>{PARTNER_PROGRAM_PAGE_UI.LIST_EMPTY}</Text>
             ) : (
-              referralRows
+              <>
+                {!isPhoneLayout ? (
+                  <View style={[...rowChrome, styles.referralRowHead]}>
+                    <Text style={[...nameCellStyle, styles.referralHeadText]}>
+                      {PARTNER_PROGRAM_PAGE_UI.COL_NAME}
+                    </Text>
+                    <Text style={[...metaCellStyle, styles.referralHeadText]}>
+                      {PARTNER_PROGRAM_PAGE_UI.COL_DATE}
+                    </Text>
+                    <Text style={[...metaCellStyle, styles.referralHeadText]}>
+                      {PARTNER_PROGRAM_PAGE_UI.COL_SPEND}
+                    </Text>
+                    <Text style={[...metaCellStyle, styles.referralHeadText]}>
+                      {PARTNER_PROGRAM_PAGE_UI.COL_CASHBACK}
+                    </Text>
+                  </View>
+                ) : null}
+                {referralRows}
+              </>
             )}
           </View>
         ) : null}

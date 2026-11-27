@@ -1,8 +1,9 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
-import { MODAL_BACKDROP_SCRIM } from "@/shared/theme/formChromeStyles";
+import { DATA_CONFIRMATION_MODAL_LAYOUT as M } from "@/entities/user-data-confirmation/lib/dataConfirmationModalLayout";
 import { PROFILE_ACCOUNT_STACK_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
+import { MODAL_BACKDROP_SCRIM } from "@/shared/theme/formChromeStyles";
 
 export const useDataConfirmationPageStyles = createThemedStyles((theme, layout) => ({
   container: {
@@ -169,119 +170,190 @@ export const useDataConfirmationPageStyles = createThemedStyles((theme, layout) 
   },
 }));
 
-/** Fullscreen dialog: fade + тап по затемнению. */
-export const useDataConfirmationRequestModalStyles = createThemedStyles(
-  (theme, layout) => ({
-    root: {
-      flex: 1,
-    },
-    backdrop: {
-      ...StyleSheet.absoluteFillObject,
-    },
-    keyboardHost: {
-      flex: 1,
-      width: "100%",
-      maxHeight: "100%",
-    },
-    card: {
-      flex: 1,
-      width: "100%",
-      maxHeight: "100%",
-      borderRadius: 0,
-      backgroundColor: theme.colors.surface,
-      overflow: "hidden",
-    },
-    header: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingHorizontal: theme.spacing[4],
-      paddingTop: theme.spacing[4],
-      paddingBottom: theme.spacing[3],
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: theme.colors.border,
-    },
-    title: {
-      fontSize: theme.typography.font2xl,
-      fontWeight: theme.typography.fontWeightBold,
-      flex: 1,
-      color: theme.colors.text,
-    },
-    intro: {
-      fontSize: theme.typography.fontBase,
-      lineHeight: theme.typography.leadingBase,
-      marginBottom: theme.spacing[2],
-      color: theme.colors.textMuted,
-    },
-    form: {
-      paddingHorizontal: theme.spacing[4],
-      paddingTop: theme.spacing[3],
-      paddingBottom: theme.spacing[5],
-      gap: 10,
-    },
-    passportInput: {
-      borderWidth: 1,
-      borderColor: theme.colors.borderStrong,
-      borderRadius: theme.radius.button,
-      paddingHorizontal: theme.spacing[3],
-      paddingVertical: 12,
-      fontSize: theme.typography.fontLg,
-      backgroundColor: theme.colors.bg,
-      color: theme.colors.text,
-    },
-    stepMeta: {
-      gap: 4,
-      marginBottom: theme.spacing[1],
-    },
-    stepProgress: {
-      fontSize: theme.typography.fontXs,
-      fontWeight: theme.typography.fontWeightSemibold,
-      color: theme.colors.textMuted,
-    },
-    stepTitle: {
-      fontSize: theme.typography.fontLg,
-      fontWeight: theme.typography.fontWeightBold,
-      color: theme.colors.text,
-    },
-    stepActions: {
-      flexDirection: "row",
-      gap: theme.spacing[2],
-      marginTop: theme.spacing[2],
-    },
-    stepActionFlex: {
-      flex: 1,
-    },
-    selfieSection: {
-      gap: theme.spacing[2],
-      marginTop: theme.spacing[1],
-    },
-    selfieHint: {
-      fontSize: theme.typography.fontSm,
-      color: theme.colors.textMuted,
-    },
-    preview: {
-      width: "100%",
-      height: 180,
-      borderRadius: theme.radius.sm,
-      backgroundColor: theme.colors.surfaceMuted,
-    },
-    fileName: {
-      fontSize: theme.typography.fontSm,
-      color: theme.colors.textMuted,
-    },
-    rejectBlock: {
-      paddingHorizontal: theme.spacing[4],
-      paddingVertical: theme.spacing[3],
-      gap: 6,
-    },
-    staffNote: {
-      fontSize: theme.typography.fontBase,
-      lineHeight: theme.typography.leadingBase,
-      color: theme.colors.textMuted,
-    },
-    statusPadding: {
-      paddingHorizontal: theme.spacing[4],
-      paddingVertical: theme.spacing[3],
-    },
-  }),
-);
+/** Паритет web `data-confirmation-modal` — phone fullscreen / tablet card. */
+export const useDataConfirmationRequestModalStyles = createThemedStyles((theme) => ({
+  root: {
+    flex: 1,
+    backgroundColor: MODAL_BACKDROP_SCRIM,
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  hostPhone: {
+    flex: 1,
+    width: "100%",
+    maxHeight: "100%",
+  },
+  hostTablet: {
+    flex: 1,
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: M.backdropPadding,
+  },
+  cardPhone: {
+    flex: 1,
+    width: "100%",
+    maxHeight: "100%",
+    borderRadius: 0,
+    backgroundColor: theme.colors.surface,
+    overflow: "hidden",
+    paddingTop: M.paddingTop,
+    paddingHorizontal: M.paddingX,
+    paddingBottom: M.paddingBottom,
+  },
+  cardTablet: {
+    width: "100%",
+    maxWidth: M.maxWidth,
+    maxHeight: `${M.maxHeightRatio * 100}%`,
+    borderRadius: M.radius,
+    backgroundColor: theme.colors.surface,
+    overflow: "hidden",
+    paddingTop: M.paddingTop,
+    paddingHorizontal: M.paddingX,
+    paddingBottom: M.paddingBottom,
+    shadowColor: theme.colors.ink,
+    shadowOpacity: 0.18,
+    shadowRadius: 28,
+    shadowOffset: { width: 0, height: 12 },
+    elevation: 12,
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: M.headerGap,
+    marginBottom: M.headerMarginBottom,
+  },
+  title: {
+    flex: 1,
+    fontSize: M.titleFontSize,
+    fontWeight: theme.typography.fontWeightBold,
+    color: theme.colors.text,
+  },
+  closeButton: {
+    padding: 4,
+  },
+  intro: {
+    fontSize: M.introFontSize,
+    lineHeight: Math.round(M.introFontSize * 1.4),
+    marginBottom: M.introMarginBottom,
+    color: theme.colors.textMuted,
+  },
+  formScroll: {
+    flexGrow: 1,
+    flexShrink: 1,
+    minHeight: 0,
+  },
+  form: {
+    gap: 0,
+    paddingBottom: 4,
+  },
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    columnGap: M.gridColumnGap,
+    rowGap: M.gridRowGap,
+  },
+  fieldHalf: {
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: "40%",
+    minWidth: 140,
+  },
+  fieldFull: {
+    width: "100%",
+    flexBasis: "100%",
+  },
+  field: {
+    gap: M.fieldGap,
+  },
+  fieldLabel: {
+    fontSize: M.fieldLabelFontSize,
+    color: theme.colors.textSecondary,
+  },
+  passportInput: {
+    borderWidth: 1,
+    borderColor: theme.colors.borderStrong,
+    borderRadius: M.inputRadius,
+    paddingHorizontal: M.inputPaddingX,
+    paddingVertical: M.inputPaddingY,
+    fontSize: M.inputFontSize,
+    backgroundColor: theme.colors.bg,
+    color: theme.colors.text,
+  },
+  passportInputMultiline: {
+    minHeight: 64,
+    textAlignVertical: "top" as const,
+  },
+  stepMeta: {
+    gap: M.stepMetaGap,
+    marginBottom: M.stepMetaMarginBottom,
+  },
+  stepProgress: {
+    fontSize: M.stepProgressFontSize,
+    fontWeight: theme.typography.fontWeightSemibold,
+    color: theme.colors.textMuted,
+  },
+  stepTitle: {
+    fontSize: M.stepTitleFontSize,
+    fontWeight: theme.typography.fontWeightBold,
+    color: theme.colors.text,
+  },
+  stepActions: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    flexWrap: "wrap",
+    gap: M.actionsGap,
+    marginTop: M.actionsMarginTop,
+  },
+  selfieSection: {
+    gap: M.selfieGap,
+    marginTop: M.selfieMarginTop,
+  },
+  selfieHint: {
+    fontSize: M.selfieHintFontSize,
+    color: theme.colors.textMuted,
+  },
+  preview: {
+    width: "100%",
+    maxWidth: M.selfiePreviewMaxWidth,
+    height: M.selfiePreviewMaxHeight,
+    marginTop: 6,
+    borderRadius: M.selfiePreviewRadius,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surfaceElevated,
+  },
+  fileName: {
+    fontSize: M.fieldLabelFontSize,
+    color: theme.colors.textMuted,
+  },
+  rejectBlock: {
+    gap: 6,
+    marginBottom: 12,
+  },
+  staffNote: {
+    padding: M.staffNotePadding,
+    borderRadius: M.staffNoteRadius,
+    backgroundColor: theme.colors.surfaceMuted,
+    fontSize: M.introFontSize,
+    lineHeight: Math.round(M.introFontSize * 1.4),
+    color: theme.colors.textMuted,
+  },
+  statusText: {
+    marginBottom: 12,
+    fontWeight: theme.typography.fontWeightSemibold,
+  },
+  stateText: {
+    marginVertical: 8,
+    fontSize: M.introFontSize,
+    color: theme.colors.textMuted,
+  },
+  stateError: {
+    marginVertical: 8,
+    fontSize: M.introFontSize,
+    color: theme.colors.danger,
+  },
+}));

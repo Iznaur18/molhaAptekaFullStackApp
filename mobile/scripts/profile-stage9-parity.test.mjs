@@ -69,9 +69,10 @@ test("WEB_ONLY services stripped from mobile nav; hub sections remain", () => {
   const deep = readMobile("features/deep-linking/lib/resolveWebPathToMobileRoute.ts");
 
   assert.match(nav, /safe-deal/);
-  assert.doesNotMatch(nav, /onec-integration/);
-  assert.doesNotMatch(nav, /delivery-payment/);
-  assert.doesNotMatch(nav, /"courier"/);
+  assert.match(nav, /delivery-payment/);
+  assert.match(nav, /onec-integration/);
+  assert.match(nav, /courier-overview/);
+  assert.match(nav, /"courier"/);
   assert.match(nav, /wishlist/);
   assert.match(nav, /my-orders/);
   assert.match(nav, /my-sales/);
@@ -81,4 +82,5 @@ test("WEB_ONLY services stripped from mobile nav; hub sections remain", () => {
   assert.match(deep, /\/profile\/onec-integration/);
   assert.match(deep, /\/profile\/delivery-payment/);
   assert.match(deep, /\/become-courier/);
+  assert.match(deep, /\/courier-overview/);
 });
