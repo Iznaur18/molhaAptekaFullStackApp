@@ -218,6 +218,7 @@ export const IntroAdAdvertisingSection = ({
               <Pressable
                 style={[
                   styles.secondaryButton,
+                  styles.actionsButton,
                   isSubmitting && styles.secondaryButtonDisabled,
                 ]}
                 onPress={handlePreview}
@@ -230,6 +231,7 @@ export const IntroAdAdvertisingSection = ({
               <Pressable
                 style={[
                   styles.primaryButton,
+                  styles.actionsButton,
                   (isSubmitting || loyaltyBalance < pricePoints) &&
                     styles.primaryButtonDisabled,
                 ]}

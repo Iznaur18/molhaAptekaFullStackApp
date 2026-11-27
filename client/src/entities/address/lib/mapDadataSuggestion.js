@@ -1,4 +1,21 @@
-import { resolveRuRegionCodeFromDadataData } from "@molha/api-contract";
+import {
+  dadataSuggestionGeo,
+  dadataSuggestionObjectFiasId,
+  hasDadataSuggestionHouseNumber,
+  resolveRuRegionCodeFromDadataData,
+} from "@molha/api-contract";
+
+/**
+ * @param {import('../model/types.js').AddressSuggestionDto | null | undefined} suggestion
+ * @returns {boolean}
+ */
+export function isCompleteDadataAddressSuggestion(suggestion) {
+  const data = suggestion?.data;
+  if (dadataSuggestionObjectFiasId(data).length > 0) {
+    return true;
+  }
+  return hasDadataSuggestionHouseNumber(data) && dadataSuggestionGeo(data) != null;
+}
 
 /**
  * @param {import('../model/types.js').AddressSuggestionDto} suggestion
@@ -7,6 +24,7 @@ import { resolveRuRegionCodeFromDadataData } from "@molha/api-contract";
  *   fiasId: string;
  *   geo: { lat: number; lon: number } | null;
  *   regionCode: string | null;
+ *   isComplete: boolean;
  * }}
  */
 export function mapDadataSuggestion(suggestion) {
@@ -14,19 +32,14 @@ export function mapDadataSuggestion(suggestion) {
   // У адреса на участке дома нет: идентификатор лежит в `stead_fias_id`.
   // Сервер читает оба поля, поэтому и здесь берём первый непустой — иначе
   // адрес «уч 27а» сохранялся без идентификатора.
-  const fiasId =
-    [data.house_fias_id, data.stead_fias_id]
-      .map((value) => String(value ?? "").trim())
-      .find((value) => value.length > 0) ?? "";
-
-  const lat = Number(data.geo_lat);
-  const lon = Number(data.geo_lon);
-  const geo = Number.isFinite(lat) && Number.isFinite(lon) ? { lat, lon } : null;
+  const fiasId = dadataSuggestionObjectFiasId(data);
+  const geo = dadataSuggestionGeo(data);
 
   return {
     line: suggestion.value?.trim() ?? "",
     fiasId,
     geo,
     regionCode: resolveRuRegionCodeFromDadataData(data),
+    isComplete: isCompleteDadataAddressSuggestion(suggestion),
   };
 }

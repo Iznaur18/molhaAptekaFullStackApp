@@ -13,11 +13,14 @@ export const PRODUCT_PHOTO_GRID_COLUMNS = 3;
 export const PRODUCT_PHOTO_GRID_GAP = 8;
 
 export const useMediaUploadFieldStyles = createThemedStyles((theme) => ({
+  /** web `.image-url-field` */
   wrap: {
-    gap: theme.spacing[2],
+    gap: 5.6,
+    width: "100%",
+    minWidth: 0,
   },
   label: {
-    fontSize: 14,
+    fontSize: 14.08,
     fontWeight: "600",
     color: theme.colors.textSecondary,
   },
@@ -32,34 +35,50 @@ export const useMediaUploadFieldStyles = createThemedStyles((theme) => ({
     borderRadius: 10,
     backgroundColor: theme.colors.surfaceMuted,
   },
+  /** web `.image-url-field__row` */
+  row: {
+    flexDirection: "row",
+    alignItems: "stretch",
+    gap: 8,
+    width: "100%",
+    minWidth: 0,
+  },
+  /** web `.advertising-page__input` / image-url input */
   input: {
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: 0,
+    minWidth: 0,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
-    borderRadius: 10,
-    paddingHorizontal: theme.spacing[3],
-    paddingVertical: 10,
+    borderRadius: 14,
+    paddingHorizontal: 10.4,
+    paddingVertical: 8,
     fontSize: 15,
     color: theme.colors.text,
     backgroundColor: theme.colors.surface,
   },
+  /** web `.image-url-field__upload-btn` — soft, not solid primary */
   button: {
-    alignSelf: "flex-start",
-    borderRadius: theme.radius.button,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.action,
-    backgroundColor: theme.colors.action,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    minHeight: 40,
+    flexShrink: 0,
+    alignSelf: "stretch",
     justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.actionSoft,
+    backgroundColor: theme.colors.actionSoft,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    minHeight: 40,
   },
   buttonDisabled: {
-    opacity: 0.6,
+    opacity: 0.65,
   },
   buttonText: {
     fontSize: 14,
-    fontWeight: "600",
-    color: theme.colors.onContrast,
+    fontWeight: "500",
+    color: theme.colors.actionHover,
   },
   dangerButton: {
     alignSelf: "flex-start",

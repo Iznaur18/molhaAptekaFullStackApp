@@ -140,21 +140,63 @@ export const usePartnerProgramPageStyles = createThemedStyles((theme, layout) =>
     lineHeight: theme.typography.leadingBase,
     color: theme.colors.textMuted,
   },
+  /** web `.partner-program-page__row` — 4 cols desktop, 2 cols phone */
   referralRow: {
-    gap: 4,
-    paddingVertical: 10,
+    flexDirection: "row",
+    flexWrap: "nowrap",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: theme.colors.border,
+    minWidth: 0,
   },
-  referralName: {
-    fontSize: theme.typography.fontMd,
-    fontWeight: theme.typography.fontWeightBold,
+  referralRowPhone: {
+    flexWrap: "wrap",
+  },
+  referralRowHead: {
+    paddingTop: 0,
+    borderBottomWidth: 0,
+  },
+  referralRowLast: {
+    borderBottomWidth: 0,
+    paddingBottom: 0,
+  },
+  referralCellName: {
+    flexGrow: 1.4,
+    flexShrink: 1,
+    flexBasis: 0,
+    minWidth: 0,
+    fontSize: 14,
+    fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
-  referralMeta: {
-    fontSize: theme.typography.fontSm,
-    lineHeight: theme.typography.leadingSm,
+  referralCellNamePhone: {
+    flexGrow: 1,
+    flexBasis: "45%",
+  },
+  referralCellMeta: {
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: 0,
+    minWidth: 0,
+    fontSize: 14,
     color: theme.colors.textSecondary,
+    fontVariant: ["tabular-nums"],
+  },
+  referralCellMetaPhone: {
+    flexBasis: "45%",
+  },
+  referralHeadText: {
+    fontSize: 12,
+    fontWeight: theme.typography.fontWeightSemibold,
+    color: theme.colors.textMuted,
+  },
+  statsRowPhone: {
+    flexDirection: "column",
+  },
+  statPhone: {
+    flexBasis: "100%",
   },
   centered: {
     flex: 1,

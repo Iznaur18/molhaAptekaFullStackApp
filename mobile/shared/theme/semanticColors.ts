@@ -34,5 +34,6 @@ export const semanticColors = {
   onContrast: izColors.onContrast,
   overlay: izColors.overlay,
   overlayStrong: izColors.overlayStrong,
+  overlaySubtle: izColors.overlaySubtle,
   focusRing: izColors.focusRing,
 } as const;

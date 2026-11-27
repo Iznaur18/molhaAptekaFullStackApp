@@ -53,8 +53,6 @@ export const SiteHeaderBannerAdvertisingSection = ({
     [pricePointsList, streakDiscountPercent],
   );
   const durationDays = campaignQuery.data?.durationDays ?? 7;
-  const paidSlotLimit = campaignQuery.data?.paidSlotLimit ?? 200;
-  const activePaidSlots = campaignQuery.data?.activePaidSlots ?? 0;
   const canCancel = campaign?.status === "pending";
   const hasOpenCampaign = Boolean(campaign);
   const isSubmitting = submitMutation.isPending || cancelMutation.isPending;
@@ -181,12 +179,6 @@ export const SiteHeaderBannerAdvertisingSection = ({
           <Text style={styles.metaLabel}>Срок</Text>
           <Text style={styles.metaValue}>{durationDays} дней</Text>
         </View>
-        <View style={styles.metaItem}>
-          <Text style={styles.metaLabel}>Слоты</Text>
-          <Text style={styles.metaValue}>
-            {activePaidSlots}/{paidSlotLimit}
-          </Text>
-        </View>
       </View>
 
       {campaign ? (
@@ -257,6 +249,7 @@ export const SiteHeaderBannerAdvertisingSection = ({
             <Pressable
               style={[
                 styles.secondaryButton,
+                styles.actionsButton,
                 isSubmitting && styles.secondaryButtonDisabled,
               ]}
               onPress={() => {
@@ -276,6 +269,7 @@ export const SiteHeaderBannerAdvertisingSection = ({
             <Pressable
               style={[
                 styles.primaryButton,
+                styles.actionsButton,
                 (isSubmitting || loyaltyBalance < pricePoints) &&
                   styles.primaryButtonDisabled,
               ]}

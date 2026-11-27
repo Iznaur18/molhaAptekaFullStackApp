@@ -38,4 +38,17 @@ describe("адрес на участке", () => {
       pickFirstHouseSuggestion([{ value: "г Грозный, ул Мира", data: {} }]),
     ).toBeNull();
   });
+
+  it("дом без ФИАС, но с номером и координатами — годится", () => {
+    const withoutFias = {
+      value: "г Грозный, ул Субры Кишиевой, д 56",
+      data: {
+        house: "56",
+        house_fias_id: "",
+        geo_lat: "43.31",
+        geo_lon: "45.71",
+      },
+    };
+    expect(pickFirstHouseSuggestion([withoutFias])).toBe(withoutFias);
+  });
 });

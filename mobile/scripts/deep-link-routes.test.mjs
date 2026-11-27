@@ -88,8 +88,23 @@ test("легаси-пути веба ведут туда же, куда ведё
 test("разделы, которых на мобилке нет, отдают null", () => {
   assert.equal(resolveWebPathToMobileRoute("/staff-audit-log-admin"), null);
   assert.equal(resolveWebPathToMobileRoute("/broadcast-notifications-admin"), null);
-  assert.equal(resolveWebPathToMobileRoute("/profile/onec-integration"), null);
-  assert.equal(resolveWebPathToMobileRoute("/profile/delivery-payment"), null);
+  assert.equal(resolveWebPathToMobileRoute("/courier-moderation"), null);
+});
+
+test("сервисы профиля открываются в hub", () => {
+  assert.equal(
+    resolveWebPathToMobileRoute("/profile/delivery-payment"),
+    "/hub/delivery-payment",
+  );
+  assert.equal(
+    resolveWebPathToMobileRoute("/profile/onec-integration"),
+    "/hub/onec-integration",
+  );
+  assert.equal(resolveWebPathToMobileRoute("/become-courier"), "/hub/courier");
+  assert.equal(
+    resolveWebPathToMobileRoute("/courier-overview"),
+    "/hub/courier-overview",
+  );
 });
 
 test("каждый путь HOME_MAIN_VIEW_PATH веба либо открывается, либо помечен web-only", () => {
@@ -103,15 +118,11 @@ test("каждый путь HOME_MAIN_VIEW_PATH веба либо открыва
   assert.ok(webPaths.length >= 35, `нашли только ${webPaths.length} путей веба`);
 
   const knownWebOnly = new Set([
-    "/profile/onec-integration",
-    "/profile/delivery-payment",
     "/staff-audit-log-admin",
     "/broadcast-notifications-admin",
     "/admin-analytics",
     "/safe-deal-moderation",
-    "/become-courier",
     "/courier-moderation",
-    "/courier-overview",
     "/shipment-disputes",
     "/shipping-carriers",
   ]);

@@ -12,16 +12,17 @@ export const useCategoryPickerSheetStyles = createThemedStyles((theme, layout) =
     fontWeight: theme.typography.fontWeightSemibold,
     color: theme.colors.text,
   },
+  /** web `.ru-region-select__trigger` / input — surface, не muted */
   fieldBox: {
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing[2],
     borderWidth: 1,
     borderColor: theme.colors.border,
-    borderRadius: 10,
+    borderRadius: 14,
     paddingHorizontal: theme.spacing[3],
     paddingVertical: 12,
-    backgroundColor: theme.colors.surfaceMuted,
+    backgroundColor: theme.colors.surface,
   },
   fieldBoxPressed: {
     borderColor: theme.colors.action,

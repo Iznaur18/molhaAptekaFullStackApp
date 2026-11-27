@@ -6,11 +6,15 @@ import {
 } from "@izibuy/shared-lib";
 
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
+import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 
 export type ProfileHubAccess = {
   isProfileReady: boolean;
   isRegularUser: boolean;
   isUserDataConfirmed: boolean;
+  canUseOneCIntegration: boolean;
+  canUseCourier: boolean;
+  canUseCourierOverview: boolean;
   canUseMyProducts: boolean;
   canUseMySales: boolean;
   canUseMyOrders: boolean;
@@ -45,13 +49,24 @@ export type ProfileHubAccess = {
 export const useProfileHubAccess = (): ProfileHubAccess => {
   const { isAuthorized, role, isAdmin, canModerate, isUserDataConfirmed } =
     useUserAccess();
+  const sessionQuery = useAuthSessionQuery();
   const isProfileReady = isAuthorized;
   const isRegularUser = role === USER_ROLE_USER;
+  const courierStatus = String(
+    (
+      sessionQuery.data?.user as
+        | { courierProfile?: { moderationStatus?: string } }
+        | undefined
+    )?.courierProfile?.moderationStatus ?? "",
+  );
 
   return {
     isProfileReady,
     isRegularUser,
     isUserDataConfirmed,
+    canUseOneCIntegration: isProfileReady,
+    canUseCourier: isProfileReady,
+    canUseCourierOverview: isProfileReady && courierStatus === "approved",
     canUseMyProducts: isProfileReady,
     canUseMySales: isProfileReady,
     canUseMyOrders: isProfileReady,
@@ -121,6 +136,10 @@ export const canAccessProfileSection = (
     "deal-requests": hubAccess.isProfileReady,
     // Как web `canUseSafeDeal`: заявку подаёт любой вошедший продавец.
     "safe-deal": hubAccess.isProfileReady,
+    "delivery-payment": hubAccess.isProfileReady,
+    "onec-integration": hubAccess.canUseOneCIntegration,
+    courier: hubAccess.canUseCourier,
+    "courier-overview": hubAccess.canUseCourierOverview,
     auction: hubAccess.canUseAuction,
     subscriptions: hubAccess.canUseSubscriptions,
     wishlist: hubAccess.canUseWishlist,

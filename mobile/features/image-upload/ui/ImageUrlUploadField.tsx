@@ -78,28 +78,30 @@ export const ImageUrlUploadField = ({
           />
         </View>
       ) : null}
-      <TextInput
-        style={styles.input}
-        value={value}
-        onChangeText={onChange}
-        editable={!disabled && !isBusy}
-        placeholder="https://… или /uploads/…"
-        autoCapitalize="none"
-        placeholderTextColor={theme.colors.textMuted}
-      />
-      <Pressable
-        style={[styles.button, (disabled || isBusy) && styles.buttonDisabled]}
-        onPress={() => {
-          void handleUpload();
-        }}
-        disabled={disabled || isBusy}
-      >
-        {isBusy ? (
-          <ActivityIndicator color={theme.colors.onContrast} />
-        ) : (
-          <Text style={styles.buttonText}>{IMAGE_UPLOAD_UI.UPLOAD_BUTTON}</Text>
-        )}
-      </Pressable>
+      <View style={styles.row}>
+        <TextInput
+          style={styles.input}
+          value={value}
+          onChangeText={onChange}
+          editable={!disabled && !isBusy}
+          placeholder="https://"
+          autoCapitalize="none"
+          placeholderTextColor={theme.colors.textMuted}
+        />
+        <Pressable
+          style={[styles.button, (disabled || isBusy) && styles.buttonDisabled]}
+          onPress={() => {
+            void handleUpload();
+          }}
+          disabled={disabled || isBusy}
+        >
+          {isBusy ? (
+            <ActivityIndicator color={theme.colors.actionHover} />
+          ) : (
+            <Text style={styles.buttonText}>{IMAGE_UPLOAD_UI.UPLOAD_BUTTON}</Text>
+          )}
+        </Pressable>
+      </View>
       {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
     </View>
   );

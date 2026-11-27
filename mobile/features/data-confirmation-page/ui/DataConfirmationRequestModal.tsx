@@ -1,3 +1,4 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useEffect, useState } from "react";
 import {
   Image,
@@ -6,11 +7,14 @@ import {
   ScrollView,
   Text,
   TextInput,
+  useWindowDimensions,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useUploadImageMutation } from "@/entities/upload/model/useUploadImageMutation";
 import type { UploadImageFilePayload } from "@/entities/upload/api/uploadImage";
+import { DATA_CONFIRMATION_MODAL_LAYOUT as M } from "@/entities/user-data-confirmation/lib/dataConfirmationModalLayout";
 import {
   emptyPassportForm,
   type PassportSnapshot,
@@ -42,12 +46,11 @@ import {
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { resolveDialogAccessibilityProps } from "@/shared/lib/resolveDialogAccessibilityProps";
+import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
-import { useCancelButtonStyles } from "@/shared/theme/cancelButtonChromeStyles";
 import { useDataConfirmationRequestModalStyles } from "@/shared/theme/dataConfirmationPageStyles";
 import { useFormFieldStyles } from "@/shared/theme/formChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
-import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
 import { ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 const keepDigitsOnly = (value: string): string => value.replace(/\D/g, "");
@@ -70,8 +73,11 @@ export const DataConfirmationRequestModal = ({
   onSubmitted,
 }: DataConfirmationRequestModalProps) => {
   const styles = useDataConfirmationRequestModalStyles();
-  const cancelStyles = useCancelButtonStyles();
   const fieldStyles = useFormFieldStyles();
+  const theme = useAppTheme();
+  const insets = useSafeAreaInsets();
+  const { width: windowWidth } = useWindowDimensions();
+  const { isPhoneLayout } = useProfileAdaptiveLayout();
   const submitMutation = useSubmitDataConfirmationRequestMutation();
   const uploadMutation = useUploadImageMutation();
   const statusQuery = useMyDataConfirmationStatusQuery(visible);
@@ -82,6 +88,8 @@ export const DataConfirmationRequestModal = ({
   const [step, setStep] = useState(PASSPORT_FORM_STEP_IDENTITY);
 
   const isSubmitting = submitMutation.isPending || uploadMutation.isPending;
+  const isSingleColGrid = windowWidth <= M.gridSingleColMaxWidthPx;
+  const fieldWidthStyle = isSingleColGrid ? styles.fieldFull : styles.fieldHalf;
 
   const status = statusQuery.data;
   const phase = statusQuery.isPending
@@ -108,7 +116,7 @@ export const DataConfirmationRequestModal = ({
     setSelfieFile(null);
     setForm(emptyPassportForm());
     setStep(PASSPORT_FORM_STEP_IDENTITY);
-  }, [visible, statusQuery.dataUpdatedAt]);
+  }, [visible]);
 
   const canSubmit =
     !isUserDataConfirmed && requestStatus !== USER_DATA_CONFIRMATION_STATUS_PENDING;
@@ -204,6 +212,15 @@ export const DataConfirmationRequestModal = ({
     }
   };
 
+  const cardSafeStyle = isPhoneLayout
+    ? {
+        paddingTop: Math.max(M.paddingTop, insets.top),
+        paddingRight: Math.max(M.paddingX, insets.right),
+        paddingBottom: Math.max(M.paddingBottom, insets.bottom),
+        paddingLeft: Math.max(M.paddingX, insets.left),
+      }
+    : null;
+
   return (
     <Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
       <View style={styles.root}>
@@ -211,22 +228,33 @@ export const DataConfirmationRequestModal = ({
           style={styles.backdrop}
           onPress={onClose}
           accessibilityRole="button"
-          accessibilityLabel={DATA_CONFIRMATION_MODAL_UI.CANCEL}
+          accessibilityLabel={DATA_CONFIRMATION_MODAL_UI.ARIA_CLOSE}
+        />
+        <View
+          style={isPhoneLayout ? styles.hostPhone : styles.hostTablet}
+          pointerEvents="box-none"
         >
-          <ModalSheetGradientBackdrop />
-        </Pressable>
-        <View style={styles.keyboardHost}>
-          <View style={styles.card} {...resolveDialogAccessibilityProps()}>
+          <View
+            style={[
+              isPhoneLayout ? styles.cardPhone : styles.cardTablet,
+              cardSafeStyle,
+            ]}
+            {...resolveDialogAccessibilityProps()}
+          >
             <View style={styles.header}>
               <Text style={styles.title}>{DATA_CONFIRMATION_MODAL_UI.TITLE}</Text>
               <Pressable
-                style={cancelStyles.cancelButtonCompact}
+                style={styles.closeButton}
                 onPress={onClose}
                 hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel={DATA_CONFIRMATION_MODAL_UI.ARIA_CLOSE}
               >
-                <Text style={cancelStyles.cancelButtonTextCompact}>
-                  {DATA_CONFIRMATION_MODAL_UI.CANCEL}
-                </Text>
+                <MaterialIcons
+                  name="close"
+                  size={M.closeIconSize}
+                  color={theme.colors.textMuted}
+                />
               </Pressable>
             </View>
 
@@ -236,15 +264,21 @@ export const DataConfirmationRequestModal = ({
               />
             ) : null}
 
+            {phase === "error" && !canSubmit ? (
+              <Text style={styles.stateError} accessibilityRole="alert">
+                {displayError}
+              </Text>
+            ) : null}
+
             {phase === "ready" && isUserDataConfirmed ? (
-              <Text style={[fieldStyles.statusOk, styles.statusPadding]}>
+              <Text style={[fieldStyles.statusOk, styles.statusText]}>
                 {DATA_CONFIRMATION_MODAL_UI.STATUS_CONFIRMED}
               </Text>
             ) : null}
 
             {phase === "ready" &&
             requestStatus === USER_DATA_CONFIRMATION_STATUS_PENDING ? (
-              <Text style={[fieldStyles.statusPending, styles.statusPadding]}>
+              <Text style={[fieldStyles.statusPending, styles.statusText]}>
                 {DATA_CONFIRMATION_MODAL_UI.STATUS_PENDING}
               </Text>
             ) : null}
@@ -261,6 +295,7 @@ export const DataConfirmationRequestModal = ({
 
             {phase === "ready" && canSubmit ? (
               <ScrollView
+                style={styles.formScroll}
                 contentContainerStyle={styles.form}
                 keyboardShouldPersistTaps="handled"
                 keyboardDismissMode="on-drag"
@@ -279,95 +314,109 @@ export const DataConfirmationRequestModal = ({
                 </View>
 
                 {step === PASSPORT_FORM_STEP_IDENTITY ? (
-                  <>
-                    <PassportFormField
-                      label={DATA_CONFIRMATION_MODAL_UI.LABEL_LAST_NAME}
-                      value={form.lastName}
-                      onChangeText={(value) => updateField("lastName", value)}
-                    />
-                    <PassportFormField
-                      label={DATA_CONFIRMATION_MODAL_UI.LABEL_FIRST_NAME}
-                      value={form.firstName}
-                      onChangeText={(value) => updateField("firstName", value)}
-                    />
-                    <PassportFormField
-                      label={DATA_CONFIRMATION_MODAL_UI.LABEL_MIDDLE_NAME}
-                      value={form.middleName}
-                      onChangeText={(value) => updateField("middleName", value)}
-                    />
-                    <PassportFormField
-                      label={DATA_CONFIRMATION_MODAL_UI.LABEL_BIRTH_DATE}
-                      value={form.birthDate}
-                      onChangeText={(value) =>
-                        updateField("birthDate", maskPassportDateInput(value))
-                      }
-                      placeholder={DATA_CONFIRMATION_MODAL_UI.PLACEHOLDER_DATE}
-                      keyboardType="number-pad"
-                      maxLength={10}
-                    />
-                  </>
+                  <View style={styles.grid}>
+                    <View style={fieldWidthStyle}>
+                      <PassportFormField
+                        label={DATA_CONFIRMATION_MODAL_UI.LABEL_LAST_NAME}
+                        value={form.lastName}
+                        onChangeText={(value) => updateField("lastName", value)}
+                      />
+                    </View>
+                    <View style={fieldWidthStyle}>
+                      <PassportFormField
+                        label={DATA_CONFIRMATION_MODAL_UI.LABEL_FIRST_NAME}
+                        value={form.firstName}
+                        onChangeText={(value) => updateField("firstName", value)}
+                      />
+                    </View>
+                    <View style={fieldWidthStyle}>
+                      <PassportFormField
+                        label={DATA_CONFIRMATION_MODAL_UI.LABEL_MIDDLE_NAME}
+                        value={form.middleName}
+                        onChangeText={(value) => updateField("middleName", value)}
+                      />
+                    </View>
+                    <View style={fieldWidthStyle}>
+                      <PassportFormField
+                        label={DATA_CONFIRMATION_MODAL_UI.LABEL_BIRTH_DATE}
+                        value={form.birthDate}
+                        onChangeText={(value) =>
+                          updateField("birthDate", maskPassportDateInput(value))
+                        }
+                        placeholder={DATA_CONFIRMATION_MODAL_UI.PLACEHOLDER_DATE}
+                        keyboardType="number-pad"
+                        maxLength={10}
+                      />
+                    </View>
+                  </View>
                 ) : null}
 
                 {step === PASSPORT_FORM_STEP_PASSPORT ? (
-                  <>
-                    <PassportFormField
-                      label={DATA_CONFIRMATION_MODAL_UI.LABEL_SERIES}
-                      value={form.series}
-                      onChangeText={(value) =>
-                        updateField("series", keepDigitsOnly(value).slice(0, 4))
-                      }
-                      keyboardType="number-pad"
-                    />
-                    <PassportFormField
-                      label={DATA_CONFIRMATION_MODAL_UI.LABEL_NUMBER}
-                      value={form.number}
-                      onChangeText={(value) =>
-                        updateField("number", keepDigitsOnly(value).slice(0, 6))
-                      }
-                      keyboardType="number-pad"
-                    />
-                    <PassportFormField
-                      label={DATA_CONFIRMATION_MODAL_UI.LABEL_ISSUED_BY}
-                      value={form.issuedBy}
-                      onChangeText={(value) => updateField("issuedBy", value)}
-                      multiline
-                    />
-                    <PassportFormField
-                      label={DATA_CONFIRMATION_MODAL_UI.LABEL_ISSUED_AT}
-                      value={form.issuedAt}
-                      onChangeText={(value) =>
-                        updateField("issuedAt", maskPassportDateInput(value))
-                      }
-                      placeholder={DATA_CONFIRMATION_MODAL_UI.PLACEHOLDER_DATE}
-                      keyboardType="number-pad"
-                      maxLength={10}
-                    />
-                    <PassportFormField
-                      label={DATA_CONFIRMATION_MODAL_UI.LABEL_DEPARTMENT_CODE}
-                      value={form.departmentCode}
-                      onChangeText={(value) =>
-                        updateField(
-                          "departmentCode",
-                          maskPassportDepartmentCodeInput(value),
-                        )
-                      }
-                      placeholder={
-                        DATA_CONFIRMATION_MODAL_UI.PLACEHOLDER_DEPARTMENT_CODE
-                      }
-                      keyboardType="number-pad"
-                      maxLength={7}
-                    />
-                  </>
+                  <View style={styles.grid}>
+                    <View style={fieldWidthStyle}>
+                      <PassportFormField
+                        label={DATA_CONFIRMATION_MODAL_UI.LABEL_SERIES}
+                        value={form.series}
+                        onChangeText={(value) =>
+                          updateField("series", keepDigitsOnly(value).slice(0, 4))
+                        }
+                        keyboardType="number-pad"
+                        maxLength={4}
+                      />
+                    </View>
+                    <View style={fieldWidthStyle}>
+                      <PassportFormField
+                        label={DATA_CONFIRMATION_MODAL_UI.LABEL_NUMBER}
+                        value={form.number}
+                        onChangeText={(value) =>
+                          updateField("number", keepDigitsOnly(value).slice(0, 6))
+                        }
+                        keyboardType="number-pad"
+                        maxLength={6}
+                      />
+                    </View>
+                    <View style={styles.fieldFull}>
+                      <PassportFormField
+                        label={DATA_CONFIRMATION_MODAL_UI.LABEL_ISSUED_BY}
+                        value={form.issuedBy}
+                        onChangeText={(value) => updateField("issuedBy", value)}
+                        multiline
+                      />
+                    </View>
+                    <View style={fieldWidthStyle}>
+                      <PassportFormField
+                        label={DATA_CONFIRMATION_MODAL_UI.LABEL_ISSUED_AT}
+                        value={form.issuedAt}
+                        onChangeText={(value) =>
+                          updateField("issuedAt", maskPassportDateInput(value))
+                        }
+                        placeholder={DATA_CONFIRMATION_MODAL_UI.PLACEHOLDER_DATE}
+                        keyboardType="number-pad"
+                        maxLength={10}
+                      />
+                    </View>
+                    <View style={fieldWidthStyle}>
+                      <PassportFormField
+                        label={DATA_CONFIRMATION_MODAL_UI.LABEL_DEPARTMENT_CODE}
+                        value={form.departmentCode}
+                        onChangeText={(value) =>
+                          updateField(
+                            "departmentCode",
+                            maskPassportDepartmentCodeInput(value),
+                          )
+                        }
+                        placeholder={
+                          DATA_CONFIRMATION_MODAL_UI.PLACEHOLDER_DEPARTMENT_CODE
+                        }
+                        keyboardType="number-pad"
+                        maxLength={7}
+                      />
+                    </View>
+                  </View>
                 ) : null}
 
                 {step === PASSPORT_FORM_STEP_SELFIE ? (
                   <View style={styles.selfieSection}>
-                    <Text style={fieldStyles.fieldLabel}>
-                      {DATA_CONFIRMATION_MODAL_UI.LABEL_PASSPORT_SELFIE}
-                    </Text>
-                    <Text style={styles.selfieHint}>
-                      {DATA_CONFIRMATION_MODAL_UI.HINT_PASSPORT_SELFIE}
-                    </Text>
                     <AppButton
                       label={IMAGE_UPLOAD_UI.UPLOAD_BUTTON}
                       variant="contrast"
@@ -378,49 +427,68 @@ export const DataConfirmationRequestModal = ({
                       <Text style={styles.fileName}>{selfieFile.name}</Text>
                     ) : null}
                     {selfieFile ? (
-                      <Image source={{ uri: selfieFile.uri }} style={styles.preview} />
+                      <Image
+                        source={{ uri: selfieFile.uri }}
+                        style={styles.preview}
+                        resizeMode="contain"
+                      />
                     ) : null}
                   </View>
                 ) : null}
 
                 {displayError ? (
-                  <Text style={fieldStyles.error}>{displayError}</Text>
+                  <Text style={styles.stateError} accessibilityRole="alert">
+                    {displayError}
+                  </Text>
                 ) : null}
 
                 <View style={styles.stepActions}>
                   {step > PASSPORT_FORM_STEP_IDENTITY ? (
-                    <View style={styles.stepActionFlex}>
-                      <AppButton
-                        label={DATA_CONFIRMATION_MODAL_UI.BACK}
-                        variant="secondary"
-                        onPress={handleBackStep}
-                        disabled={isSubmitting}
-                      />
-                    </View>
-                  ) : null}
-                  <View style={styles.stepActionFlex}>
-                    {step < PASSPORT_FORM_STEP_SELFIE ? (
-                      <AppButton
-                        label={DATA_CONFIRMATION_MODAL_UI.NEXT}
-                        variant="contrast"
-                        onPress={handleNextStep}
-                        disabled={isSubmitting}
-                      />
-                    ) : (
-                      <AppButton
-                        label={
-                          isSubmitting
-                            ? DATA_CONFIRMATION_MODAL_UI.SUBMIT_LOADING
-                            : DATA_CONFIRMATION_MODAL_UI.SUBMIT
-                        }
-                        variant="contrast"
-                        onPress={() => void handleSubmit()}
-                        disabled={isSubmitting}
-                      />
-                    )}
-                  </View>
+                    <AppButton
+                      label={DATA_CONFIRMATION_MODAL_UI.BACK}
+                      variant="secondary"
+                      onPress={handleBackStep}
+                      disabled={isSubmitting}
+                    />
+                  ) : (
+                    <AppButton
+                      label={DATA_CONFIRMATION_MODAL_UI.CANCEL}
+                      variant="secondary"
+                      onPress={onClose}
+                      disabled={isSubmitting}
+                    />
+                  )}
+                  {step < PASSPORT_FORM_STEP_SELFIE ? (
+                    <AppButton
+                      label={DATA_CONFIRMATION_MODAL_UI.NEXT}
+                      variant="contrast"
+                      onPress={handleNextStep}
+                      disabled={isSubmitting}
+                    />
+                  ) : (
+                    <AppButton
+                      label={
+                        isSubmitting
+                          ? DATA_CONFIRMATION_MODAL_UI.SUBMIT_LOADING
+                          : DATA_CONFIRMATION_MODAL_UI.SUBMIT
+                      }
+                      variant="contrast"
+                      onPress={() => void handleSubmit()}
+                      disabled={isSubmitting}
+                    />
+                  )}
                 </View>
               </ScrollView>
+            ) : null}
+
+            {phase === "ready" && !canSubmit ? (
+              <View style={styles.stepActions}>
+                <AppButton
+                  label={DATA_CONFIRMATION_MODAL_UI.CANCEL}
+                  variant="secondary"
+                  onPress={onClose}
+                />
+              </View>
             ) : null}
           </View>
         </View>
@@ -449,14 +517,13 @@ const PassportFormField = ({
   maxLength,
 }: PassportFormFieldProps) => {
   const theme = useAppTheme();
-  const fieldStyles = useFormFieldStyles();
   const styles = useDataConfirmationRequestModalStyles();
 
   return (
-    <View style={fieldStyles.field}>
-      <Text style={fieldStyles.fieldLabel}>{label}</Text>
+    <View style={styles.field}>
+      <Text style={styles.fieldLabel}>{label}</Text>
       <TextInput
-        style={[styles.passportInput, multiline && fieldStyles.inputMultiline]}
+        style={[styles.passportInput, multiline && styles.passportInputMultiline]}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}

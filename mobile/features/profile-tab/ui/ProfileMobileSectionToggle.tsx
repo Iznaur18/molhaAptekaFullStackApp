@@ -11,6 +11,7 @@ import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayou
 import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
 import {
   PROFILE_MOBILE_NAV_TOGGLE_BORDER_RADIUS,
+  PROFILE_MOBILE_NAV_TOGGLE_BORDER_RADIUS_TABLET,
   useProfileMobileNavToggleStyles,
 } from "@/shared/theme/profileChromeStyles";
 import { SquircleView } from "@/shared/ui/SquircleView";
@@ -25,16 +26,20 @@ type ProfileMobileSectionToggleProps = {
 export const ProfileMobileSectionToggle = ({
   activeLabel,
   onPress,
-  appearance = "phone",
+  appearance,
 }: ProfileMobileSectionToggleProps) => {
   const styles = useProfileMobileNavToggleStyles();
   const { theme } = useAppThemeSettings();
-  const { isDrawerLayout } = useProfileAdaptiveLayout();
+  const { isDrawerLayout, isPhoneLayout } = useProfileAdaptiveLayout();
   const scale = useSharedValue(1);
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   }));
-  const isTablet = appearance === "tablet";
+  const resolvedAppearance = appearance ?? (isPhoneLayout ? "phone" : "tablet");
+  const isTablet = resolvedAppearance === "tablet";
+  const borderRadius = isTablet
+    ? PROFILE_MOBILE_NAV_TOGGLE_BORDER_RADIUS_TABLET
+    : PROFILE_MOBILE_NAV_TOGGLE_BORDER_RADIUS;
 
   // web: toggle только ≤900; >900 постоянный sidebar.
   if (!isDrawerLayout) {
@@ -56,7 +61,7 @@ export const ProfileMobileSectionToggle = ({
         }}
       >
         <SquircleView
-          radius={PROFILE_MOBILE_NAV_TOGGLE_BORDER_RADIUS}
+          radius={borderRadius}
           style={[styles.root, isTablet && styles.rootTablet]}
           shadowStyle={isTablet ? styles.shadowTablet : styles.shadow}
         >

@@ -1,6 +1,6 @@
 import { Text, View } from "react-native";
 
-import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useAffiliateListingsPageStyles } from "@/shared/theme/affiliateListingsPageStyles";
 
 const STATUS_TONE: Record<string, "paid" | "pending" | "skipped"> = {
   paid: "paid",
@@ -23,6 +23,7 @@ type AffiliateDealCardProps = {
   dateLabel: string;
 };
 
+/** web `.affiliate-listings-page__deal` */
 export const AffiliateDealCard = ({
   title,
   status,
@@ -30,92 +31,45 @@ export const AffiliateDealCard = ({
   facts,
   dateLabel,
 }: AffiliateDealCardProps) => {
-  const theme = useAppTheme();
+  const styles = useAffiliateListingsPageStyles();
   const tone = status ? STATUS_TONE[status] : undefined;
 
-  const statusColors =
-    tone === "paid"
-      ? { bg: "rgba(34, 197, 94, 0.12)", text: theme.colors.success }
-      : tone === "pending"
-        ? { bg: "rgba(234, 179, 8, 0.14)", text: theme.colors.warning }
-        : tone === "skipped"
-          ? { bg: theme.colors.surfaceMuted, text: theme.colors.textMuted }
-          : { bg: theme.colors.surfaceMuted, text: theme.colors.textSecondary };
-
   return (
-    <View
-      style={{
-        gap: 8,
-        paddingVertical: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: theme.colors.border,
-      }}
-    >
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "flex-start",
-          justifyContent: "space-between",
-          gap: 8,
-        }}
-      >
-        <Text
-          style={{
-            flex: 1,
-            minWidth: 0,
-            fontSize: 15,
-            fontWeight: "600",
-            color: theme.colors.text,
-          }}
-        >
+    <View style={styles.deal}>
+      <View style={styles.dealHead}>
+        <Text style={styles.dealTitle} numberOfLines={2}>
           {title}
         </Text>
         {statusLabel ? (
           <Text
-            style={{
-              flexShrink: 0,
-              fontSize: 12,
-              fontWeight: "600",
-              paddingHorizontal: 8,
-              paddingVertical: 4,
-              borderRadius: 8,
-              overflow: "hidden",
-              color: statusColors.text,
-              backgroundColor: statusColors.bg,
-            }}
+            style={[
+              styles.dealStatus,
+              tone === "paid" ? styles.dealStatusPaid : null,
+              tone === "pending" ? styles.dealStatusPending : null,
+              tone === "skipped" ? styles.dealStatusSkipped : null,
+            ]}
           >
             {statusLabel}
           </Text>
         ) : null}
       </View>
-      {facts.map((fact) => (
-        <View
-          key={fact.label}
-          style={{ flexDirection: "row", gap: 8, alignItems: "baseline" }}
-        >
-          <Text
-            style={{
-              width: 112,
-              flexShrink: 0,
-              fontSize: 13,
-              color: theme.colors.textMuted,
-            }}
-          >
-            {fact.label}
-          </Text>
-          <Text
-            style={{
-              flex: 1,
-              fontSize: 14,
-              color: fact.accent ? theme.colors.link : theme.colors.text,
-              fontWeight: fact.accent ? "600" : "400",
-            }}
-          >
-            {fact.value}
-          </Text>
-        </View>
-      ))}
-      <Text style={{ fontSize: 12, color: theme.colors.textMuted }}>{dateLabel}</Text>
+      <View style={styles.dealFacts}>
+        {facts.map((fact) => (
+          <View key={fact.label} style={styles.dealFact}>
+            <Text style={styles.dealFactLabel}>{fact.label}</Text>
+            <Text
+              style={[
+                styles.dealFactValue,
+                fact.accent ? styles.dealFactValueAccent : null,
+              ]}
+              numberOfLines={1}
+            >
+              {fact.value}
+            </Text>
+          </View>
+        ))}
+      </View>
+      <Text style={styles.dealDate}>{dateLabel}</Text>
     </View>
   );
 };

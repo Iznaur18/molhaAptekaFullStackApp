@@ -46,10 +46,11 @@ export type InstallmentContract = {
   totalAmountRub?: number;
   paidAmountRub?: number;
   productNameAtContract?: string;
+  productImageUrl?: string | null;
   finalDueAt?: string;
   nextPaymentDueAt?: string | null;
   hasOverduePayment?: boolean;
-  product?: { _id?: string; productName?: string };
+  product?: { _id?: string; productName?: string; productImageUrl?: string | null };
   buyer?: InstallmentCounterparty;
   seller?: InstallmentCounterparty;
   payments?: InstallmentPayment[];

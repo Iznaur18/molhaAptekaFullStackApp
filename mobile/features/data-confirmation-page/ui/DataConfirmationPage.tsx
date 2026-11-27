@@ -2,7 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { Alert, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import {
   USER_DATA_CONFIRMATION_STATUS_PENDING,
@@ -48,7 +48,6 @@ export const DataConfirmationPage = () => {
   );
 
   const handleSubmitted = () => {
-    Alert.alert("", USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.SUBMIT_SUCCESS);
     void statusQuery.refetch();
   };
 

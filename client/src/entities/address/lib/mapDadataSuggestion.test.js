@@ -19,6 +19,7 @@ describe("mapDadataSuggestion", () => {
       fiasId: "abc-123",
       geo: { lat: 55.75, lon: 37.62 },
       regionCode: null,
+      isComplete: true,
     });
   });
 
@@ -63,6 +64,25 @@ describe("адрес на участке", () => {
     });
 
     expect(mapped.fiasId).toBe("s1");
+    expect(mapped.geo).toEqual({ lat: 43.31, lon: 45.71 });
+    expect(mapped.isComplete).toBe(true);
+  });
+});
+
+describe("дом без ФИАС", () => {
+  it("принимает разобранный номер дома с координатами", () => {
+    const mapped = mapDadataSuggestion({
+      value: "г Грозный, ул Субры Кишиевой, д 56",
+      data: {
+        house: "56",
+        house_fias_id: "",
+        geo_lat: "43.31",
+        geo_lon: "45.71",
+      },
+    });
+
+    expect(mapped.fiasId).toBe("");
+    expect(mapped.isComplete).toBe(true);
     expect(mapped.geo).toEqual({ lat: 43.31, lon: 45.71 });
   });
 });

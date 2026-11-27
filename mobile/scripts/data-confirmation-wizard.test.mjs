@@ -40,7 +40,8 @@ test("passport confirmation wizard has 3 steps with per-step validation", () => 
   assert.match(mobileModal, /STEP_PASSPORT/);
   assert.match(mobileModal, /animationType="fade"/);
   assert.match(mobileModal, /useDataConfirmationRequestModalStyles/);
-  assert.match(mobileModal, /ModalSheetGradientBackdrop/);
+  assert.match(mobileModal, /dataConfirmationModalLayout/);
+  assert.match(mobileModal, /cardTablet|hostTablet/);
   assert.doesNotMatch(mobileModal, /animationType="slide"/);
   assert.match(clientModal, /validatePassportFormStep/);
   assert.match(clientModal, /STEP_SELFIE/);

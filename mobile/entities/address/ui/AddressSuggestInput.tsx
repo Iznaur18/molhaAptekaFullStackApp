@@ -152,7 +152,9 @@ export const AddressSuggestInput = ({
 
   const handlePickSuggestion = (suggestion: AddressSuggestionDto) => {
     const mapped = mapDadataSuggestion(suggestion);
-    const isHouse = mapped.fiasId.length > 0;
+    // Дом/участок: ФИАС или номер без ФИАС с координатами — иначе форма
+    // крутит «выберите из подсказок», хотя пользователь уже кликнул дом.
+    const isHouse = mapped.isComplete;
     setMapError(null);
     setMapStatus("idle");
     patch({

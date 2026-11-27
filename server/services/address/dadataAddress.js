@@ -3,7 +3,6 @@ import { AppError } from "../../errors/AppError.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 import {
   geolocateRuAddresses,
-  isDadataConfigured,
   isDadataSuggestConfigured,
   suggestRuAddresses,
 } from "../../utils/dadata/dadataClient.js";
@@ -23,7 +22,9 @@ const toSuggestionPayload = (item) => ({
 export async function suggestAddresses({ query }) {
   const q = String(query ?? "").trim();
 
-  if (!isDadataConfigured()) {
+  // Suggest API нужен только Token (API key). SECRET — для cleaner; раньше
+  // из‑за isDadataConfigured() подсказки молча пустели при одном API key.
+  if (!isDadataSuggestConfigured()) {
     return { suggestions: [], configured: false };
   }
 

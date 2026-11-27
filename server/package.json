@@ -32,6 +32,7 @@
     "seed:auction-bids": "node scripts/seedProductAuctionBids.js",
     "seed:demo-showcase": "node scripts/seedDemoShowcase.js",
     "seed:adminaa-games": "node scripts/seedAdminaaGames.js",
+    "seed:partner-program": "node scripts/seedPartnerProgramDemo.mjs",
     "delete-products-without-images": "node scripts/deleteProductsWithoutImages.js",
     "delete-products-without-images:apply": "node scripts/deleteProductsWithoutImages.js --apply",
     "cleanup-onec-no-images-stock": "node scripts/cleanupOneCProductsWithoutImagesAndStock.js",

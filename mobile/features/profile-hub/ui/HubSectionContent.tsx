@@ -11,6 +11,10 @@ import { DataConfirmationPage } from "@/features/data-confirmation-page/ui/DataC
 import { CreateRafflePage } from "@/features/create-raffle-page/ui/CreateRafflePage";
 import { AuctionPage } from "@/features/auction-page/ui/AuctionPage";
 import { DealRequestsPage } from "@/features/deal-requests-page/ui/DealRequestsPage";
+import { CourierApplicationPage } from "@/features/courier-application-page/ui/CourierApplicationPage";
+import { CourierOverviewPage } from "@/features/courier-overview-page/ui/CourierOverviewPage";
+import { DeliveryPaymentPage } from "@/features/delivery-payment-page/ui/DeliveryPaymentPage";
+import { OneCIntegrationPage } from "@/features/onec-integration-page/ui/OneCIntegrationPage";
 import { SafeDealPage } from "@/features/safe-deal-page/ui/SafeDealPage";
 import { InstallmentPaymentsPage } from "@/features/installment-payments-page/ui/InstallmentPaymentsPage";
 import { InstallmentSalesPage } from "@/features/installment-sales-page/ui/InstallmentSalesPage";
@@ -68,6 +72,14 @@ export const HubSectionContent = ({
       return <DataConfirmationPage />;
     case "deal-requests":
       return <DealRequestsPage />;
+    case "delivery-payment":
+      return <DeliveryPaymentPage />;
+    case "onec-integration":
+      return <OneCIntegrationPage />;
+    case "courier":
+      return <CourierApplicationPage />;
+    case "courier-overview":
+      return <CourierOverviewPage />;
     case "safe-deal":
       return <SafeDealPage />;
     case "auction":

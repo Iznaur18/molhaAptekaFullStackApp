@@ -20,7 +20,7 @@ test("COMMERCE_CARD_UI expand toggle labels", () => {
   assert.equal(COMMERCE_CARD_UI.EXPAND_TOGGLE_LABEL(true), "свернуть");
 });
 
-test("commerce cards use CommerceCardExpandToggle instead of chevron glyph", () => {
+test("commerce cards expand chrome: auction text toggle; installment ▸ like web", () => {
   const toggle = readMobileFile("shared/ui/CommerceCardExpandToggle.tsx");
   const toggleStyles = readMobileFile("shared/theme/commerceCardExpandToggleStyles.ts");
   const orderCard = readMobileFile("entities/order/ui/OrderCard.tsx");
@@ -38,12 +38,17 @@ test("commerce cards use CommerceCardExpandToggle instead of chevron glyph", () 
   assert.match(toggleStyles, /fontSize: theme\.typography\.font2xs/);
   assert.doesNotMatch(toggle, /▸/);
 
-  for (const source of [buyerBid, sellerOffer, installmentCard]) {
+  for (const source of [buyerBid, sellerOffer]) {
     assert.match(source, /CommerceCardExpandToggle/);
     assert.doesNotMatch(source, /▸/);
   }
 
-  // OrderCard: main expand uses CommerceCardExpandToggle; details fold keeps ▸ (web parity).
+  // Installment compact: web chevron ▸ + thumb (InstallmentContractCard.css).
+  assert.match(installmentCard, /▸/);
+  assert.match(installmentCard, /thumb/);
+  assert.doesNotMatch(installmentCard, /CommerceCardExpandToggle/);
+
+  // OrderCard: main expand uses CommerceCardExpandToggle; details fold keeps ▸.
   assert.match(orderCard, /CommerceCardExpandToggle/);
-  assert.match(orderCard, /DETAILS_FOLD_SUMMARY/);
+  assert.match(orderCard, /OrderCardDetailsFold/);
 });

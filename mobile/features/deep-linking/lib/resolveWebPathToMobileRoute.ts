@@ -18,15 +18,11 @@ export const HOME_ROUTE = "/(tabs)";
 
 /** Разделы, которых на мобилке нет: пусть лучше вернётся null, чем заглушка. */
 const WEB_ONLY_PATHS = new Set([
-  "/profile/onec-integration",
-  "/profile/delivery-payment",
   "/staff-audit-log-admin",
   "/broadcast-notifications-admin",
   "/admin-analytics",
   "/safe-deal-moderation",
-  "/become-courier",
   "/courier-moderation",
-  "/courier-overview",
   "/shipment-disputes",
   "/shipping-carriers",
 ]);
@@ -57,6 +53,10 @@ const STATIC_PATH_ROUTES: Record<string, string> = {
   // Web `HOME_MAIN_VIEW_PATH["deal-requests"]`: `/deal-requests` занят API в nginx.
   "/profile/deal-requests": "/hub/deal-requests",
   "/profile/safe-deal": "/hub/safe-deal",
+  "/profile/delivery-payment": "/hub/delivery-payment",
+  "/profile/onec-integration": "/hub/onec-integration",
+  "/become-courier": "/hub/courier",
+  "/courier-overview": "/hub/courier-overview",
   "/installment-payments": "/hub/installment-payments",
   "/installment-sales": "/hub/installment-sales",
 

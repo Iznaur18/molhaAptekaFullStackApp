@@ -1,11 +1,19 @@
-import { useState, type ReactNode } from "react";
-import { Pressable, Text, View } from "react-native";
+import { useEffect, useState, type ReactNode } from "react";
+import { AccessibilityInfo, Pressable, Text, View } from "react-native";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 import type { InstallmentContract } from "@/entities/installment/api/installmentApi";
+import { INSTALLMENT_CONTRACT_CARD_LAYOUT as L } from "@/entities/installment/lib/installmentContractCardLayout";
 import { partitionInstallmentContractPayments } from "@/entities/installment/lib/partitionInstallmentContractPayments";
 import { InstallmentContractCardPaymentRow } from "@/entities/installment/ui/InstallmentContractCardPaymentRow";
 import { INSTALLMENT_UI, COMMERCE_CARD_UI } from "@/shared/config";
 import { useInstallmentContractCardChromeStyles } from "@/shared/theme/installmentContractCardChromeStyles";
+import { CommerceCardFoldPanel } from "@/shared/ui/CommerceCardFoldPanel";
 
 type PaymentStatuses = {
   due: string;
@@ -35,18 +43,52 @@ type InstallmentContractCardPaymentsProps = {
 const PaymentsFold = ({ title, children }: { title: string; children: ReactNode }) => {
   const styles = useInstallmentContractCardChromeStyles();
   const [expanded, setExpanded] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const progress = useSharedValue(0);
+
+  useEffect(() => {
+    let alive = true;
+    void AccessibilityInfo.isReduceMotionEnabled().then((enabled) => {
+      if (alive) setReduceMotion(Boolean(enabled));
+    });
+    const sub = AccessibilityInfo.addEventListener?.(
+      "reduceMotionChanged",
+      (enabled: boolean) => setReduceMotion(Boolean(enabled)),
+    );
+    return () => {
+      alive = false;
+      sub?.remove?.();
+    };
+  }, []);
+
+  useEffect(() => {
+    progress.value = withTiming(expanded ? 1 : 0, {
+      duration: reduceMotion ? 100 : L.chevronDurationMs,
+      easing: Easing.inOut(Easing.ease),
+    });
+  }, [expanded, progress, reduceMotion]);
+
+  const chevronStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${progress.value * 90}deg` }],
+  }));
 
   return (
     <View style={styles.fold}>
       <Pressable
         style={styles.foldSummary}
+        accessibilityRole="button"
+        accessibilityState={{ expanded }}
+        accessibilityLabel={`${COMMERCE_CARD_UI.EXPAND_TOGGLE_ARIA(expanded)}. ${title}`}
         onPress={() => setExpanded((value) => !value)}
       >
-        <Text style={styles.foldSummaryText}>
-          {COMMERCE_CARD_UI.EXPAND_TOGGLE_LABEL(expanded)} · {title}
-        </Text>
+        <Animated.Text style={[styles.foldSummaryChevron, chevronStyle]}>
+          ▸
+        </Animated.Text>
+        <Text style={styles.foldSummaryText}>{title}</Text>
       </Pressable>
-      {expanded ? <View style={styles.foldBody}>{children}</View> : null}
+      <CommerceCardFoldPanel open={expanded} innerStyle={styles.paymentsFoldBody}>
+        {children}
+      </CommerceCardFoldPanel>
     </View>
   );
 };
@@ -103,7 +145,7 @@ export const InstallmentContractCardPayments = ({
   return (
     <View style={styles.payments}>
       {focus.length > 0 ? (
-        <View style={styles.fold}>
+        <View>
           <Text style={styles.paymentsTitle}>
             {INSTALLMENT_UI.PAYMENTS_FOCUS_HEADING}
           </Text>
@@ -124,7 +166,7 @@ export const InstallmentContractCardPayments = ({
       ) : null}
 
       {focus.length === 0 && upcoming.length === 0 && history.length === 0 ? (
-        <Text style={styles.meta}>{INSTALLMENT_UI.PAYMENTS_HEADING}</Text>
+        <Text style={styles.paymentsTitle}>{INSTALLMENT_UI.PAYMENTS_HEADING}</Text>
       ) : null}
     </View>
   );

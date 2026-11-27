@@ -56,18 +56,22 @@ export const InstallmentContractCardPaymentRow = ({
   const isOverdue = payment.status === paymentStatuses.overdue;
   const isPendingConfirmation = payment.status === paymentStatuses.pendingConfirmation;
   const isPaid = payment.status === paymentStatuses.paid;
+  const isRemaining = !isPaid && !isOverdue && !isPendingConfirmation;
 
   return (
     <View
       style={[
         styles.paymentRow,
+        isRemaining ? styles.paymentRowRemaining : null,
         isPaid ? styles.paymentRowPaid : null,
         isOverdue ? styles.paymentRowOverdue : null,
         isPendingConfirmation ? styles.paymentRowPending : null,
       ]}
     >
       <View style={styles.paymentMain}>
-        <Text style={styles.paymentAmount}>{formatPriceRub(payment.amountRub)}</Text>
+        <Text style={[styles.paymentAmount, isPaid ? styles.paymentAmountPaid : null]}>
+          {formatPriceRub(payment.amountRub)}
+        </Text>
         <Text style={styles.paymentMeta}>
           {INSTALLMENT_UI.PAYMENT_DUE} {dueDate}
           {!compact ? ` · ${paymentLabel}` : null}
@@ -93,6 +97,7 @@ export const InstallmentContractCardPaymentRow = ({
           style={[
             styles.btn,
             styles.btnPrimary,
+            compact ? styles.btnFullWidth : null,
             pendingKey != null ? styles.disabled : null,
           ]}
           disabled={pendingKey != null}
@@ -113,22 +118,8 @@ export const InstallmentContractCardPaymentRow = ({
           <Pressable
             style={[
               styles.btn,
-              styles.btnPrimary,
-              pendingKey != null ? styles.disabled : null,
-            ]}
-            disabled={pendingKey != null}
-            onPress={() => onConfirmPayment(payment.paymentIndex)}
-          >
-            <Text style={[styles.btnText, styles.btnTextPrimary]}>
-              {pendingKey === `confirm:${payment.paymentIndex}`
-                ? INSTALLMENT_UI.ACTION_PENDING
-                : INSTALLMENT_UI.CONFIRM_PAYMENT}
-            </Text>
-          </Pressable>
-          <Pressable
-            style={[
-              styles.btn,
               styles.btnDanger,
+              compact ? styles.btnFlex : null,
               pendingKey != null ? styles.disabled : null,
             ]}
             disabled={pendingKey != null}
@@ -138,6 +129,22 @@ export const InstallmentContractCardPaymentRow = ({
               {pendingKey === `reject:${payment.paymentIndex}`
                 ? INSTALLMENT_UI.ACTION_PENDING
                 : INSTALLMENT_UI.REJECT_PAYMENT}
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[
+              styles.btn,
+              styles.btnPrimary,
+              compact ? styles.btnFlex : null,
+              pendingKey != null ? styles.disabled : null,
+            ]}
+            disabled={pendingKey != null}
+            onPress={() => onConfirmPayment(payment.paymentIndex)}
+          >
+            <Text style={[styles.btnText, styles.btnTextPrimary]}>
+              {pendingKey === `confirm:${payment.paymentIndex}`
+                ? INSTALLMENT_UI.ACTION_PENDING
+                : INSTALLMENT_UI.CONFIRM_PAYMENT}
             </Text>
           </Pressable>
         </View>

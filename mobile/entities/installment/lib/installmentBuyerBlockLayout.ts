@@ -1,4 +1,4 @@
-/** Паритет `InstallmentBuyerBlock.css` → `.installment-buyer-block__submit`. */
+/** Паритет `InstallmentBuyerBlock.css`. */
 export const INSTALLMENT_BUYER_SUBMIT_LAYOUT = {
   minHeight: 48,
   paddingVertical: 12,
@@ -7,4 +7,38 @@ export const INSTALLMENT_BUYER_SUBMIT_LAYOUT = {
   borderWidth: 1,
   fontSize: 16.32,
   fontWeight: "600" as const,
+} as const;
+
+export const INSTALLMENT_BUYER_FORM_LAYOUT = {
+  gap: 14,
+  planListGap: 8,
+  planListMarginTop: 6,
+  planCardRadius: 16,
+  planCardPaddingV: 10,
+  planCardPaddingH: 12,
+  planCardGap: 10,
+  planRadioSize: 18,
+  planRadioDot: 10,
+  planRadioTop: 10,
+  planRadioRight: 10,
+  planTitleFontSize: 13,
+  planMonthlyFontSize: 17,
+  planMetaFontSize: 12.5,
+  planNoteFontSize: 11.5,
+  quantityGap: 8,
+  stepperPadding: 3,
+  stepperButtonSize: 32,
+  stepperInputWidth: 44,
+  stepperInputFontSize: 16,
+  summaryGap: 6,
+  summaryPaddingV: 12,
+  summaryPaddingH: 14,
+  summaryRadius: 16,
+  summaryLabelFontSize: 13.5,
+  summaryValueFontSize: 14,
+  summaryTotalLabelFontSize: 14,
+  summaryTotalValueFontSize: 18,
+  summaryTotalPaddingTop: 10,
+  summaryTotalMarginTop: 4,
+  labelFontSize: 13,
 } as const;

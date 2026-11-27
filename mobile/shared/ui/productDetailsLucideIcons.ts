@@ -11,8 +11,10 @@ export { default as GitCompareArrows } from "lucide-react-native/icons/git-compa
 export { default as KeyRound } from "lucide-react-native/icons/key-round";
 export { default as MapPin } from "lucide-react-native/icons/map-pin";
 export { default as MessageCircle } from "lucide-react-native/icons/message-circle";
+export { default as Minus } from "lucide-react-native/icons/minus";
 export { default as MonitorSmartphone } from "lucide-react-native/icons/monitor-smartphone";
 export { default as Phone } from "lucide-react-native/icons/phone";
+export { default as Plus } from "lucide-react-native/icons/plus";
 export { default as Truck } from "lucide-react-native/icons/truck";
 export { default as Share2 } from "lucide-react-native/icons/share-2";
 export { default as ShoppingCart } from "lucide-react-native/icons/shopping-cart";
